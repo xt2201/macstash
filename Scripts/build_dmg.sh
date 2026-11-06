@@ -51,11 +51,11 @@ if [[ -x "$REPO_ROOT/scripts/render_icons.sh" ]]; then
     "$REPO_ROOT/scripts/render_icons.sh"
 fi
 
-VERSION="2.1.1"
+VERSION="2.2.0"
 if [[ -f "$REPO_ROOT/VERSION" ]]; then
     VERSION="$(tr -d '[:space:]' < "$REPO_ROOT/VERSION")"
-elif [[ -f "$REPO_ROOT/Scripts/Info.plist" ]]; then
-    VERSION=$(defaults read "$REPO_ROOT/Scripts/Info.plist" CFBundleShortVersionString 2>/dev/null || echo "2.1.1")
+elif [[ -f "$REPO_ROOT/scripts/Info.plist" ]]; then
+    VERSION=$(defaults read "$REPO_ROOT/scripts/Info.plist" CFBundleShortVersionString 2>/dev/null || echo "2.2.0")
 fi
 
 echo "[1/6] Building release binaries for arm64 and x86_64 architectures..."

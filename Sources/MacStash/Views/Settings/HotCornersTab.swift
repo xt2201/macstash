@@ -174,10 +174,24 @@ public struct HotCornersTab: View {
                 .padding(8)
             }
 
+            GroupBox(label: Label(appState.localized("corners.gestures"), systemImage: "hand.draw")) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Toggle(appState.localized("corners.scrollAdjustment"), isOn: $appState.scrollAdjustmentEnabled)
+                    Text(appState.localized("corners.scrollAdjustmentHint"))
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+                .padding(8)
+            }
+
             GroupBox(label: Label(appState.localized("corners.suppressionRules"), systemImage: "shield")) {
                 VStack(alignment: .leading, spacing: 12) {
                     Toggle(appState.localized("corners.suppressDragging"), isOn: $appState.settings.suppressWhenMousePressed)
                     Toggle(appState.localized("corners.suppressFullScreen"), isOn: $appState.settings.suppressInFullscreen)
+                    Toggle(appState.localized("corners.onlyOuterCorners"), isOn: $appState.onlyOuterCorners)
+                    Text(appState.localized("corners.onlyOuterCornersHint"))
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
                 }
                 .padding(8)
             }

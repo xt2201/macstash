@@ -3,6 +3,7 @@ import MacStashCore
 
 public struct EdgeSliderView: View {
     @ObservedObject var appState: AppState
+    public let displayID: CGDirectDisplayID
     public let edge: EdgePosition
 
     @State private var isHovered: Bool = false
@@ -12,8 +13,9 @@ public struct EdgeSliderView: View {
     private let sliderWidth: CGFloat = 50
     private let sliderHeight: CGFloat = 250
 
-    public init(appState: AppState, edge: EdgePosition = .right) {
+    public init(appState: AppState, displayID: CGDirectDisplayID = 0, edge: EdgePosition = .right) {
         self.appState = appState
+        self.displayID = displayID
         self.edge = edge
     }
 
@@ -25,7 +27,7 @@ public struct EdgeSliderView: View {
         if isDragging {
             return dragValue
         }
-        return Float(appState.getValue(for: action))
+        return Float(appState.getValue(for: action, displayID: displayID))
     }
 
     public var body: some View {
@@ -105,7 +107,7 @@ public struct EdgeSliderView: View {
                             let progress = 1.0 - (gesture.location.y / trackH)
                             let clamped = max(0.0, min(1.0, Float(progress)))
                             dragValue = clamped
-                            appState.setValue(for: action, value: Double(clamped))
+                            appState.setValue(for: action, value: Double(clamped), displayID: displayID)
                         }
                         .onEnded { _ in
                             isDragging = false

@@ -168,21 +168,21 @@ public final class ScreenManager: ObservableObject {
             RunLoop.main.add(t, forMode: .common)
         }
 
-        globalMouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged]) { [weak self] _ in
+        globalMouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .leftMouseDown]) { [weak self] event in
             Task { @MainActor [weak self] in
-                self?.evaluateMousePosition(NSEvent.mouseLocation)
+                self?.evaluateMousePosition(NSEvent.mouseLocation, isClick: event.type == .leftMouseDown)
             }
         }
 
-        localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged]) { [weak self] event in
+        localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .leftMouseDown]) { [weak self] event in
             Task { @MainActor [weak self] in
-                self?.evaluateMousePosition(NSEvent.mouseLocation)
+                self?.evaluateMousePosition(NSEvent.mouseLocation, isClick: event.type == .leftMouseDown)
             }
             return event
         }
     }
 
-    public func evaluateMousePosition(_ mouseLoc: NSPoint) {
+    public func evaluateMousePosition(_ mouseLoc: NSPoint, isClick: Bool = false) {
         guard appState.isEnabled else {
             if appState.activeCorner != nil {
                 dismissActiveDial()
@@ -191,7 +191,7 @@ public final class ScreenManager: ObservableObject {
         }
 
         // 1. Mouse Dragging / Pressed Suppression (only when dial is NOT already active)
-        if appState.activeCorner == nil && appState.settings.suppressWhenMousePressed && NSEvent.pressedMouseButtons != 0 {
+        if appState.activeCorner == nil && appState.settings.suppressWhenMousePressed && NSEvent.pressedMouseButtons != 0 && !isClick {
             cancelPendingDwell()
             return
         }
@@ -226,6 +226,10 @@ public final class ScreenManager: ObservableObject {
                 hideWorkItem = nil
                 activeInstance.setMouseInteractive(true, for: activeCorner)
             } else {
+                if isClick {
+                    dismissActiveDial()
+                    return
+                }
                 if hideWorkItem == nil {
                     scheduleHideTimer(delay: appState.settings.cornerHideDelaySeconds)
                 }
@@ -244,14 +248,20 @@ public final class ScreenManager: ObservableObject {
                     guard appState.settings.cornerEnabled[corner] == true && appState.action(for: corner) != .none else {
                         continue
                     }
-                    guard CornerGeometry.isOuterCorner(corner: corner, of: screen.frame, in: allFrames) else {
-                        continue
+                    if appState.settings.onlyOuterCorners {
+                        guard CornerGeometry.isOuterCorner(corner: corner, of: screen.frame, in: allFrames) else {
+                            continue
+                        }
                     }
                     let vertex = cornerVertex(for: corner, in: screen.frame)
                     let dist = hypot(mouseLoc.x - vertex.x, mouseLoc.y - vertex.y)
-                    if dist <= sensitivity {
+                    let hitDistance = isClick ? max(sensitivity, 35.0) : sensitivity
+                    if dist <= hitDistance {
                         foundCandidate = true
-                        if pendingDwellCorner == corner && pendingDwellDisplayID == sDisplayID {
+                        if isClick {
+                            cancelPendingDwell()
+                            activateDial(corner: corner, displayID: sDisplayID)
+                        } else if pendingDwellCorner == corner && pendingDwellDisplayID == sDisplayID {
                             // Already pending
                         } else {
                             scheduleDwellTimer(corner: corner, displayID: sDisplayID, screenFrame: screen.frame)
@@ -301,6 +311,11 @@ public final class ScreenManager: ObservableObject {
         dwellWorkItem = nil
         pendingDwellCorner = nil
         pendingDwellDisplayID = nil
+    }
+
+    public func keepDialActive() {
+        hideWorkItem?.cancel()
+        hideWorkItem = nil
     }
 
     private func scheduleHideTimer(delay: TimeInterval) {

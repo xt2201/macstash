@@ -79,14 +79,16 @@ public final class ScreenOverlayInstance {
     }
 
     private func createRightEdgePanelIfNeeded() {
-        let allFrames = NSScreen.screens.map { $0.frame }
-        guard CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames) else {
-            return
+        if appState.settings.onlyOuterCorners {
+            let allFrames = NSScreen.screens.map { $0.frame }
+            guard CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames) else {
+                return
+            }
         }
 
         let edgeFrame = rightEdgeRect(in: screen.frame)
         let panel = makeEdgePanel(contentRect: edgeFrame)
-        let sliderView = EdgeSliderView(appState: appState, edge: .right)
+        let sliderView = EdgeSliderView(appState: appState, displayID: displayID, edge: .right)
         let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, edge: .right)
 
         panel.contentView = hostingView
@@ -105,8 +107,15 @@ public final class ScreenOverlayInstance {
         }
 
         if let edgePanel = rightEdgePanel {
-            let allFrames = NSScreen.screens.map { $0.frame }
-            if CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames) {
+            let shouldShow: Bool
+            if appState.settings.onlyOuterCorners {
+                let allFrames = NSScreen.screens.map { $0.frame }
+                shouldShow = CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames)
+            } else {
+                shouldShow = true
+            }
+
+            if shouldShow {
                 let rect = rightEdgeRect(in: frame)
                 edgePanel.setFrame(rect, display: true)
                 edgePanel.orderFrontRegardless()

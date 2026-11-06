@@ -48,3 +48,15 @@ Người dùng có thể chuyển đổi linh hoạt giữa Tiếng Việt và E
 - Thanh trượt điều chỉnh đèn bàn phím phản hồi mượt mà theo thời gian thực và đồng bộ ngay lập tức với cảm biến phần cứng của MacBook.
 - Khi mở bảng điều khiển Menu Bar, ứng dụng sẽ tự động đọc mức sáng hiện tại từ hệ thống để đảm bảo giá trị luôn chính xác ngay cả khi bạn vừa chỉnh bằng phím vật lý hoặc Control Center.
 - Bạn có thể nhấp chuột trực tiếp vào biểu tượng bàn phím ở đầu thanh trượt để bật hoặc tắt nhanh đèn nền.
+
+## Hoạt Động Trên Hệ Thống Đa Màn Hình
+
+- MacStash hỗ trợ đầy đủ 4 góc xoay và thanh trượt cạnh phải trên mọi màn hình được kết nối (bao gồm cả màn hình MacBook và màn hình rời bên ngoài).
+- Bạn có thể kích hoạt nhanh vòng xoay tại góc bằng cách nhấp chuột trực tiếp (Click-to-Activate) hoặc rê chuột và dừng trong giây lát (Dwell Activation).
+- Nếu không muốn kích hoạt vòng xoay ở các vị trí tiếp giáp giữa các màn hình, hãy vào Cài đặt > Góc Màn Hình (Hot Corners) và bật tùy chọn "Chỉ kích hoạt góc biên ngoài (tắt góc tiếp giáp giữa các màn hình)".
+- Bảng điều khiển từ biểu tượng Menu Bar tự động phát hiện màn hình bạn đang thao tác để hiển thị cửa sổ mở rộng chuẩn xác ngay dưới vị trí con trỏ chuột trên màn hình đó.
+
+## Điều Khiển Bằng Cử Chỉ Cuộn Hai Ngón Tay
+
+- Nếu thao tác cuộn 2 ngón tay không làm thay đổi giá trị, hãy kiểm tra xem tùy chọn "Cuộn hai ngón để điều chỉnh" trong Cài đặt > Góc nóng > Cử chỉ tương tác đã được bật hay chưa.
+- Giá trị chỉ thay đổi trong lúc ngón tay tiếp xúc và di chuyển trên trackpad. Quán tính trượt sau khi nhấc ngón tay được tự động lọc bỏ nhằm đảm bảo âm lượng hoặc độ sáng không bị tăng giảm quá mức.

@@ -7,6 +7,7 @@ import MacStashCore
 public final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
+    private var anchorWindow: NSWindow?
     private var settingsWindow: NSWindow?
     private var helpWindow: NSWindow?
     private var onboardingWindow: NSWindow?
@@ -91,13 +92,14 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if let button = statusItem.button {
             button.image = loadStatusImage(active: false)
-            button.action = #selector(togglePopover)
+            button.action = #selector(togglePopover(_:))
             button.target = self
         }
 
         popover = NSPopover()
         popover.contentSize = NSSize(width: 260, height: 350)
         popover.behavior = .transient
+        popover.delegate = self
 
         let menuBarView = MenuBarExtraView(appState: appState) { [weak self] in
             self?.openSettings()
@@ -203,18 +205,81 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
-    @objc private func togglePopover() {
+    @objc private func togglePopover(_ sender: AnyObject? = nil) {
         guard let button = statusItem.button else { return }
+
+        let mouseLoc = NSEvent.mouseLocation
+        let clickedScreen = NSScreen.screens.first { NSMouseInRect(mouseLoc, $0.frame, false) }
+            ?? button.window?.screen
+            ?? NSScreen.main
+            ?? NSScreen.screens.first
+
+        let isTargetScreenCurrentButtonScreen = (button.window?.screen != nil && clickedScreen == button.window?.screen)
+
         if popover.isShown {
-            popover.performClose(nil)
-        } else {
+            let currentWindowScreen = popover.contentViewController?.view.window?.screen
+            if currentWindowScreen == clickedScreen {
+                popover.performClose(nil)
+                cleanupAnchorWindow()
+                return
+            } else {
+                popover.performClose(nil)
+                cleanupAnchorWindow()
+            }
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
+        appState.keyboard.updateBrightnessFromHardware()
+        appState.audio.updateVolumeFromHardware()
+
+        if isTargetScreenCurrentButtonScreen, clickedScreen != nil {
+            cleanupAnchorWindow()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
+        } else if let clickedScreen = clickedScreen {
+            let menuBarHeight = max(24, clickedScreen.frame.maxY - clickedScreen.visibleFrame.maxY)
+            let anchorWidth: CGFloat = 24
+            let anchorX = min(max(mouseLoc.x - anchorWidth / 2, clickedScreen.frame.minX), clickedScreen.frame.maxX - anchorWidth)
+            let anchorY = clickedScreen.frame.maxY - menuBarHeight
+            let anchorRect = NSRect(x: anchorX, y: anchorY, width: anchorWidth, height: menuBarHeight)
+
+            showPopover(anchoredAt: anchorRect, on: clickedScreen)
         }
+    }
+
+    private func showPopover(anchoredAt rect: NSRect, on screen: NSScreen) {
+        cleanupAnchorWindow()
+
+        let anchor = NSPanel(
+            contentRect: rect,
+            styleMask: [.borderless, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        anchor.isOpaque = false
+        anchor.backgroundColor = .clear
+        anchor.level = .statusBar
+        anchor.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+
+        let anchorView = NSView(frame: NSRect(origin: .zero, size: rect.size))
+        anchor.contentView = anchorView
+        anchor.setFrame(rect, display: true)
+        anchor.orderFrontRegardless()
+
+        self.anchorWindow = anchor
+        popover.show(relativeTo: anchorView.bounds, of: anchorView, preferredEdge: .minY)
+        popover.contentViewController?.view.window?.makeKey()
+    }
+
+    private func cleanupAnchorWindow() {
+        anchorWindow?.orderOut(nil)
+        anchorWindow?.close()
+        anchorWindow = nil
     }
 
     @objc public func openSettings() {
         popover.performClose(nil)
+        cleanupAnchorWindow()
 
         if settingsWindow == nil {
             let window = NSWindow(
@@ -286,5 +351,11 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         onboardingWindow?.center()
         onboardingWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+}
+
+extension AppDelegate: NSPopoverDelegate {
+    public func popoverDidClose(_ notification: Notification) {
+        cleanupAnchorWindow()
     }
 }

@@ -63,6 +63,57 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
         return nil
     }
 
+    public override func scrollWheel(with event: NSEvent) {
+        guard appState.isEnabled,
+              appState.isCornerDialsEnabled,
+              appState.scrollAdjustmentEnabled else {
+            super.scrollWheel(with: event)
+            return
+        }
+
+        guard appState.activeCorner == corner && appState.activeDisplayID == displayID else {
+            super.scrollWheel(with: event)
+            return
+        }
+
+        ScreenManager.shared.keepDialActive()
+
+        // Filter out momentum events to prevent values from runaway changes after lifting fingers
+        if event.hasPreciseScrollingDeltas && !event.momentumPhase.isEmpty {
+            return
+        }
+
+        let action = appState.action(for: corner)
+        guard action != .none else {
+            super.scrollWheel(with: event)
+            return
+        }
+
+        if action == .timer && appState.isPomodoroRunning {
+            return
+        }
+
+        let deltaY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
+        guard abs(deltaY) > 0.001 else { return }
+
+        let sensitivity: Double = 0.005
+        let step = Double(deltaY) * sensitivity
+        let current = appState.getValue(for: action, displayID: displayID)
+        let newValue = max(0.0, min(1.0, current + step))
+
+        if action == .timer {
+            let mins = max(1, min(60, Int(round(newValue * 60.0))))
+            let snapped = Double(mins) / 60.0
+            appState.setValue(for: action, value: snapped, displayID: displayID)
+        } else {
+            appState.setValue(for: action, value: newValue, displayID: displayID)
+        }
+
+        if event.phase == .ended || event.phase == .cancelled {
+            appState.saveSettings()
+        }
+    }
+
     public func reset(reason: ResetReason) {
         dwellTimer?.invalidate()
         dwellTimer = nil

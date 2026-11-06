@@ -1,3 +1,26 @@
+# Có Gì Mới Trong Phiên Bản 2.4.0
+
+MacStash 2.4.0 bổ sung tính năng cuộn hai ngón tay trên trackpad để điều chỉnh giá trị cho cả vòng xoay 4 góc và thanh trượt cạnh phải, mang lại trải nghiệm điều khiển tự nhiên, mượt mà mà không cần thao tác nhấn giữ chuột.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.4.0
+
+- Cuộn 2 ngón tay trên trackpad để điều chỉnh: Người dùng chỉ cần rê chuột vào vòng quay góc hoặc thanh trượt cạnh phải và lướt 2 ngón tay lên hoặc xuống để tăng giảm âm lượng, độ sáng, đèn bàn phím hoặc thời gian Pomodoro.
+- Áp dụng toàn diện: Tính năng cuộn hoạt động đồng bộ trên toàn bộ 4 vòng xoay góc và thanh trượt cạnh phải màn hình.
+- Cơ chế chặn quán tính thông minh: Tự động loại bỏ các sự kiện trượt quán tính sau khi nhấc ngón tay, đảm bảo giá trị dừng lại chính xác tại vị trí mong muốn.
+- Tùy chọn linh hoạt trong Cài đặt: Dễ dàng bật hoặc tắt tính năng trong Cài đặt > Góc nóng > Cử chỉ tương tác.
+
+# Có Gì Mới Trong Phiên Bản 2.3.6
+
+MacStash 2.3.6 tối ưu hóa trải nghiệm đa màn hình, bổ sung cơ chế kích hoạt tức thì khi nhấp chuột tại các góc, hoàn thiện thanh trượt cạnh phải và sửa lỗi mở rộng bảng điều khiển Menu Bar trên màn hình ngoài.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.3.6
+
+- Hỗ trợ đa màn hình hoàn chỉnh: Khắc phục hiện tượng các góc màn hình và thanh trượt cạnh phải trên màn hình phụ bị vô hiệu hóa do thuật toán biên ngoài. Tất cả 4 góc của mọi màn hình giờ đây đều hoạt động độc lập và mượt mà.
+- Kích hoạt góc bằng nhấp chuột (Click-to-Activate): Ngoài việc dừng chuột theo thời gian trễ (Dwell), người dùng có thể nhấp chuột trực tiếp vào góc màn hình để mở ngay vòng quay mà không cần chờ đợi.
+- Tùy chọn lọc góc biên ngoài: Thêm công tắc trong Cài đặt > Góc Màn Hình cho phép người dùng tùy ý bật/tắt tính năng chỉ nhận góc biên ngoài hoặc nhận toàn bộ các góc tiếp giáp giữa các màn hình.
+- Bảng điều khiển Menu Bar thông minh: Nhấp vào biểu tượng ứng dụng ở thanh Menu Bar trên bất kỳ màn hình nào (kể cả màn hình ngoài) đều sẽ mở rộng cửa sổ popover chuẩn xác ngay tại vị trí con trỏ chuột trên màn hình đó.
+- Điều khiển độ sáng độc lập: Thanh trượt cạnh phải truyền đúng mã định danh màn hình để điều chỉnh mức sáng riêng biệt cho từng màn hình rời.
+
 # Có Gì Mới Trong Phiên Bản 2.3.5
 
 MacStash 2.3.5 mang đến cơ chế đồng bộ số hiệu phiên bản động trên giao diện, bộ kiểm thử toàn vẹn phiên bản tự động và tối ưu hóa độ ổn định của quy trình phát hành CI/CD.

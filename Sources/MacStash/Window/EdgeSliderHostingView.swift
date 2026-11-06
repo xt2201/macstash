@@ -71,4 +71,38 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
 
         return nil
     }
+
+    public override func scrollWheel(with event: NSEvent) {
+        guard appState.isEnabled,
+              appState.isEdgeSlidersEnabled,
+              appState.scrollAdjustmentEnabled else {
+            super.scrollWheel(with: event)
+            return
+        }
+
+        let action = appState.activeProfile.rightEdgeAction
+        guard action != .none else {
+            super.scrollWheel(with: event)
+            return
+        }
+
+        // Filter out momentum events to prevent values from runaway changes after lifting fingers
+        if event.hasPreciseScrollingDeltas && !event.momentumPhase.isEmpty {
+            return
+        }
+
+        let deltaY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
+        guard abs(deltaY) > 0.001 else { return }
+
+        let sensitivity: Float = 0.005
+        let step = Float(deltaY) * sensitivity
+        let current = Float(appState.getValue(for: action, displayID: rootView.displayID))
+        let clamped = max(0.0, min(1.0, current + step))
+
+        appState.setValue(for: action, value: Double(clamped), displayID: rootView.displayID)
+
+        if event.phase == .ended || event.phase == .cancelled {
+            appState.saveSettings()
+        }
+    }
 }

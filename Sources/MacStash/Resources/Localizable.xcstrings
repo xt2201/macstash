@@ -929,6 +929,86 @@
         }
       }
     },
+    "corners.gestures": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interaction Gestures"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cử chỉ tương tác"
+          }
+        }
+      }
+    },
+    "corners.scrollAdjustment": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two-finger scroll to adjust"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuộn hai ngón để điều chỉnh"
+          }
+        }
+      }
+    },
+    "corners.scrollAdjustmentHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glide two fingers on your trackpad or roll the scroll wheel to adjust values without clicking and holding."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lướt hai ngón tay trên trackpad hoặc lăn con lăn chuột để điều chỉnh giá trị khi vòng xoay hoặc thanh trượt đang mở mà không cần bấm giữ chuột."
+          }
+        }
+      }
+    },
+    "corners.onlyOuterCorners": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trigger only outer desktop corners (suppress inner display seams)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chỉ kích hoạt góc biên ngoài (tắt góc tiếp giáp giữa các màn hình)"
+          }
+        }
+      }
+    },
+    "corners.onlyOuterCornersHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When enabled, corners and edges touching another connected display will be disabled."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khi bật, các góc và cạnh màn hình tiếp xúc với màn hình khác sẽ bị vô hiệu hóa."
+          }
+        }
+      }
+    },
     "corners.suppressionRules": {
       "localizations": {
         "en": {

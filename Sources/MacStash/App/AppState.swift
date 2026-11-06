@@ -53,6 +53,9 @@ public final class AppState: ObservableObject {
     @Published public var onlyOuterCorners: Bool = false {
         didSet { settings.onlyOuterCorners = onlyOuterCorners }
     }
+    @Published public var scrollAdjustmentEnabled: Bool = true {
+        didSet { settings.scrollAdjustmentEnabled = scrollAdjustmentEnabled }
+    }
     @Published public var cornerSensitivityRadius: CGFloat = Defaults.HotCorner.defaultHitZoneSizePoints {
         didSet { settings.cornerSensitivityPoints = cornerSensitivityRadius }
     }
@@ -104,6 +107,7 @@ public final class AppState: ObservableObject {
         self.isCornerDialsEnabled = loaded.isCornerDialsEnabled
         self.isEdgeSlidersEnabled = loaded.isEdgeSlidersEnabled
         self.onlyOuterCorners = loaded.onlyOuterCorners
+        self.scrollAdjustmentEnabled = loaded.scrollAdjustmentEnabled
         self.cornerSensitivityRadius = loaded.cornerSensitivityPoints
         self.cornerDwellDelay = loaded.cornerDwellDelaySeconds
         self.isSoundEnabled = loaded.isSoundEnabled
@@ -448,6 +452,8 @@ public final class AppState: ObservableObject {
         self.isEnabled = fresh.isEnabled
         self.isCornerDialsEnabled = fresh.isCornerDialsEnabled
         self.isEdgeSlidersEnabled = fresh.isEdgeSlidersEnabled
+        self.onlyOuterCorners = fresh.onlyOuterCorners
+        self.scrollAdjustmentEnabled = fresh.scrollAdjustmentEnabled
         self.cornerSensitivityRadius = fresh.cornerSensitivityPoints
         self.cornerDwellDelay = fresh.cornerDwellDelaySeconds
         self.isSoundEnabled = fresh.isSoundEnabled

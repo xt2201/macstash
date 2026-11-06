@@ -1,3 +1,26 @@
+# What's New in Version 2.4.0
+
+MacStash 2.4.0 introduces two-finger trackpad scroll adjustment for corner dials and screen edge sliders, enabling fluid, effortless value tuning without requiring mouse click-and-drag actions.
+
+## Key Enhancements in Version 2.4.0
+
+- Two-Finger Trackpad Scroll to Adjust: Seamlessly tune system volume, display brightness, keyboard backlight, and Pomodoro timer duration simply by scrolling with two fingers while hovering over active corner dials or edge sliders.
+- Comprehensive Surface Coverage: Scroll adjustments are supported symmetrically across all 4 corner dials and the screen edge slider bar.
+- Smart Momentum Protection: Automatic filtering of trackpad inertia phases prevents values from unintentionally running away after lifting fingers.
+- Configurable in Settings: Easily toggle the gesture on or off under Settings > Hot Corners > Interaction Gestures.
+
+# What's New in Version 2.3.6
+
+MacStash 2.3.6 delivers comprehensive multi-monitor enhancements, instant click-to-activate corner dials, multi-display edge slider support, and seamless top bar popover expansion across external displays.
+
+## Key Enhancements in Version 2.3.6
+
+- Full Multi-Monitor Hot Corner Support: Resolves issues where display seam boundaries suppressed corner dials and edge sliders on secondary screens. All four corners on each connected display now trigger reliably.
+- Instant Click-to-Activate: In addition to standard dwell delay activation, clicking directly into any screen corner immediately launches the corresponding control dial without waiting.
+- Outer Corner Seam Suppression Toggle: Added a dedicated toggle under Settings > Hot Corners allowing users to choose whether to activate all screen corners or strictly outer desktop perimeter corners.
+- Multi-Display Top Bar Popover: Clicking the MacStash icon in the top menu bar on any display (including external monitors) cleanly positions and expands the control popover on that exact display.
+- Per-Display Brightness Scrubbing: Right edge slider correctly forwards display identifiers to independently adjust brightness on individual external monitors.
+
 # What's New in Version 2.3.5
 
 MacStash 2.3.5 introduces dynamic version synchronization in the user interface, automated version integrity auditing, and robust CI/CD release pipeline error handling.

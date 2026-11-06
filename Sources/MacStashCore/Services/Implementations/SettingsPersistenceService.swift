@@ -14,6 +14,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var suppressWhenMousePressed: Bool
     public var suppressInFullscreen: Bool
     public var onlyOuterCorners: Bool
+    public var scrollAdjustmentEnabled: Bool
     public var excludedBundleIDs: [String]
     public var cornerEnabled: [CornerPosition: Bool]
     public var cornerActions: [CornerPosition: ControlAction]
@@ -67,6 +68,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         suppressWhenMousePressed: Bool = true,
         suppressInFullscreen: Bool = true,
         onlyOuterCorners: Bool = false,
+        scrollAdjustmentEnabled: Bool = true,
         excludedBundleIDs: [String] = [],
         cornerEnabled: [CornerPosition: Bool] = [
             .topLeft: true,
@@ -115,6 +117,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.suppressWhenMousePressed = suppressWhenMousePressed
         self.suppressInFullscreen = suppressInFullscreen
         self.onlyOuterCorners = onlyOuterCorners
+        self.scrollAdjustmentEnabled = scrollAdjustmentEnabled
         self.excludedBundleIDs = excludedBundleIDs
         self.cornerEnabled = cornerEnabled
         self.cornerActions = cornerActions
@@ -158,6 +161,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         let suppressWhenMousePressed = try container.decodeIfPresent(Bool.self, forKey: .suppressWhenMousePressed) ?? def.suppressWhenMousePressed
         let suppressInFullscreen = try container.decodeIfPresent(Bool.self, forKey: .suppressInFullscreen) ?? def.suppressInFullscreen
         let onlyOuterCorners = try container.decodeIfPresent(Bool.self, forKey: .onlyOuterCorners) ?? false
+        let scrollAdjustmentEnabled = try container.decodeIfPresent(Bool.self, forKey: .scrollAdjustmentEnabled) ?? def.scrollAdjustmentEnabled
         let excludedBundleIDs = try container.decodeIfPresent([String].self, forKey: .excludedBundleIDs) ?? def.excludedBundleIDs
         let cornerEnabled = try container.decodeIfPresent([CornerPosition: Bool].self, forKey: .cornerEnabled) ?? def.cornerEnabled
         let cornerActions = try container.decodeIfPresent([CornerPosition: ControlAction].self, forKey: .cornerActions) ?? def.cornerActions
@@ -197,6 +201,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
             suppressWhenMousePressed: suppressWhenMousePressed,
             suppressInFullscreen: suppressInFullscreen,
             onlyOuterCorners: onlyOuterCorners,
+            scrollAdjustmentEnabled: scrollAdjustmentEnabled,
             excludedBundleIDs: excludedBundleIDs,
             cornerEnabled: cornerEnabled,
             cornerActions: cornerActions,

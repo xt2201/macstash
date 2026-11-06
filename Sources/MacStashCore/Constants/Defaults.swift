@@ -5,7 +5,19 @@ public enum Defaults {
     public static let schemaVersion: Int = 1
 
     public static var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "2.3.5"
+        if let ver = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            return ver
+        }
+        var current = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        for _ in 0..<5 {
+            let path = current.appendingPathComponent("VERSION").path
+            if let str = try? String(contentsOfFile: path, encoding: .utf8) {
+                let trimmed = str.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmed.isEmpty { return trimmed }
+            }
+            current = current.deletingLastPathComponent()
+        }
+        return "2.4.0"
     }
 
     public enum HotCorner {

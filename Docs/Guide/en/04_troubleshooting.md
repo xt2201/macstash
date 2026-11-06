@@ -50,3 +50,15 @@ You can freely switch between English and Vietnamese at any time:
 - The keyboard backlight slider provides buttery-smooth, real-time tracking that stays in immediate lockstep with MacBook hardware sensors.
 - Whenever you open the Menu Bar popover, MacStash automatically refreshes the current hardware backlight level and master volume, ensuring the sliders reflect external adjustments made via physical keys or macOS Control Center.
 - You can tap directly on the keyboard icon to quickly toggle the keyboard backlight on or off.
+
+## Multi-Monitor Systems & Corner Activation
+
+- MacStash provides full support for all 4 corner dials and the right edge slider across every connected display (including built-in MacBook screens and external monitors).
+- You can activate corner dials instantaneously by clicking directly in the corner (Click-to-Activate) or by hovering for the dwell duration (Dwell Activation).
+- To prevent dials from appearing along internal screen seams between displays, enable "Trigger only outer desktop corners (suppress inner display seams)" under Settings > Hot Corners.
+- The Menu Bar control popover dynamically detects the active display when invoked, opening smoothly underneath the clicked menu bar location on that display.
+
+## Two-Finger Trackpad & Scroll Wheel Adjustment
+
+- If trackpad two-finger scrolling does not adjust values, verify that "Two-finger scroll to adjust" is enabled under Settings > Hot Corners > Interaction Gestures.
+- Value adjustments occur strictly while fingers remain on the trackpad. Inertial flicks (momentum) are automatically filtered out to prevent volume or brightness from overshooting.

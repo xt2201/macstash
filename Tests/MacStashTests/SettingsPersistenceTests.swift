@@ -11,9 +11,13 @@ public enum SettingsPersistenceTests {
 
     private static func testSerializationRoundtrip() {
         var settings = AppSettings.defaultSettings
+        TestAssertion.assertEqual(settings.onlyOuterCorners, false)
+        TestAssertion.assertEqual(settings.scrollAdjustmentEnabled, true)
         settings.cornerSensitivityPoints = 12.0
         settings.cornerDwellDelaySeconds = 0.35
         settings.isSoundEnabled = false
+        settings.onlyOuterCorners = true
+        settings.scrollAdjustmentEnabled = false
 
         let suiteName = "com.macstash.test.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
@@ -29,6 +33,8 @@ public enum SettingsPersistenceTests {
         TestAssertion.assertEqual(loaded.cornerSensitivityPoints, CGFloat(12.0))
         TestAssertion.assertEqual(loaded.cornerDwellDelaySeconds, TimeInterval(0.35))
         TestAssertion.assertEqual(loaded.isSoundEnabled, false)
+        TestAssertion.assertEqual(loaded.onlyOuterCorners, true)
+        TestAssertion.assertEqual(loaded.scrollAdjustmentEnabled, false)
     }
 
     private static func testExportAndImportJSON() {

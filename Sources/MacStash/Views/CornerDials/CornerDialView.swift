@@ -92,7 +92,9 @@ public struct CornerDialView: View {
                             isExpanded: isExpanded,
                             formattedTimer: appState.formattedTimerTime,
                             isPomodoroRunning: appState.isPomodoroRunning,
-                            pomodoroMode: appState.pomodoroMode
+                            pomodoroMode: appState.pomodoroMode,
+                            isMuted: appState.audio.isMuted,
+                            isKeyboardSupported: appState.keyboard.isSupported
                         )
                     }
                     .buttonStyle(.plain)
@@ -182,6 +184,8 @@ private struct CenterActionBadge: View {
     let formattedTimer: String
     let isPomodoroRunning: Bool
     let pomodoroMode: PomodoroMode
+    let isMuted: Bool
+    let isKeyboardSupported: Bool
 
     var body: some View {
         let offset = badgeOffset(for: corner, in: dialSize)
@@ -201,6 +205,22 @@ private struct CenterActionBadge: View {
                 Text(formattedTimer)
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(.primary)
+            } else if action == .volume {
+                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(isMuted ? .red : (action.accentColors.first ?? .accentColor))
+
+                Text(isMuted ? "MUTE" : "\(Int(round(value * 100)))%")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(isMuted ? .red : .primary)
+            } else if action == .keyboardBrightness && !isKeyboardSupported {
+                Image(systemName: "keyboard.badge.ellipsis")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.secondary)
+
+                Text("N/A")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(.secondary)
             } else {
                 Image(systemName: action.systemImage)
                     .font(.system(size: 18, weight: .bold))

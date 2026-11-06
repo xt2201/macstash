@@ -180,7 +180,7 @@ public final class AudioManager: ObservableObject {
             mElement: kAudioObjectPropertyElementMain
         )
 
-        let status = AudioHardwareServiceSetPropertyData(
+        var status = AudioObjectSetPropertyData(
             defaultOutputDeviceID,
             &address,
             0,
@@ -188,6 +188,23 @@ public final class AudioManager: ObservableObject {
             size,
             &vol
         )
+
+        if status != noErr {
+            // Fallback to scalar volume property if virtual main volume isn't supported on this device
+            var scalarAddr = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyVolumeScalar,
+                mScope: kAudioObjectPropertyScopeOutput,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            status = AudioObjectSetPropertyData(
+                defaultOutputDeviceID,
+                &scalarAddr,
+                0,
+                nil,
+                size,
+                &vol
+            )
+        }
 
         if status == noErr {
             DispatchQueue.main.async {
@@ -243,7 +260,7 @@ public final class AudioManager: ObservableObject {
             mElement: kAudioObjectPropertyElementMain
         )
 
-        let status = AudioHardwareServiceGetPropertyData(
+        var status = AudioObjectGetPropertyData(
             defaultOutputDeviceID,
             &address,
             0,
@@ -251,6 +268,22 @@ public final class AudioManager: ObservableObject {
             &size,
             &vol
         )
+
+        if status != noErr {
+            var scalarAddr = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyVolumeScalar,
+                mScope: kAudioObjectPropertyScopeOutput,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            status = AudioObjectGetPropertyData(
+                defaultOutputDeviceID,
+                &scalarAddr,
+                0,
+                nil,
+                &size,
+                &vol
+            )
+        }
 
         var muteVal: UInt32 = 0
         var muteSize = UInt32(MemoryLayout.size(ofValue: muteVal))

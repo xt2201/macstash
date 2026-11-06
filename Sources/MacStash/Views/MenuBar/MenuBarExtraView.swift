@@ -137,22 +137,63 @@ public struct MenuBarExtraView: View {
             // Hardware Controls
             VStack(spacing: 8) {
                 // Volume
-                HStack(spacing: 8) {
-                    Image(systemName: appState.audio.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                        .foregroundColor(.blue)
-                        .frame(width: 16)
+                VStack(spacing: 4) {
+                    HStack(spacing: 8) {
+                        Button(action: {
+                            appState.audio.toggleMute()
+                        }) {
+                            Image(systemName: appState.audio.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                                .foregroundColor(appState.audio.isMuted ? .red : .blue)
+                                .frame(width: 16)
+                        }
+                        .buttonStyle(.plain)
+                        .help(appState.audio.isMuted ? appState.localized("menubar.unmute") : appState.localized("menubar.mute"))
 
-                    Slider(
-                        value: Binding(
-                            get: { appState.audio.volume },
-                            set: { appState.audio.setVolume($0) }
-                        ),
-                        in: 0...1
-                    )
+                        Slider(
+                            value: Binding(
+                                get: { appState.audio.volume },
+                                set: { appState.audio.setVolume($0) }
+                            ),
+                            in: 0...1
+                        )
 
-                    Text("\(Int(appState.audio.volume * 100))%")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .frame(width: 32)
+                        Text(appState.audio.isMuted ? "0%" : "\(Int(appState.audio.volume * 100))%")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .frame(width: 32)
+                    }
+
+                    if !appState.audio.outputDevices.isEmpty {
+                        Menu {
+                            ForEach(appState.audio.outputDevices) { dev in
+                                Button(action: {
+                                    appState.audio.selectOutputDevice(id: dev.id)
+                                }) {
+                                    HStack {
+                                        Text(dev.name)
+                                        if dev.isDefault {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "hifispeaker.fill")
+                                    .font(.system(size: 8))
+                                    .foregroundColor(.secondary)
+                                Text(appState.audio.deviceName)
+                                    .font(.system(size: 9))
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                Spacer()
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.system(size: 7))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .menuStyle(.borderlessButton)
+                        .padding(.leading, 24)
+                    }
                 }
 
                 // Display Brightness

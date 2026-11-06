@@ -74,7 +74,10 @@ public struct GeneralTab: View {
                         title: "Notifications",
                         description: "Used for Pomodoro timer phase alerts",
                         isGranted: permissions.isNotificationGranted,
-                        onOpenSettings: { permissions.openNotificationSettings() }
+                        onOpenSettings: {
+                            permissions.requestNotificationPermission()
+                            permissions.openNotificationSettings()
+                        }
                     )
                 }
                 .padding(8)

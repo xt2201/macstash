@@ -56,6 +56,19 @@ public final class SystemPermissionService: ObservableObject {
         }
     }
 
+    public func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, error in
+            Task { @MainActor [weak self] in
+                self?.isNotificationGranted = granted
+                if let err = error {
+                    AppLogger.settings.error("Notification authorization request failed: \(err.localizedDescription)")
+                } else {
+                    AppLogger.settings.info("Notification authorization granted: \(granted)")
+                }
+            }
+        }
+    }
+
     public func openNotificationSettings() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications") {
             NSWorkspace.shared.open(url)

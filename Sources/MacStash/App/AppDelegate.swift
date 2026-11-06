@@ -12,15 +12,22 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private let appState = AppState.shared
 
     public func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.regular)
         setupMainMenu()
         setupStatusItem()
         ScreenManager.shared.start(appState: appState)
+        SystemPermissionService.shared.requestNotificationPermission()
 
         let hasLaunchedBefore = UserDefaults.standard.bool(forKey: "com.macstash.has_launched")
         if !hasLaunchedBefore {
             UserDefaults.standard.set(true, forKey: "com.macstash.has_launched")
             openOnboarding()
         }
+    }
+
+    public func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        openSettings()
+        return true
     }
 
     private func setupMainMenu() {

@@ -71,8 +71,9 @@ MacStash assigns high-frequency system controls to the four physical display ver
 
 ### 1. Quarter-Circle Radial Corner Dials
 - Invisibly docked at the screen corners with zero desktop clutter.
-- Gentle bloom animation on dwell (0.2s configurable threshold, tight 5–8pt hit-zone).
-- Drag along the radial arc or use vertical/horizontal trackpad scrolling for fluid adjustments.
+- Gentle bloom animation on dwell (0.2s configurable threshold, tight 5–8pt hit-zone) or instant click-to-activate.
+- **Two-Finger Scroll to Adjust**: Glide two fingers up or down on your trackpad (or roll the scroll wheel) to immediately adjust volume, brightness, backlight, or Pomodoro duration without clicking and holding.
+- Drag along the radial arc or use vertical trackpad scrolling for fluid adjustments.
 - Instant collapse when the cursor departs the quadrant area.
 
 ### 2. Multi-Monitor Hardware Brightness (DDC/CI &amp; Native)
@@ -94,6 +95,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 ### 5. Hidden Edge Slider &amp; Dock Shelf
 - Rides flush against your chosen screen border.
 - Smoothly slides into view when hovering the edge.
+- **Two-Finger Edge Scrubbing**: Seamlessly tune brightness or your chosen action on the edge slider using natural two-finger vertical scrolling.
 - Pinned applications feature the authentic macOS dock magnification curve.
 - Integrated Quick App Launcher with instant search.
 

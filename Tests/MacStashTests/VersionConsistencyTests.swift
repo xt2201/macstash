@@ -8,6 +8,7 @@ public enum VersionConsistencyTests {
         testChangelogMatchesVersion()
         testWhatsNewDocsMatchVersion()
         testAppcastMatchesVersion()
+        testReadmeMatchesVersion()
         testDynamicLocalizationVersion()
         testNoStaleHardcodedVersionsInCatalog()
     }
@@ -95,6 +96,19 @@ public enum VersionConsistencyTests {
 
         let expectedTag = "<sparkle:shortVersionString>\(version)</sparkle:shortVersionString>"
         TestAssertion.assertTrue(content.contains(expectedTag), "appcast.xml contains latest sparkle item '\(expectedTag)'")
+    }
+
+    private static func testReadmeMatchesVersion() {
+        guard let root = findRepoRoot(), let version = currentRepoVersion() else { return }
+        let readmePath = root.appendingPathComponent("README.md").path
+
+        guard let content = try? String(contentsOfFile: readmePath, encoding: .utf8) else {
+            TestAssertion.assertTrue(false, "README.md must exist and be readable")
+            return
+        }
+
+        TestAssertion.assertTrue(content.contains("release-v\(version)"), "README.md contains release badge 'release-v\(version)'")
+        TestAssertion.assertTrue(content.contains("MacStash--v\(version).dmg") || content.contains("MacStash-v\(version).dmg"), "README.md contains download link for v\(version)")
     }
 
     private static func testDynamicLocalizationVersion() {

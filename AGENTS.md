@@ -8,6 +8,17 @@
 - Tuyệt đối không chỉnh sửa thủ công hoặc nạp trực tiếp file ảnh nhị phân vào repository mà không qua kịch bản sinh asset.
 - Khi có thay đổi về thiết kế, bắt buộc phải cập nhật tài liệu kỹ thuật tại `Design/Logo/`, chạy lại bộ kiểm thử và tái tạo toàn bộ asset catalog.
 
+**Đồng bộ & Cập nhật README.md Bắt Buộc (README & Visual Feature Showcase)**:
+- `README.md` là mặt tiền chính (Front Page) của toàn bộ dự án trên GitHub và là tài liệu đầu tiên người dùng cũng như nhà phát triển tiếp cận.
+- **Khi thêm mới, thay đổi hoặc mở rộng bất kỳ tính năng nào trong code**:
+  1. **Danh sách & Mô tả tính năng (Features Breakdown)**: Bắt buộc phải cập nhật mục tương ứng trong `README.md` (mô tả rõ cơ chế hoạt động, giá trị mang lại, phím tắt và khả năng tùy chỉnh).
+  2. **Bảng tra cứu (Shortcuts, Settings & Permissions)**: Cập nhật ngay các bảng tương ứng trong `README.md` nếu tính năng có thêm phím tắt mới, tùy chọn cấu hình mới, hoặc cần thêm quyền hệ thống macOS (Accessibility, Input Monitoring, Apple Events).
+  3. **Hình ảnh minh họa & Sơ đồ kiến trúc (Visual Showcase & Mockups)**:
+     - Mọi tính năng thay đổi bố cục 4 góc màn hình, thanh Dock cạnh bên, biểu tượng thanh Menu Bar hay cử chỉ chuột bắt buộc phải cập nhật file vector SVG nguồn tại `Design/Logo/source/` (ví dụ: `stash_quadrant_overview.svg`, `stash_social_preview.svg`).
+     - Chạy lại `./Scripts/render_icons.sh` để tái tạo ảnh PNG Retina nhúng trong `README.md`.
+     - Tuyệt đối không để xảy ra tình trạng: code đã có tính năng mới nhưng hình ảnh minh họa trên `README.md` vẫn là phiên bản cũ, thiếu vắng các nút bấm, vành xoay hay chỉ báo trạng thái mới.
+  4. **Huy hiệu phiên bản & Đường dẫn tải về (Version Badges & CTA)**: Luôn đồng bộ số phiên bản và link tải DMG mới nhất (được kiểm chứng tự động qua bài test `VersionConsistencyTests`).
+
 **Quản lý Phiên bản & Single Source of Truth (Versioning)**:
 - Nguồn sự thật duy nhất của phiên bản là file `VERSION` ở thư mục gốc của repository (tuân thủ Semantic Versioning, ví dụ `2.3.5`).
 - Khi tăng phiên bản, bắt buộc phải đồng bộ chuẩn xác toàn bộ 6 vị trí:
@@ -30,12 +41,13 @@
 **Definition of Done**: một thay đổi chỉ hoàn thành khi:
 1. Build sạch, test pass, không thêm warning (`make test`). Bộ kiểm thử `VersionConsistencyTests` và `DocumentationIntegrityTests` phải pass 100%.
 2. Tài liệu `Docs/Guide` (cả vi và en) cập nhật nếu thay đổi ảnh hưởng tính năng, Settings, phím tắt, hành vi hoặc quyền. Tính năng mới thêm mục mới; sửa lỗi cập nhật mục liên quan và phần Xử lý sự cố.
-3. `CHANGELOG.md` có dòng mới (Added / Changed / Fixed), version tăng đúng semver (sửa lỗi: patch; tính năng tương thích: minor; thay đổi phá vỡ tương thích: major).
-4. DMG và update ZIP build lại bằng `scripts/build_dmg.sh` với version mới; báo đường dẫn và SHA-256. Không build được thì nói rõ lý do, không bỏ qua âm thầm.
-5. Commit code theo chuẩn Conventional Commits.
-6. Luôn tạo git tag phiên bản tương ứng (ví dụ `git tag v<version>`) và đẩy cả branch cùng tag lên remote repository (`git push origin <branch> && git push origin v<version>`). Tuyệt đối không bao giờ để lại commit hoặc tag dở dang chỉ ở local mà không push lên remote.
-7. **Kiểm tra phát hành & CI sau khi Push**: Sau khi push tag, bắt buộc phải kiểm tra trạng thái của GitHub Actions workflow (`gh run list --limit 1` hoặc `gh run view`) và đảm bảo GitHub Release tồn tại (`gh release view v<version>`), file ZIP cập nhật có thể tải được (HTTP 200/302, không 404). Nếu CI runner bị lỗi, phải khắc phục ngay lập tức.
-8. Báo cáo cuối có mục "Docs đã cập nhật", "DMG đã build", và "Git tag/commit đã push".
+3. **Đồng bộ README.md & Hình ảnh minh họa**: Khi có tính năng mới, thay đổi UI, thêm phím tắt, đổi quyền hoặc đổi hành vi tương tác, bắt buộc phải cập nhật đồng thời `README.md` (bao gồm mô tả tính năng, bảng phím tắt/quyền và tái tạo các sơ đồ/hình ảnh minh họa trực quan nếu cần thiết). Không được chỉ cập nhật `Docs/Guide` mà bỏ quên `README.md` hoặc để hình ảnh/sơ đồ trên README bị lỗi thời so với tính năng trong code.
+4. `CHANGELOG.md` có dòng mới (Added / Changed / Fixed), version tăng đúng semver (sửa lỗi: patch; tính năng tương thích: minor; thay đổi phá vỡ tương thích: major).
+5. DMG và update ZIP build lại bằng `scripts/build_dmg.sh` với version mới; báo đường dẫn và SHA-256. Không build được thì nói rõ lý do, không bỏ qua âm thầm.
+6. Commit code theo chuẩn Conventional Commits.
+7. Luôn tạo git tag phiên bản tương ứng (ví dụ `git tag v<version>`) và đẩy cả branch cùng tag lên remote repository (`git push origin <branch> && git push origin v<version>`). Tuyệt đối không bao giờ để lại commit hoặc tag dở dang chỉ ở local mà không push lên remote.
+8. **Kiểm tra phát hành & CI sau khi Push**: Sau khi push tag, bắt buộc phải kiểm tra trạng thái của GitHub Actions workflow (`gh run list --limit 1` hoặc `gh run view`) và đảm bảo GitHub Release tồn tại (`gh release view v<version>`), file ZIP cập nhật có thể tải được (HTTP 200/302, không 404). Nếu CI runner bị lỗi, phải khắc phục ngay lập tức.
+9. Báo cáo cuối có mục "Docs đã cập nhật", "DMG đã build", và "Git tag/commit đã push".
 Với thay đổi nội bộ không ảnh hưởng người dùng cuối (refactor): vẫn rebuild DMG, tạo tag và push đầy đủ, ghi "không cần đổi docs".
 
 **Auto-Update & Release Pipeline (Sparkle 2)**:
@@ -44,4 +56,4 @@ Với thay đổi nội bộ không ảnh hưởng người dùng cuối (refact
 - Bảo mật khóa: Private key lưu trên GitHub Secrets (`SPARKLE_PRIVATE_KEY`) và local `Scripts/.sparkle_keys.json` (được đưa vào `.gitignore`). Tuyệt đối không commit khóa bí mật lên repository.
 - Tự động hóa CI/CD & Bắt buộc Push Tag: Mỗi khi hoàn thành phiên bản hoặc sửa đổi tính năng, agent bắt buộc phải commit, tạo git tag `v<version>` và push lên remote (`git push origin <branch> && git push origin v<version>`). Hành động này sẽ kích hoạt GitHub Actions kiểm thử, biên dịch universal binary, ký gói zip, cập nhật `appcast.xml`, và tạo GitHub Release tự động.
 
-**Không được làm**: tự ý thêm dependency lớn; commit bí mật; sửa phần đang chạy tốt ngoài phạm vi; che lỗi bằng `try?` hoặc timeout cứng; báo "xong" khi chưa kiểm chứng; hardcode số phiên bản trong chuỗi giao diện.
+**Không được làm**: tự ý thêm dependency lớn; commit bí mật; sửa phần đang chạy tốt ngoài phạm vi; che lỗi bằng `try?` hoặc timeout cứng; báo "xong" khi chưa kiểm chứng; hardcode số phiên bản trong chuỗi giao diện; bỏ quên `README.md` hoặc để hình ảnh/sơ đồ minh họa trên README bị lỗi thời so với tính năng thực tế trong code.

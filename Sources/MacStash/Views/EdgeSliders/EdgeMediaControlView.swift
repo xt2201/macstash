@@ -45,7 +45,10 @@ public struct EdgeMediaControlView: View {
                 if appState.settings.edgeBarVisualizerEnabled {
                     DancingVisualizerView(
                         isPlaying: nowPlaying.isPlaying,
-                        volumeFraction: audio.volume
+                        volumeFraction: audio.volume,
+                        levels: nowPlaying.audioLevels,
+                        primaryTint: nowPlaying.artworkTint,
+                        secondaryTint: nowPlaying.artworkSecondaryTint
                     )
                     .padding(.vertical, 1)
                 }
@@ -74,7 +77,10 @@ public struct EdgeMediaControlView: View {
                             Circle()
                                 .fill(
                                     LinearGradient(
-                                        colors: [
+                                        colors: nowPlaying.isPlaying ? [
+                                            nowPlaying.artworkTint.opacity(isPlayHovered ? 0.42 : 0.30),
+                                            nowPlaying.artworkSecondaryTint.opacity(isPlayHovered ? 0.24 : 0.14)
+                                        ] : [
                                             Color.white.opacity(isPlayHovered ? 0.32 : 0.22),
                                             Color.white.opacity(isPlayHovered ? 0.16 : 0.08)
                                         ],
@@ -83,7 +89,19 @@ public struct EdgeMediaControlView: View {
                                     )
                                 )
                                 .frame(width: 34, height: 34)
-                                .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
+                                .overlay(
+                                    Circle()
+                                        .stroke(
+                                            nowPlaying.isPlaying ? nowPlaying.artworkTint.opacity(0.45) : Color.white.opacity(0.18),
+                                            lineWidth: 1
+                                        )
+                                )
+                                .shadow(
+                                    color: nowPlaying.isPlaying ? nowPlaying.artworkTint.opacity(0.35) : Color.black.opacity(0.25),
+                                    radius: 5,
+                                    x: 0,
+                                    y: 2
+                                )
 
                             Image(systemName: nowPlaying.isPlaying ? "pause.fill" : "play.fill")
                                 .font(.system(size: 13, weight: .bold))
@@ -133,9 +151,17 @@ public struct EdgeMediaControlView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            .stroke(
+                                nowPlaying.isPlaying ? nowPlaying.artworkTint.opacity(0.55) : Color.white.opacity(0.22),
+                                lineWidth: 1.2
+                            )
                     )
-                    .shadow(color: Color.black.opacity(0.35), radius: 5, x: 0, y: 2)
+                    .shadow(
+                        color: nowPlaying.isPlaying ? nowPlaying.artworkTint.opacity(0.42) : Color.black.opacity(0.35),
+                        radius: 6,
+                        x: 0,
+                        y: 2
+                    )
             } else {
                 // Placeholder vinyl / musical note when no artwork is available
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -173,7 +199,11 @@ public struct EdgeMediaControlView: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 44, height: 44)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(nowPlaying.artworkTint.opacity(0.45), lineWidth: 1)
+                    )
+                    .shadow(color: nowPlaying.artworkTint.opacity(0.35), radius: 5, x: 0, y: 2)
             }
 
             VStack(alignment: .leading, spacing: 3) {
@@ -194,6 +224,11 @@ public struct EdgeMediaControlView: View {
                         .font(.system(size: 10))
                         .foregroundColor(.secondary.opacity(0.8))
                         .lineLimit(1)
+                } else if !nowPlaying.appName.isEmpty {
+                    Text(nowPlaying.appName)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(nowPlaying.artworkTint.opacity(0.9))
+                        .lineLimit(1)
                 }
             }
             .frame(maxWidth: 180, alignment: .leading)
@@ -207,7 +242,7 @@ public struct EdgeMediaControlView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                .stroke(nowPlaying.artworkTint.opacity(0.28), lineWidth: 1)
         )
     }
 }

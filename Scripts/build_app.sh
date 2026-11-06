@@ -16,10 +16,21 @@ echo "Assembling MacStash.app bundle..."
 rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$APP_BUNDLE/Contents/Resources"
+mkdir -p "$APP_BUNDLE/Contents/Frameworks"
 
 cp "$BIN_PATH" "$APP_BUNDLE/Contents/MacOS/MacStash"
 cp "$PROJECT_DIR/Scripts/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
 chmod +x "$APP_BUNDLE/Contents/MacOS/MacStash"
+
+if [[ -f "$PROJECT_DIR/.build/release/libMacStashNowPlaying.dylib" ]]; then
+    cp "$PROJECT_DIR/.build/release/libMacStashNowPlaying.dylib" "$APP_BUNDLE/Contents/Frameworks/libMacStashNowPlaying.dylib"
+    chmod +x "$APP_BUNDLE/Contents/Frameworks/libMacStashNowPlaying.dylib"
+fi
+
+if [[ -d "$PROJECT_DIR/Sources/MacStash/Resources" ]]; then
+    cp -R "$PROJECT_DIR/Sources/MacStash/Resources/"* "$APP_BUNDLE/Contents/Resources/" 2>/dev/null || true
+    chmod +x "$APP_BUNDLE/Contents/Resources/now-playing.pl" 2>/dev/null || true
+fi
 
 echo "Ad-hoc code signing MacStash.app..."
 codesign --force --deep --sign - "$APP_BUNDLE"

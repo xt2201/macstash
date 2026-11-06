@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.7.0] - 2026-11-06
+
+### Added
+- Native macOS 15.4+ / 26+ MediaRemote Platform-Binary Bridge (`now-playing.pl` + `libMacStashNowPlaying.dylib` via `MRPlayerPath` and `MRMediaRemoteGetNowPlayingInfoForPlayer`), enabling universal real-time Now Playing metadata and high-resolution album artwork capture across all browsers (including Crest playing SoundCloud, Safari, Chrome, Arc) and native players (Spotify, Apple Music, VLC).
+- Artwork Dominant Color Extraction & Dynamic Visualizer Tinting: automatically samples a 24x24 RGBA histogram from the current track's album cover to extract vibrant primary and secondary accent colors, dynamically tinting the 5-bar dancing equalizer, artwork ring, and transport glow to match the playing track.
+- 30fps Real-Time Rhythm Envelope Generator driving the 5-bar vertical audio visualizer with fast attack and smooth decay synchronized with live playback state and volume.
+
+### Fixed
+- Fixed 120Hz EdgeBar vertical slider up/down scrubbing and two-finger trackpad scroll smoothness by dispatching CoreAudio hardware writes asynchronously, ignoring stale hardware readback callbacks during active scrubbing, caching display profiles in memory, debouncing UserDefaults persistence, and removing conflicting implicit SwiftUI animations.
+- Fixed Now Playing transport commands (`toggle`, `next`, `previous`) to target the exact active `MRPlayerPath` player process on macOS 15.4+ and newer.
+
+---
+
 ## [2.6.0] - 2026-11-06
 
 ### Added

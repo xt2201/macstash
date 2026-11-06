@@ -8,6 +8,7 @@ import MacStashCore
 public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
     private let appState: AppState
     private let edge: EdgePosition
+    private var scrollEndWorkItem: DispatchWorkItem?
 
     public init(
         rootView: EdgeSliderView,
@@ -96,13 +97,24 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
 
         let sensitivity: Float = 0.005
         let step = Float(deltaY) * sensitivity
-        let current = Float(appState.getValue(for: action, displayID: rootView.displayID))
+        let current = appState.liveEdgeSliderValue ?? Float(appState.getValue(for: action, displayID: rootView.displayID))
         let clamped = max(0.0, min(1.0, current + step))
 
+        appState.liveEdgeSliderValue = clamped
         appState.setValue(for: action, value: Double(clamped), displayID: rootView.displayID)
 
+        scrollEndWorkItem?.cancel()
         if event.phase == .ended || event.phase == .cancelled {
+            appState.liveEdgeSliderValue = nil
             appState.saveSettings()
+        } else {
+            let item = DispatchWorkItem { [weak self] in
+                guard let self = self else { return }
+                self.appState.liveEdgeSliderValue = nil
+                self.appState.saveSettings()
+            }
+            scrollEndWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22, execute: item)
         }
     }
 }

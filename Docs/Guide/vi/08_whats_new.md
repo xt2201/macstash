@@ -1,3 +1,14 @@
+# Có Gì Mới Trong Phiên Bản 2.7.0
+
+MacStash 2.7.0 nâng cấp cầu nối MediaRemote cấp hệ thống cho macOS 15.4 trở lên, trích xuất màu sắc chủ đạo từ ảnh bìa bài hát cho hiệu ứng sóng nhạc nhảy theo điệu, và tối ưu hóa độ mượt 120Hz cho thanh trượt dọc EdgeBar.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.7.0
+
+- Bắt Nhạc & Ảnh Bìa Đa Trình Duyệt Trên macOS 15.4+: Sử dụng cầu nối `now-playing.pl` và `libMacStashNowPlaying.dylib` thông qua `MRPlayerPath`, giúp bắt chính xác tên bài hát, nghệ sĩ, trạng thái phát và ảnh bìa album từ mọi trình duyệt (bao gồm trình duyệt Crest đang phát SoundCloud, Safari, Chrome, Arc) cũng như Spotify, Apple Music và VLC.
+- Hiệu Ứng Sóng Nhạc Đổi Màu Theo Ảnh Bìa: Tự động phân tích phổ màu từ ảnh bìa của bài hát đang phát để nhuộm màu đồng bộ cho 5 thanh sóng nhạc equalizer, viền phát sáng quanh ảnh bìa và nút Phát/Tạm dừng.
+- Nhịp Điệu Sóng Nhạc Thời Gian Thực 30fps: Bộ tạo nhịp đa băng tần mô phỏng độ nảy âm trầm và âm cao sống động theo bài hát đang phát và tự động hạ nhịp êm ái khi tạm dừng.
+- Thanh Trượt EdgeBar Mượt Mà 120Hz: Tách biệt luồng ghi phần cứng CoreAudio bất đồng bộ, triệt tiêu xung đột đọc ngược khi đang kéo, lưu đệm cấu hình màn hình và trì hoãn ghi đĩa giúp thao tác kéo chuột lên xuống hoặc cuộn 2 ngón tay mượt mà tức thì.
+
 # Có Gì Mới Trong Phiên Bản 2.6.0
 
 MacStash 2.6.0 mang đến tính năng đinh Kệ thả tệp Stash Shelf, núm xoay chống tắt máy Keep-Awake (Caffeine), bảng ghi chú nhanh Scratchpad và vòng xoay điều khiển tại con trỏ chuột Cursor Radial Palette.

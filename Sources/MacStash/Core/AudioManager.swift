@@ -21,12 +21,16 @@ public final class AudioManager: ObservableObject {
 
     private var defaultOutputDeviceID: AudioDeviceID = 0
     private var volumeListenerBlock: AudioObjectPropertyListenerBlock?
+    private var defaultDeviceListenerBlock: AudioObjectPropertyListenerBlock?
+    private let hardwareQueue = DispatchQueue(label: "com.macstash.audio.hardware", qos: .userInteractive)
+    private var lastUserVolumeSetTime: TimeInterval = 0
 
     private init() {
         refreshDefaultDevice()
         refreshOutputDevices()
         setupListeners()
-        updateVolumeFromHardware()
+        setupDefaultDeviceListener()
+        updateVolumeFromHardware(force: true)
     }
 
 
@@ -169,47 +173,64 @@ public final class AudioManager: ObservableObject {
 
     public func setVolume(_ newVolume: Float) {
         let clamped = max(0.0, min(1.0, newVolume))
-        refreshDefaultDevice()
-        guard defaultOutputDeviceID != 0 else { return }
+        if defaultOutputDeviceID == 0 {
+            refreshDefaultDevice()
+        }
+        let devID = defaultOutputDeviceID
+        guard devID != 0 else { return }
 
-        var vol = clamped
-        let size = UInt32(MemoryLayout.size(ofValue: vol))
-        var address = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
-            mScope: kAudioObjectPropertyScopeOutput,
-            mElement: kAudioObjectPropertyElementMain
-        )
+        // Optimistically update UI state immediately for 120fps zero-latency scrubbing
+        self.lastUserVolumeSetTime = ProcessInfo.processInfo.systemUptime
+        self.volume = clamped
+        let shouldUnmute = self.isMuted && clamped > 0
+        if shouldUnmute {
+            self.isMuted = false
+        }
 
-        var status = AudioObjectSetPropertyData(
-            defaultOutputDeviceID,
-            &address,
-            0,
-            nil,
-            size,
-            &vol
-        )
-
-        if status != noErr {
-            // Fallback to scalar volume property if virtual main volume isn't supported on this device
-            var scalarAddr = AudioObjectPropertyAddress(
-                mSelector: kAudioDevicePropertyVolumeScalar,
+        // Dispatch CoreAudio IPC asynchronously so the main thread never stalls during drag/scroll
+        hardwareQueue.async {
+            var vol = clamped
+            let size = UInt32(MemoryLayout.size(ofValue: vol))
+            var address = AudioObjectPropertyAddress(
+                mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
                 mScope: kAudioObjectPropertyScopeOutput,
                 mElement: kAudioObjectPropertyElementMain
             )
-            status = AudioObjectSetPropertyData(
-                defaultOutputDeviceID,
-                &scalarAddr,
+
+            var status = AudioObjectSetPropertyData(
+                devID,
+                &address,
                 0,
                 nil,
                 size,
                 &vol
             )
-        }
 
-        if status == noErr {
-            self.volume = clamped
-            if self.isMuted && clamped > 0 {
-                self.setMute(false)
+            if status != noErr {
+                var scalarAddr = AudioObjectPropertyAddress(
+                    mSelector: kAudioDevicePropertyVolumeScalar,
+                    mScope: kAudioObjectPropertyScopeOutput,
+                    mElement: kAudioObjectPropertyElementMain
+                )
+                status = AudioObjectSetPropertyData(
+                    devID,
+                    &scalarAddr,
+                    0,
+                    nil,
+                    size,
+                    &vol
+                )
+            }
+
+            if shouldUnmute {
+                var muteVal: UInt32 = 0
+                let muteSize = UInt32(MemoryLayout.size(ofValue: muteVal))
+                var muteAddr = AudioObjectPropertyAddress(
+                    mSelector: kAudioDevicePropertyMute,
+                    mScope: kAudioObjectPropertyScopeOutput,
+                    mElement: kAudioObjectPropertyElementMain
+                )
+                _ = AudioObjectSetPropertyData(devID, &muteAddr, 0, nil, muteSize, &muteVal)
             }
         }
     }
@@ -219,7 +240,9 @@ public final class AudioManager: ObservableObject {
     }
 
     public func setMute(_ mute: Bool) {
-        refreshDefaultDevice()
+        if defaultOutputDeviceID == 0 {
+            refreshDefaultDevice()
+        }
         guard defaultOutputDeviceID != 0 else { return }
 
         var muteVal: UInt32 = mute ? 1 : 0
@@ -240,14 +263,17 @@ public final class AudioManager: ObservableObject {
         )
 
         if status == noErr {
-            DispatchQueue.main.async {
-                self.isMuted = mute
-            }
+            self.isMuted = mute
         }
     }
 
-    public func updateVolumeFromHardware() {
-        refreshDefaultDevice()
+    public func updateVolumeFromHardware(force: Bool = false) {
+        if !force && (ProcessInfo.processInfo.systemUptime - lastUserVolumeSetTime) < 0.18 {
+            return
+        }
+        if defaultOutputDeviceID == 0 {
+            refreshDefaultDevice()
+        }
         guard defaultOutputDeviceID != 0 else { return }
 
         var vol: Float32 = 0.0
@@ -300,15 +326,39 @@ public final class AudioManager: ObservableObject {
             &muteVal
         )
 
-        DispatchQueue.main.async {
-            if status == noErr {
-                self.volume = vol
-            }
-            self.isMuted = (muteVal == 1)
+        if status == noErr {
+            self.volume = vol
         }
+        self.isMuted = (muteVal == 1)
     }
 
     // MARK: - Real-time Listeners
+
+    private func setupDefaultDeviceListener() {
+        var defaultDeviceAddr = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        defaultDeviceListenerBlock = { [weak self] (_, _) in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                self.removeListeners()
+                self.refreshDefaultDevice()
+                self.refreshOutputDevices()
+                self.setupListeners()
+                self.updateVolumeFromHardware(force: true)
+            }
+        }
+        if let block = defaultDeviceListenerBlock {
+            AudioObjectAddPropertyListenerBlock(
+                AudioObjectID(kAudioObjectSystemObject),
+                &defaultDeviceAddr,
+                DispatchQueue.main,
+                block
+            )
+        }
+    }
 
     private func setupListeners() {
         guard defaultOutputDeviceID != 0 else { return }
@@ -320,7 +370,9 @@ public final class AudioManager: ObservableObject {
         )
 
         volumeListenerBlock = { [weak self] (_, _) in
-            self?.updateVolumeFromHardware()
+            Task { @MainActor [weak self] in
+                self?.updateVolumeFromHardware(force: false)
+            }
         }
 
         if let block = volumeListenerBlock {

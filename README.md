@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.6.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.7.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.6.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.7.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -107,10 +107,10 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Adjust Volume, Display Brightness, Keep Awake, and Focus Timer anywhere on screen without flinging the pointer across 34"–49" Ultrawide setups.
 
 ### 8. Hidden Edge Slider &amp; Now Playing Media Controls
-- Rides flush against your screen border with configurable actions in Settings (Volume, Brightness, Keyboard, Timer, Keep Awake, Stash Shelf, Scratchpad).
+- Rides flush against your screen border with configurable actions in Settings (Volume, Brightness, Keyboard, Timer, Keep Awake, Stash Shelf, Scratchpad) and 120Hz ProMotion vertical drag/scroll smoothness.
 - Smoothly slides into view when hovering the edge.
-- **Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, animated dancing audio waveform visualizer, and vertical transport controls (Previous on top, Play/Pause in middle, Next at bottom) for any playing application.
-- **Hover Track Tooltip**: Floating glassmorphic card previews full track title, artist, and album on hover.
+- **Universal Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, a 5-bar rhythm audio visualizer dynamically tinted to match the track's artwork color, and vertical transport controls (Previous on top, Play/Pause in middle, Next at bottom) across all browsers (Crest, Safari, Chrome, Arc) and native players (Spotify, Apple Music, VLC).
+- **Hover Track Tooltip**: Floating glassmorphic card previews full track title, artist, album, and source app on hover.
 - **Two-Finger Edge Scrubbing**: Seamlessly tune volume, brightness, or your chosen action on the edge slider using natural two-finger vertical scrolling.
 
 ### 9. Tactile Detents &amp; Mechanical Acoustics

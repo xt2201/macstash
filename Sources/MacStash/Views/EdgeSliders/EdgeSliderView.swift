@@ -38,6 +38,9 @@ public struct EdgeSliderView: View {
         if isDragging {
             return dragValue
         }
+        if let live = appState.liveEdgeSliderValue {
+            return live
+        }
         return Float(appState.getValue(for: action, displayID: displayID))
     }
 
@@ -83,15 +86,20 @@ public struct EdgeSliderView: View {
                     )
                     .padding(.top, 12)
 
-                // Vertical Track Bar
+                // Vertical Track Bar (wide interactive hit zone around sleek 14pt track capsule)
                 GeometryReader { geo in
-                    let trackH = geo.size.height
+                    let trackH = max(1, geo.size.height)
                     let fillH = trackH * CGFloat(currentValue)
 
                     ZStack(alignment: .bottom) {
-                        // Track background
+                        // Full-width invisible hit zone so vertical drag never slips off the narrow track
+                        Color.clear
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                        // Visual Track background
                         Capsule()
                             .fill(Color.white.opacity(0.12))
+                            .frame(width: 14)
 
                         // Fill level
                         Capsule()
@@ -102,7 +110,7 @@ public struct EdgeSliderView: View {
                                     endPoint: .bottom
                                 )
                             )
-                            .frame(height: max(6, fillH))
+                            .frame(width: 14, height: max(6, fillH))
 
                         // Thumb indicator
                         Circle()
@@ -110,6 +118,10 @@ public struct EdgeSliderView: View {
                             .frame(width: 14, height: 14)
                             .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 1)
                             .offset(y: -(fillH - 7))
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .transaction { transaction in
+                        transaction.animation = nil
                     }
                     .contentShape(Rectangle())
                     .gesture(
@@ -119,15 +131,18 @@ public struct EdgeSliderView: View {
                                 let progress = 1.0 - (gesture.location.y / trackH)
                                 let clamped = max(0.0, min(1.0, Float(progress)))
                                 dragValue = clamped
+                                appState.liveEdgeSliderValue = clamped
                                 appState.setValue(for: action, value: Double(clamped), displayID: displayID)
                             }
                             .onEnded { _ in
                                 isDragging = false
+                                appState.liveEdgeSliderValue = nil
+                                appState.saveSettings()
                             }
                     )
                 }
-                .frame(width: 14, height: shouldShowMediaControls ? 110 : 140)
-                .padding(.horizontal, 16)
+                .frame(width: 44, height: shouldShowMediaControls ? 110 : 140)
+                .padding(.horizontal, 3)
 
                 // Percentage label
                 Text("\(Int(currentValue * 100))%")

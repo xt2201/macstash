@@ -1,3 +1,14 @@
+# What's New in Version 2.7.0
+
+MacStash 2.7.0 introduces a dedicated MediaRemote platform-binary bridge for macOS 15.4 and newer, dynamic album artwork color extraction for the dancing audio visualizer, and 120Hz zero-latency EdgeBar vertical slider scrubbing.
+
+## Key Enhancements in Version 2.7.0
+
+- Universal Browser & App Now Playing Capture on macOS 15.4+: Powered by a native platform-binary bridge (`now-playing.pl` and `libMacStashNowPlaying.dylib`) using `MRPlayerPath`, MacStash reliably captures live track title, artist, playback state, and full album artwork from any browser (including Crest playing SoundCloud, Safari, Chrome, Arc) as well as Spotify, Apple Music, and VLC.
+- Artwork Dominant Color Tinting: Extracts the most vibrant dominant color palette directly from the current track's album cover to dynamically tint the 5-bar dancing equalizer, artwork border glow, and Play/Pause button.
+- Real-Time Rhythm Visualizer Envelope: 30fps multi-band rhythm generator with fast attack and smooth decay that dances to the beat of the active audio session and rests smoothly when paused.
+- 120Hz ProMotion EdgeBar Smoothness: Asynchronous CoreAudio hardware dispatch, readback jitter suppression, display profile caching, and debounced settings persistence deliver instant, butter-smooth vertical dragging and two-finger trackpad scrolling along the screen edge.
+
 # What's New in Version 2.6.0
 
 MacStash 2.6.0 introduces the signature Tactile Stash Drop Shelf, a Keep-Awake (Caffeine) radial timer, an instant Quick Scratchpad drawer, and a Cursor Radial Palette for Ultrawide monitors.

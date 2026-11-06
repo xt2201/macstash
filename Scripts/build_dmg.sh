@@ -87,6 +87,14 @@ echo "[2/7] Merging universal binary via lipo..."
 lipo -create -output "$APP_BUNDLE/Contents/MacOS/Stash" "$ARM64_BIN" "$X86_BIN"
 chmod +x "$APP_BUNDLE/Contents/MacOS/Stash"
 
+ARM64_NP_DYLIB="$REPO_ROOT/.build/arm64-apple-macosx/release/libMacStashNowPlaying.dylib"
+X86_NP_DYLIB="$REPO_ROOT/.build/x86_64-apple-macosx/release/libMacStashNowPlaying.dylib"
+if [[ -f "$ARM64_NP_DYLIB" && -f "$X86_NP_DYLIB" ]]; then
+    echo "Merging universal libMacStashNowPlaying.dylib..."
+    lipo -create -output "$APP_BUNDLE/Contents/Frameworks/libMacStashNowPlaying.dylib" "$ARM64_NP_DYLIB" "$X86_NP_DYLIB"
+    chmod +x "$APP_BUNDLE/Contents/Frameworks/libMacStashNowPlaying.dylib"
+fi
+
 # Add rpath for embedded frameworks
 install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP_BUNDLE/Contents/MacOS/Stash" 2>/dev/null || true
 
@@ -116,6 +124,9 @@ fi
 # Copy icon and resources into app bundle
 if [[ -d "$REPO_ROOT/Sources/MacStash/Resources" ]]; then
     cp -R "$REPO_ROOT/Sources/MacStash/Resources/"* "$APP_BUNDLE/Contents/Resources/" 2>/dev/null || true
+    if [[ -f "$APP_BUNDLE/Contents/Resources/now-playing.pl" ]]; then
+        chmod +x "$APP_BUNDLE/Contents/Resources/now-playing.pl"
+    fi
 fi
 
 # Embed target resource bundles if present
@@ -143,6 +154,11 @@ fi
 echo "[4/7] Code signing application bundle..."
 SIGNING_IDENTITY="${SIGNING_IDENTITY:-}"
 SIGN_ID_ARG="${SIGNING_IDENTITY:--}"
+
+NP_DYLIB="$APP_BUNDLE/Contents/Frameworks/libMacStashNowPlaying.dylib"
+if [[ -f "$NP_DYLIB" ]]; then
+    codesign --force --sign "$SIGN_ID_ARG" "$NP_DYLIB"
+fi
 
 FW="$APP_BUNDLE/Contents/Frameworks/Sparkle.framework"
 if [[ -d "$FW" ]]; then

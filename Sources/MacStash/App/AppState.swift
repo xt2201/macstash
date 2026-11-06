@@ -28,7 +28,7 @@ public final class AppState: ObservableObject {
 
     @Published public var settings: AppSettings {
         didSet {
-            persistence.saveSettings(settings)
+            scheduleSaveSettings()
             let lang = AppLanguage(rawValue: settings.language) ?? .system
             LocalizationService.shared.setLanguage(lang)
             let newEffective = LocalizationService.shared.effectiveLanguage
@@ -37,6 +37,16 @@ public final class AppState: ObservableObject {
             }
             applyPomodoroSettings()
         }
+    }
+
+    private func scheduleSaveSettings() {
+        settingsSaveWorkItem?.cancel()
+        let item = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.persistence.saveSettings(self.settings)
+        }
+        settingsSaveWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: item)
     }
 
     @Published public var effectiveLanguage: String = "en"
@@ -90,8 +100,12 @@ public final class AppState: ObservableObject {
     @Published public var activeCorner: CornerPosition? = nil
     @Published public var activeDisplayID: CGDirectDisplayID = 0
     @Published public var isRightSliderActive: Bool = false
+    @Published public var liveEdgeSliderValue: Float? = nil
     @Published public var isAudioDevicePickerPresented: Bool = false
     @Published public var isCursorPalettePresented: Bool = false
+
+    private var cachedDisplays: [DisplayInfo] = []
+    private var settingsSaveWorkItem: DispatchWorkItem?
 
     // Pomodoro dynamic published properties
     @Published public var pomodoroRemainingSeconds: TimeInterval = TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds)
@@ -146,6 +160,7 @@ public final class AppState: ObservableObject {
         for (_, profile) in loaded.displayBrightnessProfiles {
             brightnessService.setProfile(profile)
         }
+        self.cachedDisplays = brightnessService.queryConnectedDisplays()
 
         setupSubscribers()
         setupPomodoroTimer()
@@ -201,6 +216,23 @@ public final class AppState: ObservableObject {
                 self?.tickPomodoro()
             }
         }
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                self.cachedDisplays = self.brightnessService.queryConnectedDisplays()
+            }
+        }
+    }
+
+    private func connectedDisplays() -> [DisplayInfo] {
+        if cachedDisplays.isEmpty {
+            cachedDisplays = brightnessService.queryConnectedDisplays()
+        }
+        return cachedDisplays
     }
 
     public func applyPomodoroSettings() {
@@ -339,7 +371,7 @@ public final class AppState: ObservableObject {
             return Double(audio.volume)
         case .brightness:
             let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
-            let displays = brightnessService.queryConnectedDisplays()
+            let displays = connectedDisplays()
             if let display = displays.first(where: { $0.id == targetID }) {
                 if let profile = brightnessService.profile(for: display.uuid) {
                     return Double(profile.brightnessLevel)
@@ -381,7 +413,7 @@ public final class AppState: ObservableObject {
             audio.setVolume(clamped)
         case .brightness:
             let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
-            let displays = brightnessService.queryConnectedDisplays()
+            let displays = connectedDisplays()
             if let display = displays.first(where: { $0.id == targetID }) {
                 var profile = brightnessService.profile(for: display.uuid) ?? DisplayBrightnessProfile(
                     displayUUID: display.uuid,

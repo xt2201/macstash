@@ -15,12 +15,21 @@ let package = Package(
         .library(
             name: "MacStashCore",
             targets: ["MacStashCore"]
+        ),
+        .library(
+            name: "MacStashNowPlaying",
+            type: .dynamic,
+            targets: ["MacStashNowPlaying"]
         )
     ],
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.4")
     ],
     targets: [
+        .target(
+            name: "MacStashNowPlaying",
+            path: "Sources/MacStashNowPlaying"
+        ),
         .target(
             name: "MacStashCore",
             path: "Sources/MacStashCore",

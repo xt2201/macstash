@@ -180,6 +180,7 @@ public final class LocalizationService: @unchecked Sendable {
             "displays.methodBuiltIn": "Native DisplayServices",
             "displays.builtInDisplay": "Built-in Retina Display",
             "displays.externalDisplay": "External Monitor",
+            "displays.activeMethodLabel": "Active Method",
             "displays.brightnessTest": "Brightness Test:",
 
             // Pomodoro Tab
@@ -369,6 +370,7 @@ public final class LocalizationService: @unchecked Sendable {
             "displays.methodBuiltIn": "DisplayServices mặc định",
             "displays.builtInDisplay": "Màn hình Retina tích hợp",
             "displays.externalDisplay": "Màn hình ngoài",
+            "displays.activeMethodLabel": "Phương thức kích hoạt",
             "displays.brightnessTest": "Thử nghiệm độ sáng:",
 
             // Pomodoro Tab

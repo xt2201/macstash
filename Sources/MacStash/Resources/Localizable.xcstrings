@@ -2688,6 +2688,22 @@
           }
         }
       }
+    },
+    "displays.activeMethodLabel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active Method"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phương thức kích hoạt"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -197,22 +197,54 @@ public struct MenuBarExtraView: View {
                 }
 
                 // Display Brightness
-                HStack(spacing: 8) {
-                    Image(systemName: "sun.max.fill")
-                        .foregroundColor(.orange)
-                        .frame(width: 16)
+                let connectedDisplays = appState.brightnessService.queryConnectedDisplays()
+                if connectedDisplays.count <= 1 {
+                    HStack(spacing: 8) {
+                        Image(systemName: "sun.max.fill")
+                            .foregroundColor(.orange)
+                            .frame(width: 16)
 
-                    Slider(
-                        value: Binding(
-                            get: { appState.getValue(for: .brightness) },
-                            set: { appState.setValue(for: .brightness, value: $0) }
-                        ),
-                        in: 0...1
-                    )
+                        Slider(
+                            value: Binding(
+                                get: { appState.getValue(for: .brightness) },
+                                set: { appState.setValue(for: .brightness, value: $0) }
+                            ),
+                            in: 0...1
+                        )
 
-                    Text("\(Int(appState.getValue(for: .brightness) * 100))%")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .frame(width: 32)
+                        Text("\(Int(appState.getValue(for: .brightness) * 100))%")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .frame(width: 32)
+                    }
+                } else {
+                    VStack(spacing: 6) {
+                        ForEach(connectedDisplays, id: \.uuid) { disp in
+                            HStack(spacing: 8) {
+                                Image(systemName: disp.isBuiltIn ? "laptopcomputer" : "display")
+                                    .foregroundColor(.orange)
+                                    .frame(width: 16)
+
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(disp.name)
+                                        .font(.system(size: 9, weight: .medium))
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(1)
+
+                                    Slider(
+                                        value: Binding(
+                                            get: { appState.getValue(for: .brightness, displayID: disp.id) },
+                                            set: { appState.setValue(for: .brightness, value: $0, displayID: disp.id) }
+                                        ),
+                                        in: 0...1
+                                    )
+                                }
+
+                                Text("\(Int(appState.getValue(for: .brightness, displayID: disp.id) * 100))%")
+                                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                                    .frame(width: 32)
+                            }
+                        }
+                    }
                 }
 
                 // Keyboard Brightness

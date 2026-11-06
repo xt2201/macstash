@@ -120,7 +120,7 @@ public struct DisplaysTab: View {
                     set: { newMethod in
                         var updated = profile
                         updated.preferredMethod = newMethod
-                        appState.brightnessService.setProfile(updated)
+                        appState.updateDisplayProfile(updated)
                     }
                 )) {
                     Text(appState.localized("displays.methodAuto")).tag(BrightnessMethod.auto)
@@ -140,7 +140,7 @@ public struct DisplaysTab: View {
                 Image(systemName: "info.circle")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
-                Text("Active Method: \(resolved.method.displayName) — \(resolved.reason)")
+                Text("\(appState.localized("displays.activeMethodLabel")): \(resolved.method.displayName) — \(resolved.reason)")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
             }
@@ -155,7 +155,7 @@ public struct DisplaysTab: View {
                         set: { val in
                             var updated = profile
                             updated.brightnessLevel = Float(val)
-                            appState.brightnessService.setProfile(updated)
+                            appState.updateDisplayProfile(updated)
                             Task {
                                 _ = await appState.brightnessService.setBrightness(Float(val), for: display)
                             }

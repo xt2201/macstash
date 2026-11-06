@@ -121,6 +121,10 @@ public final class AppState: ObservableObject {
         restorePomodoroSnapshot()
         syncPomodoroProperties()
 
+        for (_, profile) in loaded.displayBrightnessProfiles {
+            brightnessService.setProfile(profile)
+        }
+
         setupSubscribers()
         setupPomodoroTimer()
         setupSystemWakeObserver()
@@ -236,6 +240,11 @@ public final class AppState: ObservableObject {
         savePomodoroSnapshot()
     }
 
+    public func updateDisplayProfile(_ profile: DisplayBrightnessProfile) {
+        brightnessService.setProfile(profile)
+        settings.displayBrightnessProfiles[profile.displayUUID] = profile
+    }
+
     private func tickPomodoro() {
         guard pomodoroEngine.state.isRunning else {
             isPomodoroRunning = false
@@ -325,7 +334,7 @@ public final class AppState: ObservableObject {
                     isBuiltIn: display.isBuiltIn
                 )
                 profile.brightnessLevel = clamped
-                brightnessService.setProfile(profile)
+                updateDisplayProfile(profile)
                 Task {
                     _ = await brightnessService.setBrightness(clamped, for: display)
                 }

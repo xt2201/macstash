@@ -9,23 +9,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - Two-finger trackpad scroll adjustment (option in Settings > Hot Corners > Interaction Gestures) to seamlessly tune volume, brightness, backlight, and Pomodoro timer without clicking and dragging.
-- Two-finger scroll adjustment applied across all 4 corner dials and the screen edge slider bar.
-- Automatic trackpad momentum phase filtering to avoid value runaway after lifting fingers.
-- Support for traditional mouse scroll wheel notches.
-
----
-
-## [2.3.6] - 2026-11-06
-
-### Added
-- Thêm tùy chọn "Chỉ kích hoạt góc biên ngoài (tắt góc tiếp giáp giữa các màn hình)" (`onlyOuterCorners`) trong Cài đặt > Góc Màn Hình (Hot Corners), mặc định tắt để mọi góc trên mọi màn hình đều sử dụng được.
-- Cơ chế kích hoạt vòng xoay tức thì khi nhấp chuột (Click-to-Activate) tại 4 góc màn hình mà không cần chờ độ trễ dừng chuột (dwell delay).
+- Instant click-to-activate corner dials across all 4 screen corners without waiting for dwell delay.
+- Option to toggle outer-only corner triggering under Settings > Hot Corners (`onlyOuterCorners`), defaulted to false so every corner on multi-monitor setups works out of the box.
+- Independent per-display brightness control via the right-edge vertical slider on external screens.
 
 ### Fixed
-- Sửa lỗi không hiển thị vòng xoay tính năng và thanh trượt cạnh phải trên màn hình phụ do bị thuật toán lọc biên coi là góc trong tiếp giáp.
-- Sửa lỗi cửa sổ popover điều khiển trên thanh Menu Bar (Top Bar) không mở rộng xuống khi nhấp vào biểu tượng ứng dụng ở màn hình phụ.
-- Tự động đóng và giải phóng cửa sổ neo (anchor window) của popover khi chuyển đổi giữa các màn hình.
-- Truyền đúng mã định danh màn hình (`displayID`) vào thanh trượt cạnh phải (`EdgeSliderView`) để điều khiển độ sáng chuẩn xác trên từng màn hình riêng biệt.
+- Fixed suppressed corner dials and edge sliders on secondary screens caused by inner screen seam perimeter filtering.
+- Fixed Menu Bar control popover failing to expand downwards when clicking the app icon on external displays.
+- Automatic anchor window creation and cleanup when toggling the menu bar popover across different displays.
+- Smart trackpad momentum filtering preventing value runaway after lifting fingers.
 
 ---
 

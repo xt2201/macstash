@@ -11,7 +11,7 @@ permissions:
 jobs:
   build-and-release:
     name: Build Universal DMG, Sign Sparkle Update, and Publish Release
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Code

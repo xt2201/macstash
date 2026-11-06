@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.3.0] - 2026-11-06
+
+### Added
+- Audio output device selector dropdown in Menu Bar extra popover for switching between connected headphones, speakers, and external displays.
+- Quick mute toggle button integrated directly into the Menu Bar speaker icon and Corner Dial center badge.
+- Multi-monitor brightness controls in Menu Bar extra popover displaying independent sliders, monitor names, and device icons.
+- Persistent display brightness profiles saving user brightness levels and hardware control methods per display UUID.
+- Application Profiles management in Settings > Hot Corners allowing custom corner and edge control mappings per app.
+- Edge Sliders right-edge gesture slider with outer screen boundary geometry and pass-through hit testing.
+- Dynamic global hotkey parser and real-time conflict detection against macOS system reserved combinations.
+- Comprehensive JSON backup and restore capturing both application preferences and custom application profiles.
+
+### Changed
+- Migrated deprecated AudioHardwareService APIs to modern CoreAudio AudioObject APIs with zero compiler warnings.
+- Cleaned obsolete toggle dock shortcut references and synchronized string catalogs across English and Vietnamese.
+
+### Fixed
+- Fixed Swift 6 strict concurrency compiler warnings across AppearanceManager, SystemPermissionService, and AutoUpdateManager.
+- Fixed Volume dial center badge to display MUTE indicator and toggle mute state upon tap.
+- Fixed unlocalized Active Method label in DisplaysTab.
+
+---
+
 ## [2.2.0] - 2026-11-06
 
 ### Added

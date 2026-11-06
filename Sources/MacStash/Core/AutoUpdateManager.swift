@@ -7,7 +7,7 @@ import Combine
 public final class AutoUpdateManager: ObservableObject {
     public static let shared = AutoUpdateManager()
 
-    @Published public private(set) var currentVersion: String = "2.0.0"
+    @Published public private(set) var currentVersion: String = "2.3.0"
     @Published public private(set) var latestVersion: String = "2.0.0"
     @Published public private(set) var updateAvailable: Bool = false
     @Published public private(set) var releaseNotes: String = ""

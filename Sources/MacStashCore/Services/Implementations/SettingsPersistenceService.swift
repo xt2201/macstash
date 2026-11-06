@@ -13,6 +13,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var cornerHideDelaySeconds: TimeInterval
     public var suppressWhenMousePressed: Bool
     public var suppressInFullscreen: Bool
+    public var onlyOuterCorners: Bool
     public var excludedBundleIDs: [String]
     public var cornerEnabled: [CornerPosition: Bool]
     public var cornerActions: [CornerPosition: ControlAction]
@@ -65,6 +66,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         cornerHideDelaySeconds: TimeInterval = Defaults.HotCorner.defaultHideDelaySeconds,
         suppressWhenMousePressed: Bool = true,
         suppressInFullscreen: Bool = true,
+        onlyOuterCorners: Bool = false,
         excludedBundleIDs: [String] = [],
         cornerEnabled: [CornerPosition: Bool] = [
             .topLeft: true,
@@ -112,6 +114,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.cornerHideDelaySeconds = max(Defaults.HotCorner.minHideDelaySeconds, min(Defaults.HotCorner.maxHideDelaySeconds, cornerHideDelaySeconds))
         self.suppressWhenMousePressed = suppressWhenMousePressed
         self.suppressInFullscreen = suppressInFullscreen
+        self.onlyOuterCorners = onlyOuterCorners
         self.excludedBundleIDs = excludedBundleIDs
         self.cornerEnabled = cornerEnabled
         self.cornerActions = cornerActions

@@ -9,6 +9,24 @@ public struct PomodoroTab: View {
         self.appState = appState
     }
 
+    private var statusDescription: String {
+        if appState.isPomodoroRunning {
+            return appState.localized("pomodoro.statusRunning")
+        }
+        if case .paused = appState.pomodoroEngine.state {
+            return appState.localized("pomodoro.statusPausedOnly")
+        }
+        return appState.localized("pomodoro.statusIdle")
+    }
+
+    private var modeTitle: String {
+        switch appState.pomodoroMode {
+        case .focus: return appState.localized("pomodoro.modeFocus")
+        case .shortBreak: return appState.localized("pomodoro.modeShortBreak")
+        case .longBreak: return appState.localized("pomodoro.modeLongBreak")
+        }
+    }
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             GroupBox(label: Label(appState.localized("pomodoro.intervalDurations"), systemImage: "timer")) {
@@ -56,28 +74,69 @@ public struct PomodoroTab: View {
             }
 
             GroupBox(label: Label(appState.localized("pomodoro.currentState"), systemImage: "clock.arrow.circlepath")) {
-                HStack(spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("\(appState.localized("pomodoro.currentState")): \(appState.isPomodoroRunning ? appState.localized("pomodoro.statusRunning") : appState.localized("pomodoro.statusPaused"))")
-                            .font(.system(size: 13, weight: .semibold))
-                        Text("\(appState.localized("pomodoro.timeRemaining")) \(appState.formattedTimerTime)")
-                            .font(.system(size: 20, weight: .bold, design: .monospaced))
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(alignment: .center, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 6) {
+                                Text("\(appState.localized("pomodoro.currentMode")) \(modeTitle)")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(appState.pomodoroMode == .focus ? .purple : .green)
+
+                                Text("•")
+                                    .foregroundColor(.secondary)
+
+                                Text("\(statusDescription)")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                            }
+
+                            HStack(spacing: 8) {
+                                Text("\(appState.localized("pomodoro.timeRemaining")) \(appState.formattedTimerTime)")
+                                    .font(.system(size: 22, weight: .bold, design: .monospaced))
+
+                                if appState.pomodoroTotalRounds > 0 {
+                                    Text(String(format: appState.localized("pomodoro.roundIndicator"), min(appState.pomodoroTotalRounds, appState.pomodoroCompletedRounds + 1), appState.pomodoroTotalRounds))
+                                        .font(.system(size: 10, weight: .semibold))
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Capsule().fill(Color.secondary.opacity(0.12)))
+                                }
+                            }
+                        }
+
+                        Spacer()
+
+                        HStack(spacing: 8) {
+                            Button(appState.isPomodoroRunning ? appState.localized("pomodoro.btnPause") : appState.localized("pomodoro.btnStart")) {
+                                appState.togglePomodoro()
+                            }
+                            .buttonStyle(.borderedProminent)
+
+                            Button(appState.localized("pomodoro.btnSkip")) {
+                                appState.skipPomodoroMode()
+                            }
+                            .buttonStyle(.bordered)
+
+                            Button(appState.localized("pomodoro.btnReset")) {
+                                appState.resetPomodoro()
+                            }
+                            .buttonStyle(.bordered)
+                        }
                     }
 
-                    Spacer()
+                    // Progress Track
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.secondary.opacity(0.15))
+                                .frame(height: 4)
 
-                    Button(appState.isPomodoroRunning ? appState.localized("pomodoro.btnPause") : appState.localized("pomodoro.btnStart")) {
-                        appState.toggleAction(.timer)
+                            Capsule()
+                                .fill(appState.pomodoroMode == .focus ? Color.purple : Color.green)
+                                .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(appState.pomodoroProgress))), height: 4)
+                        }
                     }
-                    .buttonStyle(.borderedProminent)
-
-                    Button(appState.localized("pomodoro.btnReset")) {
-                        appState.pomodoroEngine.reset()
-                        appState.pomodoroRemainingSeconds = appState.pomodoroEngine.remainingSeconds
-                        appState.pomodoroProgress = appState.pomodoroEngine.progress
-                        appState.isPomodoroRunning = false
-                    }
-                    .buttonStyle(.bordered)
+                    .frame(height: 4)
                 }
                 .padding(8)
             }
@@ -89,7 +148,7 @@ public struct PomodoroTab: View {
             Text(title)
                 .font(.system(size: 12, weight: .medium))
             Spacer()
-            Stepper("\(minutes.wrappedValue) \(appState.effectiveLanguage == "vi" ? "phút" : "min")", value: minutes, in: range)
+            Stepper("\(minutes.wrappedValue) \(appState.localized("pomodoro.minutesUnit"))", value: minutes, in: range)
         }
     }
 }

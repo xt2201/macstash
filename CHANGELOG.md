@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.2.0] - 2026-11-06
+
+### Added
+- Full Pomodoro cycle state machine supporting Focus Sessions, Short Breaks, Long Breaks, and configurable round progression.
+- Live Menu Bar countdown text indicator (e.g. `24:50`) and dynamic active icon synchronization via Combine subscribers.
+- Redesigned Menu Bar popover Focus Timer card with Play/Pause, Skip mode, Reset action, and mini progress bar.
+- Persistent snapshot serialization restoring active or paused sessions across application restarts.
+- Mode-aware corner dial indicators with purple (Focus) and emerald green (Break) progress rings.
+- Instant screen wake synchronization eliminating refresh delay upon waking from macOS sleep.
+
+### Changed
+- Protected active Pomodoro sessions in `CornerDialView` from accidental cursor drag resets; duration scrubbing is now enabled when idle.
+- Modernized `PomodoroTab` in Settings with live state monitoring card, round indicators, and full Apple String Catalog integration.
+
+### Fixed
+- Fixed Start button failure from `.idle` and `.completed` states in `PomodoroEngine`.
+- Fixed `reset(toDurationSeconds:)` ignoring custom focus duration and forcefully defaulting to 25 minutes.
+- Fixed dead settings in `PomodoroTab` where break durations, rounds before long break, and auto-start breaks were disconnected from runtime logic.
+- Fixed hardcoded English notification strings and inline ternary units in Pomodoro UI.
+
+---
+
 ## [2.1.1] - 2026-11-06
 
 ### Fixed

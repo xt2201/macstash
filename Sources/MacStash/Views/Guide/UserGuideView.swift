@@ -159,7 +159,7 @@ public struct UserGuideView: View {
             ),
             GuideArticle(
                 id: "05_settings",
-                title: isVi ? "5. Chi Tiet 7 Tab Settings" : "5. Settings Reference",
+                title: isVi ? "5. Chi Tiết 7 Tab Settings" : "5. Settings Reference",
                 filename: "05_settings.md",
                 content: """
                 MacStash provides a comprehensive 7-tab configuration window compliant with macOS Human Interface Guidelines.
@@ -176,7 +176,7 @@ public struct UserGuideView: View {
             ),
             GuideArticle(
                 id: "06_shortcuts",
-                title: isVi ? "6. Bang Tra Nhanh Phim Tat" : "6. Shortcuts Quick Reference",
+                title: isVi ? "6. Bảng Tra Nhanh Phím Tắt" : "6. Shortcuts Quick Reference",
                 filename: "06_shortcuts.md",
                 content: """
                 Default Key Combinations:
@@ -191,7 +191,7 @@ public struct UserGuideView: View {
             ),
             GuideArticle(
                 id: "07_faq",
-                title: isVi ? "7. Cau Hoi Thuong Gap (FAQ)" : "7. Frequently Asked Questions",
+                title: isVi ? "7. Câu Hỏi Thường Gặp (FAQ)" : "7. Frequently Asked Questions",
                 filename: "07_faq.md",
                 content: """
                 Frequently Asked Questions:
@@ -208,7 +208,7 @@ public struct UserGuideView: View {
             ),
             GuideArticle(
                 id: "08_whats_new",
-                title: isVi ? "8. Co Gi Moi Trong Phien Ban 2.0.0" : "8. What's New in Version 2.0.0",
+                title: isVi ? "8. Có Gì Mới Trong Phiên Bản 2.0.0" : "8. What's New in Version 2.0.0",
                 filename: "08_whats_new.md",
                 content: """
                 What's New in Version 2.0.0:

@@ -1,0 +1,8 @@
+.build/
+.swiftpm/
+MacStash.app/
+*.dmg
+dist/
+.DS_Store
+*.swp
+*~

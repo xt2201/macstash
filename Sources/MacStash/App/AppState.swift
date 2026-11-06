@@ -14,7 +14,6 @@ public final class AppState: ObservableObject {
     public let profiles = AppProfileManager.shared
     public let haptics = HapticManager.shared
     public let sound = SoundEffectManager.shared
-    public let appManager = InstalledAppsManager.shared
 
     public let persistence = SettingsPersistenceService()
     public let brightnessService = CompositeBrightnessService()
@@ -50,9 +49,6 @@ public final class AppState: ObservableObject {
     @Published public var isEdgeSlidersEnabled: Bool = true {
         didSet { settings.isEdgeSlidersEnabled = isEdgeSlidersEnabled }
     }
-    @Published public var isHiddenDockEnabled: Bool = true {
-        didSet { settings.isHiddenDockEnabled = isHiddenDockEnabled }
-    }
     @Published public var cornerSensitivityRadius: CGFloat = Defaults.HotCorner.defaultHitZoneSizePoints {
         didSet { settings.cornerSensitivityPoints = cornerSensitivityRadius }
     }
@@ -69,7 +65,6 @@ public final class AppState: ObservableObject {
         didSet { settings.hapticIntensity = hapticIntensity.rawValue.lowercased() }
     }
 
-    @Published public var dockItems: [DockItem]
     @Published public var appProfiles: [AppProfile]
     @Published public var activeProfile: AppProfile
 
@@ -77,9 +72,7 @@ public final class AppState: ObservableObject {
 
     @Published public var activeCorner: CornerPosition? = nil
     @Published public var activeDisplayID: CGDirectDisplayID = 0
-    @Published public var isDockExpanded: Bool = false
     @Published public var isRightSliderActive: Bool = false
-    @Published public var isQuickLauncherPresented: Bool = false
     @Published public var isAudioDevicePickerPresented: Bool = false
 
     // Pomodoro dynamic published properties
@@ -102,7 +95,6 @@ public final class AppState: ObservableObject {
         self.isEnabled = loaded.isEnabled
         self.isCornerDialsEnabled = loaded.isCornerDialsEnabled
         self.isEdgeSlidersEnabled = loaded.isEdgeSlidersEnabled
-        self.isHiddenDockEnabled = loaded.isHiddenDockEnabled
         self.cornerSensitivityRadius = loaded.cornerSensitivityPoints
         self.cornerDwellDelay = loaded.cornerDwellDelaySeconds
         self.isSoundEnabled = loaded.isSoundEnabled
@@ -110,13 +102,6 @@ public final class AppState: ObservableObject {
         self.hapticIntensity = HapticIntensity(rawValue: loaded.hapticIntensity.capitalized) ?? .medium
 
         let defaults = UserDefaults.standard
-        if let data = defaults.data(forKey: "stash_dockItems"),
-           let decoded = try? JSONDecoder().decode([DockItem].self, from: data) {
-            self.dockItems = decoded
-        } else {
-            self.dockItems = InstalledAppsManager.defaultDockItems
-        }
-
         if let data = defaults.data(forKey: "stash_appProfiles"),
            let decoded = try? JSONDecoder().decode([AppProfile].self, from: data),
            !decoded.isEmpty {
@@ -300,9 +285,6 @@ public final class AppState: ObservableObject {
     public func saveSettings() {
         persistence.saveSettings(settings)
         let defaults = UserDefaults.standard
-        if let encodedDock = try? JSONEncoder().encode(dockItems) {
-            defaults.set(encodedDock, forKey: "stash_dockItems")
-        }
         if let encodedProfiles = try? JSONEncoder().encode(appProfiles) {
             defaults.set(encodedProfiles, forKey: "stash_appProfiles")
         }
@@ -314,7 +296,6 @@ public final class AppState: ObservableObject {
         self.isEnabled = fresh.isEnabled
         self.isCornerDialsEnabled = fresh.isCornerDialsEnabled
         self.isEdgeSlidersEnabled = fresh.isEdgeSlidersEnabled
-        self.isHiddenDockEnabled = fresh.isHiddenDockEnabled
         self.cornerSensitivityRadius = fresh.cornerSensitivityPoints
         self.cornerDwellDelay = fresh.cornerDwellDelaySeconds
         self.isSoundEnabled = fresh.isSoundEnabled

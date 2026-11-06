@@ -6,7 +6,6 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var isEnabled: Bool
     public var isCornerDialsEnabled: Bool
     public var isEdgeSlidersEnabled: Bool
-    public var isHiddenDockEnabled: Bool
 
     // Hot Corners
     public var cornerSensitivityPoints: CGFloat
@@ -52,7 +51,6 @@ public struct AppSettings: Codable, Equatable, Sendable {
 
     // Shortcuts
     public var globalToggleDialsShortcut: String
-    public var globalToggleDockShortcut: String
 
     // Advanced
     public var debugLoggingEnabled: Bool
@@ -62,7 +60,6 @@ public struct AppSettings: Codable, Equatable, Sendable {
         isEnabled: Bool = true,
         isCornerDialsEnabled: Bool = true,
         isEdgeSlidersEnabled: Bool = true,
-        isHiddenDockEnabled: Bool = true,
         cornerSensitivityPoints: CGFloat = Defaults.HotCorner.defaultHitZoneSizePoints,
         cornerDwellDelaySeconds: TimeInterval = Defaults.HotCorner.defaultDwellDelaySeconds,
         cornerHideDelaySeconds: TimeInterval = Defaults.HotCorner.defaultHideDelaySeconds,
@@ -104,14 +101,12 @@ public struct AppSettings: Codable, Equatable, Sendable {
         hapticFeedbackEnabled: Bool = true,
         hapticIntensity: String = "medium",
         globalToggleDialsShortcut: String = "Option+S",
-        globalToggleDockShortcut: String = "Option+D",
         debugLoggingEnabled: Bool = false
     ) {
         self.schemaVersion = schemaVersion
         self.isEnabled = isEnabled
         self.isCornerDialsEnabled = isCornerDialsEnabled
         self.isEdgeSlidersEnabled = isEdgeSlidersEnabled
-        self.isHiddenDockEnabled = isHiddenDockEnabled
         self.cornerSensitivityPoints = max(Defaults.HotCorner.minHitZoneSizePoints, min(Defaults.HotCorner.maxHitZoneSizePoints, cornerSensitivityPoints))
         self.cornerDwellDelaySeconds = max(Defaults.HotCorner.minDwellDelaySeconds, min(Defaults.HotCorner.maxDwellDelaySeconds, cornerDwellDelaySeconds))
         self.cornerHideDelaySeconds = max(Defaults.HotCorner.minHideDelaySeconds, min(Defaults.HotCorner.maxHideDelaySeconds, cornerHideDelaySeconds))
@@ -143,7 +138,6 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.hapticFeedbackEnabled = hapticFeedbackEnabled
         self.hapticIntensity = hapticIntensity
         self.globalToggleDialsShortcut = globalToggleDialsShortcut
-        self.globalToggleDockShortcut = globalToggleDockShortcut
         self.debugLoggingEnabled = debugLoggingEnabled
     }
 

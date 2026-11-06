@@ -10,6 +10,5 @@ MacStash tích hợp các tổ hợp phím tắt toàn cục và phím điều h
 | Đóng Cửa Sổ | Command+W | Cửa sổ | Đóng cửa sổ MacStash hiện tại. |
 | Mở Hướng Dẫn | Command+? | Toàn cục / App | Mở cửa sổ trợ giúp offline Help Viewer. |
 | Bật/Tắt Vòng Xoay | Option+S | Toàn cục | Hiện hoặc ẩn ngay lập tức các vòng xoay góc màn hình. |
-| Bật/Tắt Dock Ẩn | Option+D | Toàn cục | Trượt ra hoặc đóng thanh dock ứng dụng ẩn. |
 | Ẩn Ứng Dụng | Command+H | App | Phím ẩn ứng dụng chuẩn của hệ điều hành macOS. |
 | Thoát Ứng Dụng | Command+Q | App | Thoát MacStash và hoàn trả bảng màu gốc về màn hình. |

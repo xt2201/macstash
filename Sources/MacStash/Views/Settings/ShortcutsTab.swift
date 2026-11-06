@@ -18,14 +18,6 @@ public struct ShortcutsTab: View {
                         description: appState.localized("shortcuts.toggleDialsDesc"),
                         shortcut: $appState.settings.globalToggleDialsShortcut
                     )
-
-                    Divider()
-
-                    shortcutRow(
-                        title: appState.localized("shortcuts.toggleDock"),
-                        description: appState.localized("shortcuts.toggleDockDesc"),
-                        shortcut: $appState.settings.globalToggleDockShortcut
-                    )
                 }
                 .padding(8)
             }

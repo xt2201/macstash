@@ -142,19 +142,6 @@ public struct MenuBarExtraView: View {
             // Quick Actions
             VStack(spacing: 2) {
                 Button(action: {
-                    appState.isQuickLauncherPresented = true
-                }) {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                        Text("Quick App Launcher")
-                        Spacer()
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                }
-                .buttonStyle(.plain)
-
-                Button(action: {
                     appState.updater.checkForUpdates(silent: false)
                 }) {
                     HStack {

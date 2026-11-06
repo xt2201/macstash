@@ -71,17 +71,7 @@ echo "  -> Copied to: $RESOURCES_DIR/AppIcon.icns"
 
 # 2. Render Menu Bar Template Images (Monochrome Alpha Mask)
 echo "[2/4] Generating Menu Bar status bar template icons..."
-# Default Idle State
-render_svg_to_png "$SOURCE_DIR/stash_menubar.svg" "$RESOURCES_DIR/stash_menubar.png" 18 18
-render_svg_to_png "$SOURCE_DIR/stash_menubar.svg" "$RESOURCES_DIR/stash_menubar@2x.png" 36 36
-render_svg_to_png "$SOURCE_DIR/stash_menubar.svg" "$RESOURCES_DIR/stash_menubar@3x.png" 54 54
-
-# Active Pomodoro / Engaged State
-render_svg_to_png "$SOURCE_DIR/stash_menubar_active.svg" "$RESOURCES_DIR/stash_menubar_active.png" 18 18
-render_svg_to_png "$SOURCE_DIR/stash_menubar_active.svg" "$RESOURCES_DIR/stash_menubar_active@2x.png" 36 36
-render_svg_to_png "$SOURCE_DIR/stash_menubar_active.svg" "$RESOURCES_DIR/stash_menubar_active@3x.png" 54 54
-
-# Mirror to exports
+swift "$PROJECT_ROOT/Scripts/render_menubar_icons.swift" "$RESOURCES_DIR"
 cp "$RESOURCES_DIR"/stash_menubar*.png "$EXPORTS_DIR/"
 echo "  -> Menu Bar template icons generated in @1x, @2x, @3x"
 

@@ -247,7 +247,7 @@ public struct UserGuideView: View {
                     3. Appearance: Dial radius (110-200pt), glass opacity, theme selection, motion reduction, and haptic feedback.
                     4. Displays: Connected display inventory with UUIDs, method selector (Auto/DDC/Software), and live testing sliders.
                     5. Pomodoro: Interval duration steppers, rounds before long break, auto-start breaks, and completion chime alerts.
-                    6. Shortcuts: Global hotkeys for toggling dials and hidden dock, with conflict analysis.
+                    6. Shortcuts: Global hotkeys for toggling dials with conflict analysis.
                     7. About / Advanced: Diagnostics, console log shortcuts, JSON settings backup, and factory reset.
                     """
                 )
@@ -264,7 +264,6 @@ public struct UserGuideView: View {
                     - Command+W : Đóng cửa sổ MacStash hiện tại
                     - Command+? : Mở cửa sổ hướng dẫn sử dụng
                     - Option+S  : Bật/Tắt hiển thị vòng quay góc
-                    - Option+D  : Mở/Đóng thanh dock ẩn
                     - Command+H : Ẩn ứng dụng
                     - Command+Q : Thoát ứng dụng
                     """ : """
@@ -273,7 +272,6 @@ public struct UserGuideView: View {
                     - Command+W : Close frontmost window
                     - Command+? : Open User Guide
                     - Option+S  : Toggle corner dials
-                    - Option+D  : Toggle hidden dock
                     - Command+H : Hide MacStash application
                     - Command+Q : Quit MacStash and restore display gamma
                     """

@@ -7,7 +7,6 @@ public struct AppProfile: Identifiable, Codable, Equatable, Sendable {
     public var bundleIdentifier: String?
     public var cornerActions: [CornerPosition: ControlAction]
     public var rightEdgeAction: ControlAction
-    public var dockPosition: EdgePosition
     public var isEnabled: Bool
 
     public init(
@@ -21,7 +20,6 @@ public struct AppProfile: Identifiable, Codable, Equatable, Sendable {
             .topLeft: .keyboardBrightness
         ],
         rightEdgeAction: ControlAction = .brightness,
-        dockPosition: EdgePosition = .left,
         isEnabled: Bool = true
     ) {
         self.id = id
@@ -29,7 +27,6 @@ public struct AppProfile: Identifiable, Codable, Equatable, Sendable {
         self.bundleIdentifier = bundleIdentifier
         self.cornerActions = cornerActions
         self.rightEdgeAction = rightEdgeAction
-        self.dockPosition = dockPosition
         self.isEnabled = isEnabled
     }
 
@@ -44,7 +41,6 @@ public struct AppProfile: Identifiable, Codable, Equatable, Sendable {
                 .topLeft: .keyboardBrightness
             ],
             rightEdgeAction: .brightness,
-            dockPosition: .left,
             isEnabled: true
         )
     }

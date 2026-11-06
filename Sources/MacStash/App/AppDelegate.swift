@@ -112,13 +112,59 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
             img.isTemplate = true
             return img
         }
-        if let img = NSImage(named: name) {
-            img.isTemplate = true
-            return img
+        return createMenuBarVectorImage(active: active)
+    }
+
+    private func createMenuBarVectorImage(active: Bool) -> NSImage {
+        let size = NSSize(width: 18, height: 18)
+        let img = NSImage(size: size, flipped: false) { bounds in
+            guard let ctx = NSGraphicsContext.current?.cgContext else { return false }
+            ctx.clear(bounds)
+            let origin = CGPoint(x: 3.5, y: 3.5)
+
+            // 1. Pivot Dot
+            ctx.setFillColor(NSColor.black.cgColor)
+            ctx.fillEllipse(in: CGRect(x: origin.x - 1.5, y: origin.y - 1.5, width: 3.0, height: 3.0))
+
+            // 2. Outer Track Arc
+            let trackRadius: CGFloat = 11.5
+            let trackPath = CGMutablePath()
+            trackPath.addArc(center: origin, radius: trackRadius, startAngle: 0, endAngle: .pi / 2, clockwise: false)
+            ctx.addPath(trackPath)
+            ctx.setStrokeColor(NSColor.black.cgColor)
+            ctx.setLineWidth(1.75)
+            ctx.setLineCap(.round)
+            ctx.strokePath()
+
+            // 3. Indicator Detent / Active Wedge
+            if active {
+                let activeRadius: CGFloat = 7.0
+                let activePath = CGMutablePath()
+                activePath.addArc(center: origin, radius: activeRadius, startAngle: 0, endAngle: .pi / 2, clockwise: false)
+                ctx.addPath(activePath)
+                ctx.setStrokeColor(NSColor.black.cgColor)
+                ctx.setLineWidth(2.0)
+                ctx.strokePath()
+
+                let pipAngle = CGFloat.pi / 4
+                let pipDist: CGFloat = 9.25
+                let pipCenter = CGPoint(x: origin.x + pipDist * cos(pipAngle), y: origin.y + pipDist * sin(pipAngle))
+                ctx.fillEllipse(in: CGRect(x: pipCenter.x - 1.25, y: pipCenter.y - 1.25, width: 2.5, height: 2.5))
+            } else {
+                let angle = CGFloat.pi / 4
+                let innerR: CGFloat = 5.5
+                let outerR: CGFloat = 8.5
+                let p1 = CGPoint(x: origin.x + innerR * cos(angle), y: origin.y + innerR * sin(angle))
+                let p2 = CGPoint(x: origin.x + outerR * cos(angle), y: origin.y + outerR * sin(angle))
+                ctx.move(to: p1)
+                ctx.addLine(to: p2)
+                ctx.setLineWidth(1.5)
+                ctx.strokePath()
+            }
+            return true
         }
-        let fallback = NSImage(systemSymbolName: active ? "bolt.circle.fill" : "circle.dashed", accessibilityDescription: "MacStash")
-        fallback?.isTemplate = true
-        return fallback ?? NSImage()
+        img.isTemplate = true
+        return img
     }
 
     public func updateStatusItemImage() {

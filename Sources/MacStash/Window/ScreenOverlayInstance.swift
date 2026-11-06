@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import MacStashCore
 
-/// Manages floating overlay panels (4 corners + left dock) for one specific display
+/// Manages floating overlay panels (4 corners) for one specific display
 @MainActor
 public final class ScreenOverlayInstance {
     public let displayID: CGDirectDisplayID
@@ -11,13 +11,10 @@ public final class ScreenOverlayInstance {
 
     private var cornerPanels: [CornerPosition: NSPanel] = [:]
     private var passThroughViews: [CornerPosition: PassThroughHostingView<CornerDialView>] = [:]
-    private var dockPanel: NSPanel?
 
     private var cornerSize: CGFloat {
         appState.settings.dialRadiusPoints + 15
     }
-    private let dockWidth: CGFloat = 80
-    private let dockHeight: CGFloat = 460
 
     public init(displayID: CGDirectDisplayID, screen: NSScreen, appState: AppState) {
         self.displayID = displayID
@@ -52,19 +49,10 @@ public final class ScreenOverlayInstance {
         }
     }
 
-    public func setDockInteractive(_ interactive: Bool) {
-        if let panel = dockPanel {
-            panel.ignoresMouseEvents = !interactive
-            if interactive {
-                panel.orderFrontRegardless()
-            }
-        }
-    }
-
     private func createPanels() {
         let frame = screen.frame
 
-        // 1. Create 4 Corner Panels with PassThroughHostingView
+        // Create 4 Corner Panels with PassThroughHostingView
         for corner in CornerPosition.allCases {
             let panelRect = cornerRect(for: corner, in: frame)
             let panel = makeFloatingPanel(contentRect: panelRect)
@@ -84,19 +72,6 @@ public final class ScreenOverlayInstance {
             cornerPanels[corner] = panel
             passThroughViews[corner] = hostingView
         }
-
-        // 2. Create Left Edge Hidden Dock
-        let dockRect = NSRect(
-            x: frame.minX,
-            y: frame.midY - (dockHeight / 2),
-            width: dockWidth,
-            height: dockHeight
-        )
-        let dPanel = makeFloatingPanel(contentRect: dockRect)
-        let dockView = HiddenDockView(appState: appState)
-        dPanel.contentView = NSHostingView(rootView: dockView)
-        dPanel.orderFrontRegardless()
-        self.dockPanel = dPanel
     }
 
     public func repositionPanels() {
@@ -106,14 +81,6 @@ public final class ScreenOverlayInstance {
             let rect = cornerRect(for: corner, in: frame)
             panel.setFrame(rect, display: true)
         }
-
-        let dockRect = NSRect(
-            x: frame.minX,
-            y: frame.midY - (dockHeight / 2),
-            width: dockWidth,
-            height: dockHeight
-        )
-        dockPanel?.setFrame(dockRect, display: true)
     }
 
     public func destroyPanels() {
@@ -123,10 +90,6 @@ public final class ScreenOverlayInstance {
         }
         cornerPanels.removeAll()
         passThroughViews.removeAll()
-
-        dockPanel?.orderOut(nil)
-        dockPanel?.close()
-        dockPanel = nil
     }
 
     private func cornerRect(for corner: CornerPosition, in frame: NSRect) -> NSRect {

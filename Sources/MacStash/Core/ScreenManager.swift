@@ -10,7 +10,6 @@ public final class ScreenManager: ObservableObject {
 
     private var appState: AppState = AppState.shared
     private var instances: [CGDirectDisplayID: ScreenOverlayInstance] = [:]
-    private var quickLauncherPanel: NSPanel?
     private var cancellables = Set<AnyCancellable>()
 
     // Continuous Cursor Tracking & Event Monitors
@@ -33,7 +32,6 @@ public final class ScreenManager: ObservableObject {
         rebuildInstances()
         observeScreenChanges()
         observeWorkspaceEvents()
-        observeQuickLauncher()
         startCursorTracking()
         setupGlobalHotkeys()
     }
@@ -157,68 +155,6 @@ public final class ScreenManager: ObservableObject {
         }
     }
 
-    private func observeQuickLauncher() {
-        appState.$isQuickLauncherPresented
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] isPresented in
-                if isPresented {
-                    self?.showQuickLauncher()
-                } else {
-                    self?.hideQuickLauncher()
-                }
-            }
-            .store(in: &cancellables)
-    }
-
-    private func showQuickLauncher() {
-        let mouseLoc = NSEvent.mouseLocation
-        let targetScreen = NSScreen.screens.first(where: { $0.frame.contains(mouseLoc) }) ?? NSScreen.main ?? NSScreen.screens.first
-
-        guard let screen = targetScreen else { return }
-
-        if quickLauncherPanel == nil {
-            let width: CGFloat = 560
-            let height: CGFloat = 420
-            let frame = NSRect(
-                x: screen.frame.midX - (width / 2),
-                y: screen.frame.midY - (height / 2) + 100,
-                width: width,
-                height: height
-            )
-
-            let panel = NSPanel(
-                contentRect: frame,
-                styleMask: [.borderless],
-                backing: .buffered,
-                defer: false
-            )
-            panel.level = .floating
-            panel.isOpaque = false
-            panel.backgroundColor = .clear
-            panel.hasShadow = false
-
-            let rootView = QuickLauncherSheet(appState: appState)
-            panel.contentView = NSHostingView(rootView: rootView)
-            self.quickLauncherPanel = panel
-        }
-
-        let width: CGFloat = 560
-        let height: CGFloat = 420
-        let newFrame = NSRect(
-            x: screen.frame.midX - (width / 2),
-            y: screen.frame.midY - (height / 2) + 60,
-            width: width,
-            height: height
-        )
-        quickLauncherPanel?.setFrame(newFrame, display: true)
-        quickLauncherPanel?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
-    }
-
-    private func hideQuickLauncher() {
-        quickLauncherPanel?.orderOut(nil)
-    }
-
     // MARK: - Cursor Tracking Engine
 
     private func startCursorTracking() {
@@ -329,31 +265,6 @@ public final class ScreenManager: ObservableObject {
                 cancelPendingDwell()
             }
         }
-
-        // 6. Check Left Edge Hidden Dock
-        if appState.isHiddenDockEnabled {
-            if let leftScreen = screens.min(by: { $0.frame.minX < $1.frame.minX }),
-               let leftDisplayID = leftScreen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID {
-                let left = leftScreen.frame.minX
-                let midY = leftScreen.frame.midY
-                let dockTop = midY + 230
-                let dockBottom = midY - 230
-                let inYRange = (mouseLoc.y >= dockBottom && mouseLoc.y <= dockTop)
-
-                if appState.isDockExpanded {
-                    if mouseLoc.x > left + 90 || !inYRange {
-                        appState.isDockExpanded = false
-                        instances[leftDisplayID]?.setDockInteractive(false)
-                    }
-                } else {
-                    if mouseLoc.x <= left + 10 && inYRange {
-                        appState.isDockExpanded = true
-                        instances[leftDisplayID]?.setDockInteractive(true)
-                        appState.haptics.performBoundaryClick()
-                    }
-                }
-            }
-        }
     }
 
     private func scheduleDwellTimer(corner: CornerPosition, displayID: CGDirectDisplayID, screenFrame: NSRect) {
@@ -459,8 +370,6 @@ public final class ScreenManager: ObservableObject {
         if flags.contains(.option) {
             if event.keyCode == 1 { // 's'
                 toggleDials()
-            } else if event.keyCode == 2 { // 'd'
-                toggleDock()
             }
         }
     }
@@ -478,13 +387,5 @@ public final class ScreenManager: ObservableObject {
             guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else { return }
             activateDial(corner: .topRight, displayID: id)
         }
-    }
-
-    public func toggleDock() {
-        appState.isDockExpanded.toggle()
-        for instance in instances.values {
-            instance.setDockInteractive(appState.isDockExpanded)
-        }
-        appState.haptics.performBoundaryClick()
     }
 }

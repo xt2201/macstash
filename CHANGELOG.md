@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.1.1] - 2026-11-06
+
+### Fixed
+- Fixed interface language switching in Settings > General: UI labels, toolbar tabs, status bar popup, and in-app User Guide now update dynamically upon selecting Vietnamese (`vi`), English (`en`), or System Default.
+- Integrated Apple String Catalog (`Localizable.xcstrings`) and thread-safe `LocalizationService` in `MacStashCore` with 150 translated keys and zero emojis.
+- Added comprehensive unit test coverage (`LocalizationTests`) validating language resolution, key symmetry, Vietnamese diacritics, and dynamic fallback.
+
+---
+
 ## [2.1.0] - 2026-11-06
 
 ### Added

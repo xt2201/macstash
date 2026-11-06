@@ -21,6 +21,12 @@ Nếu vòng xoay xuất hiện quá nhạy hoặc ảnh hưởng đến ứng d�
 - Bật tính năng chặn khi đang kéo chuột hoặc khi ứng dụng khác chạy full screen.
 - Thêm các ứng dụng chuyên dụng vào Danh sách ứng dụng loại trừ.
 
+## Thay Đổi Ngôn Ngữ Giao Diện
+
+Người dùng có thể chuyển đổi linh hoạt giữa Tiếng Việt và English bất kỳ lúc nào:
+- Mở Settings (`Command+,`) > Tab **General (Tổng quan)** > mục **Ngôn ngữ giao diện (Interface Language)**.
+- Chọn **Tiếng Việt** hoặc **English**. Toàn bộ các tab cài đặt, thanh công cụ, menu bar và cẩm nang hướng dẫn sẽ tự động cập nhật ngôn ngữ ngay lập tức mà không cần khởi động lại ứng dụng.
+
 ## Hiển Thị Biểu Tượng Trên Menu Bar
 
 - Người dùng có thể giữ phím `Command` và kéo chuột trái để sắp xếp lại vị trí của icon MacStash trên thanh Menu Bar.

@@ -51,11 +51,11 @@ if [[ -x "$REPO_ROOT/scripts/render_icons.sh" ]]; then
     "$REPO_ROOT/scripts/render_icons.sh"
 fi
 
-VERSION="2.1.0"
+VERSION="2.1.1"
 if [[ -f "$REPO_ROOT/VERSION" ]]; then
     VERSION="$(tr -d '[:space:]' < "$REPO_ROOT/VERSION")"
 elif [[ -f "$REPO_ROOT/Scripts/Info.plist" ]]; then
-    VERSION=$(defaults read "$REPO_ROOT/Scripts/Info.plist" CFBundleShortVersionString 2>/dev/null || echo "2.1.0")
+    VERSION=$(defaults read "$REPO_ROOT/Scripts/Info.plist" CFBundleShortVersionString 2>/dev/null || echo "2.1.1")
 fi
 
 echo "[1/6] Building release binaries for arm64 and x86_64 architectures..."
@@ -114,8 +114,8 @@ done
 echo "[4/6] Code signing application bundle..."
 SIGNING_IDENTITY="${SIGNING_IDENTITY:-}"
 if [[ "$ALLOW_UNSIGNED" == "true" || -z "$SIGNING_IDENTITY" ]]; then
-    echo "Using ad-hoc code signature..."
-    codesign --force --deep --sign - "$APP_BUNDLE"
+    echo "Using ad-hoc code signature with stable designated requirement..."
+    codesign --force --deep --sign - --requirements '=designated => identifier "com.macstash.app"' "$APP_BUNDLE"
 else
     echo "Signing with identity: $SIGNING_IDENTITY..."
     codesign --force --deep --options runtime --sign "$SIGNING_IDENTITY" "$APP_BUNDLE"

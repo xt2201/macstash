@@ -21,6 +21,12 @@ If corner dials appear too easily or interfere with app controls:
 - Enable window dragging and full screen suppression.
 - Add specific full-screen or creative software to the Excluded Applications list.
 
+## Changing Interface Language
+
+You can freely switch between English and Vietnamese at any time:
+- Open Settings (`Command+,`) > **General** tab > **Interface Language**.
+- Select **English**, **Tiếng Việt**, or **System Default**. All preferences tabs, status item popup, and user guides update dynamically without requiring an application restart.
+
 ## Menu Bar Icon Display & Appearance
 
 - If the menu bar icon appears crowded, drag it with `Command + Left Click` to reorder its position on the macOS menu bar.

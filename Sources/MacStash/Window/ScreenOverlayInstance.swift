@@ -13,7 +13,9 @@ public final class ScreenOverlayInstance {
     private var passThroughViews: [CornerPosition: PassThroughHostingView<CornerDialView>] = [:]
     private var dockPanel: NSPanel?
 
-    private let cornerSize: CGFloat = 160
+    private var cornerSize: CGFloat {
+        appState.settings.dialRadiusPoints + 15
+    }
     private let dockWidth: CGFloat = 80
     private let dockHeight: CGFloat = 460
 
@@ -35,9 +37,18 @@ public final class ScreenOverlayInstance {
     }
 
     public func resetAllCorners(reason: ResetReason) {
-        for (_, view) in passThroughViews {
+        for (corner, view) in passThroughViews {
             view.reset(reason: reason)
+            setMouseInteractive(false, for: corner)
         }
+    }
+
+    public func setMouseInteractive(_ interactive: Bool, for corner: CornerPosition) {
+        cornerPanels[corner]?.ignoresMouseEvents = !interactive
+    }
+
+    public func setDockInteractive(_ interactive: Bool) {
+        dockPanel?.ignoresMouseEvents = !interactive
     }
 
     private func createPanels() {
@@ -133,7 +144,8 @@ public final class ScreenOverlayInstance {
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = false
-        panel.ignoresMouseEvents = false
+        panel.acceptsMouseMovedEvents = true
+        panel.ignoresMouseEvents = true
         panel.isMovable = false
         panel.isMovableByWindowBackground = false
         return panel

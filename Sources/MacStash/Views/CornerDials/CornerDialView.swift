@@ -67,15 +67,20 @@ public struct CornerDialView: View {
                         gradientColors: action.accentColors
                     )
 
-                    // Center Action Icon & Value readout
-                    CenterActionBadge(
-                        action: action,
-                        corner: corner,
-                        value: currentValue,
-                        dialSize: dialSize,
-                        isExpanded: isExpanded,
-                        formattedTimer: appState.formattedTimerTime
-                    )
+                    // Center Action Icon & Value readout (Tap to toggle)
+                    Button(action: {
+                        appState.toggleAction(action, displayID: displayID)
+                    }) {
+                        CenterActionBadge(
+                            action: action,
+                            corner: corner,
+                            value: currentValue,
+                            dialSize: dialSize,
+                            isExpanded: isExpanded,
+                            formattedTimer: appState.formattedTimerTime
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
                 .scaleEffect(isExpanded ? 1.0 : 0.05, anchor: unitPoint(for: corner))
                 .opacity(isExpanded ? appState.settings.dialOpacity : 0.0)

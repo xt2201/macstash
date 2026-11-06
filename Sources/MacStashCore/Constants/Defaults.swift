@@ -5,7 +5,7 @@ public enum Defaults {
     public static let schemaVersion: Int = 1
 
     public enum HotCorner {
-        public static let defaultHitZoneSizePoints: CGFloat = 5.0
+        public static let defaultHitZoneSizePoints: CGFloat = 10.0
         public static let minHitZoneSizePoints: CGFloat = 1.0
         public static let maxHitZoneSizePoints: CGFloat = 20.0
 

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B1E26" />
+      <stop offset="100%" stop-color="#0E1015" />
+    </linearGradient>
+
+    <linearGradient id="apertureAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#0A84FF" />
+    </linearGradient>
+  </defs>
+
+  <rect id="background" width="1024" height="1024" fill="url(#bgGrad4)" />
+
+  <g id="foreground">
+    <!-- Center reference: (512, 512), radius: 320 -->
+    <!-- Inactive 270-degree Ring (Top-Left, Bottom-Left, Bottom-Right) -->
+    <!-- From (512, 192) counterclockwise through (192, 512), (512, 832) to (832, 512) -->
+    <path d="M 512 192
+             A 320 320 0 1 0 832 512"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="48" stroke-linecap="round" />
+
+    <!-- Thin Fine Outer Calibration Track -->
+    <circle cx="512" cy="512" r="380" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="6" stroke-dasharray="12 12" />
+
+    <!-- Active Quadrant Visor (Top-Right Quadrant: broken out and displaced towards top-right corner) -->
+    <!-- Center displaced by (48, -48) -> center (560, 464), radius 320 -->
+    <!-- Spanning from (560, 144) to (880, 464) -->
+    <path d="M 560 144
+             A 320 320 0 0 1 880 464"
+          fill="none" stroke="url(#apertureAccent)" stroke-width="64" stroke-linecap="round" />
+
+    <!-- Accent Quadrant Internal Glow Arc -->
+    <path d="M 560 216
+             A 248 248 0 0 1 808 464"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="12" stroke-linecap="round" />
+
+    <!-- Active Hot Corner Target Indicator (Pointing towards top-right) -->
+    <circle cx="820" cy="204" r="28" fill="#00D2FF" />
+    <circle cx="820" cy="204" r="10" fill="#FFFFFF" />
+
+    <!-- Center Hub Core with Mechanical Stash Aperture -->
+    <circle cx="512" cy="512" r="130" fill="#141720" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="8" />
+    <circle cx="512" cy="512" r="70" fill="#0A84FF" />
+    <polygon points="512,472 546,532 478,532" fill="#FFFFFF" />
+  </g>
+</svg>

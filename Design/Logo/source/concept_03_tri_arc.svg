@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141822" />
+      <stop offset="100%" stop-color="#0A0C12" />
+    </linearGradient>
+
+    <!-- Arc 1: Brightness/Solar Amber Gold -->
+    <linearGradient id="arcSolar" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFB300" />
+      <stop offset="100%" stop-color="#FF5722" />
+    </linearGradient>
+
+    <!-- Arc 2: Pomodoro Focus Amethyst/Azure -->
+    <linearGradient id="arcFocus" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0A84FF" />
+      <stop offset="100%" stop-color="#9E00FF" />
+    </linearGradient>
+
+    <!-- Arc 3: Master Volume / Cyan Electric -->
+    <linearGradient id="arcVolume" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#0070F3" />
+    </linearGradient>
+  </defs>
+
+  <rect id="background" width="1024" height="1024" fill="url(#bgGrad3)" />
+
+  <!-- Tri-Arc Monolith anchored at (180, 844) -->
+  <g id="foreground">
+    <!-- Concentric Base Guides -->
+    <path d="M 180 844 L 180 264 A 580 580 0 0 1 760 844 Z"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="2" />
+    <path d="M 180 844 L 180 434 A 410 410 0 0 1 590 844 Z"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="2" />
+    <path d="M 180 844 L 180 604 A 240 240 0 0 1 420 844 Z"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="2" />
+
+    <!-- Outer Arc: Display Brightness (Radius 580, thickness 54, spans 75 deg) -->
+    <!-- Start at (180, 264), sweep to 75 deg: dx = 580*sin(75)=560.2, dy = 580*(1-cos(75))=429.8 -> (740.2, 694) -->
+    <path d="M 180 264 A 580 580 0 0 1 740 694"
+          fill="none" stroke="url(#arcSolar)" stroke-width="54" stroke-linecap="round" />
+
+    <!-- Middle Arc: Focus Pomodoro (Radius 410, thickness 44, spans 55 deg) -->
+    <path d="M 180 434 A 410 410 0 0 1 515 608"
+          fill="none" stroke="url(#arcFocus)" stroke-width="44" stroke-linecap="round" />
+
+    <!-- Inner Arc: Volume & Haptic Core (Radius 240, thickness 38, spans 40 deg) -->
+    <path d="M 180 604 A 240 240 0 0 1 363 690"
+          fill="none" stroke="url(#arcVolume)" stroke-width="38" stroke-linecap="round" />
+
+    <!-- Harmonic Ray Tracers passing through arc heads -->
+    <line x1="180" y1="844" x2="740" y2="694" stroke="#FFFFFF" stroke-opacity="0.25" stroke-dasharray="6 6" stroke-width="2" />
+    <line x1="180" y1="844" x2="515" y2="608" stroke="#FFFFFF" stroke-opacity="0.25" stroke-dasharray="6 6" stroke-width="2" />
+    <line x1="180" y1="844" x2="363" y2="690" stroke="#FFFFFF" stroke-opacity="0.25" stroke-dasharray="6 6" stroke-width="2" />
+
+    <!-- Anchor Vertex Disc -->
+    <circle cx="180" cy="844" r="80" fill="#0A0C12" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="8" />
+    <circle cx="180" cy="844" r="32" fill="#0A84FF" />
+  </g>
+</svg>

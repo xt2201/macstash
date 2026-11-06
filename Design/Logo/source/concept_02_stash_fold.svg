@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#191D28" />
+      <stop offset="100%" stop-color="#0B0D13" />
+    </linearGradient>
+
+    <!-- Pocket Interior Shadow / Depth -->
+    <linearGradient id="pocketDepth" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#05070B" />
+      <stop offset="100%" stop-color="#141824" />
+    </linearGradient>
+
+    <!-- Fold Flap Gradient -->
+    <linearGradient id="flapGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2A3142" />
+      <stop offset="100%" stop-color="#1C212E" />
+    </linearGradient>
+
+    <linearGradient id="dialGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#0A84FF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect id="background" width="1024" height="1024" fill="url(#bgGrad2)" />
+
+  <g id="foreground">
+    <!-- Under-fold Cavity (Dark recessed corner stash area) -->
+    <polygon points="160,160 864,160 864,864" fill="url(#pocketDepth)" />
+
+    <!-- Revealing Radial Gauge from within the Stash (Arcs radiating from top-right corner: 864, 160) -->
+    <!-- Arc 1 (Outer) -->
+    <path d="M 464 160 A 400 400 0 0 0 864 560"
+          fill="none" stroke="url(#dialGrad2)" stroke-width="32" stroke-linecap="round" />
+
+    <!-- Arc 2 (Middle with segment ticks) -->
+    <path d="M 584 160 A 280 280 0 0 0 864 440"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="16" stroke-dasharray="14 10" stroke-linecap="round" />
+
+    <!-- Arc 3 (Inner glowing core) -->
+    <path d="M 704 160 A 160 160 0 0 0 864 320"
+          fill="none" stroke="url(#dialGrad2)" stroke-width="24" stroke-linecap="round" />
+
+    <!-- Corner Vertex Light Point (Origin) -->
+    <circle cx="864" cy="160" r="48" fill="#00D2FF" />
+    <circle cx="864" cy="160" r="20" fill="#FFFFFF" />
+
+    <!-- The Architectural Over-Fold Flap (Cutting diagonally from 160, 160 to 864, 864) -->
+    <!-- The lower left half forms a geometric folded flap with crisp beveled edge -->
+    <polygon points="160,160 864,864 160,864" fill="url(#flapGrad)" />
+
+    <!-- Crisp Crease / Divider Edge -->
+    <line x1="160" y1="160" x2="864" y2="864" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Tactile Grip Notches on the folded flap -->
+    <line x1="280" y1="640" x2="360" y2="640" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="8" stroke-linecap="round" />
+    <line x1="280" y1="680" x2="400" y2="680" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="8" stroke-linecap="round" />
+    <line x1="280" y1="720" x2="360" y2="720" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="8" stroke-linecap="round" />
+  </g>
+</svg>

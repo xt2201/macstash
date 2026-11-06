@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#191D26" />
+      <stop offset="100%" stop-color="#0D0F14" />
+    </linearGradient>
+  </defs>
+  <!-- Background Layer for Apple Icon Composer (1024x1024 unmasked) -->
+  <rect id="background" width="1024" height="1024" fill="url(#bgGrad)" />
+</svg>

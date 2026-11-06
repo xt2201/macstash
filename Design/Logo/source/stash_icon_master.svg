@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background Gradient: Obsidian Slate to Deep Charcoal -->
+    <linearGradient id="stashBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#191D26" />
+      <stop offset="100%" stop-color="#0D0F14" />
+    </linearGradient>
+
+    <!-- Active Radial Gauge Gradient: Electric Azure to Precision Cyan -->
+    <linearGradient id="stashDial" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0A84FF" />
+      <stop offset="100%" stop-color="#00D2FF" />
+    </linearGradient>
+
+    <!-- Secondary Track Arc Gradient -->
+    <linearGradient id="stashTrack" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.06" />
+    </linearGradient>
+  </defs>
+
+  <!-- LAYER 1: BACKGROUND -->
+  <g id="layer-background">
+    <rect width="1024" height="1024" fill="url(#stashBg)" />
+  </g>
+
+  <!-- LAYER 2: MIDGROUND -->
+  <g id="layer-midground">
+    <!-- Outer Inactive Gauge Channel (Radius 560, Arc 90 deg) -->
+    <path d="M 160 304 A 560 560 0 0 1 720 864"
+          fill="none" stroke="url(#stashTrack)" stroke-width="40" stroke-linecap="round" />
+
+    <!-- Concentric Inner Guideline Arc (Radius 360) -->
+    <path d="M 160 504 A 360 360 0 0 1 520 864"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="12" stroke-linecap="round" />
+
+    <!-- Precision Detents at 0, 30, 45, 60, 90 deg -->
+    <g stroke="#FFFFFF" stroke-opacity="0.45" stroke-linecap="round">
+      <line x1="160" y1="280" x2="160" y2="254" stroke-width="6" />
+      <line x1="645" y1="584" x2="671" y2="569" stroke-width="5" />
+      <line x1="556" y1="468" x2="584" y2="440" stroke-width="8" stroke="#00D2FF" stroke-opacity="0.9" />
+      <line x1="440" y1="380" x2="455" y2="354" stroke-width="5" />
+      <line x1="744" y1="864" x2="770" y2="864" stroke-width="6" />
+    </g>
+  </g>
+
+  <!-- LAYER 3: FOREGROUND -->
+  <g id="layer-foreground">
+    <!-- Active Sweeping Sector (Radius Outer: 560, Radius Inner: 360, 60 deg) -->
+    <path d="M 160 304
+             A 560 560 0 0 1 645 584
+             L 472 684
+             A 360 360 0 0 0 160 504
+             Z"
+          fill="url(#stashDial)" />
+
+    <!-- Precision Indicator Pip at leading edge (45 deg) -->
+    <circle cx="485" cy="539" r="28" fill="#FFFFFF" />
+    <circle cx="485" cy="539" r="14" fill="#0A84FF" />
+
+    <!-- Corner Origin Anchor Pin -->
+    <circle cx="160" cy="864" r="120" fill="#0D0F14" stroke="url(#stashDial)" stroke-width="16" />
+    <circle cx="160" cy="864" r="56" fill="#00D2FF" />
+    <circle cx="160" cy="864" r="24" fill="#FFFFFF" />
+  </g>
+</svg>

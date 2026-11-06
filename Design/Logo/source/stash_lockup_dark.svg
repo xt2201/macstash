@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 320" width="1024" height="320">
+  <defs>
+    <!-- Background Gradient for Dark Lockup -->
+    <linearGradient id="lockupDarkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#191D26" />
+      <stop offset="100%" stop-color="#0E1015" />
+    </linearGradient>
+
+    <!-- Dial Gradient -->
+    <linearGradient id="lockupDial" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0A84FF" />
+      <stop offset="100%" stop-color="#00D2FF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="320" rx="32" fill="url(#lockupDarkBg)" />
+
+  <!-- STANDALONE MARK (Scales 1024 down to 240x240, placed at x=48, y=40) -->
+  <!-- scale = 240 / 1024 = 0.234375 -->
+  <g transform="translate(48, 40) scale(0.234375)">
+    <!-- Outer Inactive Channel Arc -->
+    <path d="M 180 284 A 560 560 0 0 1 740 844"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="44" stroke-linecap="round" />
+
+    <!-- Concentric Inner Guideline Arc -->
+    <path d="M 180 484 A 360 360 0 0 1 540 844"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="14" stroke-linecap="round" />
+
+    <!-- Mechanical Detents -->
+    <g stroke="#FFFFFF" stroke-opacity="0.5" stroke-linecap="round">
+      <line x1="180" y1="260" x2="180" y2="234" stroke-width="6" />
+      <line x1="665" y1="564" x2="691" y2="549" stroke-width="5" />
+      <line x1="576" y1="448" x2="604" y2="420" stroke-width="8" stroke="#00D2FF" stroke-opacity="0.9" />
+      <line x1="460" y1="360" x2="475" y2="334" stroke-width="5" />
+      <line x1="764" y1="844" x2="790" y2="844" stroke-width="6" />
+    </g>
+
+    <!-- Active Sweeping Radial Sector -->
+    <path d="M 180 284
+             A 560 560 0 0 1 665 564
+             L 492 664
+             A 360 360 0 0 0 180 484
+             Z"
+          fill="url(#lockupDial)" />
+
+    <!-- Focal Pip -->
+    <circle cx="505" cy="519" r="30" fill="#FFFFFF" />
+    <circle cx="505" cy="519" r="15" fill="#0A84FF" />
+
+    <!-- Anchor Origin Pin -->
+    <circle cx="180" cy="844" r="124" fill="#0D0F14" stroke="url(#lockupDial)" stroke-width="18" />
+    <circle cx="180" cy="844" r="58" fill="#00D2FF" />
+    <circle cx="180" cy="844" r="24" fill="#FFFFFF" />
+  </g>
+
+  <!-- TYPOGRAPHY: "Stash" and "FOR macOS" -->
+  <g transform="translate(328, 0)">
+    <text x="0" y="172"
+          font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
+          font-size="118"
+          font-weight="700"
+          letter-spacing="-1.5"
+          fill="#FFFFFF">Stash</text>
+
+    <text x="6" y="222"
+          font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif"
+          font-size="20"
+          font-weight="600"
+          letter-spacing="7"
+          fill="#00D2FF">FOR macOS</text>
+  </g>
+</svg>

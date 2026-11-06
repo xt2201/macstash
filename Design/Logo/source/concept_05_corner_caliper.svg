@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#161A24" />
+      <stop offset="100%" stop-color="#090B0F" />
+    </linearGradient>
+
+    <linearGradient id="caliperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#0A84FF" />
+    </linearGradient>
+  </defs>
+
+  <rect id="background" width="1024" height="1024" fill="url(#bgGrad5)" />
+
+  <g id="foreground">
+    <!-- Outer Precision L-Bracket (Caliper Arm) hugging top and left edges -->
+    <!-- Origin vertex at (160, 160) -->
+    <!-- Horizontal arm: (160, 160) to (864, 160) -->
+    <!-- Vertical arm: (160, 160) to (160, 864) -->
+    <path d="M 160 864 L 160 160 L 864 160"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="24" stroke-linejoin="miter" stroke-linecap="round" />
+
+    <!-- High-Precision Metric Tick Marks along L-Bracket -->
+    <g stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="6" stroke-linecap="round">
+      <!-- Horizontal ticks -->
+      <line x1="280" y1="160" x2="280" y2="190" />
+      <line x1="400" y1="160" x2="400" y2="210" stroke-width="8" stroke-opacity="0.6" />
+      <line x1="520" y1="160" x2="520" y2="190" />
+      <line x1="640" y1="160" x2="640" y2="220" stroke-width="10" stroke="#00D2FF" />
+      <line x1="760" y1="160" x2="760" y2="190" />
+
+      <!-- Vertical ticks -->
+      <line x1="160" y1="280" x2="190" y2="280" />
+      <line x1="160" y1="400" x2="210" y2="400" stroke-width="8" stroke-opacity="0.6" />
+      <line x1="160" y1="520" x2="190" y2="520" />
+      <line x1="160" y1="640" x2="220" y2="640" stroke-width="10" stroke="#00D2FF" />
+      <line x1="160" y1="760" x2="190" y2="760" />
+    </g>
+
+    <!-- Quarter-Circle Dial sweeping across the L-frame (Radius 480) -->
+    <path d="M 640 160 A 480 480 0 0 1 160 640"
+          fill="none" stroke="url(#caliperGrad)" stroke-width="48" stroke-linecap="round" />
+
+    <!-- Inner Secondary Echo Arc (Radius 300) -->
+    <path d="M 460 160 A 300 300 0 0 1 160 460"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="16" stroke-linecap="round" />
+
+    <!-- Sweeping Needle Indicator (From 160, 160 along 45 degrees) -->
+    <!-- 45 deg vector: dx = 560 * cos(45) = 396, dy = 396 -> end at (556, 556) -->
+    <line x1="160" y1="160" x2="556" y2="556" stroke="url(#caliperGrad)" stroke-width="14" stroke-linecap="round" />
+    <circle cx="556" cy="556" r="24" fill="#00D2FF" />
+
+    <!-- Corner Vertex Datum Pivot -->
+    <rect x="124" y="124" width="72" height="72" rx="16" fill="#0A84FF" />
+    <circle cx="160" cy="160" r="14" fill="#FFFFFF" />
+  </g>
+</svg>

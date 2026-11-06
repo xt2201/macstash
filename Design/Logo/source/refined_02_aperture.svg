@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="ref2Bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#191D26" />
+      <stop offset="100%" stop-color="#0D0F14" />
+    </linearGradient>
+
+    <linearGradient id="ref2Dial" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#0A84FF" />
+    </linearGradient>
+
+    <linearGradient id="ref2Track" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.08" />
+    </linearGradient>
+  </defs>
+
+  <!-- LAYER 1: BACKGROUND -->
+  <g id="layer-background">
+    <rect width="1024" height="1024" fill="url(#ref2Bg)" />
+  </g>
+
+  <!-- LAYER 2: MIDGROUND (Base Inactive 270 deg Ring & Guide Reticle) -->
+  <g id="layer-midground">
+    <!-- Center (512, 512), radius 340 -->
+    <!-- Arc from (512, 172) counter-clockwise through left and bottom to (852, 512) -->
+    <path d="M 512 172
+             A 340 340 0 1 0 852 512"
+          fill="none" stroke="url(#ref2Track)" stroke-width="56" stroke-linecap="round" />
+
+    <!-- Outer Precision Tick Ring (Radius 420) -->
+    <circle cx="512" cy="512" r="420"
+            fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="8" stroke-dasharray="16 16" />
+
+    <!-- Subtle 45-deg Angle Reticle -->
+    <line x1="215" y1="809" x2="809" y2="215" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="3" stroke-dasharray="8 8" />
+  </g>
+
+  <!-- LAYER 3: FOREGROUND (Displaced Active Quadrant Visor & Center Core) -->
+  <g id="layer-foreground">
+    <!-- Active Sector: Center displaced to (560, 464), radius 340 -->
+    <!-- From (560, 124) to (900, 464) -->
+    <path d="M 560 124
+             A 340 340 0 0 1 900 464"
+          fill="none" stroke="url(#ref2Dial)" stroke-width="72" stroke-linecap="round" />
+
+    <!-- Inner Core Hub -->
+    <circle cx="512" cy="512" r="140" fill="#0D0F14" stroke="url(#ref2Track)" stroke-width="12" />
+    <circle cx="512" cy="512" r="80" fill="url(#ref2Dial)" />
+    <!-- Aperture Target Dot -->
+    <circle cx="512" cy="512" r="28" fill="#FFFFFF" />
+
+    <!-- Corner Target Point Indicator (Corner 830, 194) -->
+    <circle cx="830" cy="194" r="32" fill="#00D2FF" />
+    <circle cx="830" cy="194" r="14" fill="#FFFFFF" />
+  </g>
+</svg>

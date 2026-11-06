@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Favicon: High contrast 64x64 vector -->
+  <defs>
+    <linearGradient id="favBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E2330" />
+      <stop offset="100%" stop-color="#0E1015" />
+    </linearGradient>
+    <linearGradient id="favDial" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0A84FF" />
+      <stop offset="100%" stop-color="#00D2FF" />
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="url(#favBg)" />
+
+  <!-- Corner Origin at (10, 54) -->
+  <!-- Outer Channel -->
+  <path d="M 10 19 A 35 35 0 0 1 45 54"
+        fill="none" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Solid Active Sector (60 deg, Outer R: 35, Inner R: 21) -->
+  <path d="M 10 19
+           A 35 35 0 0 1 40.3 36.5
+           L 28.2 43.5
+           A 21 21 0 0 0 10 33
+           Z"
+        fill="url(#favDial)" />
+
+  <!-- Origin Pin -->
+  <circle cx="10" cy="54" r="8" fill="#0D0F14" stroke="url(#favDial)" stroke-width="2" />
+  <circle cx="10" cy="54" r="3.5" fill="#00D2FF" />
+</svg>

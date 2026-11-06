@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- STANDALONE MONOCHROME MARK (WHITE ON TRANSPARENT) -->
+  <g id="mark-mono-white" fill="#FFFFFF" stroke="#FFFFFF">
+    <!-- Outer Inactive Channel Arc (R=560) -->
+    <path d="M 180 284 A 560 560 0 0 1 740 844"
+          fill="none" stroke-opacity="0.25" stroke-width="44" stroke-linecap="round" />
+
+    <!-- Concentric Inner Guideline Arc (R=360) -->
+    <path d="M 180 484 A 360 360 0 0 1 540 844"
+          fill="none" stroke-opacity="0.15" stroke-width="14" stroke-linecap="round" />
+
+    <!-- Mechanical Detents -->
+    <g stroke-linecap="round">
+      <line x1="180" y1="260" x2="180" y2="234" stroke-width="6" stroke-opacity="0.6" />
+      <line x1="665" y1="564" x2="691" y2="549" stroke-width="5" stroke-opacity="0.6" />
+      <line x1="576" y1="448" x2="604" y2="420" stroke-width="8" stroke-opacity="0.9" />
+      <line x1="460" y1="360" x2="475" y2="334" stroke-width="5" stroke-opacity="0.6" />
+      <line x1="764" y1="844" x2="790" y2="844" stroke-width="6" stroke-opacity="0.6" />
+    </g>
+
+    <!-- Active Sweeping Radial Sector -->
+    <path d="M 180 284
+             A 560 560 0 0 1 665 564
+             L 492 664
+             A 360 360 0 0 0 180 484
+             Z"
+          stroke="none" />
+
+    <!-- Focal Pip -->
+    <circle cx="505" cy="519" r="26" fill="#0D0F14" stroke="#FFFFFF" stroke-width="8" />
+
+    <!-- Anchor Origin Pin -->
+    <circle cx="180" cy="844" r="124" fill="#0D0F14" stroke="#FFFFFF" stroke-width="20" />
+    <circle cx="180" cy="844" r="58" stroke="none" />
+  </g>
+</svg>

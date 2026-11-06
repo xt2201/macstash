@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181B24" />
+      <stop offset="100%" stop-color="#0B0D13" />
+    </linearGradient>
+
+    <linearGradient id="pulseGrad" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#0A84FF" />
+    </linearGradient>
+  </defs>
+
+  <rect id="background" width="1024" height="1024" fill="url(#bgGrad6)" />
+
+  <!-- Radiating from bottom-right vertex (864, 864) -->
+  <g id="foreground">
+    <!-- Wave 1 (Distance 160) -->
+    <path d="M 704 864 A 160 160 0 0 0 864 704"
+          fill="none" stroke="url(#pulseGrad)" stroke-width="36" stroke-linecap="round" />
+
+    <!-- Wave 2 (Distance 300) -->
+    <path d="M 564 864 A 300 300 0 0 0 864 564"
+          fill="none" stroke="url(#pulseGrad)" stroke-width="48" stroke-linecap="round" />
+
+    <!-- Wave 3 (Distance 460) -->
+    <path d="M 404 864 A 460 460 0 0 0 864 404"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="28" stroke-linecap="round" />
+
+    <!-- Wave 4 (Distance 620) -->
+    <path d="M 244 864 A 620 620 0 0 0 864 244"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="16" stroke-linecap="round" />
+
+    <!-- Wave 5 (Distance 740 - subtle perimeter) -->
+    <path d="M 160 864 A 704 704 0 0 0 864 160"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="8" stroke-dasharray="16 16" stroke-linecap="round" />
+
+    <!-- Radiant Ray across center (Angle 135 deg) -->
+    <line x1="864" y1="864" x2="368" y2="368" stroke="#00D2FF" stroke-opacity="0.25" stroke-dasharray="8 8" stroke-width="3" />
+
+    <!-- Intense Corner Focal Node -->
+    <circle cx="864" cy="864" r="90" fill="#0E121B" stroke="#00D2FF" stroke-width="12" />
+    <circle cx="864" cy="864" r="50" fill="url(#pulseGrad)" />
+    <circle cx="864" cy="864" r="20" fill="#FFFFFF" />
+  </g>
+</svg>

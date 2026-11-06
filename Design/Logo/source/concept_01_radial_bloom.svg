@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E2330" />
+      <stop offset="100%" stop-color="#0E1118" />
+    </linearGradient>
+
+    <!-- Arc Glow / Highlight Gradient -->
+    <linearGradient id="accentGrad1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0A84FF" />
+      <stop offset="100%" stop-color="#00D2FF" />
+    </linearGradient>
+
+    <linearGradient id="trackGrad1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.08" />
+    </linearGradient>
+  </defs>
+
+  <!-- Layer: Background (Clean, no pre-baked squircle mask) -->
+  <rect id="background" width="1024" height="1024" fill="url(#bgGrad1)" />
+
+  <!-- Layer: Subtle Grid Lines / Calibration -->
+  <g id="grid-lines" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="2">
+    <line x1="160" y1="160" x2="864" y2="160" />
+    <line x1="160" y1="864" x2="864" y2="864" />
+    <line x1="160" y1="160" x2="160" y2="864" />
+    <line x1="864" y1="160" x2="864" y2="864" />
+    <line x1="160" y1="864" x2="864" y2="160" stroke-dasharray="8 8" />
+  </g>
+
+  <!-- Layer: Foreground Artwork - Concept 1: Radial Corner Bloom -->
+  <!-- Anchored at bottom-left corner of safe zone (x: 160, y: 864) -->
+  <g id="foreground">
+    <!-- Outer Inactive Dial Track (Radius 560px, 90 deg arc) -->
+    <path d="M 160 864 L 160 304 A 560 560 0 0 1 720 864 Z"
+          fill="none" stroke="url(#trackGrad1)" stroke-width="36" />
+
+    <!-- Secondary Track Arc (Radius 420px) -->
+    <path d="M 160 864 L 160 444 A 420 420 0 0 1 580 864 Z"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="16" />
+
+    <!-- Tertiary Track Arc (Radius 280px) -->
+    <path d="M 160 864 L 160 584 A 280 280 0 0 1 440 864 Z"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="10" />
+
+    <!-- Active Highlighting Sector (Radial gauge filled segment, sweeping 62 degrees) -->
+    <!-- Arc endpoint at 62 deg: dx = 560 * cos(62) = 262.9, dy = -560 * sin(62) = -494.48 -> pt (422.9, 369.5) -->
+    <!-- Outer radius 560, inner radius 340 -->
+    <path d="M 160 524
+             A 340 340 0 0 1 319.6 563.8
+             L 422.9 369.5
+             A 560 560 0 0 0 160 304
+             Z"
+          fill="url(#accentGrad1)" />
+
+    <!-- Corner Origin Core Pin (Tactile Corner Anchor) -->
+    <circle cx="160" cy="864" r="110" fill="#0E121B" stroke="url(#accentGrad1)" stroke-width="14" />
+    <circle cx="160" cy="864" r="44" fill="#00D2FF" />
+
+    <!-- Mechanical Detent Ticks along outer arc -->
+    <g stroke="#FFFFFF" stroke-linecap="round">
+      <!-- 0 deg (bottom) -->
+      <line x1="740" y1="864" x2="770" y2="864" stroke-width="6" stroke-opacity="0.6" />
+      <!-- 15 deg -->
+      <line x1="720.5" y1="719.1" x2="749.5" y2="711.3" stroke-width="4" stroke-opacity="0.4" />
+      <!-- 30 deg -->
+      <line x1="665.0" y1="584.0" x2="691.0" y2="569.0" stroke-width="5" stroke-opacity="0.5" />
+      <!-- 45 deg -->
+      <line x1="576.0" y1="468.0" x2="598.0" y2="446.0" stroke-width="8" stroke-opacity="0.9" stroke="#00D2FF" />
+      <!-- 60 deg -->
+      <line x1="460.0" y1="379.0" x2="475.0" y2="353.0" stroke-width="5" stroke-opacity="0.5" />
+      <!-- 75 deg -->
+      <line x1="325.1" y1="323.5" x2="332.9" y2="294.5" stroke-width="4" stroke-opacity="0.4" />
+      <!-- 90 deg (top) -->
+      <line x1="160" y1="284" x2="160" y2="254" stroke-width="6" stroke-opacity="0.6" />
+    </g>
+  </g>
+</svg>

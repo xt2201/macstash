@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background Gradient: Obsidian Space Slate -->
+    <linearGradient id="ref1Bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#191D26" />
+      <stop offset="100%" stop-color="#0D0F14" />
+    </linearGradient>
+
+    <!-- Active Radial Gauge Gradient: Electric Azure to Precision Cyan -->
+    <linearGradient id="ref1Dial" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0A84FF" />
+      <stop offset="100%" stop-color="#00D2FF" />
+    </linearGradient>
+
+    <!-- Secondary Track Arc Gradient -->
+    <linearGradient id="ref1Track" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.06" />
+    </linearGradient>
+  </defs>
+
+  <!-- LAYER 1: BACKGROUND -->
+  <g id="layer-background">
+    <rect width="1024" height="1024" fill="url(#ref1Bg)" />
+  </g>
+
+  <!-- LAYER 2: MIDGROUND (Tracks & Precision Detents) -->
+  <!-- Corner Origin Vertex: (160, 864) -->
+  <g id="layer-midground">
+    <!-- Outer Inactive Gauge Channel (Radius 560, Arc 90 deg) -->
+    <!-- Arc from (160, 304) to (720, 864) -->
+    <path d="M 160 304 A 560 560 0 0 1 720 864"
+          fill="none" stroke="url(#ref1Track)" stroke-width="40" stroke-linecap="round" />
+
+    <!-- Concentric Inner Guideline Arc (Radius 360) -->
+    <path d="M 160 504 A 360 360 0 0 1 520 864"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="12" stroke-linecap="round" />
+
+    <!-- Mechanical Detents at 0, 30, 45, 60, 90 deg -->
+    <g stroke="#FFFFFF" stroke-opacity="0.45" stroke-linecap="round">
+      <!-- 90 deg (Top vertical: x=160, y=260..284) -->
+      <line x1="160" y1="280" x2="160" y2="254" stroke-width="6" />
+      <!-- 60 deg (dx=610*sin(60)=528, dy=610*cos(60)=305 -> x=688, y=559) -->
+      <line x1="645" y1="584" x2="671" y2="569" stroke-width="5" />
+      <!-- 45 deg Major Detent (dx=610*0.7071=431, dy=431 -> x=591, y=433) -->
+      <line x1="556" y1="468" x2="584" y2="440" stroke-width="8" stroke="#00D2FF" stroke-opacity="0.9" />
+      <!-- 30 deg (dx=610*sin(30)=305, dy=610*cos(30)=528 -> x=465, y=336) -->
+      <line x1="440" y1="380" x2="455" y2="354" stroke-width="5" />
+      <!-- 0 deg (Bottom horizontal: x=740..766, y=864) -->
+      <line x1="744" y1="864" x2="770" y2="864" stroke-width="6" />
+    </g>
+  </g>
+
+  <!-- LAYER 3: FOREGROUND (Active Solid Radial Sector & Core Pin) -->
+  <g id="layer-foreground">
+    <!-- Active Sweeping Sector (Radius Outer: 560, Radius Inner: 360) -->
+    <!-- Sweeps 60 degrees from vertical (x: 160, y: 304 to 504) to (x: 645, y: 584) -->
+    <!-- Arc 1 (Outer): (160, 304) to (645, 584) with R=560 -->
+    <!-- Line to Inner: (472, 684) with R=360 -->
+    <!-- Arc 2 (Inner): (472, 684) to (160, 504) with R=360 -->
+    <path d="M 160 304
+             A 560 560 0 0 1 645 584
+             L 472 684
+             A 360 360 0 0 0 160 504
+             Z"
+          fill="url(#ref1Dial)" />
+
+    <!-- Precision Indicator Pip at leading edge (45 deg, R=460) -->
+    <!-- x = 160 + 460 * sin(45) = 160 + 325 = 485 -->
+    <!-- y = 864 - 460 * cos(45) = 864 - 325 = 539 -->
+    <circle cx="485" cy="539" r="28" fill="#FFFFFF" />
+    <circle cx="485" cy="539" r="14" fill="#0A84FF" />
+
+    <!-- Corner Origin Core Pin (Corner Coordinate Anchor) -->
+    <circle cx="160" cy="864" r="120" fill="#0D0F14" stroke="url(#ref1Dial)" stroke-width="16" />
+    <circle cx="160" cy="864" r="56" fill="#00D2FF" />
+    <circle cx="160" cy="864" r="24" fill="#FFFFFF" />
+  </g>
+</svg>

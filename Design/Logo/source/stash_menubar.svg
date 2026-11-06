@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18">
+  <!-- MacStash Menu Bar Template Icon (Standard Inactive / Idle State) -->
+  <!-- Designed specifically for macOS 16-18pt status bar (pure alpha mask) -->
+  <g fill="#000000" stroke="#000000">
+    <!-- Anchor Pin at bottom-left (2.5, 15.5) -->
+    <circle cx="2.5" cy="15.5" r="1.8" stroke="none" />
+
+    <!-- Tactile Quarter-Circle Arc (Radius 12.0) -->
+    <!-- Arc sweeping from (2.5, 3.5) to (14.5, 15.5) -->
+    <path d="M 2.5 3.5 A 12 12 0 0 1 14.5 15.5"
+          fill="none" stroke-width="2.0" stroke-linecap="round" />
+
+    <!-- Detent pip at 45 degrees (Radius 8.5) -->
+    <!-- dx = 8.5 * sin(45) = 6.01 -> x = 8.5, y = 15.5 - 6.01 = 9.49 -->
+    <circle cx="8.5" cy="9.5" r="1.2" stroke="none" />
+  </g>
+</svg>

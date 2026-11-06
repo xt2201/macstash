@@ -138,29 +138,11 @@ public struct MenuBarExtraView: View {
             VStack(spacing: 8) {
                 // Volume
                 VStack(spacing: 4) {
-                    HStack(spacing: 8) {
-                        Button(action: {
-                            appState.audio.toggleMute()
-                        }) {
-                            Image(systemName: appState.audio.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                                .foregroundColor(appState.audio.isMuted ? .red : .blue)
-                                .frame(width: 16)
-                        }
-                        .buttonStyle(.plain)
-                        .help(appState.audio.isMuted ? appState.localized("menubar.unmute") : appState.localized("menubar.mute"))
-
-                        Slider(
-                            value: Binding(
-                                get: { appState.audio.volume },
-                                set: { appState.audio.setVolume($0) }
-                            ),
-                            in: 0...1
-                        )
-
-                        Text(appState.audio.isMuted ? "0%" : "\(Int(appState.audio.volume * 100))%")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .frame(width: 32)
-                    }
+                    VolumeSliderRow(
+                        audio: appState.audio,
+                        localizedMute: appState.localized("menubar.mute"),
+                        localizedUnmute: appState.localized("menubar.unmute")
+                    )
 
                     if !appState.audio.outputDevices.isEmpty {
                         Menu {
@@ -249,23 +231,7 @@ public struct MenuBarExtraView: View {
 
                 // Keyboard Brightness
                 if appState.keyboard.isSupported {
-                    HStack(spacing: 8) {
-                        Image(systemName: "keyboard.fill")
-                            .foregroundColor(.teal)
-                            .frame(width: 16)
-
-                        Slider(
-                            value: Binding(
-                                get: { appState.keyboard.brightness },
-                                set: { appState.keyboard.setBrightness($0) }
-                            ),
-                            in: 0...1
-                        )
-
-                        Text("\(Int(appState.keyboard.brightness * 100))%")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .frame(width: 32)
-                    }
+                    KeyboardBrightnessSliderRow(keyboard: appState.keyboard)
                 }
             }
             .padding(.horizontal, 12)
@@ -322,6 +288,10 @@ public struct MenuBarExtraView: View {
             .padding(.bottom, 6)
         }
         .frame(width: 260)
+        .onAppear {
+            appState.keyboard.updateBrightnessFromHardware()
+            appState.audio.updateVolumeFromHardware()
+        }
     }
 
     private func modeTitle(for mode: PomodoroMode) -> String {
@@ -329,6 +299,67 @@ public struct MenuBarExtraView: View {
         case .focus: return appState.localized("pomodoro.modeFocus")
         case .shortBreak: return appState.localized("pomodoro.modeShortBreak")
         case .longBreak: return appState.localized("pomodoro.modeLongBreak")
+        }
+    }
+}
+
+private struct VolumeSliderRow: View {
+    @ObservedObject var audio: AudioManager
+    var localizedMute: String
+    var localizedUnmute: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button(action: {
+                audio.toggleMute()
+            }) {
+                Image(systemName: audio.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                    .foregroundColor(audio.isMuted ? .red : .blue)
+                    .frame(width: 16)
+            }
+            .buttonStyle(.plain)
+            .help(audio.isMuted ? localizedUnmute : localizedMute)
+
+            Slider(
+                value: Binding(
+                    get: { audio.volume },
+                    set: { audio.setVolume($0) }
+                ),
+                in: 0...1
+            )
+
+            Text(audio.isMuted ? "0%" : "\(Int(audio.volume * 100))%")
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .frame(width: 32)
+        }
+    }
+}
+
+private struct KeyboardBrightnessSliderRow: View {
+    @ObservedObject var keyboard: KeyboardBrightnessManager
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button(action: {
+                keyboard.setBrightness(KeyboardBrightnessPolicy.toggle(current: keyboard.brightness))
+            }) {
+                Image(systemName: "keyboard.fill")
+                    .foregroundColor(.teal)
+                    .frame(width: 16)
+            }
+            .buttonStyle(.plain)
+
+            Slider(
+                value: Binding(
+                    get: { keyboard.brightness },
+                    set: { keyboard.setBrightness($0) }
+                ),
+                in: 0...1
+            )
+
+            Text("\(Int(keyboard.brightness * 100))%")
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .frame(width: 32)
         }
     }
 }

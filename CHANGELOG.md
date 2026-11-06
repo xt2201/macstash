@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.3.2] - 2026-11-06
+
+### Added
+- One-click keyboard backlight toggle button on the menu bar keyboard icon to switch illumination on or off immediately.
+- Hardware state synchronization on menu bar popover appear, automatically pulling active keyboard backlight and master volume levels.
+
+### Changed
+- Isolated menu bar slider rows into dedicated subviews to prevent parent view re-renders and redundant display queries during dragging.
+- Forwarded keyboard and audio `objectWillChange` notifications to `AppState` for unified reactive observation.
+
+### Fixed
+- Fixed un-smooth and jittery keyboard brightness slider by removing asynchronous runloop dispatch and performing synchronous state updates on MainActor.
+- Fixed volume slider jitter during rapid scrubbing by standardizing MainActor synchronous volume mutations.
+
+---
+
 ## [2.3.1] - 2026-11-06
 
 ### Added

@@ -78,3 +78,17 @@ public enum BrightnessPolicy {
         }
     }
 }
+
+public enum KeyboardBrightnessPolicy {
+    public static func clamp(_ level: Float) -> Float {
+        max(0.0, min(1.0, level))
+    }
+
+    public static func toggle(current: Float) -> Float {
+        current > 0.05 ? 0.0 : 0.6
+    }
+
+    public static func isSignificantChange(from current: Float, to newLevel: Float, threshold: Float = 0.0001) -> Bool {
+        abs(current - newLevel) > threshold
+    }
+}

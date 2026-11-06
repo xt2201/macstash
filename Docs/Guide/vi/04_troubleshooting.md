@@ -42,3 +42,9 @@ Người dùng có thể chuyển đổi linh hoạt giữa Tiếng Việt và E
 
 - Thanh trượt cạnh phải được ẩn hoàn toàn khi ở trạng thái nghỉ nhằm giữ cho màn hình thoáng đãng và không che khuất nội dung của các ứng dụng khác.
 - Để gọi thanh trượt, chỉ cần di chuyển con trỏ chuột chạm vào sát mép ngoài cùng bên phải của màn hình. Thanh trượt sẽ trượt ra mượt mà để bạn điều chỉnh nhanh âm lượng hoặc độ sáng.
+
+## Tinh Chỉnh Đèn Nền Bàn Phím Trên Menu Bar
+
+- Thanh trượt điều chỉnh đèn bàn phím phản hồi mượt mà theo thời gian thực và đồng bộ ngay lập tức với cảm biến phần cứng của MacBook.
+- Khi mở bảng điều khiển Menu Bar, ứng dụng sẽ tự động đọc mức sáng hiện tại từ hệ thống để đảm bảo giá trị luôn chính xác ngay cả khi bạn vừa chỉnh bằng phím vật lý hoặc Control Center.
+- Bạn có thể nhấp chuột trực tiếp vào biểu tượng bàn phím ở đầu thanh trượt để bật hoặc tắt nhanh đèn nền.

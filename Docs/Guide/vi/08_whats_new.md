@@ -1,3 +1,15 @@
+# Có Gì Mới Trong Phiên Bản 2.3.2
+
+MacStash 2.3.2 tối ưu hóa độ mượt mà của thanh trượt đèn nền bàn phím trên thanh điều khiển Menu Bar, đồng bộ tức thì với phần cứng và hỗ trợ bật/tắt nhanh bằng một chạm.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.3.2
+
+- Thanh trượt đèn bàn phím mượt mà: Loại bỏ độ trễ và hiện tượng giật rung khi kéo thanh trượt trên menu bar, đồng bộ vị trí con trỏ và nhãn phần trăm với tốc độ khung hình cao.
+- Cô lập giao diện thanh trượt: Tách riêng thanh trượt đèn nền và âm lượng thành các thành phần giao diện chuyên biệt, loại bỏ thao tác truy vấn màn hình thừa thãi khi đang kéo chuột.
+- Đồng bộ phần cứng khi mở bảng điều khiển: Tự động cập nhật mức sáng đèn nền bàn phím và âm lượng thực tế của hệ thống ngay khi mở menu bar popover.
+- Chạm nhanh để bật/tắt đèn nền: Nhấp chuột vào biểu tượng bàn phím ở đầu thanh trượt để bật hoặc tắt nhanh đèn nền.
+- Cải tiến thanh trượt âm lượng: Chuẩn hóa cập nhật âm lượng đồng bộ trên luồng chính giúp thao tác kéo thả êm ái và chính xác hơn.
+
 # Có Gì Mới Trong Phiên Bản 2.3.1
 
 MacStash 2.3.1 khắc phục triệt để lỗi nhảy thời gian Pomodoro, cải tiến trải nghiệm góc xoay với cụm nút phụ tiện ích và ẩn hoàn toàn thanh trượt cạnh phải khi ở trạng thái nghỉ.

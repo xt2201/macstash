@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import MacStashCore
 
 /// Manages MacBook backlit keyboard brightness via Apple private CoreBrightness framework
 @MainActor
@@ -53,15 +54,13 @@ public final class KeyboardBrightnessManager: ObservableObject {
 
         let fn = unsafeBitCast(methodIMP, to: GetBrightnessFunc.self)
         let current = fn(client, sel, keyboardID)
-
-        DispatchQueue.main.async {
-            self.brightness = max(0.0, min(1.0, current))
-        }
+        self.brightness = KeyboardBrightnessPolicy.clamp(current)
     }
 
     public func setBrightness(_ newBrightness: Float) {
-        let clamped = max(0.0, min(1.0, newBrightness))
-        DispatchQueue.main.async { self.brightness = clamped }
+        let clamped = KeyboardBrightnessPolicy.clamp(newBrightness)
+        guard KeyboardBrightnessPolicy.isSignificantChange(from: self.brightness, to: clamped) else { return }
+        self.brightness = clamped
 
         guard isSupported, let client = clientInstance else { return }
 

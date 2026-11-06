@@ -1,3 +1,15 @@
+# What's New in Version 2.3.2
+
+MacStash 2.3.2 delivers ultra-smooth keyboard backlight scrubbing in the top bar control popover, instantaneous hardware synchronization, and one-tap backlight toggling.
+
+## Key Enhancements in Version 2.3.2
+
+- Ultra-Smooth Keyboard Backlight Slider: Eliminated runloop delays and jitter during continuous slider dragging, keeping the thumb and percentage label in exact lockstep.
+- Isolated Slider Components: Decomposed backlight and volume controls into dedicated views, preventing unnecessary display list queries during dragging.
+- On-Appear Hardware Sync: Automatically queries and synchronizes current MacBook keyboard backlight and audio volume whenever opening the Menu Bar popover.
+- One-Tap Backlight Toggle: Tapping the keyboard icon at the beginning of the slider toggles keyboard illumination on or off immediately.
+- Synchronous Volume Scrubbing: Standardized MainActor volume updates to eliminate stutter during rapid volume adjustments.
+
 # What's New in Version 2.3.1
 
 MacStash 2.3.1 resolves Pomodoro duration jumping glitches, enhances corner dial UX with integrated satellite micro-controls, and completely hides edge sliders when idle.

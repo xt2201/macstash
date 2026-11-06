@@ -207,11 +207,9 @@ public final class AudioManager: ObservableObject {
         }
 
         if status == noErr {
-            DispatchQueue.main.async {
-                self.volume = clamped
-                if self.isMuted && clamped > 0 {
-                    self.setMute(false)
-                }
+            self.volume = clamped
+            if self.isMuted && clamped > 0 {
+                self.setMute(false)
             }
         }
     }

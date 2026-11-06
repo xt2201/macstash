@@ -6,6 +6,27 @@
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
         <item>
+            <title>Version 2.3.2</title>
+            <pubDate>Fri, 06 Nov 2026 13:45:43 +0700</pubDate>
+            <sparkle:version>2.3.2</sparkle:version>
+            <sparkle:shortVersionString>2.3.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+<h2>What's New in Stash 2.3.2</h2>
+<ul>
+    <li>Ultra-smooth keyboard backlight scrubbing in the top bar control popover.</li>
+    <li>Isolated slider views eliminating frame drops and jitter during dragging.</li>
+    <li>Automatic hardware backlight and master volume synchronization on appear.</li>
+    <li>One-click keyboard backlight toggle button on the menu bar keyboard icon.</li>
+</ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/xt2201/macstash/releases/download/v2.3.2/Stash-2.3.2.zip"
+                sparkle:edSignature="D8fjElhDamtQrowRZyTKAFn0pSTuZrUREP8TCW1WSN1rLpv3gcDuRgur2Eji+OiKHHHXcUyD6ejkZMJI3qalDw=="
+                length="5566134"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 2.3.1</title>
             <pubDate>Fri, 06 Nov 2026 13:33:07 +0700</pubDate>
             <sparkle:version>2.3.1</sparkle:version>

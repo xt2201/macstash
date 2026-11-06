@@ -5,6 +5,24 @@ public enum BrightnessPolicyTests {
     public static func run() {
         testClamping()
         testMethodResolution()
+        testKeyboardBrightnessPolicy()
+    }
+
+    private static func testKeyboardBrightnessPolicy() {
+        // Clamping
+        TestAssertion.assertEqual(KeyboardBrightnessPolicy.clamp(-0.2), Float(0.0))
+        TestAssertion.assertEqual(KeyboardBrightnessPolicy.clamp(1.4), Float(1.0))
+        TestAssertion.assertEqual(KeyboardBrightnessPolicy.clamp(0.75), Float(0.75))
+
+        // Toggle
+        TestAssertion.assertEqual(KeyboardBrightnessPolicy.toggle(current: 0.8), Float(0.0))
+        TestAssertion.assertEqual(KeyboardBrightnessPolicy.toggle(current: 0.1), Float(0.0))
+        TestAssertion.assertEqual(KeyboardBrightnessPolicy.toggle(current: 0.0), Float(0.6))
+        TestAssertion.assertEqual(KeyboardBrightnessPolicy.toggle(current: 0.04), Float(0.6))
+
+        // Significant change
+        TestAssertion.assertTrue(KeyboardBrightnessPolicy.isSignificantChange(from: 0.0, to: 0.05), "Detects 0.05 change")
+        TestAssertion.assertFalse(KeyboardBrightnessPolicy.isSignificantChange(from: 0.50001, to: 0.50002), "Ignores negligible change")
     }
 
     private static func testClamping() {

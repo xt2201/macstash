@@ -137,6 +137,18 @@ public final class AppState: ObservableObject {
                 self?.evaluateActiveProfile(bundleId: bundleId)
             }
             .store(in: &cancellables)
+
+        keyboard.objectWillChange
+            .sink { [weak self] in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+
+        audio.objectWillChange
+            .sink { [weak self] in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
 
     private func evaluateActiveProfile(bundleId: String) {
@@ -400,8 +412,8 @@ public final class AppState: ObservableObject {
             haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .keyboardBrightness:
-            let cur = keyboard.brightness
-            setValue(for: .keyboardBrightness, value: cur > 0.5 ? 0.0 : 0.6)
+            let next = KeyboardBrightnessPolicy.toggle(current: keyboard.brightness)
+            setValue(for: .keyboardBrightness, value: Double(next))
             haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .none:

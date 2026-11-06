@@ -42,3 +42,9 @@ You can freely switch between English and Vietnamese at any time:
 
 - The right-edge vertical slider is completely hidden when idle to keep your display clean and unobstructed.
 - To reveal the slider, move your mouse cursor to the rightmost edge of your screen. It will smoothly glide into view, allowing quick adjustment of volume or display brightness.
+
+## Keyboard Backlight Slider & Top Bar Controls
+
+- The keyboard backlight slider provides buttery-smooth, real-time tracking that stays in immediate lockstep with MacBook hardware sensors.
+- Whenever you open the Menu Bar popover, MacStash automatically refreshes the current hardware backlight level and master volume, ensuring the sliders reflect external adjustments made via physical keys or macOS Control Center.
+- You can tap directly on the keyboard icon to quickly toggle the keyboard backlight on or off.

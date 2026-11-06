@@ -1,0 +1,50 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build Universal DMG and Publish Release
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Verify Swift Toolchain
+        run: swift --version
+
+      - name: Run Domain Unit Tests
+        run: make test
+
+      - name: Build Universal Release DMG
+        run: |
+          chmod +x Scripts/*.sh
+          ./Scripts/build_dmg.sh --unsigned
+
+      - name: Compute Artifact Checksums
+        id: checksum
+        run: |
+          DMG_FILE=$(ls dist/*.dmg | head -n 1)
+          SHA256=$(shasum -a 256 "$DMG_FILE" | awk '{print $1}')
+          echo "dmg_file=$DMG_FILE" >> $GITHUB_OUTPUT
+          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+          echo "Built: $DMG_FILE (SHA256: $SHA256)"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.checksum.outputs.dmg_file }}
+            ${{ steps.checksum.outputs.dmg_file }}.sha256
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

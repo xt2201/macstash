@@ -15,7 +15,7 @@ public final class AutoUpdateManager: ObservableObject {
     @Published public private(set) var isChecking: Bool = false
     @Published public private(set) var lastCheckDate: Date? = nil
 
-    private let updateFeedURL = URL(string: "https://api.github.com/repos/macstash/macstash/releases/latest")
+    private let updateFeedURL = URL(string: "https://api.github.com/repos/xt2201/macstash/releases/latest")
 
     private init() {
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
@@ -54,7 +54,7 @@ public final class AutoUpdateManager: ObservableObject {
 
             let remoteVersion = tagName.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
             let notes = (json["body"] as? String) ?? "Bug fixes and performance improvements."
-            let htmlURL = (json["html_url"] as? String) ?? "https://github.com/macstash/macstash/releases"
+            let htmlURL = (json["html_url"] as? String) ?? "https://github.com/xt2201/macstash/releases"
 
             DispatchQueue.main.async {
                 self?.latestVersion = remoteVersion

@@ -30,6 +30,15 @@ public struct AboutTab: View {
                     }
 
                     Spacer()
+
+                    Button(action: {
+                        appState.updater.checkForUpdates(silent: false)
+                    }) {
+                        Label(appState.updater.isChecking ? "Checking..." : "Check for Updates...", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .disabled(appState.updater.isChecking)
                 }
                 .padding(8)
             }

@@ -42,6 +42,24 @@ public struct ShortcutsTab: View {
                         description: appState.localized("shortcuts.toggleDialsDesc"),
                         shortcut: $appState.settings.globalToggleDialsShortcut
                     )
+
+                    shortcutRow(
+                        title: appState.effectiveLanguage == "vi" ? "Vòng xoay tại con trỏ chuột" : "Cursor Radial Palette",
+                        description: appState.effectiveLanguage == "vi" ? "Mở núm xoay ngay tại vị trí con trỏ chuột" : "Bloom the radial dials directly under the cursor",
+                        shortcut: $appState.settings.cursorPaletteShortcut
+                    )
+
+                    shortcutRow(
+                        title: appState.effectiveLanguage == "vi" ? "Kệ thả tệp Stash" : "Stash Drop Shelf",
+                        description: appState.effectiveLanguage == "vi" ? "Mở kệ giữ tệp ở cạnh trái" : "Slide out the left-edge drop shelf",
+                        shortcut: $appState.settings.stashShelfShortcut
+                    )
+
+                    shortcutRow(
+                        title: appState.effectiveLanguage == "vi" ? "Ghi chú nhanh Scratchpad" : "Quick Scratchpad",
+                        description: appState.effectiveLanguage == "vi" ? "Mở bảng ghi chú ở cạnh trái" : "Slide out the left-edge notes drawer",
+                        shortcut: $appState.settings.scratchpadShortcut
+                    )
                 }
                 .padding(8)
             }

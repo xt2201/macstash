@@ -14,6 +14,12 @@ extension ControlAction {
             return [Color(red: 0.22, green: 0.85, blue: 0.78), Color(red: 0.1, green: 0.6, blue: 0.75)]
         case .timer:
             return [Color(red: 0.78, green: 0.42, blue: 1.0), Color(red: 0.48, green: 0.22, blue: 0.95)]
+        case .keepAwake:
+            return [Color(red: 1.0, green: 0.62, blue: 0.18), Color(red: 0.95, green: 0.34, blue: 0.08)]
+        case .stashShelf:
+            return [Color(red: 0.0, green: 0.82, blue: 1.0), Color(red: 0.04, green: 0.52, blue: 1.0)]
+        case .scratchpad:
+            return [Color(red: 0.32, green: 0.88, blue: 0.55), Color(red: 0.1, green: 0.68, blue: 0.38)]
         case .none:
             return [Color.gray, Color.secondary]
         }

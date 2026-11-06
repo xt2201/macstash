@@ -27,6 +27,9 @@ enum TestRunnerMain {
         print("[TEST] Running LocalizationTests...")
         LocalizationTests.run()
 
+        print("[TEST] Running StashFeatureTests...")
+        StashFeatureTests.run()
+
         print("[TEST] Running VersionConsistencyTests...")
         VersionConsistencyTests.run()
 

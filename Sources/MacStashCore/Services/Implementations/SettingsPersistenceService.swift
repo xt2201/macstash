@@ -47,6 +47,19 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var pomodoroAutoStartBreaks: Bool
     public var pomodoroSoundEnabled: Bool
 
+    // Keep Awake (Caffeine)
+    public var isKeepAwakeEnabled: Bool
+    public var keepAwakeDefaultMinutes: Int
+
+    // Stash Shelf
+    public var isStashShelfEnabled: Bool
+
+    // Scratchpad
+    public var isScratchpadEnabled: Bool
+
+    // Cursor Palette
+    public var isCursorPaletteEnabled: Bool
+
     // Audio & Feedback
     public var isSoundEnabled: Bool
     public var soundVolume: Float
@@ -55,6 +68,9 @@ public struct AppSettings: Codable, Equatable, Sendable {
 
     // Shortcuts
     public var globalToggleDialsShortcut: String
+    public var cursorPaletteShortcut: String
+    public var stashShelfShortcut: String
+    public var scratchpadShortcut: String
 
     // Advanced
     public var debugLoggingEnabled: Bool
@@ -104,11 +120,19 @@ public struct AppSettings: Codable, Equatable, Sendable {
         pomodoroRoundsBeforeLongBreak: Int = Defaults.Pomodoro.defaultRoundsBeforeLongBreak,
         pomodoroAutoStartBreaks: Bool = false,
         pomodoroSoundEnabled: Bool = true,
+        isKeepAwakeEnabled: Bool = true,
+        keepAwakeDefaultMinutes: Int = Defaults.KeepAwake.defaultDurationMinutes,
+        isStashShelfEnabled: Bool = true,
+        isScratchpadEnabled: Bool = true,
+        isCursorPaletteEnabled: Bool = true,
         isSoundEnabled: Bool = true,
         soundVolume: Float = Defaults.Audio.defaultSoundVolume,
         hapticFeedbackEnabled: Bool = true,
         hapticIntensity: String = "medium",
         globalToggleDialsShortcut: String = "Option+S",
+        cursorPaletteShortcut: String = "Option+Space",
+        stashShelfShortcut: String = "Control+Option+S",
+        scratchpadShortcut: String = "Control+Option+N",
         debugLoggingEnabled: Bool = false
     ) {
         self.schemaVersion = schemaVersion
@@ -145,11 +169,19 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.pomodoroRoundsBeforeLongBreak = max(1, min(12, pomodoroRoundsBeforeLongBreak))
         self.pomodoroAutoStartBreaks = pomodoroAutoStartBreaks
         self.pomodoroSoundEnabled = pomodoroSoundEnabled
+        self.isKeepAwakeEnabled = isKeepAwakeEnabled
+        self.keepAwakeDefaultMinutes = keepAwakeDefaultMinutes
+        self.isStashShelfEnabled = isStashShelfEnabled
+        self.isScratchpadEnabled = isScratchpadEnabled
+        self.isCursorPaletteEnabled = isCursorPaletteEnabled
         self.isSoundEnabled = isSoundEnabled
         self.soundVolume = max(0.0, min(1.0, soundVolume))
         self.hapticFeedbackEnabled = hapticFeedbackEnabled
         self.hapticIntensity = hapticIntensity
         self.globalToggleDialsShortcut = globalToggleDialsShortcut
+        self.cursorPaletteShortcut = cursorPaletteShortcut
+        self.stashShelfShortcut = stashShelfShortcut
+        self.scratchpadShortcut = scratchpadShortcut
         self.debugLoggingEnabled = debugLoggingEnabled
     }
 
@@ -191,11 +223,19 @@ public struct AppSettings: Codable, Equatable, Sendable {
         let pomodoroRoundsBeforeLongBreak = try container.decodeIfPresent(Int.self, forKey: .pomodoroRoundsBeforeLongBreak) ?? def.pomodoroRoundsBeforeLongBreak
         let pomodoroAutoStartBreaks = try container.decodeIfPresent(Bool.self, forKey: .pomodoroAutoStartBreaks) ?? def.pomodoroAutoStartBreaks
         let pomodoroSoundEnabled = try container.decodeIfPresent(Bool.self, forKey: .pomodoroSoundEnabled) ?? def.pomodoroSoundEnabled
+        let isKeepAwakeEnabled = try container.decodeIfPresent(Bool.self, forKey: .isKeepAwakeEnabled) ?? def.isKeepAwakeEnabled
+        let keepAwakeDefaultMinutes = try container.decodeIfPresent(Int.self, forKey: .keepAwakeDefaultMinutes) ?? def.keepAwakeDefaultMinutes
+        let isStashShelfEnabled = try container.decodeIfPresent(Bool.self, forKey: .isStashShelfEnabled) ?? def.isStashShelfEnabled
+        let isScratchpadEnabled = try container.decodeIfPresent(Bool.self, forKey: .isScratchpadEnabled) ?? def.isScratchpadEnabled
+        let isCursorPaletteEnabled = try container.decodeIfPresent(Bool.self, forKey: .isCursorPaletteEnabled) ?? def.isCursorPaletteEnabled
         let isSoundEnabled = try container.decodeIfPresent(Bool.self, forKey: .isSoundEnabled) ?? def.isSoundEnabled
         let soundVolume = try container.decodeIfPresent(Float.self, forKey: .soundVolume) ?? def.soundVolume
         let hapticFeedbackEnabled = try container.decodeIfPresent(Bool.self, forKey: .hapticFeedbackEnabled) ?? def.hapticFeedbackEnabled
         let hapticIntensity = try container.decodeIfPresent(String.self, forKey: .hapticIntensity) ?? def.hapticIntensity
         let globalToggleDialsShortcut = try container.decodeIfPresent(String.self, forKey: .globalToggleDialsShortcut) ?? def.globalToggleDialsShortcut
+        let cursorPaletteShortcut = try container.decodeIfPresent(String.self, forKey: .cursorPaletteShortcut) ?? def.cursorPaletteShortcut
+        let stashShelfShortcut = try container.decodeIfPresent(String.self, forKey: .stashShelfShortcut) ?? def.stashShelfShortcut
+        let scratchpadShortcut = try container.decodeIfPresent(String.self, forKey: .scratchpadShortcut) ?? def.scratchpadShortcut
         let debugLoggingEnabled = try container.decodeIfPresent(Bool.self, forKey: .debugLoggingEnabled) ?? def.debugLoggingEnabled
 
         self.init(
@@ -233,11 +273,19 @@ public struct AppSettings: Codable, Equatable, Sendable {
             pomodoroRoundsBeforeLongBreak: pomodoroRoundsBeforeLongBreak,
             pomodoroAutoStartBreaks: pomodoroAutoStartBreaks,
             pomodoroSoundEnabled: pomodoroSoundEnabled,
+            isKeepAwakeEnabled: isKeepAwakeEnabled,
+            keepAwakeDefaultMinutes: keepAwakeDefaultMinutes,
+            isStashShelfEnabled: isStashShelfEnabled,
+            isScratchpadEnabled: isScratchpadEnabled,
+            isCursorPaletteEnabled: isCursorPaletteEnabled,
             isSoundEnabled: isSoundEnabled,
             soundVolume: soundVolume,
             hapticFeedbackEnabled: hapticFeedbackEnabled,
             hapticIntensity: hapticIntensity,
             globalToggleDialsShortcut: globalToggleDialsShortcut,
+            cursorPaletteShortcut: cursorPaletteShortcut,
+            stashShelfShortcut: stashShelfShortcut,
+            scratchpadShortcut: scratchpadShortcut,
             debugLoggingEnabled: debugLoggingEnabled
         )
     }
@@ -280,6 +328,12 @@ public final class SettingsPersistenceService: @unchecked Sendable {
         }
     }
 
+    public func resetToDefaults() -> AppSettings {
+        let defaults = AppSettings.defaultSettings
+        saveSettings(defaults)
+        return defaults
+    }
+
     public func exportJSON(settings: AppSettings) throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -288,35 +342,17 @@ public final class SettingsPersistenceService: @unchecked Sendable {
 
     public func importJSON(data: Data) throws -> AppSettings {
         let decoder = JSONDecoder()
-        var settings = try decoder.decode(AppSettings.self, from: data)
-        settings = migrateIfNeeded(settings)
-        saveSettings(settings)
-        return settings
-    }
-
-    public func resetToDefaults() -> AppSettings {
-        let fresh = AppSettings.defaultSettings
-        saveSettings(fresh)
-        return fresh
+        let settings = try decoder.decode(AppSettings.self, from: data)
+        let validated = migrateIfNeeded(settings)
+        saveSettings(validated)
+        return validated
     }
 
     private func migrateIfNeeded(_ settings: AppSettings) -> AppSettings {
-        var migrated = settings
-        if migrated.schemaVersion < Defaults.schemaVersion {
-            migrated.schemaVersion = Defaults.schemaVersion
+        var s = settings
+        if s.schemaVersion < Defaults.schemaVersion {
+            s.schemaVersion = Defaults.schemaVersion
         }
-        migrated.cornerSensitivityPoints = max(Defaults.HotCorner.minHitZoneSizePoints, min(Defaults.HotCorner.maxHitZoneSizePoints, migrated.cornerSensitivityPoints))
-        migrated.cornerDwellDelaySeconds = max(Defaults.HotCorner.minDwellDelaySeconds, min(Defaults.HotCorner.maxDwellDelaySeconds, migrated.cornerDwellDelaySeconds))
-        migrated.cornerHideDelaySeconds = max(Defaults.HotCorner.minHideDelaySeconds, min(Defaults.HotCorner.maxHideDelaySeconds, migrated.cornerHideDelaySeconds))
-        migrated.dialRadiusPoints = max(100.0, min(250.0, migrated.dialRadiusPoints))
-        migrated.dialOpacity = max(0.2, min(1.0, migrated.dialOpacity))
-        migrated.soundVolume = max(0.0, min(1.0, migrated.soundVolume))
-        migrated.brightnessStepFraction = max(0.01, min(0.25, migrated.brightnessStepFraction))
-        migrated.minBrightnessClamp = max(0.0, min(0.5, migrated.minBrightnessClamp))
-        migrated.maxBrightnessClamp = max(0.5, min(1.0, migrated.maxBrightnessClamp))
-        migrated.pomodoroFocusDurationMinutes = max(1, min(120, migrated.pomodoroFocusDurationMinutes))
-        migrated.pomodoroShortBreakMinutes = max(1, min(60, migrated.pomodoroShortBreakMinutes))
-        migrated.pomodoroLongBreakMinutes = max(1, min(90, migrated.pomodoroLongBreakMinutes))
-        return migrated
+        return s
     }
 }

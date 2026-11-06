@@ -24,3 +24,10 @@ MacStash provides a comprehensive 7-tab configuration window compliant with macO
 
 7. **About / Advanced**:
    Version information, 1-click in-place background updates (Sparkle 2) with Ed25519 cryptographic verification, Console log viewer launcher, user manual link, full JSON backup export and import (AppSettings and App Profiles), and factory reset.
+
+## Left Edge Utilities & Cursor Palette (Hot Corners tab)
+
+- Stash Drop Shelf: enable or disable the left-edge drop shelf for holding dragged files, images, links and text.
+- Quick Scratchpad: enable or disable the left-edge notes drawer with automatic local saving.
+- Cursor Radial Palette: enable or disable the radial dials summoned at the mouse cursor.
+- Corner and edge actions now also accept Keep Awake, Stash Shelf and Scratchpad.

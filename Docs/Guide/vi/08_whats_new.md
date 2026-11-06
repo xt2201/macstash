@@ -1,3 +1,15 @@
+# Có Gì Mới Trong Phiên Bản 2.6.0
+
+MacStash 2.6.0 mang đến tính năng đinh Kệ thả tệp Stash Shelf, núm xoay chống tắt máy Keep-Awake (Caffeine), bảng ghi chú nhanh Scratchpad và vòng xoay điều khiển tại con trỏ chuột Cursor Radial Palette.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.6.0
+
+- Kệ thả tệp Stash Drop Shelf: Hiện thực hóa trọn vẹn định danh MacStash. Một kệ kính mờ trượt êm ái từ mép trái màn hình để cất giữ tệp tin, hình ảnh, liên kết web và đoạn văn bản khi kéo thả qua lại giữa các không gian Spaces, màn hình phụ hoặc ứng dụng.
+- Núm xoay chống tắt máy Keep-Awake (Caffeine): Động cơ quản lý điện năng I/O Kit ngăn màn hình và hệ thống chuyển sang chế độ ngủ khi xuất video, biên dịch mã nguồn hoặc thuyết trình, tích hợp sẵn các nấc xoay định trước (15 phút, 30 phút, 1 giờ, 2 giờ, và Vô hạn), phản hồi rung xúc giác cơ học và chỉ báo trạng thái trên thanh Menu Bar.
+- Bảng ghi chú nhanh Scratchpad: Ngăn kéo ghi chú kính mờ thanh lịch ở cạnh trái màn hình với bộ đếm từ và ký tự thời gian thực, tự động lưu trữ cục bộ an toàn, thao tác sao chép hoặc xóa sạch trong một lần chạm.
+- Vòng xoay tại con trỏ chuột (Cursor Radial Palette): Triệu hồi các núm xoay điều khiển âm lượng, độ sáng, chống ngủ và đếm giờ Pomodoro ngay tại tâm con trỏ chuột thông qua phím tắt toàn cục (Option + Space), đặc biệt tối ưu cho người dùng màn hình siêu rộng Ultrawide hoặc thiết lập nhiều màn hình.
+- Phím tắt toàn cục tùy biến: Cho phép gán phím tắt nhanh cho Vòng xoay tại trỏ chuột (Option+Space), Kệ Stash Shelf (Control+Option+S), và Bảng ghi chú Scratchpad (Control+Option+N).
+
 # Có Gì Mới Trong Phiên Bản 2.5.0
 
 MacStash 2.5.0 mang đến khả năng tùy biến tác vụ EdgeBar trong Cài đặt và bộ điều khiển nhạc Now Playing dọc đa ứng dụng dưới thanh âm lượng, tích hợp ảnh bìa album thực tế, hiệu ứng sóng nhạc nhảy theo điệu và phím điều khiển dọc.

@@ -233,6 +233,30 @@ public struct MenuBarExtraView: View {
                 if appState.keyboard.isSupported {
                     KeyboardBrightnessSliderRow(keyboard: appState.keyboard)
                 }
+
+                // Keep Awake (Caffeine)
+                KeepAwakeRow(keepAwake: appState.keepAwake, isVietnamese: appState.effectiveLanguage == "vi")
+
+                // Stash Shelf & Scratchpad quick access
+                HStack(spacing: 6) {
+                    Button(action: { appState.stashShelf.isShelfOpen.toggle() }) {
+                        Label("Stash (\(appState.stashShelf.items.count))", systemImage: "tray.2.fill")
+                            .font(.system(size: 10, weight: .medium))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
+                            .background(RoundedRectangle(cornerRadius: 6).fill(Color.cyan.opacity(0.12)))
+                    }
+                    .buttonStyle(.plain)
+
+                    Button(action: { appState.scratchpad.isScratchpadOpen.toggle() }) {
+                        Label("Notes", systemImage: "note.text")
+                            .font(.system(size: 10, weight: .medium))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
+                            .background(RoundedRectangle(cornerRadius: 6).fill(Color.green.opacity(0.12)))
+                    }
+                    .buttonStyle(.plain)
+                }
             }
             .padding(.horizontal, 12)
 
@@ -331,6 +355,42 @@ private struct VolumeSliderRow: View {
             Text(audio.isMuted ? "0%" : "\(Int(audio.volume * 100))%")
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .frame(width: 32)
+        }
+    }
+}
+
+private struct KeepAwakeRow: View {
+    @ObservedObject var keepAwake: KeepAwakeManager
+    let isVietnamese: Bool
+
+    private func label(_ vi: String, _ en: String) -> String { isVietnamese ? vi : en }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "cup.and.saucer.fill")
+                .foregroundColor(keepAwake.isActive ? .orange : .secondary)
+                .frame(width: 16)
+
+            Text(label("Giữ máy luôn thức", "Keep Awake"))
+                .font(.system(size: 11, weight: .medium))
+
+            Spacer()
+
+            Menu {
+                Button(label("Tắt", "Off")) { keepAwake.deactivate() }
+                Divider()
+                Button(label("15 phút", "15 Minutes")) { keepAwake.activate(minutes: 15) }
+                Button(label("30 phút", "30 Minutes")) { keepAwake.activate(minutes: 30) }
+                Button(label("1 giờ", "1 Hour")) { keepAwake.activate(minutes: 60) }
+                Button(label("2 giờ", "2 Hours")) { keepAwake.activate(minutes: 120) }
+                Button(label("Vô hạn", "Indefinitely")) { keepAwake.activate(minutes: -1) }
+            } label: {
+                Text(keepAwake.formattedRemaining)
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundColor(keepAwake.isActive ? .orange : .secondary)
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
         }
     }
 }

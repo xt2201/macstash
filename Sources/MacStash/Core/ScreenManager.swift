@@ -381,9 +381,34 @@ public final class ScreenManager: ObservableObject {
     }
 
     private func handleKeyEvent(_ event: NSEvent) {
-        let configured = appState.settings.globalToggleDialsShortcut
-        if matchesConfiguredShortcut(event: event, shortcutString: configured) {
+        if event.keyCode == 53 { // Escape closes the topmost transient surface
+            if appState.isCursorPalettePresented {
+                dismissCursorPalette()
+            } else if appState.stashShelf.isShelfOpen {
+                appState.stashShelf.isShelfOpen = false
+            } else if appState.scratchpad.isScratchpadOpen {
+                appState.scratchpad.isScratchpadOpen = false
+            }
+            return
+        }
+
+        if matchesConfiguredShortcut(event: event, shortcutString: appState.settings.globalToggleDialsShortcut) {
             toggleDials()
+            return
+        }
+
+        let s = appState.settings
+        if s.isCursorPaletteEnabled, !s.cursorPaletteShortcut.isEmpty,
+           matchesConfiguredShortcut(event: event, shortcutString: s.cursorPaletteShortcut) {
+            toggleCursorPalette()
+        } else if s.isStashShelfEnabled, !s.stashShelfShortcut.isEmpty,
+                  matchesConfiguredShortcut(event: event, shortcutString: s.stashShelfShortcut) {
+            appState.stashShelf.isShelfOpen.toggle()
+            HapticManager.shared.performBoundaryClick()
+        } else if s.isScratchpadEnabled, !s.scratchpadShortcut.isEmpty,
+                  matchesConfiguredShortcut(event: event, shortcutString: s.scratchpadShortcut) {
+            appState.scratchpad.isScratchpadOpen.toggle()
+            HapticManager.shared.performBoundaryClick()
         }
     }
 
@@ -458,6 +483,8 @@ public final class ScreenManager: ObservableObject {
         case "l": return 37
         case "j": return 38
         case "k": return 40
+        case "n": return 45
+        case "m": return 46
         case "space": return 49
         case "tab": return 48
         case "return", "enter": return 36
@@ -479,5 +506,55 @@ public final class ScreenManager: ObservableObject {
             guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else { return }
             activateDial(corner: .topRight, displayID: id)
         }
+    }
+
+    // MARK: - Cursor Radial Palette
+
+    private var cursorPalettePanel: NSPanel?
+    private var paletteObserver: AnyCancellable?
+
+    public func toggleCursorPalette() {
+        if appState.isCursorPalettePresented {
+            dismissCursorPalette()
+        } else {
+            showCursorPalette()
+        }
+    }
+
+    public func showCursorPalette() {
+        let mouse = NSEvent.mouseLocation
+        let side: CGFloat = 250
+        let rect = NSRect(x: mouse.x - side / 2, y: mouse.y - side / 2, width: side, height: side)
+
+        if cursorPalettePanel == nil {
+            let panel = NSPanel(
+                contentRect: rect,
+                styleMask: [.borderless, .nonactivatingPanel],
+                backing: .buffered,
+                defer: false
+            )
+            panel.level = .floating
+            panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
+            panel.isOpaque = false
+            panel.backgroundColor = .clear
+            panel.hasShadow = false
+            panel.contentView = NSHostingView(rootView: CursorPaletteView(appState: appState))
+            cursorPalettePanel = panel
+            paletteObserver = appState.$isCursorPalettePresented
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] presented in
+                    if !presented { self?.cursorPalettePanel?.orderOut(nil) }
+                }
+        }
+
+        cursorPalettePanel?.setFrame(rect, display: true)
+        cursorPalettePanel?.orderFrontRegardless()
+        appState.isCursorPalettePresented = true
+        HapticManager.shared.performDetentTick()
+    }
+
+    public func dismissCursorPalette() {
+        cursorPalettePanel?.orderOut(nil)
+        appState.isCursorPalettePresented = false
     }
 }

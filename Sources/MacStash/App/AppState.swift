@@ -11,6 +11,9 @@ public final class AppState: ObservableObject {
     public let audio = AudioManager.shared
     public let nowPlaying = NowPlayingManager.shared
     public let keyboard = KeyboardBrightnessManager.shared
+    public let keepAwake = KeepAwakeManager.shared
+    public let stashShelf = StashShelfManager.shared
+    public let scratchpad = ScratchpadManager.shared
     public let updater = AutoUpdateManager.shared
     public let profiles = AppProfileManager.shared
     public let haptics = HapticManager.shared
@@ -88,6 +91,7 @@ public final class AppState: ObservableObject {
     @Published public var activeDisplayID: CGDirectDisplayID = 0
     @Published public var isRightSliderActive: Bool = false
     @Published public var isAudioDevicePickerPresented: Bool = false
+    @Published public var isCursorPalettePresented: Bool = false
 
     // Pomodoro dynamic published properties
     @Published public var pomodoroRemainingSeconds: TimeInterval = TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds)
@@ -359,6 +363,12 @@ public final class AppState: ObservableObject {
                 }
                 return max(0.02, min(1.0, mins / 60.0))
             }
+        case .keepAwake:
+            return keepAwake.dialProgress
+        case .stashShelf:
+            return min(1.0, Double(stashShelf.items.count) / 10.0)
+        case .scratchpad:
+            return scratchpad.text.isEmpty ? 0.0 : 1.0
         case .none:
             return 0.0
         }
@@ -404,7 +414,9 @@ public final class AppState: ObservableObject {
                 syncPomodoroProperties()
                 savePomodoroSnapshot()
             }
-        case .none:
+        case .keepAwake:
+            keepAwake.setFromDialProgress(Double(clamped))
+        case .stashShelf, .scratchpad, .none:
             break
         }
 
@@ -433,6 +445,18 @@ public final class AppState: ObservableObject {
         case .keyboardBrightness:
             let next = KeyboardBrightnessPolicy.toggle(current: keyboard.brightness)
             setValue(for: .keyboardBrightness, value: Double(next))
+            haptics.performBoundaryClick()
+            sound.playAccent(enabled: isSoundEnabled)
+        case .keepAwake:
+            keepAwake.toggle()
+            haptics.performBoundaryClick()
+            sound.playAccent(enabled: isSoundEnabled)
+        case .stashShelf:
+            stashShelf.isShelfOpen.toggle()
+            haptics.performBoundaryClick()
+            sound.playAccent(enabled: isSoundEnabled)
+        case .scratchpad:
+            scratchpad.isScratchpadOpen.toggle()
             haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .none:

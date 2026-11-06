@@ -123,7 +123,9 @@ public struct CornerDialView: View {
                             completedRounds: appState.pomodoroCompletedRounds,
                             totalRounds: appState.pomodoroTotalRounds,
                             isMuted: appState.audio.isMuted,
-                            isKeyboardSupported: appState.keyboard.isSupported
+                            isKeyboardSupported: appState.keyboard.isSupported,
+                            formattedKeepAwake: appState.keepAwake.formattedRemaining,
+                            stashItemCount: appState.stashShelf.items.count
                         )
                     }
                     .buttonStyle(.plain)
@@ -235,6 +237,8 @@ private struct CenterActionBadge: View {
     let totalRounds: Int
     let isMuted: Bool
     let isKeyboardSupported: Bool
+    let formattedKeepAwake: String
+    let stashItemCount: Int
 
     var body: some View {
         let offset = badgeOffset(for: corner, in: dialSize)
@@ -265,6 +269,30 @@ private struct CenterActionBadge: View {
                     }
                     .padding(.top, 0.5)
                 }
+            } else if action == .keepAwake {
+                Image(systemName: "cup.and.saucer.fill")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(value > 0 ? (action.accentColors.first ?? .orange) : .secondary)
+
+                Text(formattedKeepAwake)
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundColor(value > 0 ? .primary : .secondary)
+            } else if action == .stashShelf {
+                Image(systemName: "tray.2.fill")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(action.accentColors.first ?? .cyan)
+
+                Text("\(stashItemCount)")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(.primary)
+            } else if action == .scratchpad {
+                Image(systemName: "note.text")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(action.accentColors.first ?? .green)
+
+                Text("NOTES")
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundColor(.primary)
             } else if action == .volume {
                 Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
                     .font(.system(size: 18, weight: .bold))

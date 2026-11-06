@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.5.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.6.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.5.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.6.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -92,21 +92,35 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Rapid audio output device switcher directly from the corner popover.
 - Low-latency synchronization with macOS CoreAudio subsystem.
 
-### 5. Hidden Edge Slider &amp; Now Playing Media Controls
-- Rides flush against your screen border with configurable actions in Settings (Volume, Brightness, Keyboard, Timer).
+### 5. Tactile Stash Drop Shelf &amp; Quick Scratchpad
+- **The Stash Shelf**: The core namesake feature of MacStash. When dragging files, images, links, or text snippets in macOS, dragging toward the left screen edge smoothly slides out a frosted glass Stash Shelf to hold items temporarily while navigating across Spaces, full-screen apps, or displays.
+- **Quick Drag Export**: Drag stashed items back out to any application, email, or Finder folder anytime.
+- **Quick Scratchpad Drawer**: Ephemeral glassmorphic notepad accessible along the left edge or via global hotkey for capturing OTP codes, thoughts, terminal commands, and drafts with live word/character counters and automatic persistence.
+
+### 6. Keep Awake (Caffeine) Radial Dial
+- Hardware-level macOS I/O Kit power assertions (`IOPMAssertionCreateWithName`) prevent display and system sleep during video exports, large downloads, or presentations.
+- Radial presets: 15m, 30m, 1h, 2h, and Indefinite (∞) with tactile mechanical detent feedback.
+- Quick status badge and one-click toggle in the macOS menu bar companion.
+
+### 7. Cursor Radial Palette (for Ultrawide Displays)
+- Press `Option + Space` to summon the 4-quadrant radial dials directly centered at your mouse cursor.
+- Adjust Volume, Display Brightness, Keep Awake, and Focus Timer anywhere on screen without flinging the pointer across 34"–49" Ultrawide setups.
+
+### 8. Hidden Edge Slider &amp; Now Playing Media Controls
+- Rides flush against your screen border with configurable actions in Settings (Volume, Brightness, Keyboard, Timer, Keep Awake, Stash Shelf, Scratchpad).
 - Smoothly slides into view when hovering the edge.
 - **Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, animated dancing audio waveform visualizer, and vertical transport controls (Previous on top, Play/Pause in middle, Next at bottom) for any playing application.
 - **Hover Track Tooltip**: Floating glassmorphic card previews full track title, artist, and album on hover.
 - **Two-Finger Edge Scrubbing**: Seamlessly tune volume, brightness, or your chosen action on the edge slider using natural two-finger vertical scrolling.
 
-### 6. Tactile Detents &amp; Mechanical Acoustics
+### 9. Tactile Detents &amp; Mechanical Acoustics
 - **Trackpad Detents**: Emits crisp physical ticks via `NSHapticFeedbackManager` as the rotary dial steps through values.
 - **Acoustic Feedback**: Low-latency mechanical click sound effects mimicking high-end rotary hardware dials.
 
-### 7. Context-Aware Application Profiles
+### 10. Context-Aware Application Profiles
 - Detects the frontmost active application and dynamically reconfigures corner dials (e.g., volume in Final Cut Pro, brightness in Xcode, timer in Safari).
 
-### 8. Native Menu Bar Companion
+### 11. Native Menu Bar Companion
 - Operates as a lightweight agent (`LSUIElement = true`) with a ~15MB RAM footprint.
 - Monochrome template status bar icon that illuminates during active Pomodoro intervals.
 - Full-featured Preferences window (`Command + ,`).
@@ -162,6 +176,10 @@ MacStash is committed to absolute user privacy. It operates **100% locally and o
 
 | Shortcut | Action | Scope |
 |---|---|---|
+| `Option + Space` | Bloom Cursor Radial Palette | Global |
+| `Control + Option + S` | Toggle Stash Drop Shelf | Global |
+| `Control + Option + N` | Toggle Quick Scratchpad | Global |
+| `Option + S` | Toggle Screen Hot Corner Dials | Global |
 | `Command + ,` | Open MacStash Preferences | Global / In-App |
 | `Command + W` | Close Preferences or Guide Window | In-App |
 | `Command + ?` | Open In-App Interactive Guide | Global / In-App |

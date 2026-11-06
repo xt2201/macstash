@@ -13,6 +13,8 @@ public final class ScreenOverlayInstance {
     private var passThroughViews: [CornerPosition: PassThroughHostingView<CornerDialView>] = [:]
     private var rightEdgePanel: NSPanel?
     private var edgeHostingView: EdgeSliderHostingView?
+    private var leftEdgePanel: NSPanel?
+    private var stashHostingView: StashShelfHostingView?
 
     private var cornerSize: CGFloat {
         appState.settings.dialRadiusPoints + 15
@@ -76,6 +78,29 @@ public final class ScreenOverlayInstance {
         }
 
         createRightEdgePanelIfNeeded()
+        createLeftEdgePanelIfNeeded()
+    }
+
+    private func createLeftEdgePanelIfNeeded() {
+        if appState.settings.onlyOuterCorners {
+            let allFrames = NSScreen.screens.map { $0.frame }
+            guard CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames) else { return }
+        }
+
+        let panel = makeEdgePanel(contentRect: leftEdgeRect(in: screen.frame))
+        let hostingView = StashShelfHostingView(rootView: LeftEdgeContainerView(appState: appState), appState: appState)
+        panel.contentView = hostingView
+        panel.orderFrontRegardless()
+
+        leftEdgePanel = panel
+        stashHostingView = hostingView
+    }
+
+    private func leftEdgeRect(in frame: NSRect) -> NSRect {
+        let panelWidth: CGFloat = 360
+        let panelHeight: CGFloat = 480
+        let panelY = frame.minY + (frame.height - panelHeight) / 2
+        return NSRect(x: frame.minX, y: panelY, width: panelWidth, height: panelHeight)
     }
 
     private func createRightEdgePanelIfNeeded() {
@@ -125,6 +150,23 @@ public final class ScreenOverlayInstance {
         } else {
             createRightEdgePanelIfNeeded()
         }
+
+        if let leftPanel = leftEdgePanel {
+            let shouldShow: Bool
+            if appState.settings.onlyOuterCorners {
+                shouldShow = CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: NSScreen.screens.map { $0.frame })
+            } else {
+                shouldShow = true
+            }
+            if shouldShow {
+                leftPanel.setFrame(leftEdgeRect(in: frame), display: true)
+                leftPanel.orderFrontRegardless()
+            } else {
+                leftPanel.orderOut(nil)
+            }
+        } else {
+            createLeftEdgePanelIfNeeded()
+        }
     }
 
     public func destroyPanels() {
@@ -139,6 +181,11 @@ public final class ScreenOverlayInstance {
         rightEdgePanel?.close()
         rightEdgePanel = nil
         edgeHostingView = nil
+
+        leftEdgePanel?.orderOut(nil)
+        leftEdgePanel?.close()
+        leftEdgePanel = nil
+        stashHostingView = nil
     }
 
     private func rightEdgeRect(in frame: NSRect) -> NSRect {

@@ -1,3 +1,15 @@
+# What's New in Version 2.6.0
+
+MacStash 2.6.0 introduces the signature Tactile Stash Drop Shelf, a Keep-Awake (Caffeine) radial timer, an instant Quick Scratchpad drawer, and a Cursor Radial Palette for Ultrawide monitors.
+
+## Key Enhancements in Version 2.6.0
+
+- Tactile Stash Drop Shelf: The core namesake feature of MacStash. A frosted glass drop shelf sliding smoothly from the left screen edge to hold files, images, links, and text snippets when dragging across spaces, displays, or apps.
+- Keep Awake (Caffeine) Radial Timer: Hardware power assertion engine preventing screen and system sleep during video renders, terminal builds, and presentations, with preset dial notches (15m, 30m, 1h, 2h, and Indefinite), tactile mechanical detents, and Menu Bar quick status badge.
+- Quick Scratchpad Drawer: Ephemeral glassmorphic notepad on the left screen edge with live word and character counters, automatic local persistence, and quick copy/clear actions.
+- Cursor Radial Palette: Summons floating radial dials directly centered at the mouse cursor via global shortcut (Option + Space) for instant volume, brightness, keep-awake, and timer control without traversing across Ultrawide or multi-monitor screens.
+- Global Keyboard Shortcuts: Configurable shortcuts for Cursor Palette (Option+Space), Stash Shelf (Control+Option+S), and Scratchpad (Control+Option+N).
+
 # What's New in Version 2.5.0
 
 MacStash 2.5.0 introduces customizable EdgeBar actions in Settings and a sleek vertical Universal Now Playing media controller under the Volume slider, featuring live album artwork, a dancing audio waveform visualizer, and vertical transport controls.

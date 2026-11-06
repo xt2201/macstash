@@ -135,4 +135,26 @@ public enum CornerGeometry {
         }
         return true
     }
+
+    /// Determines whether a screen's left edge is an outer physical edge (not adjacent to another connected monitor).
+    public static func isOuterLeftEdge(
+        screen: CGRect,
+        in allScreens: [CGRect],
+        tolerancePoints: CGFloat = 2.0
+    ) -> Bool {
+        if allScreens.count <= 1 {
+            return true
+        }
+
+        let midY = screen.midY
+        let step = max(1.0, tolerancePoints)
+        let probe = CGPoint(x: screen.minX - step, y: midY)
+
+        for other in allScreens where other != screen {
+            if rectContains(other, probe) {
+                return false
+            }
+        }
+        return true
+    }
 }

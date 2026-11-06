@@ -24,3 +24,10 @@ MacStash cung cấp cửa sổ thiết lập gồm 7 tab chuẩn theo Apple Huma
 
 7. **About / Advanced (Thông tin & Nâng cao)**:
    Thông tin phiên bản, kiểm tra cập nhật tự động 1 chạm (Sparkle 2) với chữ ký mã hóa Ed25519, mở Console Log hệ thống, xem hướng dẫn, sao lưu và phục hồi toàn diện (cài đặt và hồ sơ ứng dụng) bằng tệp JSON, và khôi phục cài đặt gốc.
+
+## Tiện ích mép trái và Vòng xoay tại con trỏ (tab Hot Corners)
+
+- Kệ thả tệp Stash: bật hoặc tắt kệ ở cạnh trái để giữ tệp, hình ảnh, liên kết và văn bản đang kéo thả.
+- Ghi chú nhanh Scratchpad: bật hoặc tắt ngăn ghi chú ở cạnh trái, tự động lưu cục bộ.
+- Vòng xoay tại con trỏ chuột: bật hoặc tắt các núm xoay hiện ngay tại vị trí con trỏ.
+- Tác vụ của góc và cạnh màn hình nay có thêm Giữ máy luôn thức, Kệ Stash và Scratchpad.

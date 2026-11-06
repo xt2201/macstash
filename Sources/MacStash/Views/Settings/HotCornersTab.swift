@@ -132,6 +132,15 @@ public struct HotCornersTab: View {
                 .padding(8)
             }
 
+            GroupBox(label: Label(appState.effectiveLanguage == "vi" ? "Tiện ích mép trái và con trỏ" : "Left Edge Utilities & Cursor Palette", systemImage: "tray.2")) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Toggle(appState.effectiveLanguage == "vi" ? "Kệ thả tệp Stash Shelf" : "Stash Drop Shelf", isOn: $appState.settings.isStashShelfEnabled)
+                    Toggle(appState.effectiveLanguage == "vi" ? "Ghi chú nhanh Scratchpad" : "Quick Scratchpad", isOn: $appState.settings.isScratchpadEnabled)
+                    Toggle(appState.effectiveLanguage == "vi" ? "Vòng xoay tại con trỏ chuột" : "Cursor Radial Palette", isOn: $appState.settings.isCursorPaletteEnabled)
+                }
+                .padding(8)
+            }
+
             GroupBox(label: Label(appState.localized("corners.triggerPrecision"), systemImage: "timer")) {
                 VStack(alignment: .leading, spacing: 14) {
                     VStack(alignment: .leading, spacing: 4) {

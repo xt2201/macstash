@@ -17,7 +17,7 @@ public enum Defaults {
             }
             current = current.deletingLastPathComponent()
         }
-        return "2.5.0"
+        return "2.6.0"
     }
 
     public enum HotCorner {
@@ -58,5 +58,20 @@ public enum Defaults {
         public static let defaultVolume: Float = 0.5
         public static let defaultSoundVolume: Float = 0.6
         public static let minSoundIntervalSeconds: TimeInterval = 0.035
+    }
+
+    public enum KeepAwake {
+        public static let defaultPresetMinutes: [Int] = [15, 30, 60, 120, -1]
+        public static let defaultDurationMinutes: Int = 30
+    }
+
+    public enum StashShelf {
+        public static let maxItems: Int = 50
+        public static let defaultWidthPoints: CGFloat = 280.0
+    }
+
+    public enum Scratchpad {
+        public static let defaultWidthPoints: CGFloat = 320.0
+        public static let defaultHeightPoints: CGFloat = 380.0
     }
 }

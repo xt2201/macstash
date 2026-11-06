@@ -16,3 +16,12 @@ MacStash tích hợp các tổ hợp phím tắt toàn cục và phím điều h
 ## Tùy Biến Phím Tắt Toàn Cục & Cảnh Báo Xung Đột
 
 Người dùng có thể tùy biến tổ hợp phím toàn cục để bật/tắt vòng quay trong mục Cài đặt > Phím tắt. MacStash tích hợp bộ phân tích xung đột thời gian thực, tự động kiểm tra tổ hợp phím với các phím tắt hệ thống macOS (như Spotlight, Thoát khẩn cấp Force Quit, Trình chuyển ứng dụng App Switcher) để tránh tranh chấp phím bấm.
+
+## Mới trong 2.6.0
+
+- Option+Space: mở vòng xoay tại con trỏ chuột.
+- Control+Option+S: bật hoặc tắt kệ thả tệp Stash.
+- Control+Option+N: bật hoặc tắt ghi chú nhanh Scratchpad.
+- Escape: đóng vòng xoay, kệ hoặc ghi chú.
+
+Tất cả có thể thay đổi trong Cài đặt > Phím tắt.

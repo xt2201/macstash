@@ -67,6 +67,12 @@ public final class PomodoroEngine {
     public private(set) var state: PomodoroState = .idle
     public private(set) var completedRounds: Int = 0
 
+    public var configuredFocusDuration: TimeInterval = TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds)
+    public var configuredShortBreakDuration: TimeInterval = TimeInterval(Defaults.Pomodoro.defaultShortBreakDurationSeconds)
+    public var configuredLongBreakDuration: TimeInterval = TimeInterval(Defaults.Pomodoro.defaultLongBreakDurationSeconds)
+    public var roundsBeforeLongBreak: Int = Defaults.Pomodoro.defaultRoundsBeforeLongBreak
+    public var autoStartBreaks: Bool = false
+
     private let clock: ClockProtocol
 
     public init(clock: ClockProtocol = SystemClock()) {
@@ -76,7 +82,7 @@ public final class PomodoroEngine {
     public var totalDurationSeconds: TimeInterval {
         switch state {
         case .idle:
-            return TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds)
+            return durationForCurrentMode()
         case .running(_, _, let total), .paused(_, let total), .completed(let total):
             return total
         }
@@ -85,7 +91,7 @@ public final class PomodoroEngine {
     public var remainingSeconds: TimeInterval {
         switch state {
         case .idle:
-            return TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds)
+            return durationForCurrentMode()
         case .running(let targetEndDate, let monotonicEnd, _):
             let monotonicRemaining = monotonicEnd - clock.monotonicTime()
             let wallClockRemaining = targetEndDate.timeIntervalSince(clock.now())
@@ -107,9 +113,60 @@ public final class PomodoroEngine {
         return max(0.0, min(1.0, remainingSeconds / total))
     }
 
-    public func start(durationSeconds: TimeInterval, mode: PomodoroMode = .focus) {
-        let duration = max(60.0, durationSeconds)
-        self.mode = mode
+    public var nextSuggestedMode: PomodoroMode {
+        switch mode {
+        case .focus:
+            let nextRounds = completedRounds + (state == .completed(totalDurationSeconds: totalDurationSeconds) ? 0 : 1)
+            let isLong = (roundsBeforeLongBreak > 0) && (nextRounds % roundsBeforeLongBreak == 0)
+            return isLong ? .longBreak : .shortBreak
+        case .shortBreak, .longBreak:
+            return .focus
+        }
+    }
+
+    public func durationForCurrentMode() -> TimeInterval {
+        switch mode {
+        case .focus: return configuredFocusDuration
+        case .shortBreak: return configuredShortBreakDuration
+        case .longBreak: return configuredLongBreakDuration
+        }
+    }
+
+    public func configure(
+        focusDurationSeconds: TimeInterval? = nil,
+        shortBreakDurationSeconds: TimeInterval? = nil,
+        longBreakDurationSeconds: TimeInterval? = nil,
+        roundsBeforeLongBreak: Int? = nil,
+        autoStartBreaks: Bool? = nil
+    ) {
+        if let f = focusDurationSeconds, f > 0 {
+            self.configuredFocusDuration = f
+        }
+        if let s = shortBreakDurationSeconds, s > 0 {
+            self.configuredShortBreakDuration = s
+        }
+        if let l = longBreakDurationSeconds, l > 0 {
+            self.configuredLongBreakDuration = l
+        }
+        if let r = roundsBeforeLongBreak, r > 0 {
+            self.roundsBeforeLongBreak = r
+        }
+        if let a = autoStartBreaks {
+            self.autoStartBreaks = a
+        }
+    }
+
+    public func setMode(_ newMode: PomodoroMode) {
+        self.mode = newMode
+        self.state = .idle
+    }
+
+    public func start(durationSeconds: TimeInterval? = nil, mode: PomodoroMode? = nil) {
+        if let mode = mode {
+            self.mode = mode
+        }
+        let requested = durationSeconds ?? durationForCurrentMode()
+        let duration = max(1.0, requested)
         let now = clock.now()
         let monoNow = clock.monotonicTime()
         let targetEnd = now.addingTimeInterval(duration)
@@ -125,23 +182,66 @@ public final class PomodoroEngine {
     }
 
     public func resume() {
-        guard case .paused(let remaining, let total) = state else { return }
-        guard remaining > 0 else {
-            completeSession()
-            return
-        }
-        let now = clock.now()
-        let monoNow = clock.monotonicTime()
-        let targetEnd = now.addingTimeInterval(remaining)
-        let monoEnd = monoNow + remaining
+        switch state {
+        case .paused(let remaining, let total):
+            guard remaining > 0 else {
+                completeSession()
+                return
+            }
+            let now = clock.now()
+            let monoNow = clock.monotonicTime()
+            let targetEnd = now.addingTimeInterval(remaining)
+            let monoEnd = monoNow + remaining
 
-        state = .running(targetEndDate: targetEnd, monotonicEnd: monoEnd, totalDurationSeconds: total)
+            state = .running(targetEndDate: targetEnd, monotonicEnd: monoEnd, totalDurationSeconds: total)
+
+        case .idle, .completed:
+            // Recover from idle/completed by launching current mode
+            start(durationSeconds: durationForCurrentMode(), mode: mode)
+
+        case .running:
+            break
+        }
+    }
+
+    public func toggle() {
+        if state.isRunning {
+            pause()
+        } else {
+            resume()
+        }
     }
 
     public func reset(toDurationSeconds duration: TimeInterval? = nil) {
-        let dur = duration ?? totalDurationSeconds
+        if let duration = duration, duration > 0 {
+            switch mode {
+            case .focus:
+                configuredFocusDuration = duration
+            case .shortBreak:
+                configuredShortBreakDuration = duration
+            case .longBreak:
+                configuredLongBreakDuration = duration
+            }
+        }
         state = .idle
-        _ = dur
+    }
+
+    public func resetRounds() {
+        completedRounds = 0
+    }
+
+    @discardableResult
+    public func skipToNextMode() -> PomodoroMode {
+        switch mode {
+        case .focus:
+            completedRounds += 1
+            let isLong = (roundsBeforeLongBreak > 0) && (completedRounds % roundsBeforeLongBreak == 0)
+            mode = isLong ? .longBreak : .shortBreak
+        case .shortBreak, .longBreak:
+            mode = .focus
+        }
+        state = .idle
+        return mode
     }
 
     public func tick() -> (remaining: TimeInterval, progress: Double, didJustComplete: Bool) {
@@ -151,7 +251,19 @@ public final class PomodoroEngine {
 
         let remaining = remainingSeconds
         if remaining <= 0.01 {
+            let finishedMode = mode
             completeSession()
+
+            let isLong = (roundsBeforeLongBreak > 0) && (completedRounds % roundsBeforeLongBreak == 0)
+            let nextMode = (finishedMode == .focus) ? (isLong ? PomodoroMode.longBreak : PomodoroMode.shortBreak) : PomodoroMode.focus
+
+            if autoStartBreaks {
+                mode = nextMode
+                start(durationSeconds: durationForCurrentMode(), mode: nextMode)
+            } else {
+                mode = nextMode
+            }
+
             return (0.0, 0.0, true)
         }
 

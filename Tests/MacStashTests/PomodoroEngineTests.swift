@@ -29,6 +29,11 @@ public enum PomodoroEngineTests {
         testStartAndProgressWithMonotonicClock()
         testPauseAndResumeFreezesTime()
         testSnapshotRestoreAfterSleepWake()
+        testResumeFromIdleStartsSession()
+        testResetRespectsCustomDurationAndSettings()
+        testPomodoroCycleAndBreakTransitions()
+        testAutoStartBreaksConfiguration()
+        testSkipToNextMode()
     }
 
     private static func testStartAndProgressWithMonotonicClock() {
@@ -97,5 +102,123 @@ public enum PomodoroEngineTests {
 
         TestAssertion.assertTrue(expired, "Should report expired when waking past targetEndDate")
         TestAssertion.assertEqual(newEngine.remainingSeconds, TimeInterval(0))
+    }
+
+    private static func testResumeFromIdleStartsSession() {
+        let mockClock = MockClock()
+        let engine = PomodoroEngine(clock: mockClock)
+
+        // Initial state is idle
+        TestAssertion.assertFalse(engine.state.isRunning)
+        TestAssertion.assertEqual(engine.remainingSeconds, TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds))
+
+        // Calling resume from idle must start the timer
+        engine.resume()
+        TestAssertion.assertTrue(engine.state.isRunning, "resume() from idle starts the session")
+        TestAssertion.assertEqual(engine.totalDurationSeconds, TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds))
+
+        // Calling toggle when running pauses
+        engine.toggle()
+        TestAssertion.assertFalse(engine.state.isRunning, "toggle() while running pauses")
+
+        // Calling toggle when paused resumes
+        engine.toggle()
+        TestAssertion.assertTrue(engine.state.isRunning, "toggle() while paused resumes")
+    }
+
+    private static func testResetRespectsCustomDurationAndSettings() {
+        let mockClock = MockClock()
+        let engine = PomodoroEngine(clock: mockClock)
+
+        // Configure 45 min focus
+        engine.configure(focusDurationSeconds: 2700, shortBreakDurationSeconds: 600)
+        TestAssertion.assertEqual(engine.remainingSeconds, TimeInterval(2700))
+
+        engine.start()
+        TestAssertion.assertTrue(engine.state.isRunning)
+        TestAssertion.assertEqual(engine.totalDurationSeconds, TimeInterval(2700))
+
+        mockClock.advance(by: 300)
+        _ = engine.tick()
+
+        // Reset to custom duration
+        engine.reset(toDurationSeconds: 1800)
+        TestAssertion.assertFalse(engine.state.isRunning)
+        TestAssertion.assertEqual(engine.remainingSeconds, TimeInterval(1800))
+    }
+
+    private static func testPomodoroCycleAndBreakTransitions() {
+        let mockClock = MockClock()
+        let engine = PomodoroEngine(clock: mockClock)
+
+        engine.configure(
+            focusDurationSeconds: 1500,
+            shortBreakDurationSeconds: 300,
+            longBreakDurationSeconds: 900,
+            roundsBeforeLongBreak: 2,
+            autoStartBreaks: false
+        )
+
+        // Round 1 Focus
+        engine.start()
+        mockClock.advance(by: 1500)
+        let tick1 = engine.tick()
+        TestAssertion.assertTrue(tick1.didJustComplete)
+        TestAssertion.assertEqual(engine.completedRounds, 1)
+        TestAssertion.assertEqual(engine.mode, .shortBreak, "Next mode after focus round 1 is shortBreak")
+        TestAssertion.assertFalse(engine.state.isRunning, "Without autoStartBreaks, timer waits for user")
+        TestAssertion.assertEqual(engine.durationForCurrentMode(), TimeInterval(300))
+
+        // Start Short Break
+        engine.resume()
+        TestAssertion.assertTrue(engine.state.isRunning)
+        mockClock.advance(by: 300)
+        let tickBreak = engine.tick()
+        TestAssertion.assertTrue(tickBreak.didJustComplete)
+        TestAssertion.assertEqual(engine.mode, .focus, "Next mode after break is focus")
+
+        // Round 2 Focus (should trigger longBreak after completion because roundsBeforeLongBreak = 2)
+        engine.resume()
+        mockClock.advance(by: 1500)
+        let tick2 = engine.tick()
+        TestAssertion.assertTrue(tick2.didJustComplete)
+        TestAssertion.assertEqual(engine.completedRounds, 2)
+        TestAssertion.assertEqual(engine.mode, .longBreak, "Round 2 completed triggers longBreak")
+        TestAssertion.assertEqual(engine.durationForCurrentMode(), TimeInterval(900))
+    }
+
+    private static func testAutoStartBreaksConfiguration() {
+        let mockClock = MockClock()
+        let engine = PomodoroEngine(clock: mockClock)
+
+        engine.configure(
+            focusDurationSeconds: 1200,
+            shortBreakDurationSeconds: 300,
+            roundsBeforeLongBreak: 4,
+            autoStartBreaks: true
+        )
+
+        engine.start()
+        mockClock.advance(by: 1200)
+        let tick = engine.tick()
+        TestAssertion.assertTrue(tick.didJustComplete)
+        TestAssertion.assertTrue(engine.state.isRunning, "Auto-start breaks should immediately start running break")
+        TestAssertion.assertEqual(engine.mode, .shortBreak)
+        TestAssertion.assertEqual(engine.totalDurationSeconds, TimeInterval(300))
+    }
+
+    private static func testSkipToNextMode() {
+        let mockClock = MockClock()
+        let engine = PomodoroEngine(clock: mockClock)
+        engine.configure(roundsBeforeLongBreak: 3)
+
+        TestAssertion.assertEqual(engine.mode, .focus)
+        let mode1 = engine.skipToNextMode()
+        TestAssertion.assertEqual(mode1, .shortBreak)
+        TestAssertion.assertEqual(engine.completedRounds, 1)
+
+        let mode2 = engine.skipToNextMode()
+        TestAssertion.assertEqual(mode2, .focus)
+        TestAssertion.assertEqual(engine.completedRounds, 1)
     }
 }

@@ -42,7 +42,8 @@ public final class SystemPermissionService: ObservableObject {
     }
 
     public func requestAccessibilityPermission() {
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+        let promptKey = "AXTrustedCheckOptionPrompt" as CFString
+        let options = [promptKey: true] as CFDictionary
         isAccessibilityGranted = AXIsProcessTrustedWithOptions(options)
     }
 
@@ -79,8 +80,9 @@ public final class SystemPermissionService: ObservableObject {
 
     public func checkNotificationPermission() {
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
+            let isGranted = (settings.authorizationStatus == .authorized)
             Task { @MainActor [weak self] in
-                self?.isNotificationGranted = (settings.authorizationStatus == .authorized)
+                self?.isNotificationGranted = isGranted
             }
         }
     }

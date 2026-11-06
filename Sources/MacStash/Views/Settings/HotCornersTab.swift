@@ -81,6 +81,36 @@ public struct HotCornersTab: View {
                 .padding(8)
             }
 
+            GroupBox(label: Label(appState.localized("corners.edgeSliders"), systemImage: "slider.vertical.3")) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Toggle(appState.localized("corners.enableEdgeSliders"), isOn: $appState.isEdgeSlidersEnabled)
+
+                    if appState.isEdgeSlidersEnabled {
+                        HStack {
+                            Text(appState.localized("corners.rightEdgeAction"))
+                                .font(.system(size: 12, weight: .medium))
+                            Spacer()
+                            Picker("", selection: Binding(
+                                get: { currentProfile.rightEdgeAction },
+                                set: { updateEdgeAction(profileID: currentProfile.id, action: $0) }
+                            )) {
+                                ForEach(ControlAction.allCases) { action in
+                                    Label(action.localizedDisplayName(using: appState.effectiveLanguage), systemImage: action.systemImageName)
+                                        .tag(action)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 220)
+                        }
+
+                        Text(appState.localized("corners.edgeSlidersHint"))
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(8)
+            }
+
             GroupBox(label: Label(appState.localized("corners.triggerPrecision"), systemImage: "timer")) {
                 VStack(alignment: .leading, spacing: 14) {
                     VStack(alignment: .leading, spacing: 4) {
@@ -273,6 +303,16 @@ public struct HotCornersTab: View {
             }
             if appState.appProfiles[idx].bundleIdentifier == nil {
                 appState.settings.cornerActions[corner] = action
+            }
+            appState.saveSettings()
+        }
+    }
+
+    private func updateEdgeAction(profileID: UUID, action: ControlAction) {
+        if let idx = appState.appProfiles.firstIndex(where: { $0.id == profileID }) {
+            appState.appProfiles[idx].rightEdgeAction = action
+            if appState.activeProfile.id == profileID {
+                appState.activeProfile.rightEdgeAction = action
             }
             appState.saveSettings()
         }

@@ -36,41 +36,40 @@ public final class AutoUpdateManager: ObservableObject {
         request.timeoutInterval = 10
         request.setValue("MacStash/\(currentVersion)", forHTTPHeaderField: "User-Agent")
 
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                self?.isChecking = false
-            }
-
-            guard let data = data,
-                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let tagName = json["tag_name"] as? String else {
-                if !silent {
-                    DispatchQueue.main.async {
-                        self?.showUpToDateAlert()
-                    }
-                }
-                return
-            }
-
-            let remoteVersion = tagName.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
-            let notes = (json["body"] as? String) ?? "Bug fixes and performance improvements."
-            let htmlURL = (json["html_url"] as? String) ?? "https://github.com/xt2201/macstash/releases"
-
-            DispatchQueue.main.async {
-                self?.latestVersion = remoteVersion
-                self?.releaseNotes = notes
-                self?.releaseURL = htmlURL
-
-                if self?.isVersion(remoteVersion, greaterThan: self?.currentVersion ?? "2.0.0") == true {
-                    self?.updateAvailable = true
+        Task {
+            defer { self.isChecking = false }
+            do {
+                let (data, _) = try await URLSession.shared.data(for: request)
+                guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let tagName = json["tag_name"] as? String else {
                     if !silent {
-                        self?.showUpdateAvailableAlert(version: remoteVersion, notes: notes, url: htmlURL)
+                        self.showUpToDateAlert()
+                    }
+                    return
+                }
+
+                let remoteVersion = tagName.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
+                let notes = (json["body"] as? String) ?? "Bug fixes and performance improvements."
+                let htmlURL = (json["html_url"] as? String) ?? "https://github.com/macstash/macstash/releases"
+
+                self.latestVersion = remoteVersion
+                self.releaseNotes = notes
+                self.releaseURL = htmlURL
+
+                if self.isVersion(remoteVersion, greaterThan: self.currentVersion) {
+                    self.updateAvailable = true
+                    if !silent {
+                        self.showUpdateAvailableAlert(version: remoteVersion, notes: notes, url: htmlURL)
                     }
                 } else if !silent {
-                    self?.showUpToDateAlert()
+                    self.showUpToDateAlert()
+                }
+            } catch {
+                if !silent {
+                    self.showUpToDateAlert()
                 }
             }
-        }.resume()
+        }
     }
 
     private func isVersion(_ v1: String, greaterThan v2: String) -> Bool {

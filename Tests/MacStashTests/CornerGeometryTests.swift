@@ -10,6 +10,7 @@ public enum CornerGeometryTests {
         testNegativeCoordinatesAndOffsetScreen()
         testHitZoneVertexContainment()
         testDirectCornerIsOuterCorner()
+        testOuterRightEdge()
     }
 
     private static func testSingleDisplayAllCornersAreOuter() {
@@ -113,5 +114,22 @@ public enum CornerGeometryTests {
         TestAssertion.assertTrue(CornerGeometry.isOuterCorner(corner: .topRight, of: builtIn, in: allScreens))
         TestAssertion.assertFalse(CornerGeometry.isOuterCorner(corner: .bottomLeft, of: builtIn, in: allScreens))
         TestAssertion.assertTrue(CornerGeometry.isOuterCorner(corner: .bottomRight, of: builtIn, in: allScreens))
+    }
+
+    private static func testOuterRightEdge() {
+        let d1 = CGRect(x: 0, y: 0, width: 1920, height: 1080)
+        let d2 = CGRect(x: 1920, y: 0, width: 1920, height: 1080)
+        let single = [d1]
+        let dual = [d1, d2]
+
+        TestAssertion.assertTrue(CornerGeometry.isOuterRightEdge(screen: d1, in: single))
+        TestAssertion.assertFalse(CornerGeometry.isOuterRightEdge(screen: d1, in: dual))
+        TestAssertion.assertTrue(CornerGeometry.isOuterRightEdge(screen: d2, in: dual))
+
+        // Stacked vertically: both should have an outer right edge
+        let d3 = CGRect(x: 0, y: 1080, width: 1920, height: 1080)
+        let stacked = [d1, d3]
+        TestAssertion.assertTrue(CornerGeometry.isOuterRightEdge(screen: d1, in: stacked))
+        TestAssertion.assertTrue(CornerGeometry.isOuterRightEdge(screen: d3, in: stacked))
     }
 }

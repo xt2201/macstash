@@ -61,7 +61,9 @@ public final class AppearanceManager: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.checkCurrentAppearance()
+            Task { @MainActor [weak self] in
+                self?.checkCurrentAppearance()
+            }
         }
     }
 }

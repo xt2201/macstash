@@ -721,6 +721,70 @@
         }
       }
     },
+    "corners.edgeSliders": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edge Sliders"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thanh trượt cạnh màn hình"
+          }
+        }
+      }
+    },
+    "corners.edgeSlidersHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move cursor to the right edge of the screen to reveal the quick vertical slider."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rê chuột vào mép phải màn hình để hiển thị thanh trượt dọc nhanh."
+          }
+        }
+      }
+    },
+    "corners.enableEdgeSliders": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Right Edge Slider"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật thanh trượt cạnh phải màn hình"
+          }
+        }
+      }
+    },
+    "corners.rightEdgeAction": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right Edge Action:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tác vụ cạnh phải:"
+          }
+        }
+      }
+    },
     "corners.dwellDelay": {
       "localizations": {
         "en": {

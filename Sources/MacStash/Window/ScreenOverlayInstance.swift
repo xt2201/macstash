@@ -44,11 +44,21 @@ public final class ScreenOverlayInstance {
     }
 
     public func setMouseInteractive(_ interactive: Bool, for corner: CornerPosition) {
-        cornerPanels[corner]?.ignoresMouseEvents = !interactive
+        if let panel = cornerPanels[corner] {
+            panel.ignoresMouseEvents = !interactive
+            if interactive {
+                panel.orderFrontRegardless()
+            }
+        }
     }
 
     public func setDockInteractive(_ interactive: Bool) {
-        dockPanel?.ignoresMouseEvents = !interactive
+        if let panel = dockPanel {
+            panel.ignoresMouseEvents = !interactive
+            if interactive {
+                panel.orderFrontRegardless()
+            }
+        }
     }
 
     private func createPanels() {

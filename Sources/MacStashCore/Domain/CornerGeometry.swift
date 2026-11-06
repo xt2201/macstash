@@ -2,6 +2,12 @@ import Foundation
 import CoreGraphics
 
 public enum CornerGeometry {
+    @inline(__always)
+    public static func rectContains(_ rect: CGRect, _ point: CGPoint) -> Bool {
+        point.x >= rect.minX && point.x <= rect.maxX &&
+        point.y >= rect.minY && point.y <= rect.maxY
+    }
+
     /// Determines whether a point inside a candidate screen's corner represents an outer corner
     /// of the multi-display desktop arrangement. If moving across the corner boundary leads
     /// into an adjacent connected monitor, the corner is an internal junction and returns false.
@@ -13,6 +19,10 @@ public enum CornerGeometry {
         hitZoneSizePoints: CGFloat = Defaults.HotCorner.defaultHitZoneSizePoints,
         tolerancePoints: CGFloat = 2.0
     ) -> Bool {
+        if allScreens.count <= 1 {
+            return true
+        }
+
         let hitZone = HitZone(corner: corner, screenFrame: screen, sizePoints: hitZoneSizePoints)
         guard hitZone.contains(point: point) else {
             return false
@@ -53,13 +63,13 @@ public enum CornerGeometry {
 
         // If any probe lands inside another screen rectangle, this corner is adjacent to that screen
         for other in allScreens where other != screen {
-            if other.contains(horizontalProbe) {
+            if rectContains(other, horizontalProbe) {
                 return false
             }
-            if other.contains(verticalProbe) {
+            if rectContains(other, verticalProbe) {
                 return false
             }
-            if other.contains(diagonalProbe) {
+            if rectContains(other, diagonalProbe) {
                 return false
             }
             // Vertex strictly inside another screen (overlapping monitors)

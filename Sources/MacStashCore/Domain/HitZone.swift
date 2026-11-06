@@ -39,7 +39,8 @@ public struct HitZone: Equatable, Sendable {
     }
 
     public func contains(point: CGPoint) -> Bool {
-        boundingBox.contains(point)
+        point.x >= boundingBox.minX && point.x <= boundingBox.maxX &&
+        point.y >= boundingBox.minY && point.y <= boundingBox.maxY
     }
 
     public func distanceFromVertex(to point: CGPoint) -> CGFloat {

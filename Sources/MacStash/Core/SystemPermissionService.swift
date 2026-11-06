@@ -14,6 +14,19 @@ public final class SystemPermissionService: ObservableObject {
 
     private init() {
         checkAllPermissions()
+        setupActiveObserver()
+    }
+
+    private func setupActiveObserver() {
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.checkAllPermissions()
+            }
+        }
     }
 
     public func checkAllPermissions() {
@@ -21,14 +34,20 @@ public final class SystemPermissionService: ObservableObject {
         checkInputMonitoring()
         checkNotificationPermission()
         checkLaunchAtLogin()
+        AppLogger.settings.info("Permissions status: Accessibility=\(self.isAccessibilityGranted), InputMonitoring=\(self.isInputMonitoringGranted), Notification=\(self.isNotificationGranted)")
     }
 
     public func checkAccessibility() {
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: false]
-        isAccessibilityGranted = AXIsProcessTrustedWithOptions(options as CFDictionary)
+        isAccessibilityGranted = AXIsProcessTrusted()
+    }
+
+    public func requestAccessibilityPermission() {
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+        isAccessibilityGranted = AXIsProcessTrustedWithOptions(options)
     }
 
     public func openAccessibilitySettings() {
+        requestAccessibilityPermission()
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
             NSWorkspace.shared.open(url)
         }
@@ -42,7 +61,17 @@ public final class SystemPermissionService: ObservableObject {
         }
     }
 
+    public func requestInputMonitoringPermission() {
+        if #available(macOS 10.15, *) {
+            _ = CGRequestListenEventAccess()
+            isInputMonitoringGranted = CGPreflightListenEventAccess()
+        } else {
+            isInputMonitoringGranted = true
+        }
+    }
+
     public func openInputMonitoringSettings() {
+        requestInputMonitoringPermission()
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent") {
             NSWorkspace.shared.open(url)
         }

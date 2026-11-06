@@ -8,6 +8,8 @@ public enum CornerGeometryTests {
         testHorizontalDualDisplayInnerCornersAreRejected()
         testVerticalDualDisplayInnerCornersAreRejected()
         testNegativeCoordinatesAndOffsetScreen()
+        testHitZoneVertexContainment()
+        testDirectCornerIsOuterCorner()
     }
 
     private static func testSingleDisplayAllCornersAreOuter() {
@@ -81,5 +83,35 @@ public enum CornerGeometryTests {
 
         let blExternal = CGPoint(x: -1918, y: 2)
         TestAssertion.assertTrue(CornerGeometry.isOuterCorner(point: blExternal, corner: CornerPosition.bottomLeft, screen: external, allScreens: allScreens))
+    }
+
+    private static func testHitZoneVertexContainment() {
+        let frame = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        for corner in CornerPosition.allCases {
+            let zone = HitZone(corner: corner, screenFrame: frame, sizePoints: 10.0)
+            TestAssertion.assertTrue(zone.contains(point: zone.vertex))
+        }
+
+        let negFrame = CGRect(x: -1920, y: 0, width: 1920, height: 1080)
+        for corner in CornerPosition.allCases {
+            let zone = HitZone(corner: corner, screenFrame: negFrame, sizePoints: 10.0)
+            TestAssertion.assertTrue(zone.contains(point: zone.vertex))
+        }
+    }
+
+    private static func testDirectCornerIsOuterCorner() {
+        let external = CGRect(x: -1920, y: 0, width: 1920, height: 1080)
+        let builtIn = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let allScreens = [external, builtIn]
+
+        TestAssertion.assertTrue(CornerGeometry.isOuterCorner(corner: .topLeft, of: external, in: allScreens))
+        TestAssertion.assertTrue(CornerGeometry.isOuterCorner(corner: .topRight, of: external, in: allScreens))
+        TestAssertion.assertTrue(CornerGeometry.isOuterCorner(corner: .bottomLeft, of: external, in: allScreens))
+        TestAssertion.assertFalse(CornerGeometry.isOuterCorner(corner: .bottomRight, of: external, in: allScreens))
+
+        TestAssertion.assertFalse(CornerGeometry.isOuterCorner(corner: .topLeft, of: builtIn, in: allScreens))
+        TestAssertion.assertTrue(CornerGeometry.isOuterCorner(corner: .topRight, of: builtIn, in: allScreens))
+        TestAssertion.assertFalse(CornerGeometry.isOuterCorner(corner: .bottomLeft, of: builtIn, in: allScreens))
+        TestAssertion.assertTrue(CornerGeometry.isOuterCorner(corner: .bottomRight, of: builtIn, in: allScreens))
     }
 }

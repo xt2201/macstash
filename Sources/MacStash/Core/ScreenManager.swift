@@ -278,24 +278,17 @@ public final class ScreenManager: ObservableObject {
 
         let screens = NSScreen.screens
         let allFrames = screens.map { $0.frame }
-        guard let targetScreen = screens.first(where: { $0.frame.contains(mouseLoc) }) ?? screens.first else {
-            return
-        }
-        guard let displayID = targetScreen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else {
-            return
-        }
-
         let dialRadius = appState.settings.dialRadiusPoints
         let sensitivity = max(Defaults.HotCorner.minHitZoneSizePoints, appState.cornerSensitivityRadius)
 
         // 4. Check Active Dial State
-        if let activeCorner = appState.activeCorner, appState.activeDisplayID == displayID {
-            let vertex = cornerVertex(for: activeCorner, in: targetScreen.frame)
+        if let activeCorner = appState.activeCorner, let activeInstance = instances[appState.activeDisplayID] {
+            let vertex = cornerVertex(for: activeCorner, in: activeInstance.screen.frame)
             let dist = hypot(mouseLoc.x - vertex.x, mouseLoc.y - vertex.y)
-            if dist <= dialRadius + 20 {
+            if dist <= dialRadius + 25 {
                 hideWorkItem?.cancel()
                 hideWorkItem = nil
-                instances[displayID]?.setMouseInteractive(true, for: activeCorner)
+                activeInstance.setMouseInteractive(true, for: activeCorner)
             } else {
                 if hideWorkItem == nil {
                     scheduleHideTimer(delay: appState.settings.cornerHideDelaySeconds)
@@ -307,24 +300,30 @@ public final class ScreenManager: ObservableObject {
         // 5. Check Hot Corner Dwell (when no dial is active)
         if appState.isCornerDialsEnabled {
             var foundCandidate = false
-            for corner in CornerPosition.allCases {
-                guard appState.settings.cornerEnabled[corner] == true && appState.action(for: corner) != .none else {
+            for screen in screens {
+                guard let sDisplayID = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else {
                     continue
                 }
-                guard CornerGeometry.isOuterCorner(corner: corner, of: targetScreen.frame, in: allFrames) else {
-                    continue
-                }
-                let vertex = cornerVertex(for: corner, in: targetScreen.frame)
-                let dist = hypot(mouseLoc.x - vertex.x, mouseLoc.y - vertex.y)
-                if dist <= sensitivity {
-                    foundCandidate = true
-                    if pendingDwellCorner == corner && pendingDwellDisplayID == displayID {
-                        // Already pending
-                    } else {
-                        scheduleDwellTimer(corner: corner, displayID: displayID, screenFrame: targetScreen.frame)
+                for corner in CornerPosition.allCases {
+                    guard appState.settings.cornerEnabled[corner] == true && appState.action(for: corner) != .none else {
+                        continue
                     }
-                    break
+                    guard CornerGeometry.isOuterCorner(corner: corner, of: screen.frame, in: allFrames) else {
+                        continue
+                    }
+                    let vertex = cornerVertex(for: corner, in: screen.frame)
+                    let dist = hypot(mouseLoc.x - vertex.x, mouseLoc.y - vertex.y)
+                    if dist <= sensitivity {
+                        foundCandidate = true
+                        if pendingDwellCorner == corner && pendingDwellDisplayID == sDisplayID {
+                            // Already pending
+                        } else {
+                            scheduleDwellTimer(corner: corner, displayID: sDisplayID, screenFrame: screen.frame)
+                        }
+                        break
+                    }
                 }
+                if foundCandidate { break }
             }
             if !foundCandidate {
                 cancelPendingDwell()
@@ -333,23 +332,23 @@ public final class ScreenManager: ObservableObject {
 
         // 6. Check Left Edge Hidden Dock
         if appState.isHiddenDockEnabled {
-            let isPrimary = (targetScreen == screens.first)
-            if isPrimary {
-                let left = targetScreen.frame.minX
-                let midY = targetScreen.frame.midY
+            if let leftScreen = screens.min(by: { $0.frame.minX < $1.frame.minX }),
+               let leftDisplayID = leftScreen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID {
+                let left = leftScreen.frame.minX
+                let midY = leftScreen.frame.midY
                 let dockTop = midY + 230
                 let dockBottom = midY - 230
                 let inYRange = (mouseLoc.y >= dockBottom && mouseLoc.y <= dockTop)
 
                 if appState.isDockExpanded {
-                    if mouseLoc.x > left + 85 || !inYRange {
+                    if mouseLoc.x > left + 90 || !inYRange {
                         appState.isDockExpanded = false
-                        instances[displayID]?.setDockInteractive(false)
+                        instances[leftDisplayID]?.setDockInteractive(false)
                     }
                 } else {
-                    if mouseLoc.x <= left + 8 && inYRange {
+                    if mouseLoc.x <= left + 10 && inYRange {
                         appState.isDockExpanded = true
-                        instances[displayID]?.setDockInteractive(true)
+                        instances[leftDisplayID]?.setDockInteractive(true)
                         appState.haptics.performBoundaryClick()
                     }
                 }
@@ -471,7 +470,10 @@ public final class ScreenManager: ObservableObject {
             dismissActiveDial()
         } else {
             let mouse = NSEvent.mouseLocation
-            let targetScreen = NSScreen.screens.first(where: { $0.frame.contains(mouse) }) ?? NSScreen.main ?? NSScreen.screens.first
+            let targetScreen = NSScreen.screens.first(where: {
+                mouse.x >= $0.frame.minX - 5 && mouse.x <= $0.frame.maxX + 5 &&
+                mouse.y >= $0.frame.minY - 5 && mouse.y <= $0.frame.maxY + 5
+            }) ?? NSScreen.main ?? NSScreen.screens.first
             guard let screen = targetScreen else { return }
             guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else { return }
             activateDial(corner: .topRight, displayID: id)

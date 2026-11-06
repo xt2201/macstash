@@ -1,92 +1,211 @@
-# MacStash
-
 <p align="center">
-  <img src="Design/Logo/exports/brand/stash_social_preview.png" alt="Stash for macOS Brand Banner" width="760"/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="Design/Logo/exports/brand/stash_lockup_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="Design/Logo/exports/brand/stash_lockup_light.png">
+    <img src="Design/Logo/exports/brand/stash_lockup_dark.png" alt="MacStash for macOS" width="460">
+  </picture>
 </p>
 
 <p align="center">
   <strong>Tactile Hidden Controls &amp; Smart Corner Dials for macOS</strong><br/>
-  <em>Zero-pixel hot corner gestures, multi-monitor hardware brightness, and Pomodoro focus timer.</em>
+  <em>Zero-pixel hot corner gestures, multi-monitor hardware brightness, tactile audio routing, and Pomodoro focus timer.</em>
 </p>
 
 <p align="center">
-  <img src="Design/Logo/exports/brand/stash_lockup_dark.png" alt="Stash Lockup" width="380"/>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.3-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
+  <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
+  <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/updates-Sparkle%202-00D2FF?style=flat-square" alt="Sparkle 2 Auto-Update">
+  <img src="https://img.shields.io/badge/telemetry-100%25%20offline-success?style=flat-square" alt="Zero Telemetry">
+</p>
+
+<p align="center">
+  <a href="https://github.com/xt2201/macstash/releases/latest">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.3.3.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+  </a>
+</p>
+
+<p align="center">
+  <a href="#overview">Overview</a> &bull;
+  <a href="#quadrant-architecture">Quadrant Architecture</a> &bull;
+  <a href="#key-features">Key Features</a> &bull;
+  <a href="#how-it-works">How It Works</a> &bull;
+  <a href="#installation">Installation</a> &bull;
+  <a href="#permissions--privacy">Privacy &amp; Permissions</a> &bull;
+  <a href="#shortcuts">Shortcuts</a> &bull;
+  <a href="#developer-guide">Developer Guide</a> &bull;
+  <a href="#documentation">Documentation</a>
 </p>
 
 ---
 
-## Features
+## Overview
 
-- **Quarter-Circle Corner Dials**:
-  - Quarter-circle radial dials tucked invisibly into the four screen corners.
-  - Gently blooms into view when the mouse dwells at the corner (0.2s delay, 5-8pt tight hit-zone).
-  - Drag along the arc or use trackpad scroll to adjust values.
-  - **Top-Left (TL)**: Keyboard Backlight brightness.
-  - **Top-Right (TR)**: Per-Monitor Display Brightness (DDC/CI and Apple Native Display Services).
-  - **Bottom-Left (BL)**: Pomodoro Focus Timer with live radial countdown.
-  - **Bottom-Right (BR)**: Master Audio Volume & Output Device switching.
-- **Hidden Dock Shelf**:
-  - Lives discreetly on the screen border.
-  - Slides out smoothly when hovering the edge.
-  - Pinned apps with macOS dock magnification effect on hover.
-  - Includes an instant Quick App Launcher with search.
-- **Tactile Feedback**:
-  - **Trackpad Haptics**: Uses `NSHapticFeedbackManager` to emit subtle, satisfying detent ticks as dials rotate through each notch.
-  - **Mechanical Sound FX**: Low-latency mechanical click sounds mimicking physical rotary knobs.
-- **Context-Aware App Profiles**:
-  - Automatically detects frontmost active apps and switches corner dial assignments dynamically.
-- **Menu Bar Utility**:
-  - Runs in the background as a lightweight agent (`LSUIElement = true`).
-  - Native monochrome template image indicator with automatic Pomodoro active state.
-  - Full-featured Preferences window (`Command + ,`).
+**MacStash** is a lightweight, background utility for macOS that reinvents screen corners and borders as zero-pixel tactile interaction zones. Based on Fitts's Law, the physical corners of your display represent infinite target zones—meaning you can flick your mouse to any corner without needing to aim.
+
+Tucked invisibly at the screen boundary, MacStash blooms interactive radial dials into view when your pointer dwells at a corner. Drag along the arc or flick your trackpad scroll wheel to adjust display brightness, tune keyboard backlighting, scrub master audio volume, or kick off a Pomodoro focus sprint.
+
+<p align="center">
+  <img src="Design/Logo/exports/brand/stash_quadrant_overview.png" alt="MacStash Quadrant Architecture Overview" width="920"/>
+</p>
 
 ---
 
-## Brand Identity & Icon Design
+## Quadrant Architecture
 
-The visual identity of Stash is defined in `Design/Logo/`:
-- **Concept**: *The Radial Corner Bloom* - An anchor pin positioned at the physical screen corner vertex, paired with a sweeping 60-degree precision radial dial arc and mechanical detents.
-- **Liquid Glass Architecture**: Layered vector SVG specifications (`background.svg`, `foreground.svg`, `mono.svg`) adhering to Apple Human Interface Guidelines for macOS Sequoia and Icon Composer.
-- **Color Palette**: Obsidian Slate (`#191D26`), Deep Charcoal (`#0D0F14`), Precision Cyan (`#00D2FF`), Electric Azure (`#0A84FF`), and Platinum White (`#FFFFFF`).
-- **Reproducible Pipeline**: All app icons (`.icns`), menu bar template images (`@1x`, `@2x`, `@3x`), and vector PDFs are automatically generated via `scripts/render_icons.sh`.
+MacStash assigns high-frequency system controls to the four physical display vertices:
+
+| Corner | Default Assignment | Technology &amp; Action |
+|---|---|---|
+| **Top-Left (TL)** | **Keyboard Backlight** | Direct macOS Ambient Light Sensor (ALS) control; smooth 0–100% illumination with one-click toggle. |
+| **Top-Right (TR)** | **Display Brightness** | Multi-monitor hardware DDC/CI (I2C) for third-party external monitors + Apple Silicon native display brightness. |
+| **Bottom-Left (BL)** | **Pomodoro Focus Timer** | Radial arc countdown (0–60 min) with round progression pips and satellite reset/skip micro-controls. |
+| **Bottom-Right (BR)** | **Master Volume &amp; Route** | Real-time audio gain adjustment and immediate audio output device switching. |
+| **Screen Edge** | **Hidden Dock Shelf** | Smooth slide-out shelf with macOS dock magnification effect and instant Quick App Launcher. |
 
 ---
 
-## Getting Started
+## Key Features
+
+### 1. Quarter-Circle Radial Corner Dials
+- Invisibly docked at the screen corners with zero desktop clutter.
+- Gentle bloom animation on dwell (0.2s configurable threshold, tight 5–8pt hit-zone).
+- Drag along the radial arc or use vertical/horizontal trackpad scrolling for fluid adjustments.
+- Instant collapse when the cursor departs the quadrant area.
+
+### 2. Multi-Monitor Hardware Brightness (DDC/CI &amp; Native)
+- Controls third-party HDMI and DisplayPort monitors directly via DDC/CI hardware I2C packets.
+- Smooth fallback to Apple Native CoreDisplay services for built-in Retina panels and Pro Display XDR / Studio Display.
+- Synchronized multi-display dimming or independent per-display adjustment.
+
+### 3. Tactile Pomodoro Focus Engine
+- Visual countdown dial showing remaining session time as a sweeping luminous sector.
+- Integrated round progression indicators showing completed vs. target focus intervals.
+- Corner satellite micro-buttons for immediate one-click Session Reset and Interval Skip.
+- Live ticking title in the macOS menu bar status item while running.
+
+### 4. Master Audio &amp; Endpoint Routing
+- Instant volume scrubbing with linear perceived loudness scaling.
+- Rapid audio output device switcher directly from the corner popover.
+- Low-latency synchronization with macOS CoreAudio subsystem.
+
+### 5. Hidden Edge Slider &amp; Dock Shelf
+- Rides flush against your chosen screen border.
+- Smoothly slides into view when hovering the edge.
+- Pinned applications feature the authentic macOS dock magnification curve.
+- Integrated Quick App Launcher with instant search.
+
+### 6. Tactile Detents &amp; Mechanical Acoustics
+- **Trackpad Detents**: Emits crisp physical ticks via `NSHapticFeedbackManager` as the rotary dial steps through values.
+- **Acoustic Feedback**: Low-latency mechanical click sound effects mimicking high-end rotary hardware dials.
+
+### 7. Context-Aware Application Profiles
+- Detects the frontmost active application and dynamically reconfigures corner dials (e.g., volume in Final Cut Pro, brightness in Xcode, timer in Safari).
+
+### 8. Native Menu Bar Companion
+- Operates as a lightweight agent (`LSUIElement = true`) with a ~15MB RAM footprint.
+- Monochrome template status bar icon that illuminates during active Pomodoro intervals.
+- Full-featured Preferences window (`Command + ,`).
+
+---
+
+## How It Works: Fitts's Law &amp; Zero-Pixel Hit-Zones
+
+In human-computer interaction, **Fitts's Law** states that the time required to rapidly move to a target area is a function of the ratio between the distance to the target and the width of the target:
+
+$$\text{MT} = a + b \log_2 \left( \frac{2D}{W} \right)$$
+
+Because the macOS mouse cursor cannot travel beyond the physical boundary of the screen, the display edges and corners effectively have an **infinite target width** ($W = \infty$). This makes screen corners the fastest, most effortless targets on the entire screen:
+
+1. **Zero Acquisition Cost**: You can flick your mouse toward a corner with maximum physical velocity without overshooting.
+2. **Dwell Threshold Protection**: MacStash prevents accidental activations with an adjustable dwell delay (default `0.20s`), ensuring normal window management gestures are never intercepted.
+3. **Continuous Scrubbing**: Once bloomed, circular arc trigonometry tracks cursor rotation around the corner vertex, granting 360-degree precision control.
+
+---
+
+## Installation
+
+### Method 1: Direct DMG Download (Recommended)
+1. Download the latest universal disk image: **[MacStash-v2.3.3.dmg](https://github.com/xt2201/macstash/releases/latest)**.
+2. Open the disk image and drag **MacStash** into your `Applications` folder.
+3. Launch MacStash from Launchpad, Spotlight, or `Applications`.
+
+> [!NOTE]
+> If macOS displays an unsigned developer notice on first launch, open **System Settings &gt; Privacy &amp; Security** and click **Open Anyway**, or run:
+> ```bash
+> xattr -d com.apple.quarantine /Applications/MacStash.app
+> ```
+
+### Method 2: Automatic In-App Updates (Sparkle 2)
+MacStash includes built-in background updates powered by **Sparkle 2**. Updates are cryptographically verified using Apple CryptoKit Ed25519 public signatures before installation.
+- Check for updates anytime via the Menu Bar &gt; **Preferences &gt; About &gt; Check for Updates**.
+
+---
+
+## Permissions &amp; Privacy
+
+MacStash is committed to absolute user privacy. It operates **100% locally and offline**. It collects zero analytics, performs zero network tracking, and requires no account or cloud registration.
+
+| Permission | System Privilege | Purpose in MacStash | Network Activity |
+|---|---|---|:---:|
+| **Accessibility** | `AXUIElement` | Used to anchor floating dial overlays at physical display corners and track cursor proximity. | **None (Offline)** |
+| **Input Monitoring** | `CGEvent` tap | Detects corner hover gestures and global hotkey shortcuts. Does not record keystrokes or text. | **None (Offline)** |
+| **Apple Events** | `NSAppleScript` | Coordinates hardware brightness, audio levels, and active application detection. | **None (Offline)** |
+
+---
+
+## Shortcuts &amp; Settings
+
+| Shortcut | Action | Scope |
+|---|---|---|
+| `Command + ,` | Open MacStash Preferences | Global / In-App |
+| `Command + W` | Close Preferences or Guide Window | In-App |
+| `Command + ?` | Open In-App Interactive Guide | Global / In-App |
+| `Command + Q` | Quit MacStash completely | In-App |
+
+Customize dwell delays, hit-zone radii, haptic intensity, audio feedback, and corner dial assignments anytime in **Preferences &gt; Hot Corners**.
+
+---
+
+## Developer Guide
 
 ### Prerequisites
+- macOS 13.0 (Ventura) or newer (Sonoma and Sequoia fully supported).
+- Swift 6 compiler toolchain (`xcrun swift --version`).
+- Xcode Command Line Tools (`xcode-select --install`).
 
-- macOS 13.0 (Ventura) or newer (macOS 14 Sonoma and macOS 15 Sequoia fully supported).
-- Swift 5.9+ / Swift 6 compiler toolchain.
-- Xcode Command Line Tools.
+### Build &amp; Test Workflow
 
-### Building and Running
+```bash
+# 1. Clone repository
+git clone https://github.com/xt2201/macstash.git
+cd macstash
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/macstash/macstash.git
-   cd macstash
-   ```
+# 2. Run unit and domain test suite
+make test
 
-2. **Generate brand assets and icons**:
-   ```bash
-   ./scripts/render_icons.sh
-   ```
+# 3. Regenerate all brand assets, ICNS, and vector PDFs
+./Scripts/render_icons.sh
 
-3. **Run tests**:
-   ```bash
-   swift run MacStashTestRunner
-   ```
+# 4. Compile release binary and package distribution DMG
+./Scripts/build_dmg.sh
+```
 
-4. **Build and package DMG installer**:
-   ```bash
-   ./scripts/build_dmg.sh
-   ```
+The output DMG and signed Sparkle ZIP archive will be placed in `dist/`.
 
-The packaged DMG disk image will be placed at `MacStash-v2.0.0.dmg`.
+---
+
+## Documentation
+
+Full bilingual guides and troubleshooting documentation are available in the repository:
+- **[English Guide](Docs/Guide/en/01_getting_started.md)**: Getting Started, Display Brightness, Pomodoro Timer, Troubleshooting, Settings, Shortcuts, FAQ.
+- **[Vietnamese Guide](Docs/Guide/vi/01_getting_started.md)**: Hướng dẫn bắt đầu, Độ sáng màn hình, Đồng hồ Pomodoro, Xử lý sự cố, Cài đặt, Phím tắt, FAQ.
+- **[Brand &amp; Logo Rationale](Design/Logo/04-rationale.md)**: Visual identity principles, geometry specifications, and color palette.
 
 ---
 
 ## License
 
-This project is licensed under the MIT License. See `LICENSE` and `Design/Logo/LICENSES.md` for full copyright and font usage details.
+MacStash is open-source software licensed under the **[MIT License](LICENSE)**. All vector designs and brand assets are original works subject to the guidelines in `Design/Logo/LICENSES.md`.

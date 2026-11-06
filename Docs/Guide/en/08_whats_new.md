@@ -1,3 +1,14 @@
+# What's New in Version 2.3.3
+
+MacStash 2.3.3 introduces a lossless AppKit vector rendering pipeline, dual-theme GitHub lockup integration, and a comprehensive documentation and visual asset overhaul.
+
+## Key Enhancements in Version 2.3.3
+
+- Native AppKit Vector Rasterizer: Replaced legacy QuickLook thumbnailing with dedicated Swift AppKit rasterization, ensuring non-square marketing assets retain exact aspect ratios and true alpha transparency without white letterbox borders.
+- Dual-Theme Lockup Assets: Refactored dark and light lockup graphics to transparent backgrounds for seamless GitHub Light and Dark mode rendering.
+- Quadrant Architecture Showcase: Added high-DPI visual diagram illustrating the four screen corner dials and the hidden edge dock shelf.
+- Modernized README: Revamped project overview with flat badge matrix, direct release download buttons, permissions transparency matrix, and Fitts's law mechanics explanation.
+
 # What's New in Version 2.3.2
 
 MacStash 2.3.2 delivers ultra-smooth keyboard backlight scrubbing in the top bar control popover, instantaneous hardware synchronization, and one-tap backlight toggling.

@@ -269,20 +269,22 @@ public final class AppState: ObservableObject {
 
         if tickResult.didJustComplete {
             if settings.pomodoroSoundEnabled {
-                sound.playAccent(enabled: isSoundEnabled)
+                sound.playChime(enabled: isSoundEnabled)
                 haptics.performBoundaryClick()
             }
+            NSApp.requestUserAttention(.criticalRequest)
             savePomodoroSnapshot()
 
+            let completedMode = tickResult.completedMode ?? .focus
             let titleKey: String
             let bodyKey: String
-            switch pomodoroEngine.mode {
+            switch completedMode {
             case .focus:
-                titleKey = "pomodoro.notifyFocusTitle"
-                bodyKey = "pomodoro.notifyFocusBody"
-            case .shortBreak, .longBreak:
                 titleKey = "pomodoro.notifyBreakTitle"
                 bodyKey = "pomodoro.notifyBreakBody"
+            case .shortBreak, .longBreak:
+                titleKey = "pomodoro.notifyFocusTitle"
+                bodyKey = "pomodoro.notifyFocusBody"
             }
 
             let title = localized(titleKey)

@@ -28,4 +28,14 @@ public final class SoundEffectManager {
         guard enabled else { return }
         NSSound(named: "Pop")?.play()
     }
+
+    /// Play a distinct chime when a Pomodoro focus interval or break completes
+    public func playChime(enabled: Bool = true) {
+        guard enabled else { return }
+        if let sound = NSSound(named: "Glass") {
+            sound.play()
+        } else {
+            AudioServicesPlayAlertSound(kSystemSoundID_UserPreferredAlert)
+        }
+    }
 }

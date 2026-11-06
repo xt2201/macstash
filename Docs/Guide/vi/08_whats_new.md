@@ -1,3 +1,14 @@
+# Có Gì Mới Trong Phiên Bản 2.3.3
+
+MacStash 2.3.3 ra mắt hệ thống kết xuất vector AppKit không suy hao, tích hợp bộ nhận diện tương thích giao diện kép Light/Dark trên GitHub và nâng cấp toàn diện tài liệu trực quan.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.3.3
+
+- Kết xuất vector AppKit thuần túy: Thay thế hoàn toàn cơ chế QuickLook bằng script Swift AppKit chuyên dụng, đảm bảo toàn bộ asset giữ chuẩn tỷ lệ khung hình, khử răng cưa Retina và có độ trong suốt alpha tuyệt đối không bị viền trắng.
+- Logo Lockup tương thích giao diện kép: Tinh chỉnh lockup sáng và tối sang dạng nền trong suốt giúp hiển thị liền mạch trên cả hai chế độ Light mode và Dark mode của GitHub.
+- Sơ đồ kiến trúc 4 góc màn hình: Bổ sung sơ đồ trực quan độ phân giải cao minh họa chi tiết 4 góc điều khiển xúc giác và thanh trượt Dock ẩn ở cạnh màn hình.
+- Nâng cấp toàn diện README: Tái cấu trúc tài liệu giới thiệu với bảng huy hiệu phẳng, nút tải trực tiếp DMG, bảng minh bạch quyền bảo mật và phân tích nguyên lý Định luật Fitts.
+
 # Có Gì Mới Trong Phiên Bản 2.3.2
 
 MacStash 2.3.2 tối ưu hóa độ mượt mà của thanh trượt đèn nền bàn phím trên thanh điều khiển Menu Bar, đồng bộ tức thì với phần cứng và hỗ trợ bật/tắt nhanh bằng một chạm.

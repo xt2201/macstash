@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.3.3] - 2026-11-06
+
+### Added
+- Native Apple AppKit SVG rasterizer (`Scripts/render_svg.swift`) producing lossless 32-bit RGBA PNG assets without letterbox padding or aspect ratio distortion.
+- Dual-theme GitHub lockup assets supporting automatic Light and Dark appearance switching via `<picture>`.
+- Screen quadrant architecture visual showcase diagram (`stash_quadrant_overview.svg`) detailing all 4 corners and the hidden dock shelf.
+
+### Changed
+- Complete overhaul of `README.md` following modern macOS open-source standards, adding flat badges, direct DMG download call-to-action, permissions transparency matrix, and visual feature breakdowns.
+- Re-rendered all marketing, lockup, social preview, and DMG background assets with true alpha channels and exact aspect ratios.
+
+### Fixed
+- Fixed critical asset rendering distortion where `qlmanage` thumbnail squaring and `sips` force-scaling squashed non-square graphics and generated white letterbox bands.
+- Removed opaque background cards from dark and light lockup SVGs to eliminate visual clipping in GitHub markdown.
+
+---
+
 ## [2.3.2] - 2026-11-06
 
 ### Added

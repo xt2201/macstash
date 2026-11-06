@@ -249,9 +249,9 @@ public final class PomodoroEngine {
         return mode
     }
 
-    public func tick() -> (remaining: TimeInterval, progress: Double, didJustComplete: Bool) {
+    public func tick() -> (remaining: TimeInterval, progress: Double, didJustComplete: Bool, completedMode: PomodoroMode?) {
         guard case .running = state else {
-            return (remainingSeconds, progress, false)
+            return (remainingSeconds, progress, false, nil)
         }
 
         let remaining = remainingSeconds
@@ -269,10 +269,10 @@ public final class PomodoroEngine {
                 mode = nextMode
             }
 
-            return (0.0, 0.0, true)
+            return (0.0, 0.0, true, finishedMode)
         }
 
-        return (remaining, progress, false)
+        return (remaining, progress, false, nil)
     }
 
     private func completeSession() {

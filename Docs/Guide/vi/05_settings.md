@@ -23,4 +23,4 @@ MacStash cung cấp cửa sổ thiết lập gồm 7 tab chuẩn theo Apple Huma
    Tùy chỉnh phím tắt toàn cục động để bật tắt vòng quay, kèm tính năng tự động phân tích và cảnh báo xung đột với phím tắt hệ thống macOS.
 
 7. **About / Advanced (Thông tin & Nâng cao)**:
-   Thông tin phiên bản, kiểm tra cập nhật, mở Console Log hệ thống, xem hướng dẫn, sao lưu và phục hồi toàn diện (cài đặt và hồ sơ ứng dụng) bằng tệp JSON, và khôi phục cài đặt gốc.
+   Thông tin phiên bản, kiểm tra cập nhật tự động 1 chạm (Sparkle 2) với chữ ký mã hóa Ed25519, mở Console Log hệ thống, xem hướng dẫn, sao lưu và phục hồi toàn diện (cài đặt và hồ sơ ứng dụng) bằng tệp JSON, và khôi phục cài đặt gốc.

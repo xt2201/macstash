@@ -4,6 +4,7 @@ MacStash 2.3.0 delivers major polish across audio controls, multi-monitor bright
 
 ## Key Enhancements in Version 2.3.0
 
+- One-Click In-Place Auto-Updates (Sparkle 2): Industry-standard macOS auto-updater integrated with Ed25519 (CryptoKit) cryptographic signature verification for seamless background updates and relaunching.
 - Modern Audio Engine: Upgraded to modern AudioObject APIs with zero deprecation warnings, quick mute button on the menu bar speaker icon, and quick audio output device selector.
 - Multi-Monitor Brightness: Individual brightness controls in the menu bar extra popover with screen names, icons, and persistent profile storage per display UUID.
 - Application Profiles: Dedicated profile manager in Settings allowing custom corner and edge control mappings tailored to specific applications.

@@ -23,4 +23,4 @@ MacStash provides a comprehensive 7-tab configuration window compliant with macO
    Configurable dynamic global hotkeys for toggling dials, with automated conflict analysis against macOS system reserved combinations.
 
 7. **About / Advanced**:
-   Version information, update checks, Console log viewer launcher, user manual link, full JSON backup export and import (AppSettings and App Profiles), and factory reset.
+   Version information, 1-click in-place background updates (Sparkle 2) with Ed25519 cryptographic verification, Console log viewer launcher, user manual link, full JSON backup export and import (AppSettings and App Profiles), and factory reset.

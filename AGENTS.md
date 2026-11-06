@@ -18,4 +18,10 @@
 5. Báo cáo cuối có mục "Docs đã cập nhật" và "DMG đã build".
 Với thay đổi nội bộ không ảnh hưởng người dùng cuối (refactor): vẫn rebuild DMG, ghi "không cần đổi docs".
 
+**Auto-Update & Release Pipeline (Sparkle 2)**:
+- Cơ chế cập nhật: Tự động ngầm 1 chạm bằng Sparkle 2. Feed cập nhật là `appcast.xml` ở gốc repo.
+- Xác thực Ed25519: Mọi bản zip cập nhật phải được ký mã hóa Ed25519 bằng Apple `CryptoKit` (`Scripts/sign_sparkle_update.swift`). Public key lưu tại `SUPublicEDKey` trong `Info.plist`.
+- Bảo mật khóa: Private key lưu trên GitHub Secrets (`SPARKLE_PRIVATE_KEY`) và local `Scripts/.sparkle_keys.json` (được đưa vào `.gitignore`). Tuyệt đối không commit khóa bí mật lên repository.
+- Tự động hóa CI/CD: Đẩy tag git `v*` kích hoạt GitHub Actions kiểm thử, biên dịch universal binary, ký gói zip, cập nhật `appcast.xml`, và tạo GitHub Release.
+
 **Không được làm**: tự ý thêm dependency lớn; commit bí mật; sửa phần đang chạy tốt ngoài phạm vi; che lỗi bằng `try?` hoặc timeout cứng; báo "xong" khi chưa kiểm chứng.

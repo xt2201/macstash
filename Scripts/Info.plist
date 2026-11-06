@@ -32,5 +32,15 @@
     <string>MacStash requires input monitoring privileges to detect keyboard shortcuts and corner hover interactions.</string>
     <key>NSHumanReadableCopyright</key>
     <string>Copyright © 2026 MacStash. All rights reserved.</string>
+    <key>SUFeedURL</key>
+    <string>https://raw.githubusercontent.com/xt2201/macstash/main/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>yv1ZWpCWt5ayj9Ctjp2pOUXnjq/QuCJ4jcFCT7PKzXE=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUScheduledCheckInterval</key>
+    <integer>86400</integer>
+    <key>SUAllowsAutomaticUpdates</key>
+    <true/>
 </dict>
 </plist>

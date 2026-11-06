@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [2.3.0] - 2026-11-06
 
 ### Added
+- Industry-standard 1-click in-place background auto-update engine powered by Sparkle 2 (`SPUStandardUpdaterController`).
+- Cryptographic update signature verification using Apple `CryptoKit` with Ed25519 (EdDSA) and automated `appcast.xml` feed synchronization.
+- Release packaging pipeline producing universal distribution DMG installers and signed update ZIP archives.
+- Automated GitHub Actions release workflow building universal binaries, signing archives, and publishing releases on tag pushes.
 - Audio output device selector dropdown in Menu Bar extra popover for switching between connected headphones, speakers, and external displays.
 - Quick mute toggle button integrated directly into the Menu Bar speaker icon and Corner Dial center badge.
 - Multi-monitor brightness controls in Menu Bar extra popover displaying independent sliders, monitor names, and device icons.

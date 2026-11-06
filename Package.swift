@@ -17,6 +17,9 @@ let package = Package(
             targets: ["MacStashCore"]
         )
     ],
+    dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.4")
+    ],
     targets: [
         .target(
             name: "MacStashCore",
@@ -28,7 +31,8 @@ let package = Package(
         .executableTarget(
             name: "MacStash",
             dependencies: [
-                "MacStashCore"
+                "MacStashCore",
+                .product(name: "Sparkle", package: "Sparkle")
             ],
             path: "Sources/MacStash",
             resources: [

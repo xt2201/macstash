@@ -1,102 +1,97 @@
 import Foundation
 import AppKit
 import Combine
+import Sparkle
+import MacStashCore
 
-/// Manages version checking, changelog presentation, and seamless updates for MacStash
+/// Manages version checking, changelog presentation, and seamless updates for MacStash via Sparkle 2
 @MainActor
-public final class AutoUpdateManager: ObservableObject {
+public final class AutoUpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate {
     public static let shared = AutoUpdateManager()
 
     @Published public private(set) var currentVersion: String = "2.3.0"
-    @Published public private(set) var latestVersion: String = "2.0.0"
+    @Published public private(set) var latestVersion: String = "2.3.0"
     @Published public private(set) var updateAvailable: Bool = false
     @Published public private(set) var releaseNotes: String = ""
     @Published public private(set) var releaseURL: String = ""
     @Published public private(set) var isChecking: Bool = false
     @Published public private(set) var lastCheckDate: Date? = nil
+    @Published public private(set) var canCheckForUpdates: Bool = true
 
-    private let updateFeedURL = URL(string: "https://api.github.com/repos/xt2201/macstash/releases/latest")
+    private var updaterController: SPUStandardUpdaterController?
 
-    private init() {
+    public override init() {
+        super.init()
+
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
             self.currentVersion = version
+            self.latestVersion = version
+        }
+
+        let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            || NSClassFromString("XCTestCase") != nil
+
+        if !isRunningTests {
+            let controller = SPUStandardUpdaterController(
+                startingUpdater: true,
+                updaterDelegate: self,
+                userDriverDelegate: nil
+            )
+            self.updaterController = controller
+            self.canCheckForUpdates = controller.updater.canCheckForUpdates
         }
     }
 
     public func checkForUpdates(silent: Bool = false) {
-        isChecking = true
-        lastCheckDate = Date()
-
-        guard let url = updateFeedURL else {
-            isChecking = false
+        guard let controller = updaterController else {
+            AppLogger.updates.notice("Update controller not initialized (e.g. running in test harness).")
             return
         }
 
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 10
-        request.setValue("MacStash/\(currentVersion)", forHTTPHeaderField: "User-Agent")
+        isChecking = true
+        lastCheckDate = Date()
+        AppLogger.updates.info("Initiating update check (silent: \(silent, privacy: .public)).")
 
-        Task {
-            defer { self.isChecking = false }
-            do {
-                let (data, _) = try await URLSession.shared.data(for: request)
-                guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let tagName = json["tag_name"] as? String else {
-                    if !silent {
-                        self.showUpToDateAlert()
-                    }
-                    return
-                }
-
-                let remoteVersion = tagName.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
-                let notes = (json["body"] as? String) ?? "Bug fixes and performance improvements."
-                let htmlURL = (json["html_url"] as? String) ?? "https://github.com/macstash/macstash/releases"
-
-                self.latestVersion = remoteVersion
-                self.releaseNotes = notes
-                self.releaseURL = htmlURL
-
-                if self.isVersion(remoteVersion, greaterThan: self.currentVersion) {
-                    self.updateAvailable = true
-                    if !silent {
-                        self.showUpdateAvailableAlert(version: remoteVersion, notes: notes, url: htmlURL)
-                    }
-                } else if !silent {
-                    self.showUpToDateAlert()
-                }
-            } catch {
-                if !silent {
-                    self.showUpToDateAlert()
-                }
-            }
+        if silent {
+            controller.updater.checkForUpdatesInBackground()
+        } else {
+            controller.checkForUpdates(nil)
         }
     }
 
-    private func isVersion(_ v1: String, greaterThan v2: String) -> Bool {
-        v1.compare(v2, options: .numeric) == .orderedDescending
-    }
+    // MARK: - SPUUpdaterDelegate
 
-    private func showUpToDateAlert() {
-        let alert = NSAlert()
-        alert.messageText = "MacStash is Up to Date"
-        alert.informativeText = "You are currently running the latest version (v\(currentVersion))."
-        alert.alertStyle = .informational
-        alert.addButton(withTitle: "OK")
-        alert.runModal()
-    }
-
-    private func showUpdateAvailableAlert(version: String, notes: String, url: String) {
-        let alert = NSAlert()
-        alert.messageText = "A New Version of MacStash is Available! (v\(version))"
-        alert.informativeText = "Release Notes:\n\n\(notes)"
-        alert.alertStyle = .informational
-        alert.addButton(withTitle: "Download & Install")
-        alert.addButton(withTitle: "Later")
-
-        if alert.runModal() == .alertFirstButtonReturn {
-            if let targetURL = URL(string: url) {
-                NSWorkspace.shared.open(targetURL)
+    public func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        isChecking = false
+        if let error = error {
+            let nsError = error as NSError
+            if nsError.domain == "SUSparkleErrorDomain" && nsError.code == 1001 {
+                AppLogger.updates.info("Update cycle finished: app is up to date.")
+            } else {
+                AppLogger.updates.error("Update cycle finished with error: \(error.localizedDescription, privacy: .public)")
             }
+        } else {
+            AppLogger.updates.info("Update cycle finished successfully.")
         }
+    }
+
+    public func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        latestVersion = item.displayVersionString
+        updateAvailable = true
+        releaseNotes = item.itemDescription ?? ""
+        if let url = item.fileURL ?? item.infoURL {
+            releaseURL = url.absoluteString
+        }
+        AppLogger.updates.info("Found valid update version \(item.displayVersionString, privacy: .public).")
+    }
+
+    public func updaterDidNotFindUpdate(_ updater: SPUUpdater) {
+        updateAvailable = false
+        AppLogger.updates.info("No updates found. Running latest version.")
+    }
+
+    public func updater(_ updater: SPUUpdater, didAbortWithError error: any Error) {
+        isChecking = false
+        AppLogger.updates.error("Update check aborted with error: \(error.localizedDescription, privacy: .public)")
     }
 }

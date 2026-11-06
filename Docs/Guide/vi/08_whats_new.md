@@ -4,6 +4,7 @@ MacStash 2.3.0 mang đến các cải tiến toàn diện về trải nghiệm �
 
 ## Những Cải Tiến Nổi Bật Trong Bản 2.3.0
 
+- Cập nhật 1 chạm tự động (Sparkle 2): Tích hợp framework cập nhật chuẩn công nghiệp của macOS với cơ chế xác minh chữ ký mã hóa Ed25519 (CryptoKit). Nâng cấp trực tiếp không cần tải hay kéo thả file thủ công.
 - Nâng cấp Audio Engine hiện đại: Chuyển dịch toàn bộ sang chuẩn AudioObject APIs mới nhất của Apple, tích hợp nút tắt tiếng nhanh trên biểu tượng loa menu bar và danh sách chọn thiết bị đầu ra tức thì.
 - Độ sáng đa màn hình: Thanh trượt độ sáng độc lập cho từng màn hình trên menu bar popover kèm tên thiết bị, biểu tượng và tự động lưu cấu hình theo mã UUID màn hình.
 - Hồ sơ ứng dụng (App Profiles): Trình quản lý hồ sơ trong Cài đặt cho phép gán hành động góc và thanh trượt riêng biệt theo từng ứng dụng.

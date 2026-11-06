@@ -31,6 +31,7 @@ public final class AppState: ObservableObject {
             if effectiveLanguage != newEffective {
                 effectiveLanguage = newEffective
             }
+            applyPomodoroSettings()
         }
     }
 
@@ -79,6 +80,9 @@ public final class AppState: ObservableObject {
     @Published public var pomodoroRemainingSeconds: TimeInterval = TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds)
     @Published public var pomodoroProgress: Double = 1.0
     @Published public var isPomodoroRunning: Bool = false
+    @Published public var pomodoroMode: PomodoroMode = .focus
+    @Published public var pomodoroCompletedRounds: Int = 0
+    @Published public var pomodoroTotalRounds: Int = Defaults.Pomodoro.defaultRoundsBeforeLongBreak
 
     private var cancellables = Set<AnyCancellable>()
     private var pomodoroTimer: Timer?
@@ -101,6 +105,10 @@ public final class AppState: ObservableObject {
         self.soundVolume = loaded.soundVolume
         self.hapticIntensity = HapticIntensity(rawValue: loaded.hapticIntensity.capitalized) ?? .medium
 
+        applyPomodoroSettings()
+        restorePomodoroSnapshot()
+        syncPomodoroProperties()
+
         let defaults = UserDefaults.standard
         if let data = defaults.data(forKey: "stash_appProfiles"),
            let decoded = try? JSONDecoder().decode([AppProfile].self, from: data),
@@ -115,6 +123,7 @@ public final class AppState: ObservableObject {
 
         setupSubscribers()
         setupPomodoroTimer()
+        setupSystemWakeObserver()
     }
 
     private func setupSubscribers() {
@@ -144,23 +153,122 @@ public final class AppState: ObservableObject {
         }
     }
 
+    private func setupSystemWakeObserver() {
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.screensDidWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.tickPomodoro()
+            }
+        }
+    }
+
+    public func applyPomodoroSettings() {
+        pomodoroEngine.configure(
+            focusDurationSeconds: TimeInterval(settings.pomodoroFocusDurationMinutes * 60),
+            shortBreakDurationSeconds: TimeInterval(settings.pomodoroShortBreakMinutes * 60),
+            longBreakDurationSeconds: TimeInterval(settings.pomodoroLongBreakMinutes * 60),
+            roundsBeforeLongBreak: settings.pomodoroRoundsBeforeLongBreak,
+            autoStartBreaks: settings.pomodoroAutoStartBreaks
+        )
+        self.pomodoroTotalRounds = settings.pomodoroRoundsBeforeLongBreak
+        if case .idle = pomodoroEngine.state {
+            syncPomodoroProperties()
+        }
+    }
+
+    public func syncPomodoroProperties() {
+        pomodoroRemainingSeconds = pomodoroEngine.remainingSeconds
+        pomodoroProgress = pomodoroEngine.progress
+        isPomodoroRunning = pomodoroEngine.state.isRunning
+        pomodoroMode = pomodoroEngine.mode
+        pomodoroCompletedRounds = pomodoroEngine.completedRounds
+        pomodoroTotalRounds = pomodoroEngine.roundsBeforeLongBreak
+    }
+
+    public func savePomodoroSnapshot() {
+        let snap = pomodoroEngine.createSnapshot()
+        if let encoded = try? JSONEncoder().encode(snap) {
+            UserDefaults.standard.set(encoded, forKey: "stash_pomodoroSnapshot")
+        }
+    }
+
+    public func restorePomodoroSnapshot() {
+        if let data = UserDefaults.standard.data(forKey: "stash_pomodoroSnapshot"),
+           let snapshot = try? JSONDecoder().decode(PomodoroSnapshot.self, from: data) {
+            _ = pomodoroEngine.restore(from: snapshot)
+        }
+    }
+
+    public func togglePomodoro() {
+        if pomodoroEngine.state.isRunning {
+            pomodoroEngine.pause()
+        } else {
+            pomodoroEngine.resume()
+        }
+        syncPomodoroProperties()
+        savePomodoroSnapshot()
+        haptics.performBoundaryClick()
+        sound.playAccent(enabled: isSoundEnabled)
+    }
+
+    public func resetPomodoro(toDurationSeconds duration: TimeInterval? = nil) {
+        pomodoroEngine.reset(toDurationSeconds: duration)
+        syncPomodoroProperties()
+        savePomodoroSnapshot()
+        haptics.performBoundaryClick()
+        sound.playAccent(enabled: isSoundEnabled)
+    }
+
+    public func skipPomodoroMode() {
+        pomodoroEngine.skipToNextMode()
+        syncPomodoroProperties()
+        savePomodoroSnapshot()
+        haptics.performBoundaryClick()
+        sound.playAccent(enabled: isSoundEnabled)
+    }
+
+    public func setPomodoroMode(_ mode: PomodoroMode) {
+        pomodoroEngine.setMode(mode)
+        syncPomodoroProperties()
+        savePomodoroSnapshot()
+    }
+
     private func tickPomodoro() {
         guard pomodoroEngine.state.isRunning else {
             isPomodoroRunning = false
             return
         }
         let tickResult = pomodoroEngine.tick()
-        pomodoroRemainingSeconds = tickResult.remaining
-        pomodoroProgress = tickResult.progress
-        isPomodoroRunning = pomodoroEngine.state.isRunning
+        syncPomodoroProperties()
 
         if tickResult.didJustComplete {
-            sound.playAccent(enabled: isSoundEnabled)
-            haptics.performBoundaryClick()
+            if settings.pomodoroSoundEnabled {
+                sound.playAccent(enabled: isSoundEnabled)
+                haptics.performBoundaryClick()
+            }
+            savePomodoroSnapshot()
+
+            let titleKey: String
+            let bodyKey: String
+            switch pomodoroEngine.mode {
+            case .focus:
+                titleKey = "pomodoro.notifyFocusTitle"
+                bodyKey = "pomodoro.notifyFocusBody"
+            case .shortBreak, .longBreak:
+                titleKey = "pomodoro.notifyBreakTitle"
+                bodyKey = "pomodoro.notifyBreakBody"
+            }
+
+            let title = localized(titleKey)
+            let body = localized(bodyKey)
+
             Task {
                 await notificationService.deliverNotification(
-                    title: "Pomodoro Completed",
-                    body: "Time for a break!",
+                    title: title,
+                    body: body,
                     sound: settings.pomodoroSoundEnabled
                 )
             }
@@ -225,11 +333,14 @@ public final class AppState: ObservableObject {
         case .keyboardBrightness:
             keyboard.setBrightness(clamped)
         case .timer:
-            let mins = max(1, Int(round(Double(clamped) * 60.0)))
-            pomodoroEngine.start(durationSeconds: TimeInterval(mins * 60))
-            pomodoroRemainingSeconds = pomodoroEngine.remainingSeconds
-            pomodoroProgress = pomodoroEngine.progress
-            isPomodoroRunning = pomodoroEngine.state.isRunning
+            // When timer is not running, dial adjusts focus session duration (1 to 60 mins)
+            if !pomodoroEngine.state.isRunning {
+                let mins = max(1, Int(round(Double(clamped) * 60.0)))
+                let dur = TimeInterval(mins * 60)
+                pomodoroEngine.reset(toDurationSeconds: dur)
+                syncPomodoroProperties()
+                savePomodoroSnapshot()
+            }
         case .none:
             break
         }
@@ -249,16 +360,7 @@ public final class AppState: ObservableObject {
             haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .timer:
-            if pomodoroEngine.state.isRunning {
-                pomodoroEngine.pause()
-            } else {
-                pomodoroEngine.resume()
-            }
-            pomodoroRemainingSeconds = pomodoroEngine.remainingSeconds
-            pomodoroProgress = pomodoroEngine.progress
-            isPomodoroRunning = pomodoroEngine.state.isRunning
-            haptics.performBoundaryClick()
-            sound.playAccent(enabled: isSoundEnabled)
+            togglePomodoro()
         case .brightness:
             let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
             let cur = getValue(for: .brightness, displayID: targetID)
@@ -276,7 +378,7 @@ public final class AppState: ObservableObject {
     }
 
     public var formattedTimerTime: String {
-        let total = Int(pomodoroRemainingSeconds)
+        let total = max(0, Int(round(pomodoroRemainingSeconds)))
         let mins = total / 60
         let secs = total % 60
         return String(format: "%02d:%02d", mins, secs)

@@ -33,7 +33,7 @@ public struct MenuBarExtraView: View {
             // Active App Context Banner
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("ACTIVE CONTEXT")
+                    Text(appState.localized("menubar.activeContext"))
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundColor(.secondary)
                     Text(appState.profiles.currentAppName)
@@ -56,7 +56,7 @@ public struct MenuBarExtraView: View {
                     .foregroundColor(.purple)
                     .frame(width: 16)
 
-                Text("Focus Timer:")
+                Text(appState.localized("menubar.focusTimer"))
                     .font(.system(size: 11, weight: .medium))
 
                 Text(appState.formattedTimerTime)
@@ -64,7 +64,7 @@ public struct MenuBarExtraView: View {
 
                 Spacer()
 
-                Button(appState.isPomodoroRunning ? "Pause" : "Start") {
+                Button(appState.isPomodoroRunning ? appState.localized("menubar.pause") : appState.localized("menubar.start")) {
                     appState.toggleAction(.timer)
                 }
                 .buttonStyle(.bordered)
@@ -170,7 +170,7 @@ public struct MenuBarExtraView: View {
                 Button(action: onOpenSettings) {
                     HStack {
                         Image(systemName: "gearshape")
-                        Text("Preferences...")
+                        Text(appState.localized("menubar.quickSettings"))
                         Spacer()
                         Text("⌘,")
                             .foregroundColor(.secondary)
@@ -189,7 +189,7 @@ public struct MenuBarExtraView: View {
             }) {
                 HStack {
                     Image(systemName: "power")
-                    Text("Quit MacStash")
+                    Text(appState.localized("menubar.quit"))
                     Spacer()
                     Text("⌘Q")
                         .foregroundColor(.secondary)

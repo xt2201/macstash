@@ -11,11 +11,11 @@ public struct AppearanceTab: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox(label: Label("Dial Geometry & Styling", systemImage: "circle.circle")) {
+            GroupBox(label: Label(appState.localized("appearance.geometryStyling"), systemImage: "circle.circle")) {
                 VStack(alignment: .leading, spacing: 14) {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text("Dial Arc Radius:")
+                            Text(appState.localized("appearance.dialRadius"))
                                 .font(.system(size: 12, weight: .medium))
                             Spacer()
                             Text("\(Int(appState.settings.dialRadiusPoints)) pt")
@@ -28,7 +28,7 @@ public struct AppearanceTab: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text("Background Glass Opacity:")
+                            Text(appState.localized("appearance.glassOpacity"))
                                 .font(.system(size: 12, weight: .medium))
                             Spacer()
                             Text("\(Int(appState.settings.dialOpacity * 100))%")
@@ -40,13 +40,13 @@ public struct AppearanceTab: View {
                     Divider()
 
                     HStack {
-                        Text("Appearance Theme:")
+                        Text(appState.localized("appearance.theme"))
                             .font(.system(size: 12, weight: .medium))
                         Spacer()
                         Picker("", selection: $appState.settings.appearanceTheme) {
-                            Text("Match System").tag("system")
-                            Text("Light").tag("light")
-                            Text("Dark").tag("dark")
+                            Text(appState.localized("appearance.themeMatchSystem")).tag("system")
+                            Text(appState.localized("appearance.themeLight")).tag("light")
+                            Text(appState.localized("appearance.themeDark")).tag("dark")
                         }
                         .pickerStyle(.segmented)
                         .frame(width: 240)
@@ -55,11 +55,11 @@ public struct AppearanceTab: View {
                 .padding(8)
             }
 
-            GroupBox(label: Label("Animation & Motion", systemImage: "sparkles")) {
+            GroupBox(label: Label(appState.localized("appearance.animationMotion"), systemImage: "sparkles")) {
                 VStack(alignment: .leading, spacing: 14) {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text("Animation Speed:")
+                            Text(appState.localized("appearance.animationSpeed"))
                                 .font(.system(size: 12, weight: .medium))
                             Spacer()
                             Text(String(format: "%.1fx", appState.settings.animationSpeedMultiplier))
@@ -70,22 +70,22 @@ public struct AppearanceTab: View {
 
                     Divider()
 
-                    Toggle("Respect System 'Reduce Motion' Setting", isOn: $appState.settings.respectReduceMotion)
-                    Text("When enabled, transitions use instant alpha fades instead of spring rotations if Reduce Motion is active in macOS Accessibility.")
+                    Toggle(appState.localized("appearance.reduceMotion"), isOn: $appState.settings.respectReduceMotion)
+                    Text(appState.localized("appearance.reduceMotionHint"))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }
                 .padding(8)
             }
 
-            GroupBox(label: Label("Tactile & Audio Feedback", systemImage: "speaker.wave.2")) {
+            GroupBox(label: Label(appState.localized("appearance.tactileAudio"), systemImage: "speaker.wave.2")) {
                 VStack(alignment: .leading, spacing: 14) {
-                    Toggle("Enable Mechanical Click Sounds", isOn: $appState.settings.isSoundEnabled)
+                    Toggle(appState.localized("appearance.soundFx"), isOn: $appState.settings.isSoundEnabled)
 
                     if appState.settings.isSoundEnabled {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                Text("Sound Volume:")
+                                Text(appState.localized("appearance.soundVolume"))
                                     .font(.system(size: 12, weight: .medium))
                                 Spacer()
                                 Text("\(Int(appState.settings.soundVolume * 100))%")
@@ -98,14 +98,14 @@ public struct AppearanceTab: View {
                     Divider()
 
                     HStack {
-                        Text("Trackpad Haptic Intensity:")
+                        Text(appState.localized("appearance.hapticIntensity"))
                             .font(.system(size: 12, weight: .medium))
                         Spacer()
                         Picker("", selection: $appState.settings.hapticIntensity) {
-                            Text("Off").tag("off")
-                            Text("Subtle").tag("subtle")
-                            Text("Medium").tag("medium")
-                            Text("Strong").tag("strong")
+                            Text(appState.effectiveLanguage == "vi" ? "Tắt" : "Off").tag("off")
+                            Text(appState.localized("appearance.hapticLight")).tag("subtle")
+                            Text(appState.localized("appearance.hapticMedium")).tag("medium")
+                            Text(appState.localized("appearance.hapticStrong")).tag("strong")
                         }
                         .pickerStyle(.menu)
                         .frame(width: 140)

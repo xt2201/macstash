@@ -1,0 +1,2406 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "about.backupRestore": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configuration Backup & Restore"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sao lưu & Phục hồi cấu hình"
+          }
+        }
+      }
+    },
+    "about.debugHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logs subsystem output to macOS Unified Logging System (com.macstash.app)."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghi nhật ký hệ thống con vào macOS Unified Logging System (com.macstash.app)."
+          }
+        }
+      }
+    },
+    "about.debugLogging": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Detailed Debug Logging"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật nhật ký gỡ lỗi chi tiết"
+          }
+        }
+      }
+    },
+    "about.diagnostics": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagnostics & Logging"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chẩn đoán & Nhật ký"
+          }
+        }
+      }
+    },
+    "about.exportJSON": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Settings (JSON)..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xuất cài đặt (JSON)..."
+          }
+        }
+      }
+    },
+    "about.factoryReset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Factory Reset"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khôi phục gốc"
+          }
+        }
+      }
+    },
+    "about.importJSON": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Settings (JSON)..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập cài đặt (JSON)..."
+          }
+        }
+      }
+    },
+    "about.importSuccess": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings imported successfully!"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã nhập cấu hình cài đặt thành công!"
+          }
+        }
+      }
+    },
+    "about.openConsole": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Logs in Console"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở nhật ký trong Console"
+          }
+        }
+      }
+    },
+    "about.openGuide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open User Guide"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở hướng dẫn sử dụng"
+          }
+        }
+      }
+    },
+    "about.resetAllButton": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset All Preferences..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại tất cả tùy chọn..."
+          }
+        }
+      }
+    },
+    "about.subtitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tactile Hot Corner Dials & Display Controls for macOS"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vòng xoay xúc giác góc màn hình & Điều khiển hiển thị cho macOS"
+          }
+        }
+      }
+    },
+    "about.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About MacStash"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thông tin MacStash"
+          }
+        }
+      }
+    },
+    "about.version": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version 2.1.1 (Universal arm64 / x86_64)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phiên bản 2.1.1 (Universal arm64 / x86_64)"
+          }
+        }
+      }
+    },
+    "appearance.animationMotion": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Animation & Motion"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiệu ứng chuyển động"
+          }
+        }
+      }
+    },
+    "appearance.animationSpeed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Animation Duration:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thời gian hiệu ứng:"
+          }
+        }
+      }
+    },
+    "appearance.dialRadius": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dial Arc Radius:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bán kính vành quay:"
+          }
+        }
+      }
+    },
+    "appearance.geometryStyling": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dial Geometry & Styling"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hình học & Phong cách vòng quay"
+          }
+        }
+      }
+    },
+    "appearance.glassOpacity": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Background Glass Opacity:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Độ mờ kính nền:"
+          }
+        }
+      }
+    },
+    "appearance.hapticIntensity": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haptic Intensity:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cường độ rung:"
+          }
+        }
+      }
+    },
+    "appearance.hapticLight": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhẹ"
+          }
+        }
+      }
+    },
+    "appearance.hapticMedium": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medium"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vừa"
+          }
+        }
+      }
+    },
+    "appearance.hapticStrong": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strong"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mạnh"
+          }
+        }
+      }
+    },
+    "appearance.reduceMotion": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Respect System Reduce Motion"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuân thủ thiết lập Giảm chuyển động của hệ thống"
+          }
+        }
+      }
+    },
+    "appearance.reduceMotionHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminates scaling transitions for users sensitive to motion."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loại bỏ hiệu ứng phóng to/thu nhỏ cho người dùng nhạy cảm với chuyển động."
+          }
+        }
+      }
+    },
+    "appearance.soundFx": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mechanical Sound Effects"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiệu ứng âm thanh cơ học"
+          }
+        }
+      }
+    },
+    "appearance.soundVolume": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sound Volume:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Âm lượng âm thanh:"
+          }
+        }
+      }
+    },
+    "appearance.tactileAudio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tactile & Audio Feedback"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phản hồi xúc giác & Âm thanh"
+          }
+        }
+      }
+    },
+    "appearance.theme": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appearance Theme:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chủ đề giao diện:"
+          }
+        }
+      }
+    },
+    "appearance.themeDark": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dark"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tối"
+          }
+        }
+      }
+    },
+    "appearance.themeLight": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sáng"
+          }
+        }
+      }
+    },
+    "appearance.themeMatchSystem": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Match System"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Theo hệ thống"
+          }
+        }
+      }
+    },
+    "appearance.trackpadHaptics": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trackpad Haptic Detents"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rung phản hồi haptic trên Trackpad"
+          }
+        }
+      }
+    },
+    "corners.action.backlight": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keyboard Backlight"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đèn bàn phím"
+          }
+        }
+      }
+    },
+    "corners.action.brightness": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brightness"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Độ sáng"
+          }
+        }
+      }
+    },
+    "corners.action.none": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None (Disabled)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không (Tắt)"
+          }
+        }
+      }
+    },
+    "corners.action.pomodoro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pomodoro Timer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đồng hồ Pomodoro"
+          }
+        }
+      }
+    },
+    "corners.action.volume": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Âm lượng"
+          }
+        }
+      }
+    },
+    "corners.add": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm"
+          }
+        }
+      }
+    },
+    "corners.autoDismissDelay": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-Dismiss Grace Delay:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thời gian chờ tự động ẩn:"
+          }
+        }
+      }
+    },
+    "corners.autoDismissHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time allowed after exiting dial perimeter before the overlay disappears."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khoảng thời gian cho phép sau khi rê chuột ra ngoài trước khi vòng quay biến mất."
+          }
+        }
+      }
+    },
+    "corners.bottomLeft": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom-Left Corner"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Góc Dưới - Trái"
+          }
+        }
+      }
+    },
+    "corners.bottomRight": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom-Right Corner"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Góc Dưới - Phải"
+          }
+        }
+      }
+    },
+    "corners.bundleIDPlaceholder": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "com.example.app (Bundle ID)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "com.example.app (Mã Bundle ID)"
+          }
+        }
+      }
+    },
+    "corners.cornerAssignment": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Corner Assignment"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gán hành động góc"
+          }
+        }
+      }
+    },
+    "corners.dwellDelay": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dwell Activation Delay:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Độ trễ dừng chuột:"
+          }
+        }
+      }
+    },
+    "corners.dwellDelayHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cursor must remain within hit zone for this duration before the dial blooms."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Con trỏ phải dừng trong vùng chạm đủ thời gian này trước khi vòng quay mở ra."
+          }
+        }
+      }
+    },
+    "corners.excludedApps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Excluded Applications"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ứng dụng loại trừ"
+          }
+        }
+      }
+    },
+    "corners.excludedAppsDesc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Corner dials will never activate while these applications are frontmost:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vòng quay sẽ không bao giờ kích hoạt khi các ứng dụng này đang hoạt động:"
+          }
+        }
+      }
+    },
+    "corners.hitZoneHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smaller values require moving closer to the extreme edge, preventing accidental triggers."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giá trị nhỏ hơn yêu cầu rê chuột sát rìa mép ngoài hơn, giúp chống chạm nhầm."
+          }
+        }
+      }
+    },
+    "corners.hitZoneSensitivity": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hit-Zone Sensitivity:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Độ nhạy vùng chạm:"
+          }
+        }
+      }
+    },
+    "corners.noExcludedApps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No excluded applications configured."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa có ứng dụng loại trừ nào."
+          }
+        }
+      }
+    },
+    "corners.suppressDragging": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suppress dials while dragging files or windows"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không mở vòng quay khi đang kéo tệp hoặc cửa sổ"
+          }
+        }
+      }
+    },
+    "corners.suppressFullScreen": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suppress dials when frontmost app is in Full Screen"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không mở vòng quay khi ứng dụng đang chạy toàn màn hình"
+          }
+        }
+      }
+    },
+    "corners.suppressionRules": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suppression Rules"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quy tắc ngăn chặn"
+          }
+        }
+      }
+    },
+    "corners.topLeft": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top-Left Corner"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Góc Trên - Trái"
+          }
+        }
+      }
+    },
+    "corners.topRight": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top-Right Corner"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Góc Trên - Phải"
+          }
+        }
+      }
+    },
+    "corners.triggerPrecision": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trigger Precision & Timing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Độ chính xác & Thời gian kích hoạt"
+          }
+        }
+      }
+    },
+    "displays.brightnessTest": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brightness Test:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thử nghiệm độ sáng:"
+          }
+        }
+      }
+    },
+    "displays.builtInDisplay": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Built-in Retina Display"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Màn hình Retina tích hợp"
+          }
+        }
+      }
+    },
+    "displays.connectedDisplays": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected Displays"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Màn hình đang kết nối"
+          }
+        }
+      }
+    },
+    "displays.externalDisplay": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "External Monitor"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Màn hình ngoài"
+          }
+        }
+      }
+    },
+    "displays.method": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Method:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phương thức:"
+          }
+        }
+      }
+    },
+    "displays.methodAuto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto Detect"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tự động phát hiện"
+          }
+        }
+      }
+    },
+    "displays.methodBuiltIn": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Native DisplayServices"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DisplayServices mặc định"
+          }
+        }
+      }
+    },
+    "displays.methodDDC": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hardware DDC/CI"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phần cứng DDC/CI"
+          }
+        }
+      }
+    },
+    "displays.methodSoftware": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Software Dimming"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giảm sáng phần mềm"
+          }
+        }
+      }
+    },
+    "displays.minClamp": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minimum Hardware Clamp:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ngưỡng sáng tối thiểu:"
+          }
+        }
+      }
+    },
+    "displays.minClampHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prevents backlight turning completely black when dialing to minimum."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ngăn đèn nền tắt tối đen hoàn toàn khi xoay về mức nhỏ nhất."
+          }
+        }
+      }
+    },
+    "displays.precision": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brightness Adjustment Precision"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Độ chính xác điều chỉnh độ sáng"
+          }
+        }
+      }
+    },
+    "displays.scanning": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scanning for connected displays..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang dò tìm màn hình kết nối..."
+          }
+        }
+      }
+    },
+    "displays.stepBalanced": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5% (Balanced)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5% (Cân bằng)"
+          }
+        }
+      }
+    },
+    "displays.stepCoarse": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10% (Coarse)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10% (Nhanh)"
+          }
+        }
+      }
+    },
+    "displays.stepSize": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjustment Step Size:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bước nhảy điều chỉnh:"
+          }
+        }
+      }
+    },
+    "displays.stepUltraFine": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1% (Ultra Fine)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1% (Siêu mịn)"
+          }
+        }
+      }
+    },
+    "general.accessibility": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessibility"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trợ năng"
+          }
+        }
+      }
+    },
+    "general.accessibilityDesc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Required to track cursor and trigger hot corners"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bắt buộc để theo dõi con trỏ và kích hoạt góc nóng"
+          }
+        }
+      }
+    },
+    "general.cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hủy"
+          }
+        }
+      }
+    },
+    "general.enableMacStash": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable MacStash Controls"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật điều khiển MacStash"
+          }
+        }
+      }
+    },
+    "general.english": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        }
+      }
+    },
+    "general.factoryReset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset to Factory Defaults"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khôi phục cài đặt gốc"
+          }
+        }
+      }
+    },
+    "general.grantPermission": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grant Permission"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cấp quyền"
+          }
+        }
+      }
+    },
+    "general.granted": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Granted"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã cấp"
+          }
+        }
+      }
+    },
+    "general.inputMonitoring": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input Monitoring"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Theo dõi đầu vào"
+          }
+        }
+      }
+    },
+    "general.inputMonitoringDesc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Required to detect scroll and modifier keys during adjustments"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bắt buộc để nhận diện phím bổ trợ và thao tác cuộn khi tinh chỉnh"
+          }
+        }
+      }
+    },
+    "general.interfaceLanguage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interface Language"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ngôn ngữ giao diện"
+          }
+        }
+      }
+    },
+    "general.languageHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changes apply dynamically to all labels and guides."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thay đổi được áp dụng ngay lập tức cho toàn bộ nhãn và hướng dẫn."
+          }
+        }
+      }
+    },
+    "general.languageLocale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language & Locale"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ngôn ngữ & Vùng"
+          }
+        }
+      }
+    },
+    "general.launchAtLogin": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Launch at Login"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khởi động cùng máy tính"
+          }
+        }
+      }
+    },
+    "general.masterControls": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Master Controls"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Điều khiển chính"
+          }
+        }
+      }
+    },
+    "general.notGranted": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not Granted"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa cấp"
+          }
+        }
+      }
+    },
+    "general.notifications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thông báo"
+          }
+        }
+      }
+    },
+    "general.notificationsDesc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Required to post banner alerts when Pomodoro completes"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dùng để phát thông báo khi đồng hồ Pomodoro hoàn thành"
+          }
+        }
+      }
+    },
+    "general.openSettings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở Cài đặt"
+          }
+        }
+      }
+    },
+    "general.resetAlertMessage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This will restore all corner assignments, sensitivity thresholds, and display profiles to original defaults. This action cannot be undone."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thao tác này sẽ khôi phục toàn bộ gán góc, ngưỡng độ nhạy và cấu hình màn hình về mặc định ban đầu. Không thể hoàn tác hành động này."
+          }
+        }
+      }
+    },
+    "general.resetAlertTitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset All Settings?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại tất cả cài đặt?"
+          }
+        }
+      }
+    },
+    "general.resetButton": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset All Settings..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại toàn bộ cài đặt..."
+          }
+        }
+      }
+    },
+    "general.resetConfirm": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset All"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại"
+          }
+        }
+      }
+    },
+    "general.resetDesc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restores all settings, profiles, and corner assignments to default values."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khôi phục toàn bộ cài đặt, cấu hình và gán góc về giá trị mặc định."
+          }
+        }
+      }
+    },
+    "general.showMenuBarIcon": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Icon in Menu Bar"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện biểu tượng trên Menu Bar"
+          }
+        }
+      }
+    },
+    "general.systemDefault": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System Default"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mặc định hệ thống"
+          }
+        }
+      }
+    },
+    "general.systemPermissions": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System Permissions"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quyền hệ thống"
+          }
+        }
+      }
+    },
+    "general.vietnamese": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng Việt"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng Việt"
+          }
+        }
+      }
+    },
+    "guide.emptySelection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select an article from the sidebar."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn một bài viết từ danh mục bên trái."
+          }
+        }
+      }
+    },
+    "guide.searchPlaceholder": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Guide..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tìm kiếm hướng dẫn..."
+          }
+        }
+      }
+    },
+    "guide.windowTitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacStash User Guide"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hướng Dẫn Sử Dụng MacStash"
+          }
+        }
+      }
+    },
+    "menubar.activeContext": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ACTIVE CONTEXT"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NGỮ CẢNH HOẠT ĐỘNG"
+          }
+        }
+      }
+    },
+    "menubar.brightness": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brightness"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Độ sáng"
+          }
+        }
+      }
+    },
+    "menubar.focusTimer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus Timer:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đồng hồ tập trung:"
+          }
+        }
+      }
+    },
+    "menubar.keyboard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keyboard Backlight"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đèn bàn phím"
+          }
+        }
+      }
+    },
+    "menubar.pause": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tạm dừng"
+          }
+        }
+      }
+    },
+    "menubar.quickSettings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preferences..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tùy chọn..."
+          }
+        }
+      }
+    },
+    "menubar.quit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit MacStash"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thoát MacStash"
+          }
+        }
+      }
+    },
+    "menubar.reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại"
+          }
+        }
+      }
+    },
+    "menubar.start": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bắt đầu"
+          }
+        }
+      }
+    },
+    "menubar.userGuide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "User Guide"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hướng dẫn sử dụng"
+          }
+        }
+      }
+    },
+    "menubar.volume": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Master Volume"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Âm lượng tổng"
+          }
+        }
+      }
+    },
+    "onboarding.windowTitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welcome to MacStash"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chào Mừng Đến Với MacStash"
+          }
+        }
+      }
+    },
+    "pomodoro.autoStartBreak": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatically start break when focus ends"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tự động bắt đầu nghỉ khi kết thúc phiên tập trung"
+          }
+        }
+      }
+    },
+    "pomodoro.automationAlerts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automation & Alerts"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tự động hóa & Chuông báo"
+          }
+        }
+      }
+    },
+    "pomodoro.btnPause": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause Timer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tạm dừng"
+          }
+        }
+      }
+    },
+    "pomodoro.btnReset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset Timer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại"
+          }
+        }
+      }
+    },
+    "pomodoro.btnStart": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Timer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bắt đầu"
+          }
+        }
+      }
+    },
+    "pomodoro.currentState": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current Pomodoro State"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trạng thái Pomodoro hiện tại"
+          }
+        }
+      }
+    },
+    "pomodoro.focusDuration": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus Session Duration:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thời gian tập trung:"
+          }
+        }
+      }
+    },
+    "pomodoro.intervalDurations": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interval Durations"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thời lượng các khoảng đếm"
+          }
+        }
+      }
+    },
+    "pomodoro.longBreakDuration": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Long Break Duration:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thời gian nghỉ dài:"
+          }
+        }
+      }
+    },
+    "pomodoro.playChime": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play chime alert when timer completes"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát chuông báo khi đồng hồ hoàn thành"
+          }
+        }
+      }
+    },
+    "pomodoro.rounds": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "rounds"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hiệp"
+          }
+        }
+      }
+    },
+    "pomodoro.roundsBeforeLong": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rounds Before Long Break:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Số hiệp trước khi nghỉ dài:"
+          }
+        }
+      }
+    },
+    "pomodoro.shortBreakDuration": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Short Break Duration:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thời gian nghỉ ngắn:"
+          }
+        }
+      }
+    },
+    "pomodoro.statusPaused": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paused / Idle"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tạm dừng / Đang chờ"
+          }
+        }
+      }
+    },
+    "pomodoro.statusRunning": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active Focus Session"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang trong phiên tập trung"
+          }
+        }
+      }
+    },
+    "pomodoro.timeRemaining": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time Remaining:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thời gian còn lại:"
+          }
+        }
+      }
+    },
+    "settings.windowTitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacStash Settings"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài Đặt MacStash"
+          }
+        }
+      }
+    },
+    "shortcuts.conflictAnalysis": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shortcut Conflict Analysis"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phân tích xung đột phím tắt"
+          }
+        }
+      }
+    },
+    "shortcuts.conflictHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacStash automatically audits against macOS reserved shortcuts (⌘Space Spotlight, ⌘Tab Application Switcher, ⌘⌥Esc Force Quit)."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacStash tự động kiểm tra đối chiếu với các phím tắt hệ thống macOS (⌘Space Spotlight, ⌘Tab chuyển ứng dụng, ⌘⌥Esc buộc thoát)."
+          }
+        }
+      }
+    },
+    "shortcuts.globalHotkeys": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Global Hotkeys"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phím tắt toàn cục"
+          }
+        }
+      }
+    },
+    "shortcuts.noConflicts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No conflicting system shortcuts detected."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không phát hiện xung đột với phím tắt hệ thống."
+          }
+        }
+      }
+    },
+    "shortcuts.toggleDials": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toggle Corner Dials"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật/Tắt vòng xoay góc"
+          }
+        }
+      }
+    },
+    "shortcuts.toggleDialsDesc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quickly reveal or hide active corner dial controls"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện hoặc ẩn nhanh các vòng xoay điều khiển ở góc"
+          }
+        }
+      }
+    },
+    "shortcuts.toggleDock": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toggle Hidden Dock"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật/Tắt Dock ẩn"
+          }
+        }
+      }
+    },
+    "shortcuts.toggleDockDesc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slide out or dismiss the hidden application shelf"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trượt ra hoặc đóng ngăn kéo ứng dụng ẩn"
+          }
+        }
+      }
+    },
+    "tab.about": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About / Advanced"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thông tin & Nâng cao"
+          }
+        }
+      }
+    },
+    "tab.appearance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appearance"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giao diện"
+          }
+        }
+      }
+    },
+    "tab.displays": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Displays"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Màn hình"
+          }
+        }
+      }
+    },
+    "tab.general": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tổng quan"
+          }
+        }
+      }
+    },
+    "tab.hotCorners": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hot Corners"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Góc nóng"
+          }
+        }
+      }
+    },
+    "tab.pomodoro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pomodoro"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đồng hồ Pomodoro"
+          }
+        }
+      }
+    },
+    "tab.shortcuts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shortcuts"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phím tắt"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

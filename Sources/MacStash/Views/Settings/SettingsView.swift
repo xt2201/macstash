@@ -17,6 +17,19 @@ public struct SettingsView: View {
 
         public var id: String { rawValue }
 
+        @MainActor
+        public func localizedTitle(using appState: AppState) -> String {
+            switch self {
+            case .general: return appState.localized("tab.general")
+            case .hotCorners: return appState.localized("tab.hotCorners")
+            case .appearance: return appState.localized("tab.appearance")
+            case .displays: return appState.localized("tab.displays")
+            case .pomodoro: return appState.localized("tab.pomodoro")
+            case .shortcuts: return appState.localized("tab.shortcuts")
+            case .about: return appState.localized("tab.about")
+            }
+        }
+
         public var systemImage: String {
             switch self {
             case .general: return "gearshape"
@@ -43,7 +56,7 @@ public struct SettingsView: View {
                         VStack(spacing: 4) {
                             Image(systemName: tab.systemImage)
                                 .font(.system(size: 15))
-                            Text(tab.rawValue)
+                            Text(tab.localizedTitle(using: appState))
                                 .font(.system(size: 11, weight: .medium))
                         }
                         .foregroundColor(selectedTab == tab ? .accentColor : .primary)

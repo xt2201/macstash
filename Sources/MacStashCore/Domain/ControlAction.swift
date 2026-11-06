@@ -10,12 +10,18 @@ public enum ControlAction: String, CaseIterable, Identifiable, Codable, Sendable
     public var id: String { rawValue }
 
     public var displayName: String {
+        localizedDisplayName()
+    }
+
+    public func localizedDisplayName(using language: String? = nil) -> String {
+        let lang = language ?? LocalizationService.shared.effectiveLanguage
+        let isVi = lang == "vi"
         switch self {
-        case .volume: return "Volume & Audio Output"
-        case .brightness: return "Display Brightness"
-        case .keyboardBrightness: return "Keyboard Backlight"
-        case .timer: return "Focus / Quick Timer (0-60m)"
-        case .none: return "Disabled"
+        case .volume: return isVi ? "Âm lượng & Thiết bị âm thanh" : "Volume & Audio Output"
+        case .brightness: return isVi ? "Độ sáng màn hình" : "Display Brightness"
+        case .keyboardBrightness: return isVi ? "Đèn nền bàn phím" : "Keyboard Backlight"
+        case .timer: return isVi ? "Đồng hồ tập trung Pomodoro" : "Focus / Quick Timer (0-60m)"
+        case .none: return isVi ? "Không gán (Tắt)" : "Disabled"
         }
     }
 

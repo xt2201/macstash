@@ -14,17 +14,17 @@ public struct AboutTab: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox(label: Label("About MacStash", systemImage: "info.circle")) {
+            GroupBox(label: Label(appState.localized("about.title"), systemImage: "info.circle")) {
                 HStack(spacing: 16) {
                     StashBrandLogoView(size: 52)
 
                     VStack(alignment: .leading, spacing: 3) {
                         Text("MacStash")
                             .font(.system(size: 16, weight: .bold))
-                        Text("Version 2.1.0 (Universal arm64 / x86_64)")
+                        Text(appState.localized("about.version"))
                             .font(.system(size: 12))
                             .foregroundColor(.secondary)
-                        Text("Tactile Hot Corner Dials & Display Controls for macOS")
+                        Text(appState.localized("about.subtitle"))
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
@@ -34,21 +34,21 @@ public struct AboutTab: View {
                 .padding(8)
             }
 
-            GroupBox(label: Label("Diagnostics & Logging", systemImage: "stethoscope")) {
+            GroupBox(label: Label(appState.localized("about.diagnostics"), systemImage: "stethoscope")) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Toggle("Enable Detailed Debug Logging", isOn: $appState.settings.debugLoggingEnabled)
-                    Text("Logs subsystem output to macOS Unified Logging System (com.macstash.app).")
+                    Toggle(appState.localized("about.debugLogging"), isOn: $appState.settings.debugLoggingEnabled)
+                    Text(appState.localized("about.debugHint"))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
 
                     HStack {
-                        Button("Open Logs in Console") {
+                        Button(appState.localized("about.openConsole")) {
                             openConsoleApp()
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
 
-                        Button("Open User Guide") {
+                        Button(appState.localized("about.openGuide")) {
                             openUserGuide()
                         }
                         .buttonStyle(.bordered)
@@ -58,15 +58,15 @@ public struct AboutTab: View {
                 .padding(8)
             }
 
-            GroupBox(label: Label("Configuration Backup & Migration", systemImage: "arrow.triangle.2.circlepath")) {
+            GroupBox(label: Label(appState.localized("about.backupRestore"), systemImage: "arrow.triangle.2.circlepath")) {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 12) {
-                        Button("Export Settings to JSON...") {
+                        Button(appState.localized("about.exportJSON")) {
                             exportSettings()
                         }
                         .buttonStyle(.bordered)
 
-                        Button("Import Settings from JSON...") {
+                        Button(appState.localized("about.importJSON")) {
                             importSettings()
                         }
                         .buttonStyle(.bordered)
@@ -79,7 +79,7 @@ public struct AboutTab: View {
                     }
 
                     if showImportSuccess {
-                        Text("Settings successfully restored and verified!")
+                        Text(appState.localized("about.importSuccess"))
                             .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.green)
                     }
@@ -90,19 +90,19 @@ public struct AboutTab: View {
             HStack {
                 Spacer()
                 Button(role: .destructive, action: { showingResetConfirmation = true }) {
-                    Label("Factory Reset Application", systemImage: "trash")
+                    Label(appState.localized("about.resetAllButton"), systemImage: "trash")
                 }
                 .confirmationDialog(
-                    "Factory Reset MacStash?",
+                    appState.localized("general.resetAlertTitle"),
                     isPresented: $showingResetConfirmation,
                     titleVisibility: .visible
                 ) {
-                    Button("Erase All Data and Defaults", role: .destructive) {
+                    Button(appState.localized("general.resetConfirm"), role: .destructive) {
                         appState.resetToDefaults()
                     }
-                    Button("Cancel", role: .cancel) {}
+                    Button(appState.localized("general.cancel"), role: .cancel) {}
                 } message: {
-                    Text("This resets all profiles, display bindings, and corner actions to original factory condition.")
+                    Text(appState.localized("general.resetAlertMessage"))
                 }
             }
         }
@@ -115,8 +115,8 @@ public struct AboutTab: View {
     }
 
     private func openUserGuide() {
-        if let url = URL(string: "https://www.stashformac.com") {
-            NSWorkspace.shared.open(url)
+        if let appDelegate = NSApp.delegate as? AppDelegate {
+            appDelegate.openHelp()
         }
     }
 

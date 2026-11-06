@@ -26,7 +26,19 @@ public final class AppState: ObservableObject {
     @Published public var settings: AppSettings {
         didSet {
             persistence.saveSettings(settings)
+            let lang = AppLanguage(rawValue: settings.language) ?? .system
+            LocalizationService.shared.setLanguage(lang)
+            let newEffective = LocalizationService.shared.effectiveLanguage
+            if effectiveLanguage != newEffective {
+                effectiveLanguage = newEffective
+            }
         }
+    }
+
+    @Published public var effectiveLanguage: String = "en"
+
+    public nonisolated func localized(_ key: String) -> String {
+        LocalizationService.shared.localized(key)
     }
 
     @Published public var isEnabled: Bool = true {
@@ -82,6 +94,10 @@ public final class AppState: ObservableObject {
     private init() {
         let loaded = persistence.loadSettings()
         self.settings = loaded
+
+        let lang = AppLanguage(rawValue: loaded.language) ?? .system
+        LocalizationService.shared.setLanguage(lang)
+        self.effectiveLanguage = LocalizationService.shared.effectiveLanguage
 
         self.isEnabled = loaded.isEnabled
         self.isCornerDialsEnabled = loaded.isCornerDialsEnabled

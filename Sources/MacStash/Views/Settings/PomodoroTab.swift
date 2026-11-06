@@ -11,10 +11,10 @@ public struct PomodoroTab: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox(label: Label("Interval Durations", systemImage: "timer")) {
+            GroupBox(label: Label(appState.localized("pomodoro.intervalDurations"), systemImage: "timer")) {
                 VStack(alignment: .leading, spacing: 14) {
                     durationRow(
-                        title: "Focus Session Duration:",
+                        title: appState.localized("pomodoro.focusDuration"),
                         minutes: $appState.settings.pomodoroFocusDurationMinutes,
                         range: 1...120
                     )
@@ -22,7 +22,7 @@ public struct PomodoroTab: View {
                     Divider()
 
                     durationRow(
-                        title: "Short Break Duration:",
+                        title: appState.localized("pomodoro.shortBreakDuration"),
                         minutes: $appState.settings.pomodoroShortBreakMinutes,
                         range: 1...30
                     )
@@ -30,7 +30,7 @@ public struct PomodoroTab: View {
                     Divider()
 
                     durationRow(
-                        title: "Long Break Duration:",
+                        title: appState.localized("pomodoro.longBreakDuration"),
                         minutes: $appState.settings.pomodoroLongBreakMinutes,
                         range: 1...60
                     )
@@ -38,40 +38,40 @@ public struct PomodoroTab: View {
                     Divider()
 
                     HStack {
-                        Text("Rounds Before Long Break:")
+                        Text(appState.localized("pomodoro.roundsBeforeLong"))
                             .font(.system(size: 12, weight: .medium))
                         Spacer()
-                        Stepper("\(appState.settings.pomodoroRoundsBeforeLongBreak) rounds", value: $appState.settings.pomodoroRoundsBeforeLongBreak, in: 1...12)
+                        Stepper("\(appState.settings.pomodoroRoundsBeforeLongBreak) \(appState.localized("pomodoro.rounds"))", value: $appState.settings.pomodoroRoundsBeforeLongBreak, in: 1...12)
                     }
                 }
                 .padding(8)
             }
 
-            GroupBox(label: Label("Automation & Alerts", systemImage: "bell.badge")) {
+            GroupBox(label: Label(appState.localized("pomodoro.automationAlerts"), systemImage: "bell.badge")) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Toggle("Automatically start break when focus ends", isOn: $appState.settings.pomodoroAutoStartBreaks)
-                    Toggle("Play chime alert when timer completes", isOn: $appState.settings.pomodoroSoundEnabled)
+                    Toggle(appState.localized("pomodoro.autoStartBreak"), isOn: $appState.settings.pomodoroAutoStartBreaks)
+                    Toggle(appState.localized("pomodoro.playChime"), isOn: $appState.settings.pomodoroSoundEnabled)
                 }
                 .padding(8)
             }
 
-            GroupBox(label: Label("Current Pomodoro State", systemImage: "clock.arrow.circlepath")) {
+            GroupBox(label: Label(appState.localized("pomodoro.currentState"), systemImage: "clock.arrow.circlepath")) {
                 HStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Phase: \(appState.pomodoroEngine.mode.displayName)")
+                        Text("\(appState.localized("pomodoro.currentState")): \(appState.isPomodoroRunning ? appState.localized("pomodoro.statusRunning") : appState.localized("pomodoro.statusPaused"))")
                             .font(.system(size: 13, weight: .semibold))
-                        Text("Remaining: \(appState.formattedTimerTime)")
+                        Text("\(appState.localized("pomodoro.timeRemaining")) \(appState.formattedTimerTime)")
                             .font(.system(size: 20, weight: .bold, design: .monospaced))
                     }
 
                     Spacer()
 
-                    Button(appState.isPomodoroRunning ? "Pause" : "Start") {
+                    Button(appState.isPomodoroRunning ? appState.localized("pomodoro.btnPause") : appState.localized("pomodoro.btnStart")) {
                         appState.toggleAction(.timer)
                     }
                     .buttonStyle(.borderedProminent)
 
-                    Button("Reset") {
+                    Button(appState.localized("pomodoro.btnReset")) {
                         appState.pomodoroEngine.reset()
                         appState.pomodoroRemainingSeconds = appState.pomodoroEngine.remainingSeconds
                         appState.pomodoroProgress = appState.pomodoroEngine.progress
@@ -89,7 +89,7 @@ public struct PomodoroTab: View {
             Text(title)
                 .font(.system(size: 12, weight: .medium))
             Spacer()
-            Stepper("\(minutes.wrappedValue) min", value: minutes, in: range)
+            Stepper("\(minutes.wrappedValue) \(appState.effectiveLanguage == "vi" ? "phút" : "min")", value: minutes, in: range)
         }
     }
 }

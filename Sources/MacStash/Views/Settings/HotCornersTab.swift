@@ -12,24 +12,24 @@ public struct HotCornersTab: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox(label: Label("Corner Assignment", systemImage: "hand.tap.fill")) {
+            GroupBox(label: Label(appState.localized("corners.cornerAssignment"), systemImage: "hand.tap.fill")) {
                 VStack(spacing: 12) {
-                    cornerRow(corner: .topLeft, title: "Top-Left Corner")
+                    cornerRow(corner: .topLeft, title: appState.localized("corners.topLeft"))
                     Divider()
-                    cornerRow(corner: .topRight, title: "Top-Right Corner")
+                    cornerRow(corner: .topRight, title: appState.localized("corners.topRight"))
                     Divider()
-                    cornerRow(corner: .bottomLeft, title: "Bottom-Left Corner")
+                    cornerRow(corner: .bottomLeft, title: appState.localized("corners.bottomLeft"))
                     Divider()
-                    cornerRow(corner: .bottomRight, title: "Bottom-Right Corner")
+                    cornerRow(corner: .bottomRight, title: appState.localized("corners.bottomRight"))
                 }
                 .padding(8)
             }
 
-            GroupBox(label: Label("Trigger Precision & Timing", systemImage: "timer")) {
+            GroupBox(label: Label(appState.localized("corners.triggerPrecision"), systemImage: "timer")) {
                 VStack(alignment: .leading, spacing: 14) {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text("Hit-Zone Sensitivity:")
+                            Text(appState.localized("corners.hitZoneSensitivity"))
                                 .font(.system(size: 12, weight: .medium))
                             Spacer()
                             Text("\(Int(appState.settings.cornerSensitivityPoints)) pt")
@@ -40,7 +40,7 @@ public struct HotCornersTab: View {
                             in: Defaults.HotCorner.minHitZoneSizePoints...Defaults.HotCorner.maxHitZoneSizePoints,
                             step: 1
                         )
-                        Text("Smaller values require moving closer to the extreme edge, preventing accidental triggers.")
+                        Text(appState.localized("corners.hitZoneHint"))
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
@@ -49,7 +49,7 @@ public struct HotCornersTab: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text("Dwell Activation Delay:")
+                            Text(appState.localized("corners.dwellDelay"))
                                 .font(.system(size: 12, weight: .medium))
                             Spacer()
                             Text("\(Int(appState.settings.cornerDwellDelaySeconds * 1000)) ms")
@@ -60,7 +60,7 @@ public struct HotCornersTab: View {
                             in: Defaults.HotCorner.minDwellDelaySeconds...Defaults.HotCorner.maxDwellDelaySeconds,
                             step: 0.05
                         )
-                        Text("Time the cursor must pause at the corner before the dial emerges.")
+                        Text(appState.localized("corners.dwellDelayHint"))
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
@@ -69,7 +69,7 @@ public struct HotCornersTab: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text("Auto-Hide Delay:")
+                            Text(appState.localized("corners.autoDismissDelay"))
                                 .font(.system(size: 12, weight: .medium))
                             Spacer()
                             Text("\(Int(appState.settings.cornerHideDelaySeconds * 1000)) ms")
@@ -80,7 +80,7 @@ public struct HotCornersTab: View {
                             in: Defaults.HotCorner.minHideDelaySeconds...Defaults.HotCorner.maxHideDelaySeconds,
                             step: 0.05
                         )
-                        Text("Grace period before the dial smoothly hides after cursor leaves the zone.")
+                        Text(appState.localized("corners.autoDismissHint"))
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
@@ -88,22 +88,22 @@ public struct HotCornersTab: View {
                 .padding(8)
             }
 
-            GroupBox(label: Label("Intelligent Suppression", systemImage: "shield")) {
+            GroupBox(label: Label(appState.localized("corners.suppressionRules"), systemImage: "shield")) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Toggle("Suppress while dragging files or windows", isOn: $appState.settings.suppressWhenMousePressed)
-                    Toggle("Suppress when frontmost app is in Full Screen", isOn: $appState.settings.suppressInFullscreen)
+                    Toggle(appState.localized("corners.suppressDragging"), isOn: $appState.settings.suppressWhenMousePressed)
+                    Toggle(appState.localized("corners.suppressFullScreen"), isOn: $appState.settings.suppressInFullscreen)
                 }
                 .padding(8)
             }
 
-            GroupBox(label: Label("Excluded Applications", systemImage: "xmark.circle")) {
+            GroupBox(label: Label(appState.localized("corners.excludedApps"), systemImage: "xmark.circle")) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Corner dials will stay inactive while these applications are active:")
+                    Text(appState.localized("corners.excludedAppsDesc"))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
 
                     if appState.settings.excludedBundleIDs.isEmpty {
-                        Text("No excluded applications configured.")
+                        Text(appState.localized("corners.noExcludedApps"))
                             .font(.system(size: 12))
                             .foregroundColor(.secondary)
                             .padding(.vertical, 4)
@@ -127,9 +127,9 @@ public struct HotCornersTab: View {
                     }
 
                     HStack {
-                        TextField("e.g. com.apple.FinalCut", text: $newExcludedBundleID)
+                        TextField(appState.localized("corners.bundleIDPlaceholder"), text: $newExcludedBundleID)
                             .textFieldStyle(.roundedBorder)
-                        Button("Add") {
+                        Button(appState.localized("corners.add")) {
                             let trimmed = newExcludedBundleID.trimmingCharacters(in: .whitespacesAndNewlines)
                             if !trimmed.isEmpty && !appState.settings.excludedBundleIDs.contains(trimmed) {
                                 appState.settings.excludedBundleIDs.append(trimmed)
@@ -159,7 +159,7 @@ public struct HotCornersTab: View {
                 set: { appState.settings.cornerActions[corner] = $0 }
             )) {
                 ForEach(ControlAction.allCases) { action in
-                    Label(action.displayName, systemImage: action.systemImageName)
+                    Label(action.localizedDisplayName(using: appState.effectiveLanguage), systemImage: action.systemImageName)
                         .tag(action)
                 }
             }

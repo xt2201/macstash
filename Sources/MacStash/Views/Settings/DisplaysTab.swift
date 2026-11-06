@@ -12,10 +12,10 @@ public struct DisplaysTab: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox(label: Label("Connected Displays", systemImage: "display.2")) {
+            GroupBox(label: Label(appState.localized("displays.connectedDisplays"), systemImage: "display.2")) {
                 VStack(alignment: .leading, spacing: 16) {
                     if displays.isEmpty {
-                        Text("Scanning for connected displays...")
+                        Text(appState.localized("displays.scanning"))
                             .font(.system(size: 12))
                             .foregroundColor(.secondary)
                             .padding(.vertical, 8)
@@ -31,16 +31,16 @@ public struct DisplaysTab: View {
                 .padding(8)
             }
 
-            GroupBox(label: Label("Brightness Adjustment Precision", systemImage: "slider.horizontal.3")) {
+            GroupBox(label: Label(appState.localized("displays.precision"), systemImage: "slider.horizontal.3")) {
                 VStack(alignment: .leading, spacing: 14) {
                     HStack {
-                        Text("Adjustment Step Size:")
+                        Text(appState.localized("displays.stepSize"))
                             .font(.system(size: 12, weight: .medium))
                         Spacer()
                         Picker("", selection: $appState.settings.brightnessStepFraction) {
-                            Text("1% (Ultra Fine)").tag(Float(0.01))
-                            Text("5% (Balanced)").tag(Float(0.05))
-                            Text("10% (Coarse)").tag(Float(0.10))
+                            Text(appState.localized("displays.stepUltraFine")).tag(Float(0.01))
+                            Text(appState.localized("displays.stepBalanced")).tag(Float(0.05))
+                            Text(appState.localized("displays.stepCoarse")).tag(Float(0.10))
                         }
                         .pickerStyle(.menu)
                         .frame(width: 160)
@@ -50,14 +50,14 @@ public struct DisplaysTab: View {
 
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
-                            Text("Minimum Hardware Clamp:")
+                            Text(appState.localized("displays.minClamp"))
                                 .font(.system(size: 12, weight: .medium))
                             Spacer()
                             Text("\(Int(appState.settings.minBrightnessClamp * 100))%")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
                         }
                         Slider(value: $appState.settings.minBrightnessClamp, in: 0.0...0.3, step: 0.05)
-                        Text("Prevents backlight turning completely black when dialing to minimum.")
+                        Text(appState.localized("displays.minClampHint"))
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
@@ -93,14 +93,14 @@ public struct DisplaysTab: View {
                         Text(display.name)
                             .font(.system(size: 13, weight: .semibold))
                         if display.isBuiltIn {
-                            Text("Built-in Retina")
+                            Text(appState.localized("displays.builtInDisplay"))
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.blue)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
                                 .background(Capsule().fill(Color.blue.opacity(0.12)))
                         } else {
-                            Text("External Display")
+                            Text(appState.localized("displays.externalDisplay"))
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.purple)
                                 .padding(.horizontal, 6)
@@ -115,7 +115,7 @@ public struct DisplaysTab: View {
 
                 Spacer()
 
-                Picker("Method", selection: Binding(
+                Picker(appState.localized("displays.method"), selection: Binding(
                     get: { profile.preferredMethod },
                     set: { newMethod in
                         var updated = profile
@@ -123,16 +123,16 @@ public struct DisplaysTab: View {
                         appState.brightnessService.setProfile(updated)
                     }
                 )) {
-                    Text("Auto").tag(BrightnessMethod.auto)
+                    Text(appState.localized("displays.methodAuto")).tag(BrightnessMethod.auto)
                     if display.isBuiltIn {
-                        Text("Native DisplayServices").tag(BrightnessMethod.builtIn)
+                        Text(appState.localized("displays.methodBuiltIn")).tag(BrightnessMethod.builtIn)
                     } else {
-                        Text("DDC/CI Hardware").tag(BrightnessMethod.ddc)
+                        Text(appState.localized("displays.methodDDC")).tag(BrightnessMethod.ddc)
                     }
-                    Text("Software Dimming").tag(BrightnessMethod.software)
+                    Text(appState.localized("displays.methodSoftware")).tag(BrightnessMethod.software)
                 }
                 .pickerStyle(.menu)
-                .frame(width: 170)
+                .frame(width: 190)
             }
 
             // Method Explanation & Status

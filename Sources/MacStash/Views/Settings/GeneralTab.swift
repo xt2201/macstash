@@ -13,16 +13,16 @@ public struct GeneralTab: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox(label: Label("Master Controls", systemImage: "power")) {
+            GroupBox(label: Label(appState.localized("general.masterControls"), systemImage: "power")) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Toggle("Enable MacStash Controls", isOn: $appState.isEnabled)
+                    Toggle(appState.localized("general.enableMacStash"), isOn: $appState.isEnabled)
                         .font(.system(size: 13, weight: .semibold))
 
                     Divider()
 
-                    Toggle("Show Icon in Menu Bar", isOn: $appState.settings.showMenuBarIcon)
+                    Toggle(appState.localized("general.showMenuBarIcon"), isOn: $appState.settings.showMenuBarIcon)
 
-                    Toggle("Launch at Login", isOn: Binding(
+                    Toggle(appState.localized("general.launchAtLogin"), isOn: Binding(
                         get: { permissions.isLaunchAtLoginEnabled },
                         set: { val in
                             _ = permissions.setLaunchAtLogin(val)
@@ -33,28 +33,28 @@ public struct GeneralTab: View {
                 .padding(8)
             }
 
-            GroupBox(label: Label("Language & Locale", systemImage: "globe")) {
+            GroupBox(label: Label(appState.localized("general.languageLocale"), systemImage: "globe")) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Picker("Interface Language", selection: $appState.settings.language) {
-                        Text("System Default").tag("system")
-                        Text("Tiếng Việt").tag("vi")
-                        Text("English").tag("en")
+                    Picker(appState.localized("general.interfaceLanguage"), selection: $appState.settings.language) {
+                        Text(appState.localized("general.systemDefault")).tag("system")
+                        Text(appState.localized("general.vietnamese")).tag("vi")
+                        Text(appState.localized("general.english")).tag("en")
                     }
                     .pickerStyle(.menu)
                     .frame(maxWidth: 240)
 
-                    Text("Changes apply dynamically to all labels and guides.")
+                    Text(appState.localized("general.languageHint"))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }
                 .padding(8)
             }
 
-            GroupBox(label: Label("System Permissions", systemImage: "lock.shield")) {
+            GroupBox(label: Label(appState.localized("general.systemPermissions"), systemImage: "lock.shield")) {
                 VStack(spacing: 12) {
                     permissionRow(
-                        title: "Accessibility",
-                        description: "Required to track cursor and trigger hot corners",
+                        title: appState.localized("general.accessibility"),
+                        description: appState.localized("general.accessibilityDesc"),
                         isGranted: permissions.isAccessibilityGranted,
                         onOpenSettings: { permissions.openAccessibilitySettings() }
                     )
@@ -62,8 +62,8 @@ public struct GeneralTab: View {
                     Divider()
 
                     permissionRow(
-                        title: "Input Monitoring",
-                        description: "Required to detect hotkey combinations and wheel drags",
+                        title: appState.localized("general.inputMonitoring"),
+                        description: appState.localized("general.inputMonitoringDesc"),
                         isGranted: permissions.isInputMonitoringGranted,
                         onOpenSettings: { permissions.openInputMonitoringSettings() }
                     )
@@ -71,8 +71,8 @@ public struct GeneralTab: View {
                     Divider()
 
                     permissionRow(
-                        title: "Notifications",
-                        description: "Used for Pomodoro timer phase alerts",
+                        title: appState.localized("general.notifications"),
+                        description: appState.localized("general.notificationsDesc"),
                         isGranted: permissions.isNotificationGranted,
                         onOpenSettings: {
                             permissions.requestNotificationPermission()
@@ -86,23 +86,26 @@ public struct GeneralTab: View {
             HStack {
                 Spacer()
                 Button(role: .destructive, action: { showingResetAlert = true }) {
-                    Label("Reset All Settings to Defaults", systemImage: "arrow.counterclockwise")
+                    Label(appState.localized("general.resetButton"), systemImage: "arrow.counterclockwise")
                 }
                 .confirmationDialog(
-                    "Reset All Settings?",
+                    appState.localized("general.resetAlertTitle"),
                     isPresented: $showingResetAlert,
                     titleVisibility: .visible
                 ) {
-                    Button("Reset to Defaults", role: .destructive) {
+                    Button(appState.localized("general.resetConfirm"), role: .destructive) {
                         appState.resetToDefaults()
                     }
-                    Button("Cancel", role: .cancel) {}
+                    Button(appState.localized("general.cancel"), role: .cancel) {}
                 } message: {
-                    Text("This will restore hot corners, sensitivity, and appearance to default values.")
+                    Text(appState.localized("general.resetAlertMessage"))
                 }
             }
         }
         .onAppear {
+            permissions.checkAllPermissions()
+        }
+        .onReceive(Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()) { _ in
             permissions.checkAllPermissions()
         }
     }
@@ -120,19 +123,19 @@ public struct GeneralTab: View {
                         .font(.system(size: 12, weight: .semibold))
 
                     if isGranted {
-                        Text("Granted")
+                        Text(appState.localized("general.granted"))
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.green)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(Capsule().fill(Color.green.opacity(0.15)))
                     } else {
-                        Text("Not Granted")
+                        Text(appState.localized("general.notGranted"))
                             .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.red)
+                            .foregroundColor(.orange)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(Capsule().fill(Color.red.opacity(0.15)))
+                            .background(Capsule().fill(Color.orange.opacity(0.15)))
                     }
                 }
                 Text(description)
@@ -142,7 +145,7 @@ public struct GeneralTab: View {
 
             Spacer()
 
-            Button("Configure in Settings") {
+            Button(isGranted ? appState.localized("general.openSettings") : appState.localized("general.grantPermission")) {
                 onOpenSettings()
             }
             .buttonStyle(.bordered)

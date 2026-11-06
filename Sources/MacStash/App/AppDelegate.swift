@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import Combine
 import MacStashCore
 
 @MainActor
@@ -10,6 +11,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private var helpWindow: NSWindow?
     private var onboardingWindow: NSWindow?
     private let appState = AppState.shared
+    private var cancellables = Set<AnyCancellable>()
 
     public func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -17,11 +19,28 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         setupStatusItem()
         ScreenManager.shared.start(appState: appState)
         SystemPermissionService.shared.requestNotificationPermission()
+        if !SystemPermissionService.shared.isAccessibilityGranted {
+            SystemPermissionService.shared.requestAccessibilityPermission()
+        }
+        if !SystemPermissionService.shared.isInputMonitoringGranted {
+            SystemPermissionService.shared.requestInputMonitoringPermission()
+        }
+
+        appState.$effectiveLanguage
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.settingsWindow?.title = self.appState.localized("settings.windowTitle")
+                self.helpWindow?.title = self.appState.localized("guide.windowTitle")
+            }
+            .store(in: &cancellables)
 
         let hasLaunchedBefore = UserDefaults.standard.bool(forKey: "com.macstash.has_launched")
         if !hasLaunchedBefore {
             UserDefaults.standard.set(true, forKey: "com.macstash.has_launched")
             openOnboarding()
+        } else if !SystemPermissionService.shared.isAccessibilityGranted {
+            openSettings()
         }
     }
 
@@ -127,13 +146,15 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
                 backing: .buffered,
                 defer: false
             )
-            window.title = "MacStash Settings"
+            window.title = appState.localized("settings.windowTitle")
             window.center()
             window.isReleasedWhenClosed = false
 
             let settingsView = SettingsView(appState: appState)
             window.contentView = NSHostingView(rootView: settingsView)
             self.settingsWindow = window
+        } else {
+            settingsWindow?.title = appState.localized("settings.windowTitle")
         }
 
         settingsWindow?.center()
@@ -149,13 +170,15 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
                 backing: .buffered,
                 defer: false
             )
-            window.title = "MacStash User Guide"
+            window.title = appState.localized("guide.windowTitle")
             window.center()
             window.isReleasedWhenClosed = false
 
-            let guideView = UserGuideView()
+            let guideView = UserGuideView(appState: appState)
             window.contentView = NSHostingView(rootView: guideView)
             self.helpWindow = window
+        } else {
+            helpWindow?.title = appState.localized("guide.windowTitle")
         }
 
         helpWindow?.center()

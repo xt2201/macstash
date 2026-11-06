@@ -11,34 +11,34 @@ public struct ShortcutsTab: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            GroupBox(label: Label("Global Hotkeys", systemImage: "keyboard")) {
+            GroupBox(label: Label(appState.localized("shortcuts.globalHotkeys"), systemImage: "keyboard")) {
                 VStack(alignment: .leading, spacing: 14) {
                     shortcutRow(
-                        title: "Toggle Corner Dials",
-                        description: "Quickly reveal or hide active corner dial controls",
+                        title: appState.localized("shortcuts.toggleDials"),
+                        description: appState.localized("shortcuts.toggleDialsDesc"),
                         shortcut: $appState.settings.globalToggleDialsShortcut
                     )
 
                     Divider()
 
                     shortcutRow(
-                        title: "Toggle Hidden Dock",
-                        description: "Slide out or dismiss the hidden application shelf",
+                        title: appState.localized("shortcuts.toggleDock"),
+                        description: appState.localized("shortcuts.toggleDockDesc"),
                         shortcut: $appState.settings.globalToggleDockShortcut
                     )
                 }
                 .padding(8)
             }
 
-            GroupBox(label: Label("Shortcut Conflict Analysis", systemImage: "exclamationmark.shield")) {
+            GroupBox(label: Label(appState.localized("shortcuts.conflictAnalysis"), systemImage: "exclamationmark.shield")) {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(.green)
-                        Text("No conflicting system shortcuts detected.")
+                        Text(appState.localized("shortcuts.noConflicts"))
                             .font(.system(size: 12, weight: .medium))
                     }
-                    Text("MacStash automatically audits against macOS reserved shortcuts (⌘Space Spotlight, ⌘Tab Application Switcher, ⌘⌥Esc Force Quit).")
+                    Text(appState.localized("shortcuts.conflictHint"))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }

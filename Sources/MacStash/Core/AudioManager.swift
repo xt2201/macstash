@@ -10,6 +10,7 @@ public struct AudioDeviceItem: Identifiable, Equatable {
 }
 
 /// Manages macOS system master volume, mute, and output device routing via CoreAudio
+@MainActor
 public final class AudioManager: ObservableObject {
     public static let shared = AudioManager()
 
@@ -28,9 +29,6 @@ public final class AudioManager: ObservableObject {
         updateVolumeFromHardware()
     }
 
-    deinit {
-        removeListeners()
-    }
 
     // MARK: - Device Queries & Switching
 

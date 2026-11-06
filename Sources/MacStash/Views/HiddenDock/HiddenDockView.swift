@@ -45,7 +45,7 @@ public struct HiddenDockView: View {
                 Button(action: {
                     item.launch()
                     appState.sound.playAccent(enabled: appState.isSoundEnabled)
-                    appState.haptics.performBoundaryClick(intensity: appState.hapticIntensity)
+                    appState.haptics.performBoundaryClick()
                 }) {
                     VStack(spacing: 4) {
                         Image(nsImage: item.icon)

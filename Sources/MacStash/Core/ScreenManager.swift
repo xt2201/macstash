@@ -1,8 +1,10 @@
 import AppKit
 import SwiftUI
 import Combine
+import MacStashCore
 
 /// Manages multi-display overlay lifecycles across MacBook built-in & all external monitors
+@MainActor
 public final class ScreenManager: ObservableObject {
     public static let shared = ScreenManager()
 
@@ -17,6 +19,7 @@ public final class ScreenManager: ObservableObject {
         self.appState = appState
         rebuildInstances()
         observeScreenChanges()
+        observeWorkspaceEvents()
         observeQuickLauncher()
     }
 
@@ -26,7 +29,91 @@ public final class ScreenManager: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.rebuildInstances()
+            Task { @MainActor in
+                self?.rebuildInstances()
+                self?.resetAllInstances(reason: .displayConfigurationChange)
+            }
+        }
+    }
+
+    private func observeWorkspaceEvents() {
+        let wsCenter = NSWorkspace.shared.notificationCenter
+
+        wsCenter.addObserver(
+            forName: NSWorkspace.activeSpaceDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.resetAllInstances(reason: .spaceChange)
+            }
+        }
+
+        wsCenter.addObserver(
+            forName: NSWorkspace.screensDidSleepNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.resetAllInstances(reason: .systemSleep)
+            }
+        }
+
+        wsCenter.addObserver(
+            forName: NSWorkspace.screensDidWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.rebuildInstances()
+            }
+        }
+
+        wsCenter.addObserver(
+            forName: NSWorkspace.sessionDidResignActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.resetAllInstances(reason: .screenLock)
+            }
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.didEnterFullScreenNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.resetAllInstances(reason: .fullscreenToggle)
+            }
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.didExitFullScreenNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.resetAllInstances(reason: .fullscreenToggle)
+            }
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didResignActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.resetAllInstances(reason: .appDeactivated)
+            }
+        }
+    }
+
+    public func resetAllInstances(reason: ResetReason) {
+        AppLogger.hotcorner.debug("Resetting all overlay instances with reason: \(reason.rawValue)")
+        for instance in instances.values {
+            instance.resetAllCorners(reason: reason)
         }
     }
 
@@ -68,7 +155,6 @@ public final class ScreenManager: ObservableObject {
     }
 
     private func showQuickLauncher() {
-        // Place Quick Launcher on the screen containing mouse cursor
         let mouseLoc = NSEvent.mouseLocation
         let targetScreen = NSScreen.screens.first(where: { $0.frame.contains(mouseLoc) }) ?? NSScreen.main ?? NSScreen.screens.first
 

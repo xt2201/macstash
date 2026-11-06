@@ -10,6 +10,7 @@ public enum HapticIntensity: String, CaseIterable, Identifiable, Codable {
 }
 
 /// Provides tactile trackpad feedback for dial rotations and slider steps
+@MainActor
 public final class HapticManager {
     public static let shared = HapticManager()
 

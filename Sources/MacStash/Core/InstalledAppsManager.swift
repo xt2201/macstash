@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 
 /// Discovers installed applications on macOS for the Hidden Dock and Quick Launcher
+@MainActor
 public final class InstalledAppsManager: ObservableObject {
     public static let shared = InstalledAppsManager()
 

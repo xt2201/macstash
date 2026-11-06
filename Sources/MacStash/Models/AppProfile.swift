@@ -1,9 +1,10 @@
 import Foundation
+import MacStashCore
 
-public struct AppProfile: Identifiable, Codable, Equatable {
+public struct AppProfile: Identifiable, Codable, Equatable, Sendable {
     public var id: UUID
     public var name: String
-    public var bundleIdentifier: String? // nil for default profile
+    public var bundleIdentifier: String?
     public var cornerActions: [CornerPosition: ControlAction]
     public var rightEdgeAction: ControlAction
     public var dockPosition: EdgePosition

@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Manages MacBook backlit keyboard brightness via Apple private CoreBrightness framework
+@MainActor
 public final class KeyboardBrightnessManager: ObservableObject {
     public static let shared = KeyboardBrightnessManager()
 

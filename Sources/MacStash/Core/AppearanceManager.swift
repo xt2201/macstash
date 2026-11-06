@@ -3,6 +3,7 @@ import Foundation
 import Combine
 
 /// Manages macOS System Appearance (Dark Mode vs Light Mode)
+@MainActor
 public final class AppearanceManager: ObservableObject {
     public static let shared = AppearanceManager()
 

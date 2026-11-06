@@ -80,4 +80,16 @@ public final class CompositeBrightnessService: ObservableObject, @unchecked Send
     public func restoreAllSoftwareDimming() {
         softwareService.restoreAllDisplays()
     }
+
+    public func queryConnectedDisplays() -> [DisplayInfo] {
+        displayService.activeDisplays()
+    }
+
+    public func profile(for uuid: String) -> DisplayBrightnessProfile? {
+        profiles[uuid]
+    }
+
+    public func setProfile(_ profile: DisplayBrightnessProfile) {
+        profiles[profile.displayUUID] = profile
+    }
 }

@@ -1,7 +1,9 @@
 import AppKit
 import SwiftUI
+import MacStashCore
 
 /// Manages floating overlay panels (4 corners + left dock) for one specific display
+@MainActor
 public final class ScreenOverlayInstance {
     public let displayID: CGDirectDisplayID
     public private(set) var screen: NSScreen
@@ -11,7 +13,7 @@ public final class ScreenOverlayInstance {
     private var passThroughViews: [CornerPosition: PassThroughHostingView<CornerDialView>] = [:]
     private var dockPanel: NSPanel?
 
-    private let cornerSize: CGFloat = 150
+    private let cornerSize: CGFloat = 160
     private let dockWidth: CGFloat = 80
     private let dockHeight: CGFloat = 460
 
@@ -24,7 +26,7 @@ public final class ScreenOverlayInstance {
     }
 
     deinit {
-        destroyPanels()
+        // NSPanels cleaned up on main actor
     }
 
     public func updateScreen(_ newScreen: NSScreen) {
@@ -32,20 +34,29 @@ public final class ScreenOverlayInstance {
         repositionPanels()
     }
 
+    public func resetAllCorners(reason: ResetReason) {
+        for (_, view) in passThroughViews {
+            view.reset(reason: reason)
+        }
+    }
+
     private func createPanels() {
         let frame = screen.frame
 
-        // 1. Create 4 Corner Panels
+        // 1. Create 4 Corner Panels with PassThroughHostingView
         for corner in CornerPosition.allCases {
             let panelRect = cornerRect(for: corner, in: frame)
             let panel = makeFloatingPanel(contentRect: panelRect)
 
-            var hostingView: PassThroughHostingView<CornerDialView>!
-            let dialView = CornerDialView(appState: appState, corner: corner) { [weak self] isExpanded in
-                self?.passThroughViews[corner]?.isExpanded = isExpanded
-            }
+            let dialView = CornerDialView(appState: appState, corner: corner, displayID: displayID)
+            let hostingView = PassThroughHostingView(
+                rootView: dialView,
+                corner: corner,
+                displayID: displayID,
+                screenFrame: frame,
+                appState: appState
+            )
 
-            hostingView = PassThroughHostingView(rootView: dialView, corner: corner, appState: appState)
             panel.contentView = hostingView
             panel.orderFrontRegardless()
 

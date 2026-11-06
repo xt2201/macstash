@@ -1,21 +1,21 @@
 import SwiftUI
+import AppKit
+import MacStashCore
 
 public struct CornerDialView: View {
     @ObservedObject var appState: AppState
     public let corner: CornerPosition
-    public var onExpansionChange: ((Bool) -> Void)?
+    public let displayID: CGDirectDisplayID
 
-    @State private var isHovered: Bool = false
     @State private var isDragging: Bool = false
     @State private var dragValue: Double = 0.5
-    @State private var hoverTask: DispatchWorkItem?
 
-    private let dialSize: CGFloat = 145
+    private let dialSize: CGFloat = Defaults.HotCorner.defaultDialRadiusPoints
 
-    public init(appState: AppState, corner: CornerPosition, onExpansionChange: ((Bool) -> Void)? = nil) {
+    public init(appState: AppState, corner: CornerPosition, displayID: CGDirectDisplayID = 0) {
         self.appState = appState
         self.corner = corner
-        self.onExpansionChange = onExpansionChange
+        self.displayID = displayID
     }
 
     private var action: ControlAction {
@@ -27,9 +27,9 @@ public struct CornerDialView: View {
             return dragValue
         }
         if action == .timer {
-            return appState.timer.progress
+            return appState.pomodoroProgress
         }
-        return Double(appState.getValue(for: action))
+        return appState.getValue(for: action, displayID: displayID)
     }
 
     public var body: some View {
@@ -40,120 +40,76 @@ public struct CornerDialView: View {
                 let geom = RadialDialGeometry(
                     corner: corner,
                     size: CGSize(width: dialSize, height: dialSize),
-                    outerRadius: 130,
+                    outerRadius: dialSize - 15,
                     innerRadius: 55
                 )
 
-                let isExpanded = isHovered || isDragging || appState.activeCorner == corner
+                let isExpanded = isDragging || (appState.activeCorner == corner && appState.activeDisplayID == displayID)
 
                 ZStack {
                     // Quarter-circle backdrop disc
                     QuarterCircleBackdrop(corner: corner)
                         .fill(.ultraThinMaterial)
-                        .overlay(
-                            QuarterCircleBorder(corner: corner)
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.white.opacity(0.4),
-                                            Color.white.opacity(0.1),
-                                            Color.clear
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1
-                                )
-                        )
-                        .shadow(color: Color.black.opacity(0.35), radius: 18, x: 0, y: 6)
+                        .frame(width: dialSize, height: dialSize)
+                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
 
-                    // Track & Radial Ticks
+                    // Tick marks
                     DialTicksView(
                         geometry: geom,
                         value: currentValue,
-                        accentColor: action.accentColors.first ?? .blue
+                        accentColor: action.accentColors.first ?? .accentColor
                     )
 
-                    // Active Value Arc
-                    ActiveArcView(
+                    // Active progress ring arc
+                    DialArcShape(
                         geometry: geom,
                         value: currentValue,
                         gradientColors: action.accentColors
                     )
 
-                    // Center Knob & Status Info
-                    CenterKnobView(
-                        geometry: geom,
-                        corner: corner,
+                    // Center Action Icon & Value readout
+                    CenterActionBadge(
                         action: action,
+                        corner: corner,
                         value: currentValue,
-                        appState: appState,
+                        dialSize: dialSize,
                         isExpanded: isExpanded,
-                        onTap: {
-                            appState.toggleAction(action)
-                        }
+                        formattedTimer: appState.formattedTimerTime
                     )
                 }
-                .frame(width: dialSize, height: dialSize)
-                .scaleEffect(isExpanded ? 1.0 : 0.35, anchor: unitPointAnchor(for: corner))
-                .opacity(isExpanded ? 1.0 : 0.35)
-                .animation(.spring(response: 0.32, dampingFraction: 0.72), value: isExpanded)
-                .contentShape(QuarterCircleHitShape(corner: corner))
+                .scaleEffect(isExpanded ? 1.0 : 0.05, anchor: unitPoint(for: corner))
+                .opacity(isExpanded ? appState.settings.dialOpacity : 0.0)
+                .animation(
+                    NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+                        ? .easeInOut(duration: 0.1)
+                        : .spring(response: 0.28 * appState.settings.animationSpeedMultiplier, dampingFraction: 0.72),
+                    value: isExpanded
+                )
                 .gesture(
-                    DragGesture(minimumDistance: 1)
+                    DragGesture(minimumDistance: 0)
                         .onChanged { gesture in
                             if !isDragging {
                                 isDragging = true
-                                appState.activeCorner = corner
-                                onExpansionChange?(true)
+                                dragValue = currentValue
                             }
-                            let newVal = geom.value(for: gesture.location)
-                            dragValue = newVal
-                            appState.setValue(for: action, value: Float(newVal))
+                            let center = geom.center
+                            let loc = gesture.location
+                            let angle = calculateAngle(from: center, to: loc, corner: corner)
+                            let norm = normalizeAngle(angle, for: corner)
+                            dragValue = norm
+                            appState.setValue(for: action, value: norm, displayID: displayID)
                         }
                         .onEnded { _ in
                             isDragging = false
-                            if !isHovered {
-                                appState.activeCorner = nil
-                                onExpansionChange?(false)
-                            }
+                            appState.setValue(for: action, value: dragValue, displayID: displayID)
                         }
                 )
-                .onHover { hovering in
-                    hoverTask?.cancel()
-                    if hovering {
-                        // Apply dwell delay to prevent accidental activation
-                        let task = DispatchWorkItem {
-                            isHovered = true
-                            appState.activeCorner = corner
-                            onExpansionChange?(true)
-                        }
-                        hoverTask = task
-                        DispatchQueue.main.asyncAfter(deadline: .now() + appState.cornerDwellDelay, execute: task)
-                    } else {
-                        hoverTask?.cancel()
-                        if !isDragging {
-                            isHovered = false
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                if !self.isHovered && !self.isDragging && self.appState.activeCorner == self.corner {
-                                    self.appState.activeCorner = nil
-                                    self.onExpansionChange?(false)
-                                }
-                            }
-                        }
-                    }
-                }
-                .popover(isPresented: $appState.isAudioDevicePickerPresented, arrowEdge: .top) {
-                    if action == .volume {
-                        AudioDevicePickerPopover(appState: appState)
-                    }
-                }
             }
         }
         .frame(width: dialSize, height: dialSize)
     }
 
-    private func unitPointAnchor(for corner: CornerPosition) -> UnitPoint {
+    private func unitPoint(for corner: CornerPosition) -> UnitPoint {
         switch corner {
         case .topLeft: return .topLeading
         case .topRight: return .topTrailing
@@ -161,153 +117,88 @@ public struct CornerDialView: View {
         case .bottomRight: return .bottomTrailing
         }
     }
-}
 
-// MARK: - Center Knob View
-
-private struct CenterKnobView: View {
-    let geometry: RadialDialGeometry
-    let corner: CornerPosition
-    let action: ControlAction
-    let value: Double
-    @ObservedObject var appState: AppState
-    let isExpanded: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        let centerPoint = geometry.center
-        let offset = knobOffset(for: corner)
-        let knobSize: CGFloat = 62
-
-        Button(action: onTap) {
-            ZStack {
-                Circle()
-                    .fill(Color(nsColor: .windowBackgroundColor).opacity(0.88))
-                    .overlay(
-                        Circle()
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                    )
-                    .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 3)
-
-                VStack(spacing: 2) {
-                    Image(systemName: centerIcon)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: action.accentColors,
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    Text(centerText)
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-
-                    Text(action.shortTitle)
-                        .font(.system(size: 7, weight: .semibold))
-                        .foregroundColor(.secondary)
-                        .tracking(0.5)
-                }
-            }
-            .frame(width: knobSize, height: knobSize)
-        }
-        .buttonStyle(.plain)
-        .position(x: centerPoint.x + offset.x, y: centerPoint.y + offset.y)
+    private func calculateAngle(from center: CGPoint, to point: CGPoint, corner: CornerPosition) -> Double {
+        let dx = Double(point.x - center.x)
+        let dy = Double(point.y - center.y)
+        var rad = atan2(dy, dx)
+        if rad < 0 { rad += 2 * .pi }
+        return rad * 180.0 / .pi
     }
 
-    private var centerIcon: String {
-        if action == .timer {
-            return appState.timer.isRunning ? "pause.fill" : "play.fill"
-        }
-        return action.systemImage
-    }
-
-    private var centerText: String {
-        if action == .timer {
-            return appState.timer.formattedTime
-        }
-        return "\(Int(value * 100))%"
-    }
-
-    private func knobOffset(for corner: CornerPosition) -> CGPoint {
-        let dist: CGFloat = 45
-        let rad45 = 45.0 * .pi / 180.0
-        let d = dist * cos(CGFloat(rad45))
+    private func normalizeAngle(_ degrees: Double, for corner: CornerPosition) -> Double {
         switch corner {
-        case .topLeft: return CGPoint(x: d, y: d)
-        case .topRight: return CGPoint(x: -d, y: d)
-        case .bottomLeft: return CGPoint(x: d, y: -d)
-        case .bottomRight: return CGPoint(x: -d, y: -d)
+        case .bottomRight:
+            let clamped = max(180.0, min(270.0, degrees))
+            return (clamped - 180.0) / 90.0
+        case .bottomLeft:
+            var deg = degrees
+            if deg < 180.0 { deg += 360.0 }
+            let clamped = max(270.0, min(360.0, deg))
+            return (clamped - 270.0) / 90.0
+        case .topRight:
+            let clamped = max(90.0, min(180.0, degrees))
+            return (180.0 - clamped) / 90.0
+        case .topLeft:
+            let clamped = max(0.0, min(90.0, degrees))
+            return (90.0 - clamped) / 90.0
         }
     }
 }
 
-// MARK: - Audio Device Picker Popover
+// MARK: - Subviews
 
-private struct AudioDevicePickerPopover: View {
-    @ObservedObject var appState: AppState
+private struct CenterActionBadge: View {
+    let action: ControlAction
+    let corner: CornerPosition
+    let value: Double
+    let dialSize: CGFloat
+    let isExpanded: Bool
+    let formattedTimer: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Audio Output Devices")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(.secondary)
-                .padding(.horizontal, 10)
-                .padding(.top, 8)
+        let offset = badgeOffset(for: corner, in: dialSize)
 
-            Divider()
+        VStack(spacing: 2) {
+            Image(systemName: action.systemImage)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(action.accentColors.first ?? .accentColor)
 
-            ForEach(appState.audio.outputDevices) { device in
-                Button(action: {
-                    appState.audio.selectOutputDevice(id: device.id)
-                    appState.isAudioDevicePickerPresented = false
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: iconForDevice(device.name))
-                            .foregroundColor(device.isDefault ? .accentColor : .secondary)
-                            .frame(width: 16)
-
-                        Text(device.name)
-                            .font(.system(size: 12, weight: device.isDefault ? .bold : .regular))
-                            .foregroundColor(.primary)
-
-                        Spacer()
-
-                        if device.isDefault {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.accentColor)
-                        }
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(device.isDefault ? Color.accentColor.opacity(0.12) : Color.clear)
-                    )
-                }
-                .buttonStyle(.plain)
+            if action == .timer {
+                Text(formattedTimer)
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(.primary)
+            } else {
+                Text("\(Int(round(value * 100)))%")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(.primary)
             }
         }
-        .padding(8)
-        .frame(width: 240)
+        .frame(width: 58, height: 58)
+        .background(
+            Circle()
+                .fill(.ultraThickMaterial)
+                .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+        )
+        .offset(x: offset.x, y: offset.y)
     }
 
-    private func iconForDevice(_ name: String) -> String {
-        let lower = name.lowercased()
-        if lower.contains("airpod") || lower.contains("buds") || lower.contains("headphone") {
-            return "headphones"
-        } else if lower.contains("display") || lower.contains("hdmi") {
-            return "tv"
+    private func badgeOffset(for corner: CornerPosition, in size: CGFloat) -> CGPoint {
+        let dist: CGFloat = 52
+        switch corner {
+        case .topLeft:
+            return CGPoint(x: dist - (size / 2), y: dist - (size / 2))
+        case .topRight:
+            return CGPoint(x: (size / 2) - dist, y: dist - (size / 2))
+        case .bottomLeft:
+            return CGPoint(x: dist - (size / 2), y: (size / 2) - dist)
+        case .bottomRight:
+            return CGPoint(x: (size / 2) - dist, y: (size / 2) - dist)
         }
-        return "speaker.wave.2"
     }
 }
 
-// MARK: - Active Arc View
-
-private struct ActiveArcView: View {
+private struct DialArcShape: View {
     let geometry: RadialDialGeometry
     let value: Double
     let gradientColors: [Color]
@@ -338,7 +229,7 @@ private struct ActiveArcView: View {
                 style: StrokeStyle(lineWidth: 6, lineCap: .round)
             )
 
-            // Tip indicator glow
+            // Tip indicator
             let tipPoint = geometry.point(radius: trackRadius, angleDegrees: endDeg)
             let tipCircle = Path(ellipseIn: CGRect(x: tipPoint.x - 5, y: tipPoint.y - 5, width: 10, height: 10))
             context.fill(tipCircle, with: .color(Color.white))
@@ -353,56 +244,52 @@ private struct QuarterCircleBackdrop: Shape {
 
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let c = cornerCenter(in: rect, corner: corner)
-        let r = max(rect.width, rect.height)
-
-        path.move(to: c)
-        let (start, end, clockwise) = angles(for: corner)
-        path.addArc(center: c, radius: r, startAngle: start, endAngle: end, clockwise: clockwise)
-        path.closeSubpath()
+        switch corner {
+        case .topLeft:
+            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addArc(
+                center: CGPoint(x: rect.minX, y: rect.minY),
+                radius: rect.width,
+                startAngle: .degrees(0),
+                endAngle: .degrees(90),
+                clockwise: false
+            )
+            path.closeSubpath()
+        case .topRight:
+            path.move(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addArc(
+                center: CGPoint(x: rect.maxX, y: rect.minY),
+                radius: rect.width,
+                startAngle: .degrees(180),
+                endAngle: .degrees(90),
+                clockwise: true
+            )
+            path.closeSubpath()
+        case .bottomLeft:
+            path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addArc(
+                center: CGPoint(x: rect.minX, y: rect.maxY),
+                radius: rect.width,
+                startAngle: .degrees(270),
+                endAngle: .degrees(360),
+                clockwise: false
+            )
+            path.closeSubpath()
+        case .bottomRight:
+            path.move(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+            path.addArc(
+                center: CGPoint(x: rect.maxX, y: rect.maxY),
+                radius: rect.width,
+                startAngle: .degrees(180),
+                endAngle: .degrees(270),
+                clockwise: false
+            )
+            path.closeSubpath()
+        }
         return path
-    }
-}
-
-private struct QuarterCircleBorder: Shape {
-    let corner: CornerPosition
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let c = cornerCenter(in: rect, corner: corner)
-        let r = max(rect.width, rect.height)
-        let (start, end, clockwise) = angles(for: corner)
-        path.addArc(center: c, radius: r, startAngle: start, endAngle: end, clockwise: clockwise)
-        return path
-    }
-}
-
-private struct QuarterCircleHitShape: Shape {
-    let corner: CornerPosition
-
-    func path(in rect: CGRect) -> Path {
-        QuarterCircleBackdrop(corner: corner).path(in: rect)
-    }
-}
-
-private func cornerCenter(in rect: CGRect, corner: CornerPosition) -> CGPoint {
-    switch corner {
-    case .topLeft: return CGPoint(x: rect.minX, y: rect.minY)
-    case .topRight: return CGPoint(x: rect.maxX, y: rect.minY)
-    case .bottomLeft: return CGPoint(x: rect.minX, y: rect.maxY)
-    case .bottomRight: return CGPoint(x: rect.maxX, y: rect.maxY)
-    }
-}
-
-private func angles(for corner: CornerPosition) -> (Angle, Angle, Bool) {
-    switch corner {
-    case .bottomRight:
-        return (.degrees(180), .degrees(270), false)
-    case .bottomLeft:
-        return (.degrees(270), .degrees(360), false)
-    case .topRight:
-        return (.degrees(90), .degrees(180), false)
-    case .topLeft:
-        return (.degrees(0), .degrees(90), false)
     }
 }

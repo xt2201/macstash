@@ -1,4 +1,5 @@
 import SwiftUI
+import MacStashCore
 
 public struct EdgeSliderView: View {
     @ObservedObject var appState: AppState
@@ -24,7 +25,7 @@ public struct EdgeSliderView: View {
         if isDragging {
             return dragValue
         }
-        return appState.getValue(for: action)
+        return Float(appState.getValue(for: action))
     }
 
     public var body: some View {
@@ -51,7 +52,7 @@ public struct EdgeSliderView: View {
                 }
             }
         }
-        .frame(width: sliderWidth + 10, height: sliderHeight)
+        .frame(width: sliderWidth + 10)
     }
 
     @ViewBuilder
@@ -105,7 +106,7 @@ public struct EdgeSliderView: View {
                             let progress = 1.0 - (gesture.location.y / trackH)
                             let clamped = max(0.0, min(1.0, Float(progress)))
                             dragValue = clamped
-                            appState.setValue(for: action, value: clamped)
+                            appState.setValue(for: action, value: Double(clamped))
                         }
                         .onEnded { _ in
                             isDragging = false

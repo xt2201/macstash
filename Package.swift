@@ -31,6 +31,9 @@ let package = Package(
                 "MacStashCore"
             ],
             path: "Sources/MacStash",
+            resources: [
+                .process("Resources")
+            ],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
             ]

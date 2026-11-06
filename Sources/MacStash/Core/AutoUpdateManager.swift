@@ -3,6 +3,7 @@ import AppKit
 import Combine
 
 /// Manages version checking, changelog presentation, and seamless updates for MacStash
+@MainActor
 public final class AutoUpdateManager: ObservableObject {
     public static let shared = AutoUpdateManager()
 

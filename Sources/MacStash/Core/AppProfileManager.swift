@@ -3,6 +3,7 @@ import Foundation
 import Combine
 
 /// Tracks active frontmost macOS application and manages context-aware profile switching
+@MainActor
 public final class AppProfileManager: ObservableObject {
     public static let shared = AppProfileManager()
 

@@ -14,9 +14,7 @@ public struct MenuBarExtraView: View {
         VStack(alignment: .leading, spacing: 10) {
             // Header
             HStack(spacing: 8) {
-                Image(systemName: "hand.tap.fill")
-                    .foregroundColor(.accentColor)
-                    .font(.system(size: 14))
+                StashBrandLogoView(size: 20)
 
                 Text("MacStash")
                     .font(.system(size: 13, weight: .bold))
@@ -61,13 +59,13 @@ public struct MenuBarExtraView: View {
                 Text("Focus Timer:")
                     .font(.system(size: 11, weight: .medium))
 
-                Text(appState.timer.formattedTime)
+                Text(appState.formattedTimerTime)
                     .font(.system(size: 11, weight: .bold, design: .rounded))
 
                 Spacer()
 
-                Button(appState.timer.isRunning ? "Pause" : "Start") {
-                    appState.timer.togglePlayPause()
+                Button(appState.isPomodoroRunning ? "Pause" : "Start") {
+                    appState.toggleAction(.timer)
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.mini)
@@ -105,13 +103,13 @@ public struct MenuBarExtraView: View {
 
                     Slider(
                         value: Binding(
-                            get: { appState.brightness.brightness },
-                            set: { appState.brightness.setBrightness($0) }
+                            get: { appState.getValue(for: .brightness) },
+                            set: { appState.setValue(for: .brightness, value: $0) }
                         ),
                         in: 0...1
                     )
 
-                    Text("\(Int(appState.brightness.brightness * 100))%")
+                    Text("\(Int(appState.getValue(for: .brightness) * 100))%")
                         .font(.system(size: 10, weight: .bold, design: .rounded))
                         .frame(width: 32)
                 }

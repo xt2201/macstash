@@ -2,6 +2,12 @@
 
 **Chuẩn code**: áp dụng toàn bộ mục 1 của tài liệu này (danh sách cấm, kiến trúc tầng, concurrency, persistence, log bằng `os.Logger`, không emoji, chuỗi UI qua String Catalog, accessibility, hiệu năng).
 
+**Design & Brand Identity**:
+- Nguồn sự thật (Single Source of Truth) duy nhất của logo và bộ nhận diện thương hiệu là các file vector SVG đặt tại `Design/Logo/source/`.
+- Toàn bộ asset phái sinh (bao gồm `MacStash.icns`, `AppIcon.icns`, ảnh Menu Bar template `@1x/@2x/@3x`, ảnh lockup, ảnh mạng xã hội, favicon, nền DMG) bắt buộc phải được sinh tự động và lặp lại thông qua script `scripts/render_icons.sh`.
+- Tuyệt đối không chỉnh sửa thủ công hoặc nạp trực tiếp file ảnh nhị phân vào repository mà không qua kịch bản sinh asset.
+- Khi có thay đổi về thiết kế, bắt buộc phải cập nhật tài liệu kỹ thuật tại `Design/Logo/`, chạy lại bộ kiểm thử và tái tạo toàn bộ asset catalog.
+
 **Quy trình**: đọc code trước khi sửa; commit nhỏ theo Conventional Commits; mỗi commit build được; sửa lỗi thì có test tái hiện.
 
 **Definition of Done**: một thay đổi chỉ hoàn thành khi:

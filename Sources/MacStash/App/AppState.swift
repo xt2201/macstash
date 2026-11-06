@@ -1,95 +1,99 @@
 import SwiftUI
 import Combine
+import CoreGraphics
+import MacStashCore
 
-/// Central observable state manager for MacStash v2
+@MainActor
 public final class AppState: ObservableObject {
     public static let shared = AppState()
 
-    // Sub-managers
+    // Domain & Hardware Services
     public let audio = AudioManager.shared
-    public let brightness = BrightnessManager.shared
     public let keyboard = KeyboardBrightnessManager.shared
-    public let timer = FocusTimerManager.shared
     public let updater = AutoUpdateManager.shared
-    public let appearance = AppearanceManager.shared
     public let profiles = AppProfileManager.shared
     public let haptics = HapticManager.shared
     public let sound = SoundEffectManager.shared
     public let appManager = InstalledAppsManager.shared
 
-    // MARK: - User Settings (Persisted)
+    public let persistence = SettingsPersistenceService()
+    public let brightnessService = CompositeBrightnessService()
+    public let pomodoroEngine = PomodoroEngine()
+    public let notificationService = SystemNotificationService()
 
-    @Published public var isEnabled: Bool {
-        didSet { saveSettings() }
+    // MARK: - Persisted Settings
+
+    @Published public var settings: AppSettings {
+        didSet {
+            persistence.saveSettings(settings)
+        }
     }
-    @Published public var isCornerDialsEnabled: Bool {
-        didSet { saveSettings() }
+
+    @Published public var isEnabled: Bool = true {
+        didSet { settings.isEnabled = isEnabled }
     }
-    @Published public var isEdgeSlidersEnabled: Bool {
-        didSet { saveSettings() }
+    @Published public var isCornerDialsEnabled: Bool = true {
+        didSet { settings.isCornerDialsEnabled = isCornerDialsEnabled }
     }
-    @Published public var isHiddenDockEnabled: Bool {
-        didSet { saveSettings() }
+    @Published public var isEdgeSlidersEnabled: Bool = true {
+        didSet { settings.isEdgeSlidersEnabled = isEdgeSlidersEnabled }
     }
-    @Published public var cornerSensitivityRadius: CGFloat {
-        didSet { saveSettings() }
+    @Published public var isHiddenDockEnabled: Bool = true {
+        didSet { settings.isHiddenDockEnabled = isHiddenDockEnabled }
     }
-    @Published public var cornerDwellDelay: TimeInterval {
-        didSet { saveSettings() }
+    @Published public var cornerSensitivityRadius: CGFloat = Defaults.HotCorner.defaultHitZoneSizePoints {
+        didSet { settings.cornerSensitivityPoints = cornerSensitivityRadius }
     }
-    @Published public var hapticIntensity: HapticIntensity {
-        didSet { saveSettings() }
+    @Published public var cornerDwellDelay: TimeInterval = Defaults.HotCorner.defaultDwellDelaySeconds {
+        didSet { settings.cornerDwellDelaySeconds = cornerDwellDelay }
     }
-    @Published public var isSoundEnabled: Bool {
-        didSet { saveSettings() }
+    @Published public var isSoundEnabled: Bool = true {
+        didSet { settings.isSoundEnabled = isSoundEnabled }
     }
-    @Published public var soundVolume: Float {
-        didSet { saveSettings() }
+    @Published public var soundVolume: Float = Defaults.Audio.defaultSoundVolume {
+        didSet { settings.soundVolume = soundVolume }
     }
-    @Published public var dockPosition: EdgePosition {
-        didSet { saveSettings() }
+    @Published public var hapticIntensity: HapticIntensity = .medium {
+        didSet { settings.hapticIntensity = hapticIntensity.rawValue.lowercased() }
     }
-    @Published public var dockItems: [DockItem] {
-        didSet { saveSettings() }
-    }
-    @Published public var appProfiles: [AppProfile] {
-        didSet { saveSettings() }
-    }
+
+    @Published public var dockItems: [DockItem]
+    @Published public var appProfiles: [AppProfile]
     @Published public var activeProfile: AppProfile
 
-    // MARK: - Dynamic UI State (Transient)
+    // MARK: - Dynamic UI State
 
     @Published public var activeCorner: CornerPosition? = nil
+    @Published public var activeDisplayID: CGDirectDisplayID = 0
     @Published public var isDockExpanded: Bool = false
     @Published public var isRightSliderActive: Bool = false
     @Published public var isQuickLauncherPresented: Bool = false
     @Published public var isAudioDevicePickerPresented: Bool = false
 
+    // Pomodoro dynamic published properties
+    @Published public var pomodoroRemainingSeconds: TimeInterval = TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds)
+    @Published public var pomodoroProgress: Double = 1.0
+    @Published public var isPomodoroRunning: Bool = false
+
     private var cancellables = Set<AnyCancellable>()
+    private var pomodoroTimer: Timer?
     private var lastValueNotch: Int = -1
 
     private init() {
+        let loaded = persistence.loadSettings()
+        self.settings = loaded
+
+        self.isEnabled = loaded.isEnabled
+        self.isCornerDialsEnabled = loaded.isCornerDialsEnabled
+        self.isEdgeSlidersEnabled = loaded.isEdgeSlidersEnabled
+        self.isHiddenDockEnabled = loaded.isHiddenDockEnabled
+        self.cornerSensitivityRadius = loaded.cornerSensitivityPoints
+        self.cornerDwellDelay = loaded.cornerDwellDelaySeconds
+        self.isSoundEnabled = loaded.isSoundEnabled
+        self.soundVolume = loaded.soundVolume
+        self.hapticIntensity = HapticIntensity(rawValue: loaded.hapticIntensity.capitalized) ?? .medium
+
         let defaults = UserDefaults.standard
-
-        self.isEnabled = defaults.object(forKey: "stash_isEnabled") as? Bool ?? true
-        self.isCornerDialsEnabled = defaults.object(forKey: "stash_cornersEnabled") as? Bool ?? true
-        self.isEdgeSlidersEnabled = defaults.object(forKey: "stash_slidersEnabled") as? Bool ?? true
-        self.isHiddenDockEnabled = defaults.object(forKey: "stash_dockEnabled") as? Bool ?? true
-
-        // Corner sensitivity (tight hot zone: default 8px)
-        self.cornerSensitivityRadius = defaults.object(forKey: "stash_sensitivity") as? CGFloat ?? 8.0
-        self.cornerDwellDelay = defaults.object(forKey: "stash_dwellDelay") as? TimeInterval ?? 0.08
-
-        let hapticRaw = defaults.string(forKey: "stash_hapticIntensity") ?? HapticIntensity.medium.rawValue
-        self.hapticIntensity = HapticIntensity(rawValue: hapticRaw) ?? .medium
-
-        self.isSoundEnabled = defaults.object(forKey: "stash_soundEnabled") as? Bool ?? true
-        self.soundVolume = defaults.object(forKey: "stash_soundVolume") as? Float ?? 0.6
-
-        let dockPosRaw = defaults.string(forKey: "stash_dockPosition") ?? EdgePosition.left.rawValue
-        self.dockPosition = EdgePosition(rawValue: dockPosRaw) ?? .left
-
-        // Load dock items or use starter apps
         if let data = defaults.data(forKey: "stash_dockItems"),
            let decoded = try? JSONDecoder().decode([DockItem].self, from: data) {
             self.dockItems = decoded
@@ -97,7 +101,6 @@ public final class AppState: ObservableObject {
             self.dockItems = InstalledAppsManager.defaultDockItems
         }
 
-        // Load profiles
         if let data = defaults.data(forKey: "stash_appProfiles"),
            let decoded = try? JSONDecoder().decode([AppProfile].self, from: data),
            !decoded.isEmpty {
@@ -110,6 +113,7 @@ public final class AppState: ObservableObject {
         }
 
         setupSubscribers()
+        setupPomodoroTimer()
     }
 
     private func setupSubscribers() {
@@ -122,113 +126,183 @@ public final class AppState: ObservableObject {
 
     private func evaluateActiveProfile(bundleId: String) {
         if let matching = appProfiles.first(where: { $0.bundleIdentifier == bundleId && $0.isEnabled }) {
-            DispatchQueue.main.async {
-                self.activeProfile = matching
-            }
+            self.activeProfile = matching
         } else if let def = appProfiles.first(where: { $0.bundleIdentifier == nil }) {
-            DispatchQueue.main.async {
-                self.activeProfile = def
+            self.activeProfile = def
+        }
+    }
+
+    private func setupPomodoroTimer() {
+        pomodoroTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.tickPomodoro()
+            }
+        }
+        if let t = pomodoroTimer {
+            RunLoop.main.add(t, forMode: .common)
+        }
+    }
+
+    private func tickPomodoro() {
+        guard pomodoroEngine.state.isRunning else {
+            isPomodoroRunning = false
+            return
+        }
+        let tickResult = pomodoroEngine.tick()
+        pomodoroRemainingSeconds = tickResult.remaining
+        pomodoroProgress = tickResult.progress
+        isPomodoroRunning = pomodoroEngine.state.isRunning
+
+        if tickResult.didJustComplete {
+            sound.playAccent(enabled: isSoundEnabled)
+            haptics.performBoundaryClick()
+            Task {
+                await notificationService.deliverNotification(
+                    title: "Pomodoro Completed",
+                    body: "Time for a break!",
+                    sound: settings.pomodoroSoundEnabled
+                )
             }
         }
     }
 
-    // MARK: - Action Resolvers & Handlers
+    // MARK: - Action Mapping
 
     public func action(for corner: CornerPosition) -> ControlAction {
-        activeProfile.cornerActions[corner] ?? .none
+        if let isEnabled = settings.cornerEnabled[corner], !isEnabled {
+            return .none
+        }
+        if let profileAction = activeProfile.cornerActions[corner] {
+            return profileAction
+        }
+        return settings.cornerActions[corner] ?? .none
     }
 
-    public func getValue(for action: ControlAction) -> Float {
+    public func getValue(for action: ControlAction, displayID: CGDirectDisplayID = 0) -> Double {
         switch action {
         case .volume:
-            return audio.isMuted ? 0.0 : audio.volume
+            return Double(audio.volume)
         case .brightness:
-            return brightness.brightness
+            let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
+            let displays = brightnessService.queryConnectedDisplays()
+            if let display = displays.first(where: { $0.id == targetID }) {
+                if let profile = brightnessService.profile(for: display.uuid) {
+                    return Double(profile.brightnessLevel)
+                }
+            }
+            return Double(Defaults.Brightness.defaultLevel)
         case .keyboardBrightness:
-            return keyboard.brightness
+            return Double(keyboard.brightness)
         case .timer:
-            return Float(timer.progress)
+            return pomodoroProgress
         case .none:
             return 0.0
         }
     }
 
-    public func setValue(for action: ControlAction, value: Float) {
-        let clamped = max(0.0, min(1.0, value))
+    public func setValue(for action: ControlAction, value: Double, displayID: CGDirectDisplayID = 0) {
+        let clamped = Float(max(0.0, min(1.0, value)))
         switch action {
         case .volume:
             audio.setVolume(clamped)
         case .brightness:
-            brightness.setBrightness(clamped)
+            let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
+            let displays = brightnessService.queryConnectedDisplays()
+            if let display = displays.first(where: { $0.id == targetID }) {
+                var profile = brightnessService.profile(for: display.uuid) ?? DisplayBrightnessProfile(
+                    displayUUID: display.uuid,
+                    displayName: display.name,
+                    brightnessLevel: clamped,
+                    isBuiltIn: display.isBuiltIn
+                )
+                profile.brightnessLevel = clamped
+                brightnessService.setProfile(profile)
+                Task {
+                    _ = await brightnessService.setBrightness(clamped, for: display)
+                }
+            }
         case .keyboardBrightness:
             keyboard.setBrightness(clamped)
         case .timer:
-            timer.setFraction(Double(clamped))
+            let mins = max(1, Int(round(Double(clamped) * 60.0)))
+            pomodoroEngine.start(durationSeconds: TimeInterval(mins * 60))
+            pomodoroRemainingSeconds = pomodoroEngine.remainingSeconds
+            pomodoroProgress = pomodoroEngine.progress
+            isPomodoroRunning = pomodoroEngine.state.isRunning
         case .none:
             break
         }
 
-        // Trigger detent tick for every 3% step
         let notch = Int(clamped * 33.3)
         if notch != lastValueNotch {
             lastValueNotch = notch
-            haptics.performDetentTick(intensity: hapticIntensity)
+            haptics.performDetentTick()
             sound.playTick(enabled: isSoundEnabled, volume: soundVolume)
         }
     }
 
-    public func adjustValue(for action: ControlAction, delta: Float) {
-        let current = getValue(for: action)
-        setValue(for: action, value: current + delta)
-    }
-
-    public func toggleAction(_ action: ControlAction) {
+    public func toggleAction(_ action: ControlAction, displayID: CGDirectDisplayID = 0) {
         switch action {
         case .volume:
-            // Center tap opens Audio Device switcher or toggles mute
             isAudioDevicePickerPresented.toggle()
-            haptics.performBoundaryClick(intensity: hapticIntensity)
+            haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .timer:
-            // Toggle play/pause
-            timer.togglePlayPause()
-            haptics.performBoundaryClick(intensity: hapticIntensity)
+            if pomodoroEngine.state.isRunning {
+                pomodoroEngine.pause()
+            } else {
+                pomodoroEngine.resume()
+            }
+            pomodoroRemainingSeconds = pomodoroEngine.remainingSeconds
+            pomodoroProgress = pomodoroEngine.progress
+            isPomodoroRunning = pomodoroEngine.state.isRunning
+            haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .brightness:
-            let cur = brightness.brightness
-            setValue(for: .brightness, value: cur > 0.5 ? 0.2 : 0.8)
-            haptics.performBoundaryClick(intensity: hapticIntensity)
+            let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
+            let cur = getValue(for: .brightness, displayID: targetID)
+            setValue(for: .brightness, value: cur > 0.5 ? 0.2 : 0.8, displayID: targetID)
+            haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .keyboardBrightness:
             let cur = keyboard.brightness
             setValue(for: .keyboardBrightness, value: cur > 0.5 ? 0.0 : 0.6)
-            haptics.performBoundaryClick(intensity: hapticIntensity)
+            haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .none:
             break
         }
     }
 
-    // MARK: - Persistence
+    public var formattedTimerTime: String {
+        let total = Int(pomodoroRemainingSeconds)
+        let mins = total / 60
+        let secs = total % 60
+        return String(format: "%02d:%02d", mins, secs)
+    }
 
     public func saveSettings() {
+        persistence.saveSettings(settings)
         let defaults = UserDefaults.standard
-        defaults.set(isEnabled, forKey: "stash_isEnabled")
-        defaults.set(isCornerDialsEnabled, forKey: "stash_cornersEnabled")
-        defaults.set(isEdgeSlidersEnabled, forKey: "stash_slidersEnabled")
-        defaults.set(isHiddenDockEnabled, forKey: "stash_dockEnabled")
-        defaults.set(cornerSensitivityRadius, forKey: "stash_sensitivity")
-        defaults.set(cornerDwellDelay, forKey: "stash_dwellDelay")
-        defaults.set(hapticIntensity.rawValue, forKey: "stash_hapticIntensity")
-        defaults.set(isSoundEnabled, forKey: "stash_soundEnabled")
-        defaults.set(soundVolume, forKey: "stash_soundVolume")
-        defaults.set(dockPosition.rawValue, forKey: "stash_dockPosition")
-
         if let encodedDock = try? JSONEncoder().encode(dockItems) {
             defaults.set(encodedDock, forKey: "stash_dockItems")
         }
         if let encodedProfiles = try? JSONEncoder().encode(appProfiles) {
             defaults.set(encodedProfiles, forKey: "stash_appProfiles")
         }
+    }
+
+    public func resetToDefaults() {
+        let fresh = persistence.resetToDefaults()
+        self.settings = fresh
+        self.isEnabled = fresh.isEnabled
+        self.isCornerDialsEnabled = fresh.isCornerDialsEnabled
+        self.isEdgeSlidersEnabled = fresh.isEdgeSlidersEnabled
+        self.isHiddenDockEnabled = fresh.isHiddenDockEnabled
+        self.cornerSensitivityRadius = fresh.cornerSensitivityPoints
+        self.cornerDwellDelay = fresh.cornerDwellDelaySeconds
+        self.isSoundEnabled = fresh.isSoundEnabled
+        self.soundVolume = fresh.soundVolume
+        self.hapticIntensity = HapticIntensity(rawValue: fresh.hapticIntensity.capitalized) ?? .medium
     }
 }

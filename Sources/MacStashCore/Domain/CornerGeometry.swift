@@ -71,6 +71,24 @@ public enum CornerGeometry {
         return true
     }
 
+    public static func isOuterCorner(
+        corner: CornerPosition,
+        of screen: CGRect,
+        in allScreens: [CGRect],
+        hitZoneSizePoints: CGFloat = Defaults.HotCorner.defaultHitZoneSizePoints,
+        tolerancePoints: CGFloat = 2.0
+    ) -> Bool {
+        let hitZone = HitZone(corner: corner, screenFrame: screen, sizePoints: hitZoneSizePoints)
+        return isOuterCorner(
+            point: hitZone.vertex,
+            corner: corner,
+            screen: screen,
+            allScreens: allScreens,
+            hitZoneSizePoints: hitZoneSizePoints,
+            tolerancePoints: tolerancePoints
+        )
+    }
+
     /// Helper to find candidate corner on a screen if point is within hit zone
     public static func candidateCorner(
         for point: CGPoint,

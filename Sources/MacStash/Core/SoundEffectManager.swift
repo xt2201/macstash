@@ -2,6 +2,7 @@ import AppKit
 import AudioToolbox
 
 /// Manages subtle mechanical audio clicks for dial rotation and slider detents
+@MainActor
 public final class SoundEffectManager {
     public static let shared = SoundEffectManager()
 

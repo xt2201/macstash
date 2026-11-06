@@ -1,4 +1,5 @@
 import SwiftUI
+import MacStashCore
 
 /// Draws quarter-circle radial gauges, tick marks, and arc tracks for corner dials
 public struct RadialDialGeometry {

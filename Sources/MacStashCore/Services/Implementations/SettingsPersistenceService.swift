@@ -144,6 +144,89 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.debugLoggingEnabled = debugLoggingEnabled
     }
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let def = AppSettings.defaultSettings
+
+        let schemaVersion = try container.decodeIfPresent(Int.self, forKey: .schemaVersion) ?? def.schemaVersion
+        let isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? def.isEnabled
+        let isCornerDialsEnabled = try container.decodeIfPresent(Bool.self, forKey: .isCornerDialsEnabled) ?? def.isCornerDialsEnabled
+        let isEdgeSlidersEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEdgeSlidersEnabled) ?? def.isEdgeSlidersEnabled
+        let cornerSensitivityPoints = try container.decodeIfPresent(CGFloat.self, forKey: .cornerSensitivityPoints) ?? def.cornerSensitivityPoints
+        let cornerDwellDelaySeconds = try container.decodeIfPresent(TimeInterval.self, forKey: .cornerDwellDelaySeconds) ?? def.cornerDwellDelaySeconds
+        let cornerHideDelaySeconds = try container.decodeIfPresent(TimeInterval.self, forKey: .cornerHideDelaySeconds) ?? def.cornerHideDelaySeconds
+        let suppressWhenMousePressed = try container.decodeIfPresent(Bool.self, forKey: .suppressWhenMousePressed) ?? def.suppressWhenMousePressed
+        let suppressInFullscreen = try container.decodeIfPresent(Bool.self, forKey: .suppressInFullscreen) ?? def.suppressInFullscreen
+        let onlyOuterCorners = try container.decodeIfPresent(Bool.self, forKey: .onlyOuterCorners) ?? false
+        let excludedBundleIDs = try container.decodeIfPresent([String].self, forKey: .excludedBundleIDs) ?? def.excludedBundleIDs
+        let cornerEnabled = try container.decodeIfPresent([CornerPosition: Bool].self, forKey: .cornerEnabled) ?? def.cornerEnabled
+        let cornerActions = try container.decodeIfPresent([CornerPosition: ControlAction].self, forKey: .cornerActions) ?? def.cornerActions
+        let launchAtLogin = try container.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? def.launchAtLogin
+        let showMenuBarIcon = try container.decodeIfPresent(Bool.self, forKey: .showMenuBarIcon) ?? def.showMenuBarIcon
+        let language = try container.decodeIfPresent(String.self, forKey: .language) ?? def.language
+        let dialRadiusPoints = try container.decodeIfPresent(CGFloat.self, forKey: .dialRadiusPoints) ?? def.dialRadiusPoints
+        let dialOpacity = try container.decodeIfPresent(Double.self, forKey: .dialOpacity) ?? def.dialOpacity
+        let appearanceTheme = try container.decodeIfPresent(String.self, forKey: .appearanceTheme) ?? def.appearanceTheme
+        let animationSpeedMultiplier = try container.decodeIfPresent(Double.self, forKey: .animationSpeedMultiplier) ?? def.animationSpeedMultiplier
+        let respectReduceMotion = try container.decodeIfPresent(Bool.self, forKey: .respectReduceMotion) ?? def.respectReduceMotion
+        let displayBrightnessProfiles = try container.decodeIfPresent([String: DisplayBrightnessProfile].self, forKey: .displayBrightnessProfiles) ?? def.displayBrightnessProfiles
+        let brightnessStepFraction = try container.decodeIfPresent(Float.self, forKey: .brightnessStepFraction) ?? def.brightnessStepFraction
+        let minBrightnessClamp = try container.decodeIfPresent(Float.self, forKey: .minBrightnessClamp) ?? def.minBrightnessClamp
+        let maxBrightnessClamp = try container.decodeIfPresent(Float.self, forKey: .maxBrightnessClamp) ?? def.maxBrightnessClamp
+        let pomodoroFocusDurationMinutes = try container.decodeIfPresent(Int.self, forKey: .pomodoroFocusDurationMinutes) ?? def.pomodoroFocusDurationMinutes
+        let pomodoroShortBreakMinutes = try container.decodeIfPresent(Int.self, forKey: .pomodoroShortBreakMinutes) ?? def.pomodoroShortBreakMinutes
+        let pomodoroLongBreakMinutes = try container.decodeIfPresent(Int.self, forKey: .pomodoroLongBreakMinutes) ?? def.pomodoroLongBreakMinutes
+        let pomodoroRoundsBeforeLongBreak = try container.decodeIfPresent(Int.self, forKey: .pomodoroRoundsBeforeLongBreak) ?? def.pomodoroRoundsBeforeLongBreak
+        let pomodoroAutoStartBreaks = try container.decodeIfPresent(Bool.self, forKey: .pomodoroAutoStartBreaks) ?? def.pomodoroAutoStartBreaks
+        let pomodoroSoundEnabled = try container.decodeIfPresent(Bool.self, forKey: .pomodoroSoundEnabled) ?? def.pomodoroSoundEnabled
+        let isSoundEnabled = try container.decodeIfPresent(Bool.self, forKey: .isSoundEnabled) ?? def.isSoundEnabled
+        let soundVolume = try container.decodeIfPresent(Float.self, forKey: .soundVolume) ?? def.soundVolume
+        let hapticFeedbackEnabled = try container.decodeIfPresent(Bool.self, forKey: .hapticFeedbackEnabled) ?? def.hapticFeedbackEnabled
+        let hapticIntensity = try container.decodeIfPresent(String.self, forKey: .hapticIntensity) ?? def.hapticIntensity
+        let globalToggleDialsShortcut = try container.decodeIfPresent(String.self, forKey: .globalToggleDialsShortcut) ?? def.globalToggleDialsShortcut
+        let debugLoggingEnabled = try container.decodeIfPresent(Bool.self, forKey: .debugLoggingEnabled) ?? def.debugLoggingEnabled
+
+        self.init(
+            schemaVersion: schemaVersion,
+            isEnabled: isEnabled,
+            isCornerDialsEnabled: isCornerDialsEnabled,
+            isEdgeSlidersEnabled: isEdgeSlidersEnabled,
+            cornerSensitivityPoints: cornerSensitivityPoints,
+            cornerDwellDelaySeconds: cornerDwellDelaySeconds,
+            cornerHideDelaySeconds: cornerHideDelaySeconds,
+            suppressWhenMousePressed: suppressWhenMousePressed,
+            suppressInFullscreen: suppressInFullscreen,
+            onlyOuterCorners: onlyOuterCorners,
+            excludedBundleIDs: excludedBundleIDs,
+            cornerEnabled: cornerEnabled,
+            cornerActions: cornerActions,
+            launchAtLogin: launchAtLogin,
+            showMenuBarIcon: showMenuBarIcon,
+            language: language,
+            dialRadiusPoints: dialRadiusPoints,
+            dialOpacity: dialOpacity,
+            appearanceTheme: appearanceTheme,
+            animationSpeedMultiplier: animationSpeedMultiplier,
+            respectReduceMotion: respectReduceMotion,
+            displayBrightnessProfiles: displayBrightnessProfiles,
+            brightnessStepFraction: brightnessStepFraction,
+            minBrightnessClamp: minBrightnessClamp,
+            maxBrightnessClamp: maxBrightnessClamp,
+            pomodoroFocusDurationMinutes: pomodoroFocusDurationMinutes,
+            pomodoroShortBreakMinutes: pomodoroShortBreakMinutes,
+            pomodoroLongBreakMinutes: pomodoroLongBreakMinutes,
+            pomodoroRoundsBeforeLongBreak: pomodoroRoundsBeforeLongBreak,
+            pomodoroAutoStartBreaks: pomodoroAutoStartBreaks,
+            pomodoroSoundEnabled: pomodoroSoundEnabled,
+            isSoundEnabled: isSoundEnabled,
+            soundVolume: soundVolume,
+            hapticFeedbackEnabled: hapticFeedbackEnabled,
+            hapticIntensity: hapticIntensity,
+            globalToggleDialsShortcut: globalToggleDialsShortcut,
+            debugLoggingEnabled: debugLoggingEnabled
+        )
+    }
+
     public static var defaultSettings: AppSettings {
         AppSettings()
     }

@@ -2257,38 +2257,6 @@
         }
       }
     },
-    "shortcuts.toggleDock": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toggle Hidden Dock"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bật/Tắt Dock ẩn"
-          }
-        }
-      }
-    },
-    "shortcuts.toggleDockDesc": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slide out or dismiss the hidden application shelf"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trượt ra hoặc đóng ngăn kéo ứng dụng ẩn"
-          }
-        }
-      }
-    },
     "tab.about": {
       "localizations": {
         "en": {
@@ -2701,6 +2669,150 @@
           "stringUnit": {
             "state": "translated",
             "value": "Phương thức kích hoạt"
+          }
+        }
+      }
+    },
+    "shortcuts.conflictDetected": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Potential System Shortcut Conflict"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xung đột với phím tắt hệ thống"
+          }
+        }
+      }
+    },
+    "corners.profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active Profile:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ áp dụng:"
+          }
+        }
+      }
+    },
+    "corners.default": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Default"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mặc định"
+          }
+        }
+      }
+    },
+    "corners.addProfile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Application Profile"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm hồ sơ ứng dụng"
+          }
+        }
+      }
+    },
+    "corners.deleteProfile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Profile"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xóa hồ sơ"
+          }
+        }
+      }
+    },
+    "corners.profileName": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profile Name:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tên hồ sơ:"
+          }
+        }
+      }
+    },
+    "corners.bundleID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundle Identifier (e.g. com.apple.Safari):"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mã ứng dụng (ví dụ com.apple.Safari):"
+          }
+        }
+      }
+    },
+    "corners.cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hủy"
+          }
+        }
+      }
+    },
+    "corners.save": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lưu"
           }
         }
       }

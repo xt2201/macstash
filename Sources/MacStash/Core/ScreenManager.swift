@@ -366,11 +366,88 @@ public final class ScreenManager: ObservableObject {
     }
 
     private func handleKeyEvent(_ event: NSEvent) {
-        let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-        if flags.contains(.option) {
-            if event.keyCode == 1 { // 's'
-                toggleDials()
+        let configured = appState.settings.globalToggleDialsShortcut
+        if matchesConfiguredShortcut(event: event, shortcutString: configured) {
+            toggleDials()
+        }
+    }
+
+    private func matchesConfiguredShortcut(event: NSEvent, shortcutString: String) -> Bool {
+        let parts = shortcutString
+            .replacingOccurrences(of: "-", with: "+")
+            .split(separator: "+")
+            .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+
+        guard !parts.isEmpty else { return false }
+
+        var expectedFlags: NSEvent.ModifierFlags = []
+        var expectedKey: String? = nil
+
+        for part in parts {
+            switch part {
+            case "option", "opt", "alt":
+                expectedFlags.insert(.option)
+            case "command", "cmd":
+                expectedFlags.insert(.command)
+            case "shift":
+                expectedFlags.insert(.shift)
+            case "control", "ctrl":
+                expectedFlags.insert(.control)
+            default:
+                expectedKey = part
             }
+        }
+
+        let eventFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        guard eventFlags == expectedFlags else { return false }
+
+        guard let key = expectedKey else { return false }
+        guard let expectedCode = keyCode(for: key) else { return false }
+
+        return event.keyCode == expectedCode
+    }
+
+    private func keyCode(for keyString: String) -> UInt16? {
+        switch keyString.lowercased() {
+        case "a": return 0
+        case "s": return 1
+        case "d": return 2
+        case "f": return 3
+        case "h": return 4
+        case "g": return 5
+        case "z": return 6
+        case "x": return 7
+        case "c": return 8
+        case "v": return 9
+        case "b": return 11
+        case "q": return 12
+        case "w": return 13
+        case "e": return 14
+        case "r": return 15
+        case "y": return 16
+        case "t": return 17
+        case "1": return 18
+        case "2": return 19
+        case "3": return 20
+        case "4": return 21
+        case "6": return 22
+        case "5": return 23
+        case "9": return 25
+        case "7": return 26
+        case "8": return 28
+        case "0": return 29
+        case "o": return 31
+        case "u": return 32
+        case "i": return 34
+        case "p": return 35
+        case "l": return 37
+        case "j": return 38
+        case "k": return 40
+        case "space": return 49
+        case "tab": return 48
+        case "return", "enter": return 36
+        case "esc", "escape": return 53
+        default: return nil
         }
     }
 

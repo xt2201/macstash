@@ -5,22 +5,78 @@ import MacStashCore
 public struct HotCornersTab: View {
     @ObservedObject var appState: AppState
     @State private var newExcludedBundleID: String = ""
+    @State private var selectedProfileID: UUID?
+    @State private var showAddProfileSheet: Bool = false
+    @State private var newProfileName: String = ""
+    @State private var newProfileBundleID: String = ""
 
     public init(appState: AppState) {
         self.appState = appState
+    }
+
+    private var currentProfile: AppProfile {
+        if let id = selectedProfileID, let found = appState.appProfiles.first(where: { $0.id == id }) {
+            return found
+        }
+        return appState.appProfiles.first ?? .defaultProfile
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             GroupBox(label: Label(appState.localized("corners.cornerAssignment"), systemImage: "hand.tap.fill")) {
                 VStack(spacing: 12) {
-                    cornerRow(corner: .topLeft, title: appState.localized("corners.topLeft"))
+                    // Profile Switcher Header
+                    HStack {
+                        Text(appState.localized("corners.profile"))
+                            .font(.system(size: 12, weight: .semibold))
+
+                        Picker("", selection: Binding(
+                            get: { currentProfile.id },
+                            set: { selectedProfileID = $0 }
+                        )) {
+                            ForEach(appState.appProfiles) { prof in
+                                Text(prof.name + (prof.bundleIdentifier == nil ? " (\(appState.localized("corners.default")))" : ""))
+                                    .tag(prof.id)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: 190)
+
+                        Spacer()
+
+                        Button(action: {
+                            newProfileName = ""
+                            newProfileBundleID = ""
+                            showAddProfileSheet = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 11))
+                        }
+                        .buttonStyle(.bordered)
+                        .help(appState.localized("corners.addProfile"))
+
+                        if currentProfile.bundleIdentifier != nil {
+                            Button(action: {
+                                deleteProfile(currentProfile)
+                            }) {
+                                Image(systemName: "trash")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.red)
+                            }
+                            .buttonStyle(.bordered)
+                            .help(appState.localized("corners.deleteProfile"))
+                        }
+                    }
+
                     Divider()
-                    cornerRow(corner: .topRight, title: appState.localized("corners.topRight"))
+
+                    cornerRow(profile: currentProfile, corner: .topLeft, title: appState.localized("corners.topLeft"))
                     Divider()
-                    cornerRow(corner: .bottomLeft, title: appState.localized("corners.bottomLeft"))
+                    cornerRow(profile: currentProfile, corner: .topRight, title: appState.localized("corners.topRight"))
                     Divider()
-                    cornerRow(corner: .bottomRight, title: appState.localized("corners.bottomRight"))
+                    cornerRow(profile: currentProfile, corner: .bottomLeft, title: appState.localized("corners.bottomLeft"))
+                    Divider()
+                    cornerRow(profile: currentProfile, corner: .bottomRight, title: appState.localized("corners.bottomRight"))
                 }
                 .padding(8)
             }
@@ -142,21 +198,62 @@ public struct HotCornersTab: View {
                 .padding(8)
             }
         }
+        .sheet(isPresented: $showAddProfileSheet) {
+            VStack(alignment: .leading, spacing: 14) {
+                Text(appState.localized("corners.addProfile"))
+                    .font(.system(size: 14, weight: .bold))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(appState.localized("corners.profileName"))
+                        .font(.system(size: 12, weight: .medium))
+                    TextField("e.g. Safari, Xcode, Photoshop", text: $newProfileName)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(appState.localized("corners.bundleID"))
+                        .font(.system(size: 12, weight: .medium))
+                    TextField("com.apple.Safari", text: $newProfileBundleID)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                HStack {
+                    Spacer()
+                    Button(appState.localized("corners.cancel")) {
+                        showAddProfileSheet = false
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button(appState.localized("corners.save")) {
+                        addProfile()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(newProfileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            .padding(16)
+            .frame(width: 320)
+        }
     }
 
-    private func cornerRow(corner: CornerPosition, title: String) -> some View {
+    private func cornerRow(profile: AppProfile, corner: CornerPosition, title: String) -> some View {
         HStack {
             Toggle(title, isOn: Binding(
                 get: { appState.settings.cornerEnabled[corner] ?? true },
-                set: { appState.settings.cornerEnabled[corner] = $0 }
+                set: {
+                    appState.settings.cornerEnabled[corner] = $0
+                    appState.saveSettings()
+                }
             ))
             .font(.system(size: 12, weight: .medium))
 
             Spacer()
 
             Picker("", selection: Binding(
-                get: { appState.settings.cornerActions[corner] ?? ControlAction.none },
-                set: { appState.settings.cornerActions[corner] = $0 }
+                get: { profile.cornerActions[corner] ?? appState.settings.cornerActions[corner] ?? ControlAction.none },
+                set: { newAction in
+                    updateCornerAction(profileID: profile.id, corner: corner, action: newAction)
+                }
             )) {
                 ForEach(ControlAction.allCases) { action in
                     Label(action.localizedDisplayName(using: appState.effectiveLanguage), systemImage: action.systemImageName)
@@ -166,5 +263,40 @@ public struct HotCornersTab: View {
             .pickerStyle(.menu)
             .frame(width: 220)
         }
+    }
+
+    private func updateCornerAction(profileID: UUID, corner: CornerPosition, action: ControlAction) {
+        if let idx = appState.appProfiles.firstIndex(where: { $0.id == profileID }) {
+            appState.appProfiles[idx].cornerActions[corner] = action
+            if appState.activeProfile.id == profileID {
+                appState.activeProfile.cornerActions[corner] = action
+            }
+            if appState.appProfiles[idx].bundleIdentifier == nil {
+                appState.settings.cornerActions[corner] = action
+            }
+            appState.saveSettings()
+        }
+    }
+
+    private func deleteProfile(_ profile: AppProfile) {
+        guard profile.bundleIdentifier != nil else { return }
+        appState.appProfiles.removeAll(where: { $0.id == profile.id })
+        selectedProfileID = appState.appProfiles.first?.id
+        appState.saveSettings()
+    }
+
+    private func addProfile() {
+        let trimmedName = newProfileName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedID = newProfileBundleID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
+
+        let newProf = AppProfile(
+            name: trimmedName,
+            bundleIdentifier: trimmedID.isEmpty ? nil : trimmedID
+        )
+        appState.appProfiles.append(newProf)
+        selectedProfileID = newProf.id
+        appState.saveSettings()
+        showAddProfileSheet = false
     }
 }

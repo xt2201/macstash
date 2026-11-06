@@ -129,6 +129,11 @@ public struct AboutTab: View {
         }
     }
 
+    private struct FullBackupPayload: Codable {
+        let settings: AppSettings
+        let appProfiles: [AppProfile]?
+    }
+
     private func exportSettings() {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
@@ -137,7 +142,10 @@ public struct AboutTab: View {
         panel.begin { response in
             guard response == .OK, let url = panel.url else { return }
             do {
-                let data = try appState.persistence.exportJSON(settings: appState.settings)
+                let payload = FullBackupPayload(settings: appState.settings, appProfiles: appState.appProfiles)
+                let encoder = JSONEncoder()
+                encoder.outputFormatting = .prettyPrinted
+                let data = try encoder.encode(payload)
                 try data.write(to: url, options: .atomic)
             } catch {
                 AppLogger.settings.error("Failed to export settings JSON: \(error.localizedDescription)")
@@ -154,11 +162,23 @@ public struct AboutTab: View {
             guard response == .OK, let url = panel.url else { return }
             do {
                 let data = try Data(contentsOf: url)
-                let imported = try appState.persistence.importJSON(data: data)
-                Task { @MainActor in
-                    appState.settings = imported
-                    showImportSuccess = true
-                    importErrorMessage = nil
+                if let payload = try? JSONDecoder().decode(FullBackupPayload.self, from: data) {
+                    Task { @MainActor in
+                        appState.settings = payload.settings
+                        if let profs = payload.appProfiles, !profs.isEmpty {
+                            appState.appProfiles = profs
+                            appState.saveSettings()
+                        }
+                        showImportSuccess = true
+                        importErrorMessage = nil
+                    }
+                } else {
+                    let imported = try appState.persistence.importJSON(data: data)
+                    Task { @MainActor in
+                        appState.settings = imported
+                        showImportSuccess = true
+                        importErrorMessage = nil
+                    }
                 }
             } catch {
                 Task { @MainActor in

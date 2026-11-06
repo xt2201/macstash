@@ -9,6 +9,30 @@ public struct ShortcutsTab: View {
         self.appState = appState
     }
 
+    private var detectedConflict: String? {
+        let cleaned = appState.settings.globalToggleDialsShortcut
+            .lowercased()
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "-", with: "+")
+
+        if cleaned == "command+space" || cleaned == "cmd+space" {
+            return "Spotlight Search (⌘Space)"
+        }
+        if cleaned == "command+tab" || cleaned == "cmd+tab" {
+            return "Application Switcher (⌘Tab)"
+        }
+        if cleaned == "command+option+escape" || cleaned == "cmd+opt+esc" || cleaned == "command+alt+escape" {
+            return "Force Quit Applications (⌘⌥Esc)"
+        }
+        if cleaned == "command+q" || cleaned == "cmd+q" {
+            return "Quit Application (⌘Q)"
+        }
+        if cleaned == "command+w" || cleaned == "cmd+w" {
+            return "Close Window (⌘W)"
+        }
+        return nil
+    }
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             GroupBox(label: Label(appState.localized("shortcuts.globalHotkeys"), systemImage: "keyboard")) {
@@ -24,11 +48,21 @@ public struct ShortcutsTab: View {
 
             GroupBox(label: Label(appState.localized("shortcuts.conflictAnalysis"), systemImage: "exclamationmark.shield")) {
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                        Text(appState.localized("shortcuts.noConflicts"))
-                            .font(.system(size: 12, weight: .medium))
+                    if let conflict = detectedConflict {
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                            Text("\(appState.localized("shortcuts.conflictDetected")): \(conflict)")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.orange)
+                        }
+                    } else {
+                        HStack(spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text(appState.localized("shortcuts.noConflicts"))
+                                .font(.system(size: 12, weight: .medium))
+                        }
                     }
                     Text(appState.localized("shortcuts.conflictHint"))
                         .font(.system(size: 11))

@@ -1,11 +1,18 @@
 import SwiftUI
 import AppKit
 
-public struct GuideArticle: Identifiable {
+public struct GuideArticle: Identifiable, Equatable {
     public let id: String
     public let title: String
     public let filename: String
     public let content: String
+
+    public init(id: String, title: String, filename: String, content: String) {
+        self.id = id
+        self.title = title
+        self.filename = filename
+        self.content = content
+    }
 }
 
 public struct UserGuideView: View {
@@ -20,13 +27,6 @@ public struct UserGuideView: View {
     public var body: some View {
         NavigationSplitView {
             VStack(spacing: 8) {
-                HStack {
-                    StashBrandLogoView(size: 26, showWordmark: true)
-                    Spacer()
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, 10)
-
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.secondary)
@@ -53,7 +53,7 @@ public struct UserGuideView: View {
                 }
                 .listStyle(.sidebar)
             }
-            .frame(minWidth: 200, maxWidth: 260)
+            .frame(minWidth: 220, maxWidth: 280)
         } detail: {
             if let active = articles.first(where: { $0.id == selectedArticleID }) {
                 ScrollView {
@@ -75,7 +75,7 @@ public struct UserGuideView: View {
                     .foregroundColor(.secondary)
             }
         }
-        .frame(minWidth: 640, minHeight: 460)
+        .frame(minWidth: 680, minHeight: 480)
     }
 
     private var filteredArticles: [GuideArticle] {
@@ -155,6 +155,70 @@ public struct UserGuideView: View {
                 - Increase Dwell Activation Delay to 200-300 milliseconds.
                 - Enable window dragging and full screen suppression.
                 - Add specific full-screen or creative software to the Excluded Applications list.
+                """
+            ),
+            GuideArticle(
+                id: "05_settings",
+                title: isVi ? "5. Chi Tiet 7 Tab Settings" : "5. Settings Reference",
+                filename: "05_settings.md",
+                content: """
+                MacStash provides a comprehensive 7-tab configuration window compliant with macOS Human Interface Guidelines.
+
+                Tab Directory:
+                1. General: Master switch, menu bar icon toggle, language switcher, launch at login, and system permissions dashboard.
+                2. Hot Corners: Per-corner assignments, sensitivity (1-20pt), dwell activation delay, and suppression rules.
+                3. Appearance: Dial radius (110-200pt), glass opacity, theme selection, motion reduction, and haptic feedback.
+                4. Displays: Connected display inventory with UUIDs, method selector (Auto/DDC/Software), and live testing sliders.
+                5. Pomodoro: Interval duration steppers, rounds before long break, auto-start breaks, and completion chime alerts.
+                6. Shortcuts: Global hotkeys for toggling dials and hidden dock, with conflict analysis.
+                7. About / Advanced: Diagnostics, console log shortcuts, JSON settings backup, and factory reset.
+                """
+            ),
+            GuideArticle(
+                id: "06_shortcuts",
+                title: isVi ? "6. Bang Tra Nhanh Phim Tat" : "6. Shortcuts Quick Reference",
+                filename: "06_shortcuts.md",
+                content: """
+                Default Key Combinations:
+                - Command+, : Open Settings window
+                - Command+W : Close frontmost window
+                - Command+? : Open User Guide
+                - Option+S  : Toggle corner dials
+                - Option+D  : Toggle hidden dock
+                - Command+H : Hide MacStash application
+                - Command+Q : Quit MacStash and restore display gamma
+                """
+            ),
+            GuideArticle(
+                id: "07_faq",
+                title: isVi ? "7. Cau Hoi Thuong Gap (FAQ)" : "7. Frequently Asked Questions",
+                filename: "07_faq.md",
+                content: """
+                Frequently Asked Questions:
+
+                Q: Does MacStash consume CPU when idle?
+                A: No. When dials are hidden, MacStash uses zero CPU cycles. It operates without polling timers.
+
+                Q: Can I click buttons located behind corner dials?
+                A: Yes. When dials are hidden, hit testing returns nil, allowing clicks to pass through to underlying apps.
+
+                Q: What happens if an external monitor does not support DDC/CI?
+                A: MacStash seamlessly falls back to Software Dimming via hardware gamma tables.
+                """
+            ),
+            GuideArticle(
+                id: "08_whats_new",
+                title: isVi ? "8. Co Gi Moi Trong Phien Ban 2.0.0" : "8. What's New in Version 2.0.0",
+                filename: "08_whats_new.md",
+                content: """
+                What's New in Version 2.0.0:
+                - Multi-monitor outer corner detection avoiding inner display seam conflicts.
+                - Formal state machine overlay lifecycle with generational delay cancellation.
+                - Universal binary distribution supporting both Apple Silicon (arm64) and Intel (x86_64).
+                - Multi-display brightness controller supporting Apple DisplayServices, DDC/CI, and Software Dimming.
+                - Monotonic Pomodoro focus timer surviving window drags and macOS system sleep.
+                - Standard 7-tab Settings preferences window with permissions deep-links and JSON backup.
+                - In-app offline user guide with search filter and first-launch onboarding walkthrough.
                 """
             )
         ]

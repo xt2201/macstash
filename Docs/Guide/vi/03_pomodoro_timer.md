@@ -1,14 +1,14 @@
-# Dong Ho Tap Trung Pomodoro
+# Đồng Hồ Tập Trung Pomodoro
 
-Bo may Pomodoro duoc tich hop truc tiep vao vong xoay goc man hinh va bieu tuong tren thanh menu bar.
+Bộ máy Pomodoro được tích hợp trực tiếp vào vòng xoay góc màn hình và biểu tượng trên thanh menu bar.
 
-## Tinh Nang Noi Bat
+## Tính Năng Nổi Bật
 
-1. **Khong Bi Dong Bang Khi Keo Chuot**:
-   He thong tinh toan thoi gian con lai dua tren moc thoi gian ket thuc va dong ho don dieu (monotonic clock) thay vi bo dem giam dan don thuan. Thao tac keo xoay hoac di chuyen cua so se khong bao gio lam dung dong ho.
+1. **Không Bị Đóng Băng Khi Kéo Chuột**:
+   Hệ thống tính toán thời gian còn lại dựa trên mốc thời gian kết thúc và đồng hồ đơn điệu (monotonic clock) thay vì bộ đếm giảm dần đơn thuần. Thao tác kéo xoay hoặc di chuyển cửa sổ sẽ không bao giờ làm dừng đồng hồ.
 
-2. **Duy Tri Trang Thai Khi May Ngu (Sleep/Wake)**:
-   Khi may tinh ngu, thoi gian troi qua van duoc tinh toan chinh xac ngay khi man hinh bat tro lai.
+2. **Duy Trì Trạng Thái Khi Máy Ngủ (Sleep/Wake)**:
+   Khi máy tính ngủ, thời gian trôi qua vẫn được tính toán chính xác ngay khi màn hình bật trở lại.
 
-3. **Thong Bao He Thong**:
-   Phat thong bao va am thanh co hoc khi ket thuc phien lam viec hoac phien nghi ngoi.
+3. **Thông Báo Hệ Thống**:
+   Phát thông báo và âm thanh cơ học khi kết thúc phiên làm việc hoặc phiên nghỉ ngơi.

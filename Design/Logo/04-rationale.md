@@ -1,72 +1,72 @@
-# Stash for macOS: Co so Thiet ke va Quy chuan Thuong hieu (Brand Rationale)
+# Stash cho macOS: Cơ Sở Thiết Kế và Quy Chuẩn Thương Hiệu (Brand Rationale)
 
-Tai lieu thiet lap co so y tuong, he thong hinh hoc quy chuan, bang mau chuc nang va quy tac su dung bieu tuong Stash.
-
----
-
-## 1. Y tuong Cot loi va Triet ly Thiet ke
-
-Bieu tuong Stash duoc xay dung dua tren triet ly: **"Thao tac Vong quay Xuc giac tai Goc Toa do Vat ly" (Tactile Corner Kinematics)**.
-
-### Ba Yeu to Cau thanh bieu tuong:
-1. **Diem neo Goc (Origin Anchor Pin)**: Toa do `(0,0)` tai goc man hinh - noi theo Dinh luat Fitts co dien tich cham vo han boi vi con tro chuot khong the vuot ra ngoai ria man hinh vat ly. Day la chot dinh vi duy nhat giup nguoi dung re chuot khong can ngam ban.
-2. **Vanh Cung Xuc giac (Radial Dial Sector)**: Khoi hinh quat 60 do phat xuat tu diem neo goc, mo phong chinh xac chuyen dong xoay nhe cua co tay khi nguoi dung dieu chinh do sang man hinh, am luong hoac thoi gian Pomodoro.
-3. **Nac Co hoc (Mechanical Detents)**: Cac vach chia do tai cac goc dac biet (0, 30, 45, 60, 90 do) goi cam giac ve nhung chiec dong ho tinh gio hoac ong kinh may anh Leica cao cap.
+Tài liệu thiết lập cơ sở ý tưởng, hệ thống hình học quy chuẩn, bảng màu chức năng và quy tắc sử dụng biểu tượng Stash.
 
 ---
 
-## 2. He Luoi va Hinh hoc Xay dung (Construction Geometry)
+## 1. Ý Tưởng Cốt Lõi và Triết Lý Thiết Kế
 
-Toan bo bieu tuong duoc dung dua tren he truc toa do goc vuong va phuong trinh hinh hoc cung tron:
+Biểu tượng Stash được xây dựng dựa trên triết lý: **"Thao tác Vòng quay Xúc giác tại Góc Tọa độ Vật lý" (Tactile Corner Kinematics)**.
 
-### 2.1. Thong so Toa do Chuan tren Canvas 1024x1024
-- **Diem tam goc (Anchor Center)**: `P0 = (160, 864)` (goc duoi-trai cua vung an toan macOS).
-- **Ban kinh Vanh quat Chinh (Active Sector)**:
-  - Ban kinh ngoai: `R_outer = 560 px` (tuong duong 54.7% kich thuoc canvas).
-  - Ban kinh trong: `R_inner = 360 px` (tuong duong 35.1% kich thuoc canvas).
-  - Do day thanh quat: `Delta_R = 200 px`.
-  - Goc quet: 60 do tu truc thang dung (tu goc 90 do den goc 30 do tren he truc toa do cuc).
-- **Vanh Ranh truot Inactive (Track Channel)**:
-  - Ban kinh tam: `560 px`, do day net stroke: `40 px`.
-  - Quet tron ven 90 do tu truc thang dung `(160, 304)` den truc nam ngang `(720, 864)`.
-- **Hat nhan Goc (Anchor Node)**:
-  - Vanh ngoai: Ban kinh `120 px`, vien stroke `16 px`.
-  - Vanh loi quang: Ban kinh `56 px`.
-  - Diem sang tam: Ban kinh `24 px`.
-- **Diem chi 45 do (Focal Detent Pip)**:
-  - Toa do tam: `(485, 539)`.
-  - Ban kinh ngoai: `28 px` (Platinum White).
-  - Ban kinh loi: `14 px` (Azure Core).
+### Ba Yếu Tố Cấu Thành Biểu Tượng:
+1. **Điểm neo Gốc (Origin Anchor Pin)**: Tọa độ `(0,0)` tại góc màn hình - nơi theo Định luật Fitts có diện tích chạm vô hạn bởi vì con trỏ chuột không thể vượt ra ngoài rìa màn hình vật lý. Đây là chốt định vị duy nhất giúp người dùng rê chuột không cần ngắm bắn.
+2. **Vành Cung Xúc Giác (Radial Dial Sector)**: Khối hình quạt 60 độ phát xuất từ điểm neo góc, mô phỏng chính xác chuyển động xoay nhẹ của cổ tay khi người dùng điều chỉnh độ sáng màn hình, âm lượng hoặc thời gian Pomodoro.
+3. **Nấc Cơ Học (Mechanical Detents)**: Các vạch chia độ tại các góc đặc biệt (0, 30, 45, 60, 90 độ) gợi cảm giác về những chiếc đồng hồ tính giờ hoặc ống kính máy ảnh Leica cao cấp.
 
 ---
 
-## 3. Bang Mau Chuc nang va Gia tri Quy chuan
+## 2. Hệ Lưới và Hình Học Xây Dựng (Construction Geometry)
 
-Bang mau duoc kiem toa chat che, su dung khong gian mau tieu chuan Display P3 va sRGB:
+Toàn bộ biểu tượng được dựng dựa trên hệ trục tọa độ góc vuông và phương trình hình học cung tròn:
 
-| Mau sac | Ma Hex | RGB (sRGB) | Ty le Su dung | Vai tro va Y nghia |
+### 2.1. Thông Số Tọa Độ Chuẩn trên Canvas 1024x1024
+- **Điểm tâm góc (Anchor Center)**: `P0 = (160, 864)` (góc dưới-trái của vùng an toàn macOS).
+- **Bán kính Vành quạt Chính (Active Sector)**:
+  - Bán kính ngoài: `R_outer = 560 px` (tương đương 54.7% kích thước canvas).
+  - Bán kính trong: `R_inner = 360 px` (tương đương 35.1% kích thước canvas).
+  - Độ dày thanh quạt: `Delta_R = 200 px`.
+  - Góc quét: 60 độ từ trục thẳng đứng (từ góc 90 độ đến góc 30 độ trên hệ trục tọa độ cực).
+- **Vành Rãnh Trượt Inactive (Track Channel)**:
+  - Bán kính tâm: `560 px`, độ dày nét stroke: `40 px`.
+  - Quét trọn vẹn 90 độ từ trục thẳng đứng `(160, 304)` đến trục nằm ngang `(720, 864)`.
+- **Hạt Nhân Gốc (Anchor Node)**:
+  - Vành ngoài: Bán kính `120 px`, viền stroke `16 px`.
+  - Vành lõi quang: Bán kính `56 px`.
+  - Điểm sáng tâm: Bán kính `24 px`.
+- **Điểm chỉ 45 độ (Focal Detent Pip)**:
+  - Tọa độ tâm: `(485, 539)`.
+  - Bán kính ngoài: `28 px` (Platinum White).
+  - Bán kính lõi: `14 px` (Azure Core).
+
+---
+
+## 3. Bảng Màu Chức Năng và Giá Trị Quy Chuẩn
+
+Bảng màu được kiểm tỏa chặt chẽ, sử dụng không gian màu tiêu chuẩn Display P3 và sRGB:
+
+| Màu sắc | Mã Hex | RGB (sRGB) | Tỷ Lệ Sử Dụng | Vai Trò và Ý Nghĩa |
 |---|---|---|:---:|---|
-| **Obsidian Slate** | `#191D26` | `(25, 29, 38)` | 55% | Mau nen tren cua gradient hop chua (container); tao chieu sau khong gian toi macOS. |
-| **Deep Charcoal** | `#0D0F14` | `(13, 15, 20)` | 30% | Mau nen duoi cua gradient hop chua; tao cam giac be mat kim loai anot hoa (anodized metal). |
-| **Precision Cyan** | `#00D2FF` | `(0, 210, 255)` | 8% | Mau phan quang phia truoc cua vanh quay active; do tuong phan cao nhat (9.95:1) dam bao nhan dien o 16px. |
-| **Electric Azure** | `#0A84FF` | `(10, 132, 255)` | 5% | Mau nhan he thong Apple macOS; ket noi tu nhien voi he sinh thai giao dien goc. |
-| **Platinum White** | `#FFFFFF` | `(255, 255, 255)` | 2% | Mau cac vach chia do co hoc va diem sang loi; do tuong phan toi da (17.92:1). |
+| **Obsidian Slate** | `#191D26` | `(25, 29, 38)` | 55% | Màu nền trên của gradient hộp chứa (container); tạo chiều sâu không gian tối macOS. |
+| **Deep Charcoal** | `#0D0F14` | `(13, 15, 20)` | 30% | Màu nền dưới của gradient hộp chứa; tạo cảm giác bề mặt kim loại anot hóa (anodized metal). |
+| **Precision Cyan** | `#00D2FF` | `(0, 210, 255)` | 8% | Màu phản quang phía trước của vành quay active; độ tương phản cao nhất (9.95:1) đảm bảo nhận diện ở 16px. |
+| **Electric Azure** | `#0A84FF` | `(10, 132, 255)` | 5% | Màu nhấn hệ thống Apple macOS; kết nối tự nhiên với hệ sinh thái giao diện gốc. |
+| **Platinum White** | `#FFFFFF` | `(255, 255, 255)` | 2% | Màu các vạch chia độ cơ học và điểm sáng lõi; độ tương phản tối đa (17.92:1). |
 
 ---
 
-## 4. Quy tac Su dung Bieu tuong (Brand Usage Guidelines)
+## 4. Quy Tắc Sử Dụng Biểu Tượng (Brand Usage Guidelines)
 
-### 4.1. Khoang trong An toan (Clear Space)
-- **Quy tac `X`**: Khoang trong an toan xung quanh bieu tuong hoac logo lockup duoc xac dinh bang chieu rong cua hat nhan goc (Anchor Pin diameter = `X = 112 px` tren canvas 1024, tuong duong khoang 12% tong chieu rong).
-- Khong duoc de bat ky van ban, thanh phan do hoa hay ranh gioi khung cua so nao xam pham vao vung an toan `X` nay.
+### 4.1. Khoảng Trống An Toàn (Clear Space)
+- **Quy tắc `X`**: Khoảng trống an toàn xung quanh biểu tượng hoặc logo lockup được xác định bằng chiều rộng của hạt nhân gốc (Anchor Pin diameter = `X = 112 px` trên canvas 1024, tương đương khoảng 12% tổng chiều rộng).
+- Không được để bất kỳ văn bản, thành phần đồ họa hay ranh giới khung cửa sổ nào xâm phạm vào vùng an toàn `X` này.
 
-### 4.2. Kich thuoc Toi thieu (Minimum Sizing)
-- **Dau hieu doc lap (Standalone Mark)**: Kich thuoc hien thi toi thieu la **16 x 16 px** (hoac 16 x 16 pt tren man hinh Retina). O kich thuoc nay, cac vach chia do sieu nho tu dong an di, chi giu lai vanh quat dac va hat nhan goc.
-- **Lockup Logo Ngang (Mark + Wordmark "Stash")**: Kich thuoc hien thi toi thieu la **24 pt** ve chieu cao (chieu dai tuong ung khoang 96 pt) de dam bao chu "Stash" luon doc ro.
+### 4.2. Kích Thước Tối Thiểu (Minimum Sizing)
+- **Dấu hiệu độc lập (Standalone Mark)**: Kích thước hiển thị tối thiểu là **16 x 16 px** (hoặc 16 x 16 pt trên màn hình Retina). Ở kích thước này, các vạch chia độ siêu nhỏ tự động ẩn đi, chỉ giữ lại vành quạt đặc và hạt nhân gốc.
+- **Lockup Logo Ngang (Mark + Wordmark "Stash")**: Kích thước hiển thị tối thiểu là **24 pt** về chiều cao (chiều dài tương ứng khoảng 96 pt) để đảm bảo chữ "Stash" luôn đọc rõ.
 
-### 4.3. Cac Dieu Tuyet doi Cam (Do-Nots)
-1. **Cam xoay huong bieu tuong**: Khong duoc xoay goc bieu tuong sang cac huong khac trong logo chinh thuc. Diem neo phai luon nam o goc phu hop voi quy chuan da duoc phe duyet.
-2. **Cam bop meo ty le (No Distort / Stretch)**: Phai luon phong to / thu nho dong ty le 1:1.
-3. **Cam tu ve them bong do hoac vien kinh gia**: He thong macOS Liquid Glass va Icon Composer se tu dong sinh bong do quang hoc. Khong them drop shadow thu cong vao file SVG.
-4. **Cam doi mau tuy tien**: Khong su dung cac dai gradient cau vong hoac gradient tim-hong ngoai quy chuan bang mau da neu tai Muc 3.
-5. **Cam dat bieu tuong tren nen kho doc**: Khong dat bieu tuong khong hop chua truc tiep tren cac hinh nen co hoa tiet phuc tap hoac nen co do tuong phan duoi 4.5:1.
+### 4.3. Các Điều Tuyệt Đối Cấm (Do-Nots)
+1. **Cấm xoay hướng biểu tượng**: Không được xoay góc biểu tượng sang các hướng khác trong logo chính thức. Điểm neo phải luôn nằm ở góc phù hợp với quy chuẩn đã được phê duyệt.
+2. **Cấm bóp méo tỷ lệ (No Distort / Stretch)**: Phải luôn phóng to / thu nhỏ đồng tỷ lệ 1:1.
+3. **Cấm tự vẽ thêm bóng đổ hoặc viền kính giả**: Hệ thống macOS Liquid Glass và Icon Composer sẽ tự động sinh bóng đổ quang học. Không thêm drop shadow thủ công vào tệp SVG.
+4. **Cấm đổi màu tùy tiện**: Không sử dụng các dải gradient cầu vồng hoặc gradient tím-hồng ngoài quy chuẩn bảng màu đã nêu tại Mục 3.
+5. **Cấm đặt biểu tượng trên nền khó đọc**: Không đặt biểu tượng không hộp chứa trực tiếp trên các hình nền có họa tiết phức tạp hoặc nền có độ tương phản dưới 4.5:1.

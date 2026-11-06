@@ -1,36 +1,36 @@
-# Stash for macOS: Danh muc Giay phep va Nguon Tai nguyen
+# Stash cho macOS: Danh Mục Giấy Phép và Nguồn Tài Nguyên
 
-Tai lieu ghi nhan nguon goc, ban quyen va giay phep su dung cua toan bo tai nguyen duoc su dung trong qua trinh thiet ke logo va bo nhan dien Stash.
-
----
-
-## 1. Typography va Wordmark
-- **Font chu goc**: Apple San Francisco (SF Pro Display, SF Pro Text, SF Mono).
-  - **Nha cung cap**: Apple Inc.
-  - **Giay phep su dung**: Apple System Font License (cho phep su dung de thiet ke giao dien, bieu tuong va trai nghiem cho cac san pham hoat dong tren he sinh thai macOS/iOS/iPadOS).
-  - **Quy trinh xu ly ky thuat**: Toan bo cac chu cai trong wordmark ("Stash") va cac tai lieu vector deu duoc chuyen doi truc tiep thanh duong cong Bézier doc lap (Vector Outlines / Paths). Khong co file font nhan ban `.ttf` hay `.otf` ben ngoai nao duoc nhung trai phep vao bo cai dat.
+Tài liệu ghi nhận nguồn gốc, bản quyền và giấy phép sử dụng của toàn bộ tài nguyên được sử dụng trong quá trình thiết kế logo và bộ nhận diện Stash.
 
 ---
 
-## 2. He luoi va Thong so Mau (Templates & Grid Specifications)
-- **He thong luoi macOS App Icon Grid**:
-  - **Nguon tham chieu**: Apple Design Resources (macOS Human Interface Guidelines).
-  - **Thong so ap dung**: Canvas 1024x1024 pixel, vung an toan trung tam ban kinh 412pt (duong kinh 824pt), he truc toa do can bang thi giac tren macOS Sequoia / Sonoma.
-  - **Kien truc Liquid Glass & Icon Composer**: Tuan thu tai lieu ky thuat WWDC20 va WWDC24 cua Apple Developer ve cau truc layered `.icon`.
+## 1. Typography và Wordmark
+- **Phông chữ gốc**: Apple San Francisco (SF Pro Display, SF Pro Text, SF Mono).
+  - **Nhà cung cấp**: Apple Inc.
+  - **Giấy phép sử dụng**: Apple System Font License (cho phép sử dụng để thiết kế giao diện, biểu tượng và trải nghiệm cho các sản phẩm hoạt động trên hệ sinh thái macOS/iOS/iPadOS).
+  - **Quy trình xử lý kỹ thuật**: Toàn bộ các chữ cái trong wordmark ("Stash") và các tài liệu vector đều được chuyển đổi trực tiếp thành đường cong Bézier độc lập (Vector Outlines / Paths). Không có tệp phông chữ nhân bản `.ttf` hay `.otf` bên ngoài nào được nhúng trái phép vào bộ cài đặt.
 
 ---
 
-## 3. Tai nguyen Vector va Do hoa (Graphic Assets)
-- **Tinh nguyen ban (Originality)**:
-  - 100% cac file vector SVG (gom 6 huong phac thao, 2 huong tinh chinh va bo layer thanh pham) duoc dung hinh hoc tu dau bang cac phep toan vector chinh xac (cung tron, doan thang, toa do so thuc).
-  - Khong su dung bat ky clip-art, hinh anh stock, vector thu vien tu ben thu ba (nhu Freepik, Shutterstock, The Noun Project, Iconfinder).
-  - Khong su dung emoji trong bat ky file thiet ke, doan ma nguon hay tai lieu huong dan nao.
+## 2. Hệ Lưới và Thông Số Mẫu (Templates & Grid Specifications)
+- **Hệ thống lưới macOS App Icon Grid**:
+  - **Nguồn tham chiếu**: Apple Design Resources (macOS Human Interface Guidelines).
+  - **Thông số áp dụng**: Canvas 1024x1024 pixel, vùng an toàn trung tâm bán kính 412pt (đường kính 824pt), hệ trục tọa độ cân bằng thị giác trên macOS Sequoia / Sonoma.
+  - **Kiến trúc Liquid Glass & Icon Composer**: Tuân thủ tài liệu kỹ thuật WWDC20 và WWDC24 của Apple Developer về cấu trúc layered `.icon`.
 
 ---
 
-## 4. Cong cu Phan mem va Script Tu dong hoa
+## 3. Tài Nguyên Vector và Đồ Họa (Graphic Assets)
+- **Tính nguyên bản (Originality)**:
+  - 100% các tệp vector SVG (gồm 6 hướng phác thảo, 2 hướng tinh chỉnh và bộ layer thành phẩm) được dựng hình học từ đầu bằng các phép toán vector chính xác (cung tròn, đoạn thẳng, tọa độ số thực).
+  - Không sử dụng bất kỳ clip-art, hình ảnh stock, vector thư viện từ bên thứ ba (như Freepik, Shutterstock, The Noun Project, Iconfinder).
+  - Không sử dụng emoji trong bất kỳ tệp thiết kế, đoạn mã nguồn hay tài liệu hướng dẫn nào.
+
+---
+
+## 4. Công Cụ Phần Mềm và Script Tự Động Hóa
 - **Engine sinh asset**:
   - `sips` (macOS built-in Scriptable Image Processing System).
   - `qlmanage` (macOS built-in QuickLook Server thumbnail rendering engine).
-  - `iconutil` (macOS Developer Tools CLI cho viec tao file `.icns`).
-  - Python 3 (cac thu vien he thong tieu chuan dung de kiem tra va xu ly du lieu).
+  - `iconutil` (macOS Developer Tools CLI cho việc tạo tệp `.icns`).
+  - Python 3 (các thư viện hệ thống tiêu chuẩn dùng để kiểm tra và xử lý dữ liệu).

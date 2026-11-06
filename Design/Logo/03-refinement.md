@@ -1,92 +1,92 @@
-# Stash for macOS: Tinh chinh va Kiem thu (Refinement & Testing)
+# Stash cho macOS: Tinh Chỉnh và Kiểm Thử (Refinement & Testing)
 
-Tai lieu ghi nhan qua trinh tinh chinh hinh hoc tren he luoi chuan, ket qua chay bo kiem thu da chieu va ly do lua chon bieu tuong cuoi cung cho Stash.
-
----
-
-## 1. He Luoi Hinh hoc va Kien truc Vector Chuan (Geometric Grid System)
-
-Hai huong phac thao vao chung ket da duoc dung lai hoan toan bang cac phuong trinh hinh hoc vector voi do chinh xac toa do tuyet doi tren canvas 1024x1024 pixel.
-
-### 1.1. Thong so Luoi Quy chuan (MacStash Modular Grid)
-- **Kich thuoc Canvas goc**: 1024 x 1024 px.
-- **Vung an toan (HIG Safe Zone)**: Vong tron duong kinh 824px tam tai `(512, 512)`. Cac phan tu hinh hoc chinh nam tron ven ben trong ranh gioi tu toa do 100px den 924px tren ca hai truc X va Y.
-- **Diem neo goc (Origin Corner Anchor)**: Toa do `(160, 864)` tai goc duoi-trai cua vung an toan (dong bo voi vi tri vat ly cua Hot Corner man hinh macOS).
-- **Kien truc Phan tang (Liquid Glass Layer Architecture)**:
-  - `layer-background`: Hinh chu nhat 1024x1024 voi gradient chuyen tiep tu Obsidian Slate `#191D26` den Deep Charcoal `#0D0F14`. Tuyet doi khong co mask bo goc san de he thong macOS tu dong cat squircle.
-  - `layer-midground`: Vanh ranh truot 90 do ban kinh ngoai 560px, do day 40px cung cac vach chia do (detents) co hoc 0, 30, 45, 60, 90 do.
-  - `layer-foreground`: Vanh quat dac (Solid Radial Sector) ban kinh ngoai 560px, ban kinh trong 360px, quet goc 60 do ruc ro voi gradient Cyan/Azure; hat nhan chot goc (origin pin) hai tang tai diem neo.
+Tài liệu ghi nhận quá trình tinh chỉnh hình học trên hệ lưới chuẩn, kết quả chạy bộ kiểm thử đa chiều và lý do lựa chọn biểu tượng cuối cùng cho Stash.
 
 ---
 
-## 2. Ket qua Bo Kiem thu Bat buoc (Multi-Dimensional Test Suite)
+## 1. Hệ Lưới Hình Học và Kiến Trúc Vector Chuẩn (Geometric Grid System)
 
-Bo kiem thu duoc thuc thi tu dong bang script `scripts/test_icons.py` va ghi nhan toan bo ket qua hinh anh tai thu muc `Design/Logo/exports/tests/`.
+Hai hướng phác thảo vào chung kết đã được dựng lại hoàn toàn bằng các phương trình hình học vector với độ chính xác tọa độ tuyệt đối trên canvas 1024x1024 pixel.
 
-### 2.1. Kiem thu Kich thuoc da tang (Multi-Scale Pyramid)
-Kiem tra kha nang doc duoc cua bieu tuong tai cac kich thuoc: 1024, 512, 256, 128, 64, 32, 16 px.
+### 1.1. Thông Số Lưới Quy Chuẩn (MacStash Modular Grid)
+- **Kích thước Canvas gốc**: 1024 x 1024 px.
+- **Vùng an toàn (HIG Safe Zone)**: Vòng tròn đường kính 824px tâm tại `(512, 512)`. Các phần tử hình học chính nằm trọn vẹn bên trong ranh giới từ tọa độ 100px đến 924px trên cả hai trục X và Y.
+- **Điểm neo góc (Origin Corner Anchor)**: Tọa độ `(160, 864)` tại góc dưới-trái của vùng an toàn (đồng bộ với vị trí vật lý của Hot Corner màn hình macOS).
+- **Kiến trúc Phân tầng (Liquid Glass Layer Architecture)**:
+  - `layer-background`: Hình chữ nhật 1024x1024 với gradient chuyển tiếp từ Obsidian Slate `#191D26` đến Deep Charcoal `#0D0F14`. Tuyệt đối không có mask bo góc sẵn để hệ thống macOS tự động cắt squircle.
+  - `layer-midground`: Vành rãnh trượt 90 độ bán kính ngoài 560px, độ dày 40px cùng các vạch chia độ (detents) cơ học 0, 30, 45, 60, 90 độ.
+  - `layer-foreground`: Vành quạt đặc (Solid Radial Sector) bán kính ngoài 560px, bán kính trong 360px, quét góc 60 độ rực rỡ với gradient Cyan/Azure; hạt nhân chốt góc (origin pin) hai tầng tại điểm neo.
 
-| Kich thuoc | Huong 1 (Radial Bloom) | Huong 2 (Aperture Sector) | Danh gia Chuyen mon |
+---
+
+## 2. Kết Quả Bộ Kiểm Thử Bắt Buộc (Multi-Dimensional Test Suite)
+
+Bộ kiểm thử được thực thi tự động bằng script `scripts/test_icons.py` và ghi nhận toàn bộ kết quả hình ảnh tại thư mục `Design/Logo/exports/tests/`.
+
+### 2.1. Kiểm Thử Kích Thước Đa Tầng (Multi-Scale Pyramid)
+Kiểm tra khả năng đọc được của biểu tượng tại các kích thước: 1024, 512, 256, 128, 64, 32, 16 px.
+
+| Kích thước | Hướng 1 (Radial Bloom) | Hướng 2 (Aperture Sector) | Đánh Giá Chuyên Môn |
 |---|:---:|:---:|---|
-| **1024 px** | Dat tuyet doi | Dat tuyet doi | Do sac net vector hoan hao, gradient muot ma, chi tiet co hoc ro net. |
-| **512 px** | Dat tuyet doi | Dat tuyet doi | Hien thi chuan xac tren man hinh Retina Finder va App Store. |
-| **256 px** | Dat tuyet doi | Dat tuyet doi | Vanh cung va vach detent 45 do giu nguyen tinh xuc giac. |
-| **128 px** | Dat tuyet doi | Dat tuyet doi | Kich thuoc mac dinh tren Dock macOS; ty trong thi giac can bang. |
-| **64 px** | Dat tuyet doi | Dat | Vanh quat cua Huong 1 van noi bat; Huong 2 bat dau hoi manh khanh. |
-| **32 px** | Dat | Dat (ranh gioi) | Huong 1 giu duoc khoi dac hinh quat va hat nhan goc ro rang. |
-| **16 px** | **Dat xuat sac** | Khong dat (mo nhat) | **Huong 1 nhan ra duoc trong 1 giay**: hat nhan goc sang va cung tron 60 do tao thanh bieu tuong vanh quay doc dao. Huong 2 bi dut quang va giong vong xoay buffering bi loi. |
+| **1024 px** | Đạt tuyệt đối | Đạt tuyệt đối | Độ sắc nét vector hoàn hảo, gradient mượt mà, chi tiết cơ học rõ nét. |
+| **512 px** | Đạt tuyệt đối | Đạt tuyệt đối | Hiển thị chuẩn xác trên màn hình Retina Finder và App Store. |
+| **256 px** | Đạt tuyệt đối | Đạt tuyệt đối | Vành cung và vạch detent 45 độ giữ nguyên tính xúc giác. |
+| **128 px** | Đạt tuyệt đối | Đạt tuyệt đối | Kích thước mặc định trên Dock macOS; tỷ trọng thị giác cân bằng. |
+| **64 px** | Đạt tuyệt đối | Đạt | Vành quạt của Hướng 1 vẫn nổi bật; Hướng 2 bắt đầu hơi mảnh khảnh. |
+| **32 px** | Đạt | Đạt (ranh giới) | Hướng 1 giữ được khối đặc hình quạt và hạt nhân gốc rõ ràng. |
+| **16 px** | **Đạt xuất sắc** | Không đạt (mờ nhạt) | **Hướng 1 nhận ra được trong 1 giây**: hạt nhân gốc sáng và cung tròn 60 độ tạo thành biểu tượng vành quay độc đáo. Hướng 2 bị đứt quãng và giống vòng xoay buffering bị lỗi. |
 
-### 2.2. Kiem thu Nen boi canh (Background Contrast Matrix)
-Kiem tra hien thi icon tren 4 boi canh giao dien tieu bieu:
-- **Nen Sang (#F5F5F7)**: Nen toi cua icon co vien tu nhien tach biet hoan hao khoi nen trang he thong.
-- **Nen Toi (#121212)**: Vanh nhan Precision Cyan va cham pin phat sang noi bat tren boi canh Dark Mode sau tham.
-- **Nen Hinh nen Nhieu mau (Sonoma Sunset Gradient)**: Khoi Obsidian Slate dong vai tro khay do (container) bao ve chi tiet vanh quay khong bi loan mau voi hinh nen destop.
-- **Nen Thang xam Trung tinh (#808080)**: Tuong phan van duy tri o muc tren 4.5:1.
+### 2.2. Kiểm Thử Nền Bối Cảnh (Background Contrast Matrix)
+Kiểm tra hiển thị icon trên 4 bối cảnh giao diện tiêu biểu:
+- **Nền Sáng (#F5F5F7)**: Nền tối của icon có viền tự nhiên tách biệt hoàn hảo khỏi nền trắng hệ thống.
+- **Nền Tối (#121212)**: Vành nhấn Precision Cyan và chấm pin phát sáng nổi bật trên bối cảnh Dark Mode sâu thẳm.
+- **Nền Hình Nền Nhiều Màu (Sonoma Sunset Gradient)**: Khối Obsidian Slate đóng vai trò khay đỡ (container) bảo vệ chi tiết vành quay không bị loạn màu với hình nền desktop.
+- **Nền Thang Xám Trung Tính (#808080)**: Tương phản vẫn duy trì ở mức trên 4.5:1.
 
-*File ket qua kiem thu*: `Design/Logo/exports/tests/refined_01_radial_bloom_test_backgrounds.png`
+*Tệp kết quả kiểm thử*: `Design/Logo/exports/tests/refined_01_radial_bloom_test_backgrounds.png`
 
-### 2.3. Kiem thu Cac Che do Hien thi macOS (Appearance Modes)
-- **Default Mode**: Mau sac day du (Obsidian Slate + Electric Cyan `#00D2FF` + Azure `#0A84FF` + Platinum White `#FFFFFF`).
-- **Dark Mode**: Tang do sau, giam 15% do choi nen, nhan manh cac vien quang hoc cua vanh dial.
-- **Clear Mode (Kinh trong suốt)**: Thu nghiem voi lop nen kinh mo (frosted glass) va khuc xa anh nen. Cac vien vector duong cong tao ra hieu ung uon cong anh sang thuc su an tuong.
-- **Tinted Mode (Thu nghiem 4 tong mau bat buoc)**:
-  - *Electric Cyan*: Dong bo voi mau thuong hieu nguyen ban.
-  - *Forest Emerald (#34C759)*: Su dung thang xam chuyen doi (grayscale mapping); hinh the giu nguyen 100% tinh nhan dien.
-  - *Amber Gold (#FF9500)*: Tong mau sang dac trung; do tuong phan giua vung dac va vung ranh truot van duy tri tren 7:1.
-  - *Coral Crimson (#FF3B30)*: Manh me va sac sao, the hien tot o cac trang thai canh bao he thong.
+### 2.3. Kiểm Thử Các Chế Độ Hiển Thị macOS (Appearance Modes)
+- **Default Mode**: Màu sắc đầy đủ (Obsidian Slate + Electric Cyan `#00D2FF` + Azure `#0A84FF` + Platinum White `#FFFFFF`).
+- **Dark Mode**: Tăng độ sâu, giảm 15% độ chói nền, nhấn mạnh các viền quang học của vành dial.
+- **Clear Mode (Kính trong suốt)**: Thử nghiệm với lớp nền kính mờ (frosted glass) và khúc xạ ảnh nền. Các viền vector đường cong tạo ra hiệu ứng uốn cong ánh sáng thực sự ấn tượng.
+- **Tinted Mode (Thử nghiệm 4 tông màu bắt buộc)**:
+  - *Electric Cyan*: Đồng bộ với màu thương hiệu nguyên bản.
+  - *Forest Emerald (#34C759)*: Sử dụng thang xám chuyển đổi (grayscale mapping); hình thể giữ nguyên 100% tính nhận diện.
+  - *Amber Gold (#FF9500)*: Tông màu sáng đặc trưng; độ tương phản giữa vùng đặc và vùng rãnh trượt vẫn duy trì trên 7:1.
+  - *Coral Crimson (#FF3B30)*: Mạnh mẽ và sắc sảo, thể hiện tốt ở các trạng thái cảnh báo hệ thống.
 
-*File ket qua kiem thu*: `Design/Logo/exports/tests/refined_01_radial_bloom_test_modes.png`
+*Tệp kết quả kiểm thử*: `Design/Logo/exports/tests/refined_01_radial_bloom_test_modes.png`
 
-### 2.4. Mo phong Mu mau va Do Tuong phan WCAG 2.1
-Su dung ma tran bien doi quang hoc Brettel/Viénot:
-- **Deuteranopia (Mu mau xanh la / green-weak)**: Mau Cyan chuyen sang tong xanh lam bac, van tuong phan rat manh so voi nen toi.
-- **Protanopia (Mu mau do / red-weak)**: Mau Cyan giu nguyen tinh chat phan quang xanh duong dien tu.
-- **Do tuong phan Do luong cu the (Contrast Ratio)**:
-  - Cyan phan quang (`#00D2FF`) tren nen Obsidian Slate (`#14171F`): **9.95 : 1** (Vuot xa chuan WCAG 2.1 AAA la 7.0:1).
-  - Azure chu dao (`#0A84FF`) tren nen Obsidian Slate (`#14171F`): **4.91 : 1** (Vuot chuan WCAG 2.1 AA la 4.5:1).
-  - Vach so Platinum (`#FFFFFF`) tren nen Obsidian Slate (`#14171F`): **17.92 : 1** (Vuot xa chuan WCAG 2.1 AAA la 7.0:1).
+### 2.4. Mô Phỏng Mù Màu và Độ Tương Phản WCAG 2.1
+Sử dụng ma trận biến đổi quang học Brettel/Viénot:
+- **Deuteranopia (Mù màu xanh lá / green-weak)**: Màu Cyan chuyển sang tông xanh lam bạc, vẫn tương phản rất mạnh so với nền tối.
+- **Protanopia (Mù màu đỏ / red-weak)**: Màu Cyan giữ nguyên tính chất phản quang xanh dương điện tử.
+- **Độ Tương Phản Đo Lường Cụ Thể (Contrast Ratio)**:
+  - Cyan phản quang (`#00D2FF`) trên nền Obsidian Slate (`#14171F`): **9.95 : 1** (Vượt xa chuẩn WCAG 2.1 AAA là 7.0:1).
+  - Azure chủ đạo (`#0A84FF`) trên nền Obsidian Slate (`#14171F`): **4.91 : 1** (Vượt chuẩn WCAG 2.1 AA là 4.5:1).
+  - Vạch số Platinum (`#FFFFFF`) trên nền Obsidian Slate (`#14171F`): **17.92 : 1** (Vượt xa chuẩn WCAG 2.1 AAA là 7.0:1).
 
-*File ket qua kiem thu*: `Design/Logo/exports/tests/refined_01_radial_bloom_test_colorblind.png`
+*Tệp kết quả kiểm thử*: `Design/Logo/exports/tests/refined_01_radial_bloom_test_colorblind.png`
 
-### 2.5. Kiem tra Ty trong Thi giac tren Dock Mo phong (Dock Simulation)
-Thu nghiem dat canh cac ung dung hang ngay tren thanh Dock macOS: **Finder, Safari, Terminal, Raycast, va Stash**:
-- **Ket qua**: Bieu tuong Stash khong bi qua to (khong bi tran ra khoi ranh gioi 824pt nhu cac app thiet ke loi), khong bi qua nho (nho khoi hinh quat dac co dien tich be mat quang hoc can doi voi mat cuoi cua Finder va chiec laban cua Safari).
-- Dấu hieu goc khong bi lan at boi cac gradient choi loa cua ben thu ba, mang lai cam giac mot cong cu tien ich he thong di kem macOS chuyen nghiep va dang tin cay.
+### 2.5. Kiểm Tra Tỷ Trọng Thị Giác trên Dock Mô Phỏng (Dock Simulation)
+Thử nghiệm đặt cạnh các ứng dụng hàng ngày trên thanh Dock macOS: **Finder, Safari, Terminal, Raycast, và Stash**:
+- **Kết quả**: Biểu tượng Stash không bị quá to (không bị tràn ra khỏi ranh giới 824pt như các app thiết kế lỗi), không bị quá nhỏ (nhờ khối hình quạt đặc có diện tích bề mặt quang học cân đối với mặt cười của Finder và chiếc la bàn của Safari).
+- Dấu hiệu gốc không bị lấn át bởi các gradient chói lòa của bên thứ ba, mang lại cảm giác một công cụ tiện ích hệ thống đi kèm macOS chuyên nghiệp và đáng tin cậy.
 
-*File ket qua kiem thu*: `Design/Logo/exports/tests/dock_simulation_comparison.png`
+*Tệp kết quả kiểm thử*: `Design/Logo/exports/tests/dock_simulation_comparison.png`
 
 ---
 
-## 3. Quyet dinh Cuoi cung va Chon lua Bieu tuong Chinh thuc
+## 3. Quyết Định Cuối Cùng và Chọn Lựa Biểu Tượng Chính Thức
 
-### 3.1. Phuong an Duoc Chon lam Bieu tuong Chinh thuc
-**Huong 1: The Radial Corner Bloom (Goc No Vanh Cung)** duoc quyet dinh lam nhan dien thuong hieu va app icon chinh thuc cua Stash.
+### 3.1. Phương Án Được Chọn làm Biểu Tượng Chính Thức
+**Hướng 1: The Radial Corner Bloom (Góc Nở Vành Cung)** được quyết định làm nhận diện thương hiệu và app icon chính thức của Stash.
 
-### 3.2. Ly do Chon
-1. **Nhan dien 16px vuot troi**: Hinh the khoi hinh quat 60 do va hat nhan goc van doc ro ngay lap tuc o do phan giai cuc nho 16x16 px, trong khi huong 2 bi suy hao thanh nhung hat diem roi rac.
-2. **Khop tuyet doi voi Tinh nang San pham**: Khong co hinh anh nao dai dien cho "Hot Corner Dials" va "Stash" trung thuc hon mot vanh quay mo ra tu goc man hinh.
-3. **Kha nang chiet xuat sang Menu Bar Icon**: Vanh cung 1/4 hinh tron kem hat nhan goc de dang chuyen doi thanh bieu tuong template don sac 16pt tren Menu Bar voi do nhan dien nhat quan 100%.
+### 3.2. Lý Do Chọn
+1. **Nhận diện 16px vượt trội**: Hình thể khối hình quạt 60 độ và hạt nhân gốc vẫn đọc rõ ngay lập tức ở độ phân giải cực nhỏ 16x16 px, trong khi hướng 2 bị suy hao thành những hạt điểm rời rạc.
+2. **Khớp tuyệt đối với Tính năng Sản phẩm**: Không có hình ảnh nào đại diện cho "Hot Corner Dials" và "Stash" trung thực hơn một vành quay mở ra từ góc màn hình.
+3. **Khả năng chiết xuất sang Menu Bar Icon**: Vành cung 1/4 hình tròn kèm hạt nhân gốc dễ dàng chuyển đổi thành biểu tượng template đơn sắc 16pt trên Menu Bar với độ nhận diện nhất quán 100%.
 
-### 3.3. Nhung gi Da bo va Ly do
-- **Bo Huong 2 (Aperture Sector)**: Hinh the tron trung tam tuy can xung nhung thieu su doc ban ve mat vi tri (khong goi duoc vi tri goc man hinh). O 16px va 32px, phan quat tach roi khien nguoi dung lien tuong toi mot vong quay loading bi dut doan hon la mot dial dieu khien.
-- **Loai bo cac vach chia do phu tren Huong 1**: Trong ban phac thao ban dau co 12 vach chia nho doc theo vanh; qua kiem thu thuc te chung gay nhieu o 32px. Ban tinh chinh cuoi da luoc bo cac vach phu, chi giu lai 5 vach detent co hoc chinh tai 0, 30, 45, 60 va 90 do.
+### 3.3. Những Gì Đã Bỏ và Lý Do
+- **Bỏ Hướng 2 (Aperture Sector)**: Hình thể tròn trung tâm tuy cân xứng nhưng thiếu sự độc bản về mặt vị trí (không gợi được vị trí góc màn hình). Ở 16px và 32px, phần quạt tách rời khiến người dùng liên tưởng tới một vòng quay loading bị đứt đoạn hơn là một dial điều khiển.
+- **Loại bỏ các vạch chia độ phụ trên Hướng 1**: Trong bản phác thảo ban đầu có 12 vạch chia nhỏ dọc theo vành; qua kiểm thử thực tế chúng gây nhiễu ở 32px. Bản tinh chỉnh cuối đã lược bỏ các vạch phụ, chỉ giữ lại 5 vạch detent cơ học chính tại 0, 30, 45, 60 và 90 độ.

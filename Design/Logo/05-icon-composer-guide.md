@@ -1,57 +1,57 @@
-# Stash for macOS: Huong dan Dung file .icon bang Apple Icon Composer
+# Stash cho macOS: Hướng Dẫn Dựng Tệp .icon bằng Apple Icon Composer
 
-Tai lieu huong dan tung buoc quy trinh lap rap va cau hinh file `.icon` chuan Apple Liquid Glass bang ung dung Apple Icon Composer (macOS 15 Sequoia / Xcode 16+).
-
----
-
-## 1. Cac File Layer San sang (Prepared Layer Assets)
-Cac file SVG nguon nam tai `Design/Logo/source/`:
-1. `stash_icon_background.svg`: Tang nen khong cat mask (1024x1024), gradient Obsidian Slate den Deep Charcoal.
-2. `stash_icon_foreground.svg`: Tang vanh quat quang hoc (Cyan/Azure), hat nhan goc va cac vach detent co hoc.
-3. `stash_icon_mono.svg`: Ban hinh hoc don sac (Monochrome Silhouette) voi cac muc alpha tuong ung cho do phan xa quang hoc va che do Tinted.
+Tài liệu hướng dẫn từng bước quy trình lắp ráp và cấu hình tệp `.icon` chuẩn Apple Liquid Glass bằng ứng dụng Apple Icon Composer (macOS 15 Sequoia / Xcode 16+).
 
 ---
 
-## 2. Quy trinh Tung buoc trong Icon Composer
+## 1. Các Tệp Layer Sẵn Sàng (Prepared Layer Assets)
+Các tệp SVG nguồn nằm tại `Design/Logo/source/`:
+1. `stash_icon_background.svg`: Tầng nền không cắt mask (1024x1024), gradient Obsidian Slate đến Deep Charcoal.
+2. `stash_icon_foreground.svg`: Tầng vành quạt quang học (Cyan/Azure), hạt nhân gốc và các vạch detent cơ học.
+3. `stash_icon_mono.svg`: Bản hình học đơn sắc (Monochrome Silhouette) với các mức alpha tương ứng cho độ phản xạ quang học và chế độ Tinted.
 
-### Buoc 1: Tao Du an Icon moi (New Icon Document)
-1. Mo **Icon Composer** tren macOS.
-2. Chon **File > New** (hoac bam `Command + N`).
-3. Chon template **macOS App Icon** (Canvas 1024 x 1024).
+---
 
-### Buoc 2: Thiet lap Tang Nen (Background Layer)
-1. Keo tha file `Design/Logo/source/stash_icon_background.svg` vao o **Background** trong ngan Layer Stack ben trai.
-2. Hoac chon tuy chon **Native Solid / Gradient** trong Inspector panel ben phai:
-   - Type: `Linear Gradient` (goc 135 do).
+## 2. Quy Trình Từng Bước trong Icon Composer
+
+### Bước 1: Tạo Dự Án Icon Mới (New Icon Document)
+1. Mở **Icon Composer** trên macOS.
+2. Chọn **File > New** (hoặc bấm `Command + N`).
+3. Chọn template **macOS App Icon** (Canvas 1024 x 1024).
+
+### Bước 2: Thiết Lập Tầng Nền (Background Layer)
+1. Kéo thả tệp `Design/Logo/source/stash_icon_background.svg` vào ô **Background** trong ngăn Layer Stack bên trái.
+2. Hoặc chọn tùy chọn **Native Solid / Gradient** trong Inspector panel bên phải:
+   - Type: `Linear Gradient` (góc 135 độ).
    - Start Color: `#191D26` (Obsidian Slate).
    - End Color: `#0D0F14` (Deep Charcoal).
 
-### Buoc 3: Thiet lap Nhom Tien canh (Foreground Group)
-1. Keo tha file `Design/Logo/source/stash_icon_foreground.svg` vao o **Foreground**.
+### Bước 3: Thiết Lập Nhóm Tiền Cảnh (Foreground Group)
+1. Kéo thả tệp `Design/Logo/source/stash_icon_foreground.svg` vào ô **Foreground**.
 2. Trong Inspector panel:
-   - **Blend Mode**: Chon `Normal`.
-   - **Material Type**: Chon `Liquid Glass / Specular Glass`.
-   - **Refraction Index**: Chon `1.15` (tao do cong uon quang hoc nhe quanh mep vanh dial).
-   - **Specular Highlights**: Chon `Automatic` (he thong tu dong phan chieu vach sang theo chieu chieu sang doc cua macOS).
+   - **Blend Mode**: Chọn `Normal`.
+   - **Material Type**: Chọn `Liquid Glass / Specular Glass`.
+   - **Refraction Index**: Chọn `1.15` (tạo độ cong uốn quang học nhẹ quanh mép vành dial).
+   - **Specular Highlights**: Chọn `Automatic` (hệ thống tự động phản chiếu vạch sáng theo chiều chiếu sáng dọc của macOS).
 
-### Buoc 4: Gan Ban Hinh hoc Don sac (Monochrome Representation)
-1. Chon slot **Monochrome / Tint Representation**.
-2. Keo tha file `Design/Logo/source/stash_icon_mono.svg`.
-3. Icon Composer se su dung cac muc do alpha cua file nay de ap dung mau sac khi nguoi dung bat che do **Tinted Mode** trong phan cai dat hien thi macOS.
+### Bước 4: Gắn Bản Hình Học Đơn Sắc (Monochrome Representation)
+1. Chọn slot **Monochrome / Tint Representation**.
+2. Kéo thả tệp `Design/Logo/source/stash_icon_mono.svg`.
+3. Icon Composer sẽ sử dụng các mức độ alpha của tệp này để áp dụng màu sắc khi người dùng bật chế độ **Tinted Mode** trong phần cài đặt hiển thị macOS.
 
-### Buoc 5: Kiem tra Truc quan 4 Che do Hien thi (Variants Inspection)
-Trong thanh Preview toolbar cua Icon Composer, lan luot chuyen doi giua:
-- **Default**: Kiem tra do phan xa anh sang tren mat kinh vanh dial.
-- **Dark**: Kiem tra do sau cua be mat Obsidian va tinh phat quang cua hat nhan Cyan.
-- **Clear**: Xac nhan rang hinh anh hinh nen ben duoi duoc khuc xa tu nhien qua khoi kinh.
-- **Tinted**: Kiem tra voi cac mau mau (vang, xanh la, do) xem khoi hinh hoc co bi mat tuong phan hay khong.
+### Bước 5: Kiểm Tra Trực Quan 4 Chế Độ Hiển Thị (Variants Inspection)
+Trong thanh Preview toolbar của Icon Composer, lần lượt chuyển đổi giữa:
+- **Default**: Kiểm tra độ phản xạ ánh sáng trên mặt kính vành dial.
+- **Dark**: Kiểm tra độ sâu của bề mặt Obsidian và tính phát quang của hạt nhân Cyan.
+- **Clear**: Xác nhận rằng hình ảnh hình nền bên dưới được khúc xạ tự nhiên qua khối kính.
+- **Tinted**: Kiểm tra với các màu mẫu (vàng, xanh lá, đỏ) xem khối hình học có bị mất tương phản hay không.
 
-### Buoc 6: Xuat Asset (Export)
-1. Chon **File > Export...**.
-2. Dinh dang xuat: `.icon` hoac keo tha truc tiep vao Xcode Asset Catalog (`Assets.xcassets/AppIcon.icon`).
+### Bước 6: Xuất Asset (Export)
+1. Chọn **File > Export...**.
+2. Định dạng xuất: `.icon` hoặc kéo thả trực tiếp vào Xcode Asset Catalog (`Assets.xcassets/AppIcon.icon`).
 
 ---
 
-## 3. Ghi chu ve Moi truong Thuc thi
-- Trong moi truong may chu dong lenh (CLI headless runner), ung dung do hoa Icon Composer khong duoc cai dat san trong `/Applications`.
-- Du an su dung pipeline tu dong hoa doc lap `scripts/render_icons.sh` de sinh bo `AppIcon.appiconset` va `MacStash.icns` du phong chuan muc, dam bao ung dung luon hien thi day du icon tren moi phien ban macOS tu macOS 13 tro len.
+## 3. Ghi Chú về Môi Trường Thực Thi
+- Trong môi trường máy chủ dòng lệnh (CLI headless runner), ứng dụng đồ họa Icon Composer không được cài đặt sẵn trong `/Applications`.
+- Dự án sử dụng pipeline tự động hóa độc lập `scripts/render_icons.sh` để sinh bộ `AppIcon.appiconset` và `MacStash.icns` dự phòng chuẩn mực, đảm bảo ứng dụng luôn hiển thị đầy đủ icon trên mọi phiên bản macOS từ macOS 13 trở lên.

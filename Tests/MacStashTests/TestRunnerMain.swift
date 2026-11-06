@@ -21,6 +21,9 @@ enum TestRunnerMain {
         print("[TEST] Running SettingsPersistenceTests...")
         SettingsPersistenceTests.run()
 
+        print("[TEST] Running DocumentationIntegrityTests...")
+        DocumentationIntegrityTests.run()
+
         let elapsed = ProcessInfo.processInfo.systemUptime - startTime
         let total = TestAssertion.passCount + TestAssertion.failCount
 

@@ -1,25 +1,25 @@
-# Huong Dan Bat Dau MacStash
+# Hướng Dẫn Bắt Đầu MacStash
 
-MacStash cung cap cac vong xoay dieu khien hinh goc phan tu xuat hien tinh te tai bon goc vat ly cua man hinh macOS.
+MacStash cung cấp các vòng xoay điều khiển hình góc phần tư xuất hiện tinh tế tại bốn góc vật lý của màn hình macOS.
 
-## Khai Niem Cot Loi
+## Khái Niệm Cốt Lõi
 
-MacStash duoc thiet ke de duy tri trang thai an hoan toan va khong tieu ton tai nguyen cho den khi nguoi dung can thao tac. Khi di chuot vao goc kich hoat va dung lai trong giay lat, vong xoay tuong ung se xuat hien muot ma.
+MacStash được thiết kế để duy trì trạng thái ẩn hoàn toàn và không tiêu tốn tài nguyên cho đến khi người dùng cần thao tác. Khi di chuột vào góc kích hoạt và dừng lại trong giây lát, vòng xoay tương ứng sẽ xuất hiện mượt mà.
 
-### Bon Goc Vat Ly
-1. **Goc Tren - Trai**: Mac dinh dieu chinh den ban phim (Keyboard Backlight).
-2. **Goc Tren - Phai**: Mac dinh dieu chinh do sang man hinh (Display Brightness).
-3. **Goc Duoi - Trai**: Mac dinh dong ho tap trung Pomodoro.
-4. **Goc Duoi - Phai**: Mac dinh am luong loa tong (Master Volume).
+### Bốn Góc Vật Lý
+1. **Góc Trên - Trái**: Mặc định điều chỉnh đèn bàn phím (Keyboard Backlight).
+2. **Góc Trên - Phải**: Mặc định điều chỉnh độ sáng màn hình (Display Brightness).
+3. **Góc Dưới - Trái**: Mặc định đồng hồ tập trung Pomodoro.
+4. **Góc Dưới - Phải**: Mặc định âm lượng loa tổng (Master Volume).
 
-### Phan Biet Goc Ngoai Bien va Diem Tiep Giap Man Hinh
-Tren cau hinh nhieu man hinh, MacStash su dung thuat toan hinh hoc de chi nhan dien goc ngoai bien thuc su cua toan bo khong gian desktop. Khi con tro chuot di chuyen qua lai giua cac man hinh tai cac duong bien tiep giap ben trong, MacStash se khong chan chuot va khong kich hoat nham.
+### Phân Biệt Góc Ngoài Biên và Điểm Tiếp Giáp Màn Hình
+Trên cấu hình nhiều màn hình, MacStash sử dụng thuật toán hình học để chỉ nhận diện góc ngoài biên thực sự của toàn bộ không gian desktop. Khi con trỏ chuột di chuyển qua lại giữa các màn hình tại các đường biên tiếp giáp bên trong, MacStash sẽ không chặn chuột và không kích hoạt nhầm.
 
-## Bieu Tuong Nhan Dien va Menu Bar
+## Biểu Tượng Nhận Diện và Menu Bar
 
-MacStash su dung bo nhan dien thuong hieu **Radial Corner Bloom (Goc No Vanh Cung)**: gom mot hat nhan toa do neo tai goc man hinh vat ly ket hop cung vanh quay quang hoc 1/4 hinh tron.
+MacStash sử dụng bộ nhận diện thương hiệu **Radial Corner Bloom (Góc Nở Vành Cung)**: gồm một hạt nhân tọa độ neo tại góc màn hình vật lý kết hợp cùng vành quay quang học 1/4 hình tròn.
 
-### Cac Trang Thai Tren Menu Bar
-- **Trang thai Nghi (Idle)**: Vanh cung 1/4 hinh tron don sac thanh lich voi cham neo goc, an khop hoan hao voi do day cua cac bieu tuong he thong Apple.
-- **Trang thai Hoat dong (Active / Pomodoro)**: Vanh cung tu dong chuyen sang dang hinh quat dac, giup nguoi dung nhan biet ngay lap tuc phien tap trung dang chay ma khong can mo popover.
-- **Tu dong Thich ung Giao dien**: Bieu tuong su dung co che template image, tu dong chuyen doi giua mau trang va den theo che do Light Mode, Dark Mode hoac man hinh hinh nen trong suot.
+### Các Trạng Thái Trên Menu Bar
+- **Trạng thái Nghỉ (Idle)**: Vành cung 1/4 hình tròn đơn sắc thanh lịch với chấm neo góc, ăn khớp hoàn hảo với độ dày của các biểu tượng hệ thống Apple.
+- **Trạng thái Hoạt động (Active / Pomodoro)**: Vành cung tự động chuyển sang dạng hình quạt đặc, giúp người dùng nhận biết ngay lập tức phiên tập trung đang chạy mà không cần mở popover.
+- **Tự động Thích ứng Giao diện**: Biểu tượng sử dụng cơ chế template image, tự động chuyển đổi giữa màu trắng và đen theo chế độ Light Mode, Dark Mode hoặc màn hình hình nền trong suốt.

@@ -1,15 +1,15 @@
-# Dieu Chinh Do Sang Da Man Hinh
+# Điều Chỉnh Độ Sáng Đa Màn Hình
 
-MacStash ho tro dieu chinh do sang doc lap cho tung man hinh, bao gom man hinh tich hop tren MacBook va tat ca cac man hinh ngoai.
+MacStash hỗ trợ điều chỉnh độ sáng độc lập cho từng màn hình, bao gồm màn hình tích hợp trên MacBook và tất cả các màn hình ngoài.
 
-## Cac Phuong Thuc Dieu Khien
+## Các Phương Thức Điều Khiển
 
-### Dich Vu Mac Dinh (DisplayServices)
-Ap dung cho man hinh Retina tich hop cua Apple. Tuong tac truc tiep qua DisplayServices cua he dieu hanh.
+### Dịch Vụ Mặc Định (DisplayServices)
+Áp dụng cho màn hình Retina tích hợp của Apple. Tương tác trực tiếp qua DisplayServices của hệ điều hành.
 
-### Dieu Khien Phan Cung DDC/CI
-Danh cho cac man hinh ngoai tuong thich ket noi qua cong DisplayPort, HDMI hoac USB-C. Tieu chuan VESA DDC/CI duoc chay tren hang doi nen bat dong bo co co che gioi han thoi gian cho (timeout) de khong lam dung giao dien.
+### Điều Khiển Phần Cứng DDC/CI
+Dành cho các màn hình ngoài tương thích kết nối qua cổng DisplayPort, HDMI hoặc USB-C. Tiêu chuẩn VESA DDC/CI được chạy trên hàng đợi nền bất đồng bộ có cơ chế giới hạn thời gian chờ (timeout) để không làm đơ giao diện.
 
-### Giam Sang Bang Phan Mem (Software Dimming)
-Tu dong su dung khi man hinh ngoai khong phan hoi DDC/CI. Co che dieu chinh bang bang mau gamma giup ha thap do sang xuong den 0% mot cach muot ma.
-Khi thoat ung dung hoac trong truong hop gap loi bat thuong, MacStash tu dong khoi phuc lai bang mau he thong ve trang thai goc.
+### Giảm Sáng Bằng Phần Mềm (Software Dimming)
+Tự động sử dụng khi màn hình ngoài không phản hồi DDC/CI. Cơ chế điều chỉnh bằng bảng màu gamma giúp hạ thấp độ sáng xuống đến 0% một cách mượt mà.
+Khi thoát ứng dụng hoặc trong trường hợp gặp lỗi bất thường, MacStash tự động khôi phục lại bảng màu hệ thống về trạng thái gốc.

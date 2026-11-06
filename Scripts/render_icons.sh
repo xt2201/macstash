@@ -87,22 +87,23 @@ echo "=== All assets rendered successfully! ==="
 echo "[5/5] Generating Vector PDF Exports..."
 python3 -c "
 import os
-from weasyprint import HTML
-
-svg_files = [
-    'stash_icon_master',
-    'stash_mark_color',
-    'stash_mark_mono_black',
-    'stash_mark_mono_white',
-    'stash_lockup_dark',
-    'stash_lockup_light',
-    'stash_quadrant_overview',
-    'stash_menubar'
-]
-
-for name in svg_files:
-    svg_path = f'$SOURCE_DIR/{name}.svg'
-    pdf_path = f'$EXPORTS_DIR/{name}.pdf'
-    HTML(string=f'<style>@page {{ size: auto; margin: 0; }} body {{ margin: 0; }}</style><img src=\"{os.path.abspath(svg_path)}\" style=\"display:block; width:100%;\" />').write_pdf(pdf_path)
+try:
+    from weasyprint import HTML
+    svg_files = [
+        'stash_icon_master',
+        'stash_mark_color',
+        'stash_mark_mono_black',
+        'stash_mark_mono_white',
+        'stash_lockup_dark',
+        'stash_lockup_light',
+        'stash_quadrant_overview',
+        'stash_menubar'
+    ]
+    for name in svg_files:
+        svg_path = f'$SOURCE_DIR/{name}.svg'
+        pdf_path = f'$EXPORTS_DIR/{name}.pdf'
+        HTML(string=f'<style>@page {{ size: auto; margin: 0; }} body {{ margin: 0; }}</style><img src=\"{os.path.abspath(svg_path)}\" style=\"display:block; width:100%;\" />').write_pdf(pdf_path)
+    print('  -> Vector PDFs generated in $EXPORTS_DIR')
+except ImportError:
+    print('  -> Notice: weasyprint not installed in python3 environment; skipping vector PDF export safely.')
 "
-echo "  -> Vector PDFs generated in $EXPORTS_DIR"

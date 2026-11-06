@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.3.5] - 2026-11-06
+
+### Added
+- Dynamic bundle version resolution for About tab and localization catalog, ensuring active version numbers are always accurately presented in the UI.
+- Comprehensive `VersionConsistencyTests` test suite verifying synchronization across VERSION, Info.plist, CHANGELOG, Guides, and Sparkle appcast.
+
+### Fixed
+- Fixed stale version `2.1.1` in About tab by eliminating hardcoded version strings from `LocalizationService.swift` and `Localizable.xcstrings`.
+- Fixed CI/CD release build failure on GitHub Actions by making `weasyprint` optional in `render_icons.sh`, preventing pipeline crashes when optional python PDF libraries are absent.
+
+---
+
 ## [2.3.4] - 2026-11-06
 
 ### Added

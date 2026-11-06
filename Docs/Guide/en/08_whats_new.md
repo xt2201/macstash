@@ -1,3 +1,13 @@
+# What's New in Version 2.3.5
+
+MacStash 2.3.5 introduces dynamic version synchronization in the user interface, automated version integrity auditing, and robust CI/CD release pipeline error handling.
+
+## Key Enhancements in Version 2.3.5
+
+- Dynamic Version Display: Replaced hardcoded version strings in settings and localization catalogs with dynamic bundle inspection, guaranteeing that the About tab always reflects the exact active version.
+- Automated Version Consistency Audit: Added test suite coverage verifying that release tags, Info.plist metadata, documentation, and update feeds stay perfectly synchronized.
+- Resilient Release Pipeline: Hardened icon and asset rendering scripts against missing optional python PDF libraries, preventing pipeline failures on remote runners.
+
 # What's New in Version 2.3.4
 
 MacStash 2.3.4 guarantees Pomodoro completion notifications on macOS via native foreground presentation delegates, audible alert chimes, and Dock icon attention requests.

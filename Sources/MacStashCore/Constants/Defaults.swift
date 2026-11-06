@@ -4,6 +4,10 @@ import CoreGraphics
 public enum Defaults {
     public static let schemaVersion: Int = 1
 
+    public static var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "2.3.5"
+    }
+
     public enum HotCorner {
         public static let defaultHitZoneSizePoints: CGFloat = 10.0
         public static let minHitZoneSizePoints: CGFloat = 1.0

@@ -1,3 +1,13 @@
+# Có Gì Mới Trong Phiên Bản 2.3.5
+
+MacStash 2.3.5 mang đến cơ chế đồng bộ số hiệu phiên bản động trên giao diện, bộ kiểm thử toàn vẹn phiên bản tự động và tối ưu hóa độ ổn định của quy trình phát hành CI/CD.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.3.5
+
+- Hiển thị số phiên bản động: Thay thế toàn bộ chuỗi phiên bản cố định trong cài đặt và danh mục bản địa hóa bằng cơ chế truy xuất động từ App Bundle, đảm bảo tab Giới thiệu luôn phản ánh chuẩn xác phiên bản đang chạy.
+- Bộ kiểm thử toàn vẹn phiên bản tự động: Bổ sung kiểm thử tự động xác minh tính đồng nhất giữa thẻ phát hành, siêu dữ liệu Info.plist, tài liệu hướng dẫn và luồng cập nhật Sparkle.
+- Quy trình phát hành CI/CD chống lỗi: Xử lý an toàn các thư viện Python tùy chọn trong kịch bản kết xuất tài nguyên, ngăn chặn gián đoạn luồng tự động hóa trên máy chủ từ xa.
+
 # Có Gì Mới Trong Phiên Bản 2.3.4
 
 MacStash 2.3.4 đảm bảo thông báo hoàn thành Pomodoro trên macOS với cơ chế hiển thị tiền cảnh, chuông báo âm thanh và hiệu ứng nhảy icon Dock.

@@ -214,13 +214,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Version 2.1.1 (Universal arm64 / x86_64)"
+            "value": "Version %1$@ (Universal arm64 / x86_64)"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Phiên bản 2.1.1 (Universal arm64 / x86_64)"
+            "value": "Phiên bản %1$@ (Universal arm64 / x86_64)"
           }
         }
       }

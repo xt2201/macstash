@@ -27,6 +27,9 @@ enum TestRunnerMain {
         print("[TEST] Running LocalizationTests...")
         LocalizationTests.run()
 
+        print("[TEST] Running VersionConsistencyTests...")
+        VersionConsistencyTests.run()
+
         let elapsed = ProcessInfo.processInfo.systemUptime - startTime
         let total = TestAssertion.passCount + TestAssertion.failCount
 

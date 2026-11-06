@@ -61,6 +61,10 @@ public final class LocalizationService: @unchecked Sendable {
 
     public func localized(_ key: String, language: String? = nil) -> String {
         let lang = language ?? effectiveLanguage
+        if key == "about.version" {
+            let ver = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? Defaults.appVersion
+            return lang == "vi" ? "Phiên bản \(ver) (Universal arm64 / x86_64)" : "Version \(ver) (Universal arm64 / x86_64)"
+        }
         if let translation = Self.catalog[lang]?[key] {
             return translation
         }
@@ -238,7 +242,7 @@ public final class LocalizationService: @unchecked Sendable {
 
             // About Tab
             "about.title": "About MacStash",
-            "about.version": "Version 2.1.1 (Universal arm64 / x86_64)",
+            "about.version": "Version \(Defaults.appVersion) (Universal arm64 / x86_64)",
             "about.subtitle": "Tactile Hot Corner Dials & Display Controls for macOS",
             "about.diagnostics": "Diagnostics & Logging",
             "about.debugLogging": "Enable Detailed Debug Logging",
@@ -439,7 +443,7 @@ public final class LocalizationService: @unchecked Sendable {
 
             // About Tab
             "about.title": "Thông tin MacStash",
-            "about.version": "Phiên bản 2.1.1 (Universal arm64 / x86_64)",
+            "about.version": "Phiên bản \(Defaults.appVersion) (Universal arm64 / x86_64)",
             "about.subtitle": "Vòng xoay xúc giác góc màn hình & Điều khiển hiển thị cho macOS",
             "about.diagnostics": "Chẩn đoán & Nhật ký",
             "about.debugLogging": "Bật nhật ký gỡ lỗi chi tiết",

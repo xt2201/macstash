@@ -1,15 +1,15 @@
-# Bang Tra Nhanh Phim Tat
+# Bảng Tra Nhanh Phím Tắt
 
-MacStash tich hop cac to hop phim tat toan cuc va phim dieu huong cua so chuan macOS.
+MacStash tích hợp các tổ hợp phím tắt toàn cục và phím điều hướng cửa sổ chuẩn macOS.
 
-## Cac To Hop Phim Mac Dinh
+## Các Tổ Hợp Phím Mặc Định
 
-| Hanh Dong | Phim Tat | Pham Vi | Mo Ta |
+| Hành Động | Phím Tắt | Phạm Vi | Mô Tả |
 |---|---|---|---|
-| Mo Settings | Command+, | Toan cuc / App | Mo cua so thiet lap tuy chon 7 tab. |
-| Dong Cua So | Command+W | Cua so | Dong cua so MacStash hien tai. |
-| Mo Huong Dan | Command+? | Toan cuc / App | Mo cua so tro giup offline Help Viewer. |
-| Bat/Tat Vong Xoay | Option+S | Toan cuc | Hien hoac an ngay lap tuc cac vong xoay goc man hinh. |
-| Bat/Tat Dock An | Option+D | Toan cuc | Truot ra hoac dong thanh dock ung dung an. |
-| An Ung Dung | Command+H | App | Phim an ung dung chuan cua he dieu hanh macOS. |
-| Thoat Ung Dung | Command+Q | App | Thoat MacStash va hoan tra bang mau goc ve man hinh. |
+| Mở Settings | Command+, | Toàn cục / App | Mở cửa sổ thiết lập tùy chọn 7 tab. |
+| Đóng Cửa Sổ | Command+W | Cửa sổ | Đóng cửa sổ MacStash hiện tại. |
+| Mở Hướng Dẫn | Command+? | Toàn cục / App | Mở cửa sổ trợ giúp offline Help Viewer. |
+| Bật/Tắt Vòng Xoay | Option+S | Toàn cục | Hiện hoặc ẩn ngay lập tức các vòng xoay góc màn hình. |
+| Bật/Tắt Dock Ẩn | Option+D | Toàn cục | Trượt ra hoặc đóng thanh dock ứng dụng ẩn. |
+| Ẩn Ứng Dụng | Command+H | App | Phím ẩn ứng dụng chuẩn của hệ điều hành macOS. |
+| Thoát Ứng Dụng | Command+Q | App | Thoát MacStash và hoàn trả bảng màu gốc về màn hình. |

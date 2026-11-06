@@ -1,26 +1,26 @@
-# Huong Dan Cai Dat Settings
+# Hướng Dẫn Cài Đặt Settings
 
-MacStash cung cap cua so thiet lap gom 7 tab chuan theo Apple Human Interface Guidelines. Mo nhanh bang to hop phim Command+, hoac qua menu bar icon.
+MacStash cung cấp cửa sổ thiết lập gồm 7 tab chuẩn theo Apple Human Interface Guidelines. Mở nhanh bằng tổ hợp phím Command+, hoặc qua menu bar icon.
 
-## Danh Sach 7 Tab
+## Danh Sách 7 Tab
 
-1. **General (Tong quan)**:
-   Cong tac tong, an hien bieu tuong tren menu bar, lua chon ngon ngu (Tieng Viet, English), khoi dong cung macOS, va dashboard cap quyen Accessibility, Input Monitoring, Notifications.
+1. **General (Tổng quan)**:
+   Công tắc tổng, ẩn hiện biểu tượng trên menu bar, lựa chọn ngôn ngữ (Tiếng Việt, English), khởi động cùng macOS, và dashboard cấp quyền Accessibility, Input Monitoring, Notifications.
 
-2. **Hot Corners (Goc nong)**:
-   Bat/tat tung goc, gan hanh dong (Volume, Brightness, Backlight, Pomodoro, None), do nhay hit-zone (1-20pt), do tre dung chuot (0-1000ms), do tre tu dong an (50-1000ms), chan khi keo chuot / full screen, va danh sach ung dung loai tru.
+2. **Hot Corners (Góc nóng)**:
+   Bật/tắt từng góc, gán hành động (Volume, Brightness, Backlight, Pomodoro, None), độ nhạy hit-zone (1-20pt), độ trễ dừng chuột (0-1000ms), độ trễ tự động ẩn (50-1000ms), chặn khi kéo chuột / full screen, và danh sách ứng dụng loại trừ.
 
-3. **Appearance (Giao dien)**:
-   Ban kinh vong quay (110-200pt), do trong suot nen kinh, chon chu de (He thong, Sang, Toi), toc do hieu ung, ho tro Reduce Motion, am thanh click co hoc va cuong do rung haptic trackpad.
+3. **Appearance (Giao diện)**:
+   Bán kính vòng quay (110-200pt), độ trong suốt nền kính, chọn chủ đề (Hệ thống, Sáng, Tối), tốc độ hiệu ứng, hỗ trợ Reduce Motion, âm thanh click cơ học và cường độ rung haptic trackpad.
 
-4. **Displays (Man hinh)**:
-   Danh sach man hinh ket noi kem UUID, chon phuong thuc dieu khien (Tu dong, DDC/CI, Giam sang phan mem, Mac dinh), ly do fallback thuc te, thanh truot thu nghiem do sang, va nguong gioi han toi thieu.
+4. **Displays (Màn hình)**:
+   Danh sách màn hình kết nối kèm UUID, chọn phương thức điều khiển (Tự động, DDC/CI, Giảm sáng phần mềm, Mặc định), lý do fallback thực tế, thanh trượt thử nghiệm độ sáng, và ngưỡng giới hạn tối thiểu.
 
-5. **Pomodoro (Dong ho tap trung)**:
-   Thoi gian tap trung, thoi gian nghi ngan, thoi gian nghi dai, so round truoc khi nghi dai, tu dong chay break, va chuong bao khi hoan thanh.
+5. **Pomodoro (Đồng hồ tập trung)**:
+   Thời gian tập trung, thời gian nghỉ ngắn, thời gian nghỉ dài, số round trước khi nghỉ dài, tự động chạy break, và chuông báo khi hoàn thành.
 
-6. **Shortcuts (Phim tat)**:
-   Phim tat toan cuc cho bat tat vong quay va thanh dock an, kem tinh nang kiem tra xung dot voi phim tat macOS he thong.
+6. **Shortcuts (Phím tắt)**:
+   Phím tắt toàn cục cho bật tắt vòng quay và thanh dock ẩn, kèm tính năng kiểm tra xung đột với phím tắt macOS hệ thống.
 
-7. **About / Advanced (Thong tin & Nang cao)**:
-   Thong tin phien ban, mo Console Log he thong, xem huong dan, sao luu va phuc hoi cai dat bang file JSON, va khoi phuc cai dat goc.
+7. **About / Advanced (Thông tin & Nâng cao)**:
+   Thông tin phiên bản, mở Console Log hệ thống, xem hướng dẫn, sao lưu và phục hồi cài đặt bằng tệp JSON, và khôi phục cài đặt gốc.

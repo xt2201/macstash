@@ -1,13 +1,13 @@
-# Co Gi Moi Trong Phien Ban 2.0.0
+# Có Gì Mới Trong Phiên Bản 2.0.0
 
-MacStash 2.0.0 la ban cap nhat lon tap trung vao on dinh, nang cao trai nghiem va bo sung tinh nang cao cap.
+MacStash 2.0.0 là bản cập nhật lớn tập trung vào ổn định, nâng cao trải nghiệm và bổ sung tính năng cao cấp.
 
-## Nhung Cai Tien Noi Bat
+## Những Cải Tiến Nổi Bật
 
-- Nhan dien hinh hoc goc ngoai bien cho he thong da man hinh.
-- May trang thai formal state machine quan ly hien/an voi bo dem generation.
-- Ho tro Universal Binary cho ca Apple Silicon (arm64) va Intel (x86_64).
-- Dieu khien do sang da man hinh tich hop DisplayServices, DDC/CI va giam sang bang phan mem.
-- Dong ho tap trung Pomodoro theo thoi gian don dieu khong bao gio bi do khi keo chuot va ton tai qua che do ngu.
-- Cua so Settings chuan 7 tab voi deep link cap quyen va sao luu cau hinh qua file JSON.
-- Huong dan su dung offline tich hop tim kiem va chuong trinh Onboarding chao mung nguoi dung.
+- Nhận diện hình học góc ngoài biên cho hệ thống đa màn hình.
+- Máy trạng thái formal state machine quản lý hiện/ẩn với bộ đếm generation.
+- Hỗ trợ Universal Binary cho cả Apple Silicon (arm64) và Intel (x86_64).
+- Điều khiển độ sáng đa màn hình tích hợp DisplayServices, DDC/CI và giảm sáng bằng phần mềm.
+- Đồng hồ tập trung Pomodoro theo thời gian đơn điệu không bao giờ bị đơ khi kéo chuột và tồn tại qua chế độ ngủ.
+- Cửa sổ Settings chuẩn 7 tab với deep link cấp quyền và sao lưu cấu hình qua tệp JSON.
+- Hướng dẫn sử dụng offline tích hợp tìm kiếm và chương trình Onboarding chào mừng người dùng.

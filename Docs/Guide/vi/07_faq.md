@@ -1,15 +1,15 @@
-# Cau Hoi Thuong Gap (FAQ)
+# Câu Hỏi Thường Gặp (FAQ)
 
-## Cau Hoi Chung
+## Câu Hỏi Chung
 
-### MacStash co gay ton CPU khi chay ngam khong?
-Khong. Khi cac vong xoay o trang thai an, MacStash khong tieu thu CPU. Ung dung khong su dung timer quet lap hoac tien trinh chay nen vo ich.
+### MacStash có gây tốn CPU khi chạy ngầm không?
+Không. Khi các vòng xoay ở trạng thái ẩn, MacStash không tiêu thụ CPU. Ứng dụng không sử dụng timer quét lặp hoặc tiến trình chạy nền vô ích.
 
-### Toi co the bam cac nut nam o goc cua app khac khong?
-Co. Khi vong xoay dang an, hit-testing luon tra ve nil, cho phep con tro va thao tac click xuyen qua truc tiep xuong cua so ben duoi.
+### Tôi có thể bấm các nút nằm ở góc của app khác không?
+Có. Khi vòng xoay đang ẩn, hit-testing luôn trả về nil, cho phép con trỏ và thao tác click xuyên qua trực tiếp xuống cửa sổ bên dưới.
 
-### Co che nhan dien goc ngoai tren nhieu man hinh hoat dong nhu the nao?
-MacStash tinh toan hinh hoc khong gian desktop theo thoi gian thuc. Khi hai man hinh tiep giap nhau tai mot duong bien chung, ung dung se bo qua va chi kich hoat tai cac goc ngoai bien vat ly that su.
+### Cơ chế nhận diện góc ngoài trên nhiều màn hình hoạt động như thế nào?
+MacStash tính toán hình học không gian desktop theo thời gian thực. Khi hai màn hình tiếp giáp nhau tại một đường biên chung, ứng dụng sẽ bỏ qua và chỉ kích hoạt tại các góc ngoài biên vật lý thật sự.
 
-### Chuyen gi xay ra neu man hinh ngoai khong ho tro DDC/CI?
-MacStash se tu dong chuyen sang co che Giam Sang Bang Phan Mem (Software Dimming) thong qua bang mau gamma. Khi thoat ung dung, bang mau se duoc phuc hoi ve trang thai ban dau.
+### Chuyện gì xảy ra nếu màn hình ngoài không hỗ trợ DDC/CI?
+MacStash sẽ tự động chuyển sang cơ chế Giảm Sáng Bằng Phần Mềm (Software Dimming) thông qua bảng màu gamma. Khi thoát ứng dụng, bảng màu sẽ được phục hồi về trạng thái ban đầu.

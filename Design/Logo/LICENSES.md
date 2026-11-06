@@ -30,7 +30,7 @@ Tài liệu ghi nhận nguồn gốc, bản quyền và giấy phép sử dụng
 
 ## 4. Công Cụ Phần Mềm và Script Tự Động Hóa
 - **Engine sinh asset**:
+  - Swift CLI & Apple AppKit (`NSImage`, `NSBitmapImageRep`, CoreGraphics) để rasterize vector SVG sang PNG chuẩn Retina 32-bit RGBA không méo tỷ lệ.
   - `sips` (macOS built-in Scriptable Image Processing System).
-  - `qlmanage` (macOS built-in QuickLook Server thumbnail rendering engine).
   - `iconutil` (macOS Developer Tools CLI cho việc tạo tệp `.icns`).
   - Python 3 (các thư viện hệ thống tiêu chuẩn dùng để kiểm tra và xử lý dữ liệu).

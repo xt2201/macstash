@@ -17,27 +17,14 @@ mkdir -p "$TMP_DIR"
 
 echo "=== Stash Icon & Asset Rendering Pipeline ==="
 
-# Helper function to render SVG to exact size PNG using qlmanage and sips
+# Helper function to render SVG to exact size PNG using native Apple AppKit vector rasterizer
 render_svg_to_png() {
     local svg_file="$1"
     local out_png="$2"
     local target_w="$3"
     local target_h="$4"
-    local base_name
-    base_name="$(basename "$svg_file" .svg)"
 
-    # Render at high resolution using macOS QuickLook engine
-    qlmanage -t -s 1024 -o "$TMP_DIR" "$svg_file" > /dev/null 2>&1
-    local tmp_render="$TMP_DIR/${base_name}.svg.png"
-
-    if [ ! -f "$tmp_render" ]; then
-        echo "Error: Failed to render $svg_file"
-        exit 1
-    fi
-
-    # Scale to requested dimensions
-    sips -z "$target_h" "$target_w" "$tmp_render" --out "$out_png" > /dev/null 2>&1
-    rm -f "$tmp_render"
+    swift "$PROJECT_ROOT/Scripts/render_svg.swift" "$svg_file" "$out_png" "$target_w" "$target_h"
 }
 
 # 1. Render App Master Icon & Multi-Resolution ICNS
@@ -83,6 +70,7 @@ render_svg_to_png "$SOURCE_DIR/stash_mark_color.svg" "$EXPORTS_DIR/stash_mark_co
 render_svg_to_png "$SOURCE_DIR/stash_mark_mono_black.svg" "$EXPORTS_DIR/stash_mark_mono_black.png" 512 512
 render_svg_to_png "$SOURCE_DIR/stash_mark_mono_white.svg" "$EXPORTS_DIR/stash_mark_mono_white.png" 512 512
 render_svg_to_png "$SOURCE_DIR/stash_social_preview.svg" "$EXPORTS_DIR/stash_social_preview.png" 1280 640
+render_svg_to_png "$SOURCE_DIR/stash_quadrant_overview.svg" "$EXPORTS_DIR/stash_quadrant_overview.png" 1200 640
 render_svg_to_png "$SOURCE_DIR/stash_favicon.svg" "$EXPORTS_DIR/stash_favicon_64.png" 64 64
 render_svg_to_png "$SOURCE_DIR/stash_favicon.svg" "$EXPORTS_DIR/stash_favicon_32.png" 32 32
 
@@ -108,6 +96,7 @@ svg_files = [
     'stash_mark_mono_white',
     'stash_lockup_dark',
     'stash_lockup_light',
+    'stash_quadrant_overview',
     'stash_menubar'
 ]
 

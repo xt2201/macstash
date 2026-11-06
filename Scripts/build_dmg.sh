@@ -99,8 +99,15 @@ fi
 
 # Update version and executable metadata in Info.plist
 if [[ -f "$APP_BUNDLE/Contents/Info.plist" ]]; then
+    BUILD_VERSION=$(echo "$VERSION" | tr -d '.')
+    if [[ -f "$REPO_ROOT/Scripts/Info.plist" ]]; then
+        EXISTING_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$REPO_ROOT/Scripts/Info.plist" 2>/dev/null || true)
+        if [[ -n "$EXISTING_BUILD" && "$EXISTING_BUILD" =~ ^[0-9]+$ ]]; then
+            BUILD_VERSION="$EXISTING_BUILD"
+        fi
+    fi
     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || true
-    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_VERSION" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || true
     /usr/libexec/PlistBuddy -c "Set :CFBundleExecutable Stash" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || true
     /usr/libexec/PlistBuddy -c "Add :CFBundleIconFile string AppIcon" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || \
     /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile AppIcon" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || true

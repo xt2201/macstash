@@ -13,8 +13,7 @@
     </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect width="1024" height="320" rx="32" fill="url(#lockupLightBg)" stroke="#E5E5EA" stroke-width="2" />
+  <!-- Transparent Background for GitHub Dual-Theme Compatibility -->
 
   <!-- STANDALONE MARK (Scales 1024 down to 240x240, placed at x=48, y=40) -->
   <g transform="translate(48, 40) scale(0.234375)">

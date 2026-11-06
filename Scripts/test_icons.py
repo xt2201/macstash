@@ -12,12 +12,9 @@ targets = ["refined_01_radial_bloom", "refined_02_aperture"]
 # 1. Render master 1024x1024
 for name in targets:
     svg = f"{src_dir}/{name}.svg"
-    raw_png = f"{out_dir}/{name}.svg.png"
     dest_1024 = f"{out_dir}/{name}_1024.png"
-    subprocess.run(["qlmanage", "-t", "-s", "1024", "-o", out_dir, svg],
+    subprocess.run(["swift", "Scripts/render_svg.swift", svg, dest_1024, "1024", "1024"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if os.path.exists(raw_png):
-        os.replace(raw_png, dest_1024)
 
 sizes = [1024, 512, 256, 128, 64, 32, 16]
 

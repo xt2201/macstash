@@ -785,6 +785,118 @@
         }
       }
     },
+    "corners.edgeMediaControls": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Now Playing Media Controls under Volume"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiển thị bộ điều khiển nhạc Now Playing dưới thanh âm lượng"
+          }
+        }
+      }
+    },
+    "corners.edgeVisualizer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dancing Audio Waveform Visualizer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiệu ứng sóng nhạc nhảy theo điệu"
+          }
+        }
+      }
+    },
+    "corners.edgeMediaControlsHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Displays album artwork, dancing equalizer bars, and vertical controls (Previous on top, Play/Pause in middle, Next at bottom) for any playing media."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiển thị ảnh bìa album, thanh sóng nhảy theo nhạc và phím điều khiển dọc (Lùi bài ở trên, Phát/Dừng ở giữa, Chuyển bài ở dưới) cho mọi nguồn âm thanh."
+          }
+        }
+      }
+    },
+    "corners.media.previous": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous Track"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài trước"
+          }
+        }
+      }
+    },
+    "corners.media.play": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát"
+          }
+        }
+      }
+    },
+    "corners.media.pause": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tạm dừng"
+          }
+        }
+      }
+    },
+    "corners.media.next": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next Track"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài tiếp theo"
+          }
+        }
+      }
+    },
     "corners.dwellDelay": {
       "localizations": {
         "en": {

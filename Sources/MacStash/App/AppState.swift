@@ -9,6 +9,7 @@ public final class AppState: ObservableObject {
 
     // Domain & Hardware Services
     public let audio = AudioManager.shared
+    public let nowPlaying = NowPlayingManager.shared
     public let keyboard = KeyboardBrightnessManager.shared
     public let updater = AutoUpdateManager.shared
     public let profiles = AppProfileManager.shared
@@ -49,6 +50,12 @@ public final class AppState: ObservableObject {
     }
     @Published public var isEdgeSlidersEnabled: Bool = true {
         didSet { settings.isEdgeSlidersEnabled = isEdgeSlidersEnabled }
+    }
+    @Published public var edgeBarShowMediaControls: Bool = true {
+        didSet { settings.edgeBarShowMediaControls = edgeBarShowMediaControls }
+    }
+    @Published public var edgeBarVisualizerEnabled: Bool = true {
+        didSet { settings.edgeBarVisualizerEnabled = edgeBarVisualizerEnabled }
     }
     @Published public var onlyOuterCorners: Bool = false {
         didSet { settings.onlyOuterCorners = onlyOuterCorners }
@@ -106,6 +113,8 @@ public final class AppState: ObservableObject {
         self.isEnabled = loaded.isEnabled
         self.isCornerDialsEnabled = loaded.isCornerDialsEnabled
         self.isEdgeSlidersEnabled = loaded.isEdgeSlidersEnabled
+        self.edgeBarShowMediaControls = loaded.edgeBarShowMediaControls
+        self.edgeBarVisualizerEnabled = loaded.edgeBarVisualizerEnabled
         self.onlyOuterCorners = loaded.onlyOuterCorners
         self.scrollAdjustmentEnabled = loaded.scrollAdjustmentEnabled
         self.cornerSensitivityRadius = loaded.cornerSensitivityPoints
@@ -452,6 +461,8 @@ public final class AppState: ObservableObject {
         self.isEnabled = fresh.isEnabled
         self.isCornerDialsEnabled = fresh.isCornerDialsEnabled
         self.isEdgeSlidersEnabled = fresh.isEdgeSlidersEnabled
+        self.edgeBarShowMediaControls = fresh.edgeBarShowMediaControls
+        self.edgeBarVisualizerEnabled = fresh.edgeBarVisualizerEnabled
         self.onlyOuterCorners = fresh.onlyOuterCorners
         self.scrollAdjustmentEnabled = fresh.scrollAdjustmentEnabled
         self.cornerSensitivityRadius = fresh.cornerSensitivityPoints

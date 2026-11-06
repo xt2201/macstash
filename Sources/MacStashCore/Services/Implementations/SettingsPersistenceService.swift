@@ -6,6 +6,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var isEnabled: Bool
     public var isCornerDialsEnabled: Bool
     public var isEdgeSlidersEnabled: Bool
+    public var edgeBarShowMediaControls: Bool
+    public var edgeBarVisualizerEnabled: Bool
 
     // Hot Corners
     public var cornerSensitivityPoints: CGFloat
@@ -62,6 +64,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
         isEnabled: Bool = true,
         isCornerDialsEnabled: Bool = true,
         isEdgeSlidersEnabled: Bool = true,
+        edgeBarShowMediaControls: Bool = true,
+        edgeBarVisualizerEnabled: Bool = true,
         cornerSensitivityPoints: CGFloat = Defaults.HotCorner.defaultHitZoneSizePoints,
         cornerDwellDelaySeconds: TimeInterval = Defaults.HotCorner.defaultDwellDelaySeconds,
         cornerHideDelaySeconds: TimeInterval = Defaults.HotCorner.defaultHideDelaySeconds,
@@ -111,6 +115,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.isEnabled = isEnabled
         self.isCornerDialsEnabled = isCornerDialsEnabled
         self.isEdgeSlidersEnabled = isEdgeSlidersEnabled
+        self.edgeBarShowMediaControls = edgeBarShowMediaControls
+        self.edgeBarVisualizerEnabled = edgeBarVisualizerEnabled
         self.cornerSensitivityPoints = max(Defaults.HotCorner.minHitZoneSizePoints, min(Defaults.HotCorner.maxHitZoneSizePoints, cornerSensitivityPoints))
         self.cornerDwellDelaySeconds = max(Defaults.HotCorner.minDwellDelaySeconds, min(Defaults.HotCorner.maxDwellDelaySeconds, cornerDwellDelaySeconds))
         self.cornerHideDelaySeconds = max(Defaults.HotCorner.minHideDelaySeconds, min(Defaults.HotCorner.maxHideDelaySeconds, cornerHideDelaySeconds))
@@ -155,6 +161,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
         let isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? def.isEnabled
         let isCornerDialsEnabled = try container.decodeIfPresent(Bool.self, forKey: .isCornerDialsEnabled) ?? def.isCornerDialsEnabled
         let isEdgeSlidersEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEdgeSlidersEnabled) ?? def.isEdgeSlidersEnabled
+        let edgeBarShowMediaControls = try container.decodeIfPresent(Bool.self, forKey: .edgeBarShowMediaControls) ?? def.edgeBarShowMediaControls
+        let edgeBarVisualizerEnabled = try container.decodeIfPresent(Bool.self, forKey: .edgeBarVisualizerEnabled) ?? def.edgeBarVisualizerEnabled
         let cornerSensitivityPoints = try container.decodeIfPresent(CGFloat.self, forKey: .cornerSensitivityPoints) ?? def.cornerSensitivityPoints
         let cornerDwellDelaySeconds = try container.decodeIfPresent(TimeInterval.self, forKey: .cornerDwellDelaySeconds) ?? def.cornerDwellDelaySeconds
         let cornerHideDelaySeconds = try container.decodeIfPresent(TimeInterval.self, forKey: .cornerHideDelaySeconds) ?? def.cornerHideDelaySeconds
@@ -195,6 +203,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
             isEnabled: isEnabled,
             isCornerDialsEnabled: isCornerDialsEnabled,
             isEdgeSlidersEnabled: isEdgeSlidersEnabled,
+            edgeBarShowMediaControls: edgeBarShowMediaControls,
+            edgeBarVisualizerEnabled: edgeBarVisualizerEnabled,
             cornerSensitivityPoints: cornerSensitivityPoints,
             cornerDwellDelaySeconds: cornerDwellDelaySeconds,
             cornerHideDelaySeconds: cornerHideDelaySeconds,

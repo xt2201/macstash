@@ -106,6 +106,27 @@ public struct HotCornersTab: View {
                         Text(appState.localized("corners.edgeSlidersHint"))
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
+
+                        if currentProfile.rightEdgeAction == .volume {
+                            Divider()
+                                .padding(.vertical, 2)
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Toggle(appState.localized("corners.edgeMediaControls"), isOn: $appState.edgeBarShowMediaControls)
+                                    .font(.system(size: 12, weight: .medium))
+
+                                if appState.edgeBarShowMediaControls {
+                                    Toggle(appState.localized("corners.edgeVisualizer"), isOn: $appState.edgeBarVisualizerEnabled)
+                                        .font(.system(size: 12))
+                                        .padding(.leading, 18)
+
+                                    Text(appState.localized("corners.edgeMediaControlsHint"))
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.secondary)
+                                        .padding(.leading, 18)
+                                }
+                            }
+                        }
                     }
                 }
                 .padding(8)

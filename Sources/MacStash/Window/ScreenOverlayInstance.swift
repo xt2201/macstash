@@ -142,8 +142,8 @@ public final class ScreenOverlayInstance {
     }
 
     private func rightEdgeRect(in frame: NSRect) -> NSRect {
-        let panelWidth: CGFloat = 60
-        let panelHeight: CGFloat = 250
+        let panelWidth: CGFloat = 260
+        let panelHeight: CGFloat = 440
         let panelY = frame.minY + (frame.height - panelHeight) / 2
         let panelX = frame.maxX - panelWidth
         return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)

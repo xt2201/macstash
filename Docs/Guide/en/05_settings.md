@@ -8,7 +8,7 @@ MacStash provides a comprehensive 7-tab configuration window compliant with macO
    Master switch, menu bar icon toggle, language switcher (English, Vietnamese), launch at login, and permissions status dashboard for Accessibility, Input Monitoring, and Notifications.
 
 2. **Hot Corners**:
-   Application Profile manager (Default plus custom per-app profiles with automatic frontmost app detection), per-corner enable toggles and action assignments (Volume, Brightness, Backlight, Pomodoro, None), Edge Sliders toggle and right-edge action assignment, hit-zone sensitivity (1-20pt), dwell activation delay (0-1000ms), auto-hide delay (50-1000ms), interaction gestures (two-finger scroll adjustment without click-and-drag), mouse drag suppression, fullscreen suppression, inner display seam suppression, and excluded applications.
+   Application Profile manager (Default plus custom per-app profiles with automatic frontmost app detection), per-corner enable toggles and action assignments (Volume, Brightness, Backlight, Pomodoro, None), Edge Sliders toggle and action assignment, with Now Playing media controls option under Volume (live album artwork, dancing audio waveform visualizer, and vertical transport controls: Previous on top, Play/Pause in middle, Next at bottom), hit-zone sensitivity (1-20pt), dwell activation delay (0-1000ms), auto-hide delay (50-1000ms), interaction gestures (two-finger scroll adjustment without click-and-drag), mouse drag suppression, fullscreen suppression, inner display seam suppression, and excluded applications.
 
 3. **Appearance**:
    Dial radius (110-200pt), glass opacity (30-100%), theme selection (System, Light, Dark), animation speed, Reduce Motion support, mechanical audio click sounds, and trackpad haptic intensity.

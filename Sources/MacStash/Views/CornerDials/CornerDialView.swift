@@ -22,12 +22,25 @@ public struct CornerDialView: View {
         appState.action(for: corner)
     }
 
+    private var actionColors: [Color] {
+        if action == .timer && appState.pomodoroMode != .focus {
+            return [Color(red: 0.2, green: 0.85, blue: 0.5), Color(red: 0.1, green: 0.65, blue: 0.35)]
+        }
+        return action.accentColors
+    }
+
     private var currentValue: Double {
+        if action == .timer {
+            if appState.isPomodoroRunning {
+                return appState.pomodoroProgress
+            }
+            if isDragging {
+                return dragValue
+            }
+            return appState.pomodoroProgress
+        }
         if isDragging {
             return dragValue
-        }
-        if action == .timer {
-            return appState.pomodoroProgress
         }
         return appState.getValue(for: action, displayID: displayID)
     }
@@ -57,14 +70,14 @@ public struct CornerDialView: View {
                     DialTicksView(
                         geometry: geom,
                         value: currentValue,
-                        accentColor: action.accentColors.first ?? .accentColor
+                        accentColor: actionColors.first ?? .accentColor
                     )
 
                     // Active progress ring arc
                     DialArcShape(
                         geometry: geom,
                         value: currentValue,
-                        gradientColors: action.accentColors
+                        gradientColors: actionColors
                     )
 
                     // Center Action Icon & Value readout (Tap to toggle)
@@ -77,7 +90,9 @@ public struct CornerDialView: View {
                             value: currentValue,
                             dialSize: dialSize,
                             isExpanded: isExpanded,
-                            formattedTimer: appState.formattedTimerTime
+                            formattedTimer: appState.formattedTimerTime,
+                            isPomodoroRunning: appState.isPomodoroRunning,
+                            pomodoroMode: appState.pomodoroMode
                         )
                     }
                     .buttonStyle(.plain)
@@ -93,6 +108,9 @@ public struct CornerDialView: View {
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { gesture in
+                            if action == .timer && appState.isPomodoroRunning {
+                                return
+                            }
                             if !isDragging {
                                 isDragging = true
                                 dragValue = currentValue
@@ -105,8 +123,10 @@ public struct CornerDialView: View {
                             appState.setValue(for: action, value: norm, displayID: displayID)
                         }
                         .onEnded { _ in
-                            isDragging = false
-                            appState.setValue(for: action, value: dragValue, displayID: displayID)
+                            if isDragging {
+                                isDragging = false
+                                appState.setValue(for: action, value: dragValue, displayID: displayID)
+                            }
                         }
                 )
             }
@@ -160,20 +180,32 @@ private struct CenterActionBadge: View {
     let dialSize: CGFloat
     let isExpanded: Bool
     let formattedTimer: String
+    let isPomodoroRunning: Bool
+    let pomodoroMode: PomodoroMode
 
     var body: some View {
         let offset = badgeOffset(for: corner, in: dialSize)
 
-        VStack(spacing: 2) {
-            Image(systemName: action.systemImage)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(action.accentColors.first ?? .accentColor)
-
+        VStack(spacing: 1) {
             if action == .timer {
+                HStack(spacing: 3) {
+                    Image(systemName: isPomodoroRunning ? "pause.fill" : "play.fill")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundColor(pomodoroMode == .focus ? .purple : .green)
+
+                    Image(systemName: pomodoroMode == .focus ? "brain.head.profile" : "cup.and.saucer.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(pomodoroMode == .focus ? .purple : .green)
+                }
+
                 Text(formattedTimer)
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(.primary)
             } else {
+                Image(systemName: action.systemImage)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(action.accentColors.first ?? .accentColor)
+
                 Text("\(Int(round(value * 100)))%")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(.primary)
@@ -184,6 +216,15 @@ private struct CenterActionBadge: View {
             Circle()
                 .fill(.ultraThickMaterial)
                 .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+                .overlay(
+                    Circle()
+                        .strokeBorder(
+                            action == .timer && isPomodoroRunning
+                                ? (pomodoroMode == .focus ? Color.purple.opacity(0.6) : Color.green.opacity(0.6))
+                                : Color.white.opacity(0.1),
+                            lineWidth: 1.5
+                        )
+                )
         )
         .offset(x: offset.x, y: offset.y)
     }

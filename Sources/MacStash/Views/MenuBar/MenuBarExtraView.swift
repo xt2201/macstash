@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import MacStashCore
 
 public struct MenuBarExtraView: View {
     @ObservedObject var appState: AppState
@@ -51,24 +52,83 @@ public struct MenuBarExtraView: View {
             Divider()
 
             // Focus Timer Quick Status
-            HStack {
-                Image(systemName: "timer")
-                    .foregroundColor(.purple)
-                    .frame(width: 16)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    Image(systemName: appState.pomodoroMode == .focus ? "brain.head.profile" : "cup.and.saucer.fill")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(appState.pomodoroMode == .focus ? .purple : .green)
 
-                Text(appState.localized("menubar.focusTimer"))
-                    .font(.system(size: 11, weight: .medium))
+                    Text(modeTitle(for: appState.pomodoroMode))
+                        .font(.system(size: 11, weight: .semibold))
 
-                Text(appState.formattedTimerTime)
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    Spacer()
 
-                Spacer()
-
-                Button(appState.isPomodoroRunning ? appState.localized("menubar.pause") : appState.localized("menubar.start")) {
-                    appState.toggleAction(.timer)
+                    if appState.pomodoroTotalRounds > 0 {
+                        Text(String(format: appState.localized("pomodoro.roundIndicator"), min(appState.pomodoroTotalRounds, appState.pomodoroCompletedRounds + 1), appState.pomodoroTotalRounds))
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1.5)
+                            .background(Capsule().fill(Color.secondary.opacity(0.12)))
+                    }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.mini)
+
+                HStack(alignment: .center) {
+                    Text(appState.formattedTimerTime)
+                        .font(.system(size: 18, weight: .bold, design: .monospaced))
+                        .foregroundColor(appState.isPomodoroRunning ? .primary : .secondary)
+
+                    Spacer()
+
+                    HStack(spacing: 4) {
+                        Button(action: {
+                            appState.togglePomodoro()
+                        }) {
+                            Image(systemName: appState.isPomodoroRunning ? "pause.fill" : "play.fill")
+                                .font(.system(size: 10, weight: .bold))
+                                .frame(width: 14, height: 14)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.mini)
+                        .help(appState.isPomodoroRunning ? appState.localized("menubar.pause") : appState.localized("menubar.start"))
+
+                        Button(action: {
+                            appState.skipPomodoroMode()
+                        }) {
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 10, weight: .bold))
+                                .frame(width: 14, height: 14)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.mini)
+                        .help(appState.localized("menubar.skip"))
+
+                        Button(action: {
+                            appState.resetPomodoro()
+                        }) {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 10, weight: .bold))
+                                .frame(width: 14, height: 14)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.mini)
+                        .help(appState.localized("menubar.reset"))
+                    }
+                }
+
+                // Progress Bar
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.secondary.opacity(0.15))
+                            .frame(height: 3)
+
+                        Capsule()
+                            .fill(appState.pomodoroMode == .focus ? Color.purple : Color.green)
+                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(appState.pomodoroProgress))), height: 3)
+                    }
+                }
+                .frame(height: 3)
             }
             .padding(.horizontal, 12)
 
@@ -189,5 +249,13 @@ public struct MenuBarExtraView: View {
             .padding(.bottom, 6)
         }
         .frame(width: 260)
+    }
+
+    private func modeTitle(for mode: PomodoroMode) -> String {
+        switch mode {
+        case .focus: return appState.localized("pomodoro.modeFocus")
+        case .shortBreak: return appState.localized("pomodoro.modeShortBreak")
+        case .longBreak: return appState.localized("pomodoro.modeLongBreak")
+        }
     }
 }

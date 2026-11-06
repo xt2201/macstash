@@ -96,13 +96,24 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 250, height: 320)
+        popover.contentSize = NSSize(width: 260, height: 350)
         popover.behavior = .transient
 
         let menuBarView = MenuBarExtraView(appState: appState) { [weak self] in
             self?.openSettings()
         }
         popover.contentViewController = NSHostingController(rootView: menuBarView)
+
+        setupStatusItemSubscribers()
+    }
+
+    private func setupStatusItemSubscribers() {
+        Publishers.CombineLatest3(appState.$isPomodoroRunning, appState.$pomodoroRemainingSeconds, appState.$pomodoroMode)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isRunning, remaining, mode in
+                self?.updateStatusItem(isRunning: isRunning, remaining: remaining, mode: mode)
+            }
+            .store(in: &cancellables)
     }
 
     private func loadStatusImage(active: Bool) -> NSImage {
@@ -167,9 +178,28 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         return img
     }
 
-    public func updateStatusItemImage() {
+    public func updateStatusItem(isRunning: Bool, remaining: TimeInterval, mode: PomodoroMode) {
         guard let button = statusItem?.button else { return }
-        button.image = loadStatusImage(active: appState.isPomodoroRunning)
+        button.image = loadStatusImage(active: isRunning)
+        button.imagePosition = .imageLeading
+
+        if isRunning {
+            let total = max(0, Int(round(remaining)))
+            let mins = total / 60
+            let secs = total % 60
+            let timeStr = String(format: "%02d:%02d", mins, secs)
+            button.title = " \(timeStr)"
+        } else {
+            button.title = ""
+        }
+    }
+
+    public func updateStatusItemImage() {
+        updateStatusItem(
+            isRunning: appState.isPomodoroRunning,
+            remaining: appState.pomodoroRemainingSeconds,
+            mode: appState.pomodoroMode
+        )
     }
 
     @objc private func togglePopover() {

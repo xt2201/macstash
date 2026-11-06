@@ -105,10 +105,6 @@ public final class AppState: ObservableObject {
         self.soundVolume = loaded.soundVolume
         self.hapticIntensity = HapticIntensity(rawValue: loaded.hapticIntensity.capitalized) ?? .medium
 
-        applyPomodoroSettings()
-        restorePomodoroSnapshot()
-        syncPomodoroProperties()
-
         let defaults = UserDefaults.standard
         if let data = defaults.data(forKey: "stash_appProfiles"),
            let decoded = try? JSONDecoder().decode([AppProfile].self, from: data),
@@ -120,6 +116,10 @@ public final class AppState: ObservableObject {
             self.appProfiles = [defaultProf]
             self.activeProfile = defaultProf
         }
+
+        applyPomodoroSettings()
+        restorePomodoroSnapshot()
+        syncPomodoroProperties()
 
         setupSubscribers()
         setupPomodoroTimer()

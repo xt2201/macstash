@@ -11,7 +11,7 @@ This document reports the technical stabilization, architectural overhaul, and p
 - **Settings Scene**: Implemented standard macOS Human Interface Guidelines (HIG) 7-tab Settings window with system permission deep links and JSON backup.
 - **Documentation & User Guidance**: Bundled bilingual offline Markdown guide (`en` and `vi`) with in-app Help Viewer and interactive 4-step first-launch Onboarding.
 - **Release Automation**: Full universal release packaging (`arm64 + x86_64`) via `Makefile` and `Scripts/build_dmg.sh`, generating signed DMGs and SHA-256 checksums.
-- **Quality Audit**: 0 emojis across all files, 0 `print`/`NSLog` calls in application source code, 0 force unwraps, strict concurrency compliance, and 67/67 unit test cases passing in 0.005s.
+- **Quality Audit**: 0 emojis across all files, 0 `print`/`NSLog` calls in application source code, 0 force unwraps, strict concurrency compliance, and 122/122 test assertions passing in 0.011s.
 
 ---
 
@@ -178,8 +178,9 @@ This document reports the technical stabilization, architectural overhaul, and p
 | `Sources/MacStash/Views/Settings/AboutTab.swift` | Added | Diagnostics, logging, and JSON configuration backup pane. |
 | `Sources/MacStash/Views/Guide/UserGuideView.swift` | Added | In-app offline markdown help viewer with search. |
 | `Sources/MacStash/Views/Guide/OnboardingView.swift` | Added | 4-step interactive onboarding sheet. |
-| `Docs/Guide/en/*.md` (4 files) | Added | English offline user manual articles. |
-| `Docs/Guide/vi/*.md` (4 files) | Added | Vietnamese offline user manual articles. |
+| `Docs/Guide/en/*.md` (8 files) | Added | English offline user manual articles (Getting Started, Brightness, Pomodoro, Troubleshooting, Settings, Shortcuts, FAQ, What's New). |
+| `Docs/Guide/vi/*.md` (8 files) | Added | Vietnamese offline user manual articles. |
+| `Tests/MacStashTests/DocumentationIntegrityTests.swift` | Added | Automated verification of doc symmetry, settings coverage, and zero emojis. |
 | `Sources/MacStash/Core/BrightnessManager.swift` | Deleted | Replaced by `CompositeBrightnessService`. |
 | `Sources/MacStash/Core/FocusTimerManager.swift` | Deleted | Replaced by `PomodoroEngine`. |
 | `Sources/MacStash/Models/CornerPosition.swift` | Deleted | Replaced by `MacStashCore.CornerPosition`. |
@@ -200,7 +201,8 @@ The automated test runner executes without dependencies on external IDE framewor
 | `PomodoroEngineTests` | 4 | 10 | Passed | 0.001s |
 | `BrightnessPolicyTests` | 3 | 12 | Passed | 0.001s |
 | `SettingsPersistenceTests` | 3 | 7 | Passed | 0.002s |
-| **Total** | **18** | **67** | **67 / 67 Passed** | **0.005s** |
+| `DocumentationIntegrityTests` | 5 | 55 | Passed | 0.005s |
+| **Total** | **23** | **122** | **122 / 122 Passed** | **0.011s** |
 
 ### Reproduction Commands
 ```bash

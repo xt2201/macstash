@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Replaced generic placeholder symbols in status bar, onboarding, and about panels with official brand mark.
 - Added Design Governance section to `AGENTS.md` designating SVGs in `Design/Logo/source/` as the single source of truth.
 - Updated User Guide (both English and Vietnamese editions) with brand identity and status bar appearance documentation.
+- Standardized all Vietnamese documentation across Docs/Guide/vi/ and Design/Logo/ with complete diacritics and typography.
 
 ---
 

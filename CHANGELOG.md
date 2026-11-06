@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.3.4] - 2026-11-06
+
+### Added
+- Native macOS alert chime sound (`Glass`) and system audio alert on Pomodoro interval completion.
+- Critical user attention request (`NSApp.requestUserAttention`) causing the Dock icon to bounce upon interval finish.
+- Foreground notification presentation support via `UNUserNotificationCenterDelegate` ensuring alert banners and sounds are delivered even when MacStash is active.
+
+### Fixed
+- Fixed missing Pomodoro completion notifications on macOS by setting the notification center delegate and handling `willPresent` with banner, sound, and badge options.
+- Fixed inverted completion messages: properly passes `completedMode` from engine tick so focus session completions announce break time and break completions announce focus time.
+- Fixed notification delivery authorization auto-check when status is unprompted.
+
+---
+
 ## [2.3.3] - 2026-11-06
 
 ### Added

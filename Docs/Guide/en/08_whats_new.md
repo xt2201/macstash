@@ -1,3 +1,14 @@
+# What's New in Version 2.3.4
+
+MacStash 2.3.4 guarantees Pomodoro completion notifications on macOS via native foreground presentation delegates, audible alert chimes, and Dock icon attention requests.
+
+## Key Enhancements in Version 2.3.4
+
+- Guaranteed Foreground Notification Delivery: Integrated `UNUserNotificationCenterDelegate` with `.banner, .sound, .badge, .list` presentation options, resolving issues where macOS silently discarded completion banners while the application was active.
+- Audible Alert Chime: Plays a crisp macOS completion sound (`Glass` or user preferred alert) and haptic detents when an interval ends, ensuring you hear the alert even if banners are silenced.
+- Critical User Attention: Automatically requests user attention (`NSApp.requestUserAttention`) causing the Dock icon to bounce upon interval finish.
+- Synchronized Mode Text: Accurately announces focus completion ("Pomodoro Completed") and break completion ("Break Finished") without inverted message strings.
+
 # What's New in Version 2.3.3
 
 MacStash 2.3.3 introduces a lossless AppKit vector rendering pipeline, dual-theme GitHub lockup integration, and a comprehensive documentation and visual asset overhaul.

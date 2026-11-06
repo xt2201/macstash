@@ -1,3 +1,14 @@
+# Có Gì Mới Trong Phiên Bản 2.3.4
+
+MacStash 2.3.4 đảm bảo thông báo hoàn thành Pomodoro trên macOS với cơ chế hiển thị tiền cảnh, chuông báo âm thanh và hiệu ứng nhảy icon Dock.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.3.4
+
+- Hiển thị biểu ngữ thông báo tiền cảnh: Tích hợp `UNUserNotificationCenterDelegate` kèm tùy chọn `.banner, .sound, .badge, .list`, chấm dứt hiện tượng macOS tự động nuốt/bỏ qua biểu ngữ khi ứng dụng đang chạy.
+- Chuông báo âm thanh tức thì: Phát âm thanh thông báo macOS rõ ràng (`Glass`) và rung xúc giác khi kết thúc phiên, đảm bảo bạn luôn nghe thấy ngay cả khi biểu ngữ bị ẩn.
+- Hiệu ứng nhảy icon Dock: Gọi `NSApp.requestUserAttention` khiến icon ứng dụng nhảy trên Dock để báo hiệu phiên tập trung hoặc phiên nghỉ đã hoàn thành.
+- Đồng bộ thông điệp chính xác: Khắc phục thông điệp thông báo bị ngược, thông báo chính xác "Hoàn thành phiên Pomodoro" khi hết giờ làm việc và "Kết thúc giờ nghỉ" khi hết giờ nghỉ.
+
 # Có Gì Mới Trong Phiên Bản 2.3.3
 
 MacStash 2.3.3 ra mắt hệ thống kết xuất vector AppKit không suy hao, tích hợp bộ nhận diện tương thích giao diện kép Light/Dark trên GitHub và nâng cấp toàn diện tài liệu trực quan.

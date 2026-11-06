@@ -12,6 +12,8 @@
 
 3. **Notifications**:
    Required to post completion banners for Pomodoro focus intervals.
+   Grant access in macOS System Settings > Notifications > MacStash.
+   MacStash integrates native foreground presentation (`UNUserNotificationCenterDelegate`), audible alert chimes (`Glass`), and Dock icon bouncing (`requestUserAttention`) ensuring completion alerts are never missed even when working in other applications.
 
 ## Accidental Trigger Prevention
 

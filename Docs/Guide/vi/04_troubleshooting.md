@@ -11,7 +11,7 @@
    Cấp quyền tại: System Settings > Privacy & Security > Input Monitoring.
 
 3. **Notifications (Thông Báo)**:
-   Dùng để gửi thông báo khi đồng hồ Pomodoro hoàn thành.
+   Dùng để gửi thông báo khi đồng hồ Pomodoro hoàn thành. Cấp quyền tại: System Settings > Notifications > MacStash. MacStash tích hợp thông báo tiền cảnh (`UNUserNotificationCenterDelegate`), chuông báo âm thanh (`Glass`) cùng hiệu ứng nhảy icon Dock (`requestUserAttention`) để bạn không bỏ lỡ thông báo kết thúc phiên.
 
 ## Tránh Chạm Nhầm Các Góc
 

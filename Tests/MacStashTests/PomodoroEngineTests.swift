@@ -59,6 +59,7 @@ public enum PomodoroEngineTests {
         TestAssertion.assertEqual(tick2.remaining, TimeInterval(0.0))
         TestAssertion.assertEqual(tick2.progress, Double(0.0))
         TestAssertion.assertTrue(tick2.didJustComplete)
+        TestAssertion.assertEqual(tick2.completedMode, .focus)
         TestAssertion.assertEqual(engine.completedRounds, 1)
 
         let tick3 = engine.tick()

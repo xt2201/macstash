@@ -35,6 +35,11 @@ public enum PomodoroState: Equatable, Sendable {
         if case .running = self { return true }
         return false
     }
+
+    public var isPaused: Bool {
+        if case .paused = self { return true }
+        return false
+    }
 }
 
 public struct PomodoroSnapshot: Codable, Equatable, Sendable {

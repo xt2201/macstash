@@ -80,6 +80,7 @@ public final class AppState: ObservableObject {
     @Published public var pomodoroRemainingSeconds: TimeInterval = TimeInterval(Defaults.Pomodoro.defaultFocusDurationSeconds)
     @Published public var pomodoroProgress: Double = 1.0
     @Published public var isPomodoroRunning: Bool = false
+    @Published public var isPomodoroPaused: Bool = false
     @Published public var pomodoroMode: PomodoroMode = .focus
     @Published public var pomodoroCompletedRounds: Int = 0
     @Published public var pomodoroTotalRounds: Int = Defaults.Pomodoro.defaultRoundsBeforeLongBreak
@@ -187,6 +188,7 @@ public final class AppState: ObservableObject {
         pomodoroRemainingSeconds = pomodoroEngine.remainingSeconds
         pomodoroProgress = pomodoroEngine.progress
         isPomodoroRunning = pomodoroEngine.state.isRunning
+        isPomodoroPaused = pomodoroEngine.state.isPaused
         pomodoroMode = pomodoroEngine.mode
         pomodoroCompletedRounds = pomodoroEngine.completedRounds
         pomodoroTotalRounds = pomodoroEngine.roundsBeforeLongBreak
@@ -312,7 +314,20 @@ public final class AppState: ObservableObject {
         case .keyboardBrightness:
             return Double(keyboard.brightness)
         case .timer:
-            return pomodoroProgress
+            if pomodoroEngine.state.isRunning || isPomodoroPaused {
+                return pomodoroProgress
+            } else {
+                let mins: Double
+                switch pomodoroEngine.mode {
+                case .focus:
+                    mins = Double(settings.pomodoroFocusDurationMinutes)
+                case .shortBreak:
+                    mins = Double(settings.pomodoroShortBreakMinutes)
+                case .longBreak:
+                    mins = Double(settings.pomodoroLongBreakMinutes)
+                }
+                return max(0.02, min(1.0, mins / 60.0))
+            }
         case .none:
             return 0.0
         }
@@ -342,10 +357,18 @@ public final class AppState: ObservableObject {
         case .keyboardBrightness:
             keyboard.setBrightness(clamped)
         case .timer:
-            // When timer is not running, dial adjusts focus session duration (1 to 60 mins)
+            // When timer is not running, dial adjusts session duration (1 to 60 mins)
             if !pomodoroEngine.state.isRunning {
-                let mins = max(1, Int(round(Double(clamped) * 60.0)))
+                let mins = max(1, min(60, Int(round(Double(clamped) * 60.0))))
                 let dur = TimeInterval(mins * 60)
+                switch pomodoroEngine.mode {
+                case .focus:
+                    settings.pomodoroFocusDurationMinutes = mins
+                case .shortBreak:
+                    settings.pomodoroShortBreakMinutes = mins
+                case .longBreak:
+                    settings.pomodoroLongBreakMinutes = mins
+                }
                 pomodoroEngine.reset(toDurationSeconds: dur)
                 syncPomodoroProperties()
                 savePomodoroSnapshot()

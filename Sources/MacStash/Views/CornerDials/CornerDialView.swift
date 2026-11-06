@@ -30,15 +30,6 @@ public struct CornerDialView: View {
     }
 
     private var currentValue: Double {
-        if action == .timer {
-            if appState.isPomodoroRunning {
-                return appState.pomodoroProgress
-            }
-            if isDragging {
-                return dragValue
-            }
-            return appState.pomodoroProgress
-        }
         if isDragging {
             return dragValue
         }
@@ -80,6 +71,41 @@ public struct CornerDialView: View {
                         gradientColors: actionColors
                     )
 
+                    // Satellite micro-controls for Pomodoro
+                    if action == .timer && isExpanded {
+                        let resetPt = geom.point(radius: 96, angleDegrees: geom.angle(for: 0.14))
+                        Button(action: {
+                            appState.resetPomodoro()
+                        }) {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.secondary)
+                                .frame(width: 22, height: 22)
+                                .background(Circle().fill(.ultraThinMaterial))
+                                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                                .shadow(color: Color.black.opacity(0.25), radius: 2, x: 0, y: 1)
+                        }
+                        .buttonStyle(.plain)
+                        .help(appState.localized("menubar.reset"))
+                        .position(x: resetPt.x, y: resetPt.y)
+
+                        let skipPt = geom.point(radius: 96, angleDegrees: geom.angle(for: 0.86))
+                        Button(action: {
+                            appState.skipPomodoroMode()
+                        }) {
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 8, weight: .bold))
+                                .foregroundColor(appState.pomodoroMode == .focus ? .purple : .green)
+                                .frame(width: 22, height: 22)
+                                .background(Circle().fill(.ultraThinMaterial))
+                                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                                .shadow(color: Color.black.opacity(0.25), radius: 2, x: 0, y: 1)
+                        }
+                        .buttonStyle(.plain)
+                        .help(appState.localized("menubar.skip"))
+                        .position(x: skipPt.x, y: skipPt.y)
+                    }
+
                     // Center Action Icon & Value readout (Tap to toggle)
                     Button(action: {
                         appState.toggleAction(action, displayID: displayID)
@@ -92,7 +118,10 @@ public struct CornerDialView: View {
                             isExpanded: isExpanded,
                             formattedTimer: appState.formattedTimerTime,
                             isPomodoroRunning: appState.isPomodoroRunning,
+                            isPomodoroPaused: appState.isPomodoroPaused,
                             pomodoroMode: appState.pomodoroMode,
+                            completedRounds: appState.pomodoroCompletedRounds,
+                            totalRounds: appState.pomodoroTotalRounds,
                             isMuted: appState.audio.isMuted,
                             isKeyboardSupported: appState.keyboard.isSupported
                         )
@@ -108,26 +137,43 @@ public struct CornerDialView: View {
                     value: isExpanded
                 )
                 .gesture(
-                    DragGesture(minimumDistance: 0)
+                    DragGesture(minimumDistance: 4)
                         .onChanged { gesture in
+                            let center = geom.center
+                            let loc = gesture.location
+                            let dist = hypot(loc.x - center.x, loc.y - center.y)
+
+                            // Ignore touches on center badge (dist < 58) or outside dial perimeter
+                            guard dist >= 58 && dist <= dialSize + 30 else {
+                                return
+                            }
+
                             if action == .timer && appState.isPomodoroRunning {
                                 return
                             }
-                            if !isDragging {
-                                isDragging = true
-                                dragValue = currentValue
-                            }
-                            let center = geom.center
-                            let loc = gesture.location
+
                             let angle = calculateAngle(from: center, to: loc, corner: corner)
                             let norm = normalizeAngle(angle, for: corner)
-                            dragValue = norm
-                            appState.setValue(for: action, value: norm, displayID: displayID)
+
+                            if !isDragging {
+                                isDragging = true
+                            }
+
+                            if action == .timer {
+                                let mins = max(1, min(60, Int(round(norm * 60.0))))
+                                let snapped = Double(mins) / 60.0
+                                dragValue = snapped
+                                appState.setValue(for: action, value: snapped, displayID: displayID)
+                            } else {
+                                dragValue = norm
+                                appState.setValue(for: action, value: norm, displayID: displayID)
+                            }
                         }
                         .onEnded { _ in
                             if isDragging {
                                 isDragging = false
                                 appState.setValue(for: action, value: dragValue, displayID: displayID)
+                                appState.saveSettings()
                             }
                         }
                 )
@@ -183,14 +229,17 @@ private struct CenterActionBadge: View {
     let isExpanded: Bool
     let formattedTimer: String
     let isPomodoroRunning: Bool
+    let isPomodoroPaused: Bool
     let pomodoroMode: PomodoroMode
+    let completedRounds: Int
+    let totalRounds: Int
     let isMuted: Bool
     let isKeyboardSupported: Bool
 
     var body: some View {
         let offset = badgeOffset(for: corner, in: dialSize)
 
-        VStack(spacing: 1) {
+        VStack(spacing: 1.5) {
             if action == .timer {
                 HStack(spacing: 3) {
                     Image(systemName: isPomodoroRunning ? "pause.fill" : "play.fill")
@@ -198,13 +247,24 @@ private struct CenterActionBadge: View {
                         .foregroundColor(pomodoroMode == .focus ? .purple : .green)
 
                     Image(systemName: pomodoroMode == .focus ? "brain.head.profile" : "cup.and.saucer.fill")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(pomodoroMode == .focus ? .purple : .green)
                 }
 
                 Text(formattedTimer)
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(.primary)
+
+                if totalRounds > 0 {
+                    HStack(spacing: 2.5) {
+                        ForEach(0..<min(totalRounds, 6), id: \.self) { roundIndex in
+                            Circle()
+                                .fill(roundIndex < completedRounds ? (pomodoroMode == .focus ? Color.purple : Color.green) : Color.secondary.opacity(0.35))
+                                .frame(width: 3.5, height: 3.5)
+                        }
+                    }
+                    .padding(.top, 0.5)
+                }
             } else if action == .volume {
                 Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
                     .font(.system(size: 18, weight: .bold))
@@ -239,8 +299,8 @@ private struct CenterActionBadge: View {
                 .overlay(
                     Circle()
                         .strokeBorder(
-                            action == .timer && isPomodoroRunning
-                                ? (pomodoroMode == .focus ? Color.purple.opacity(0.6) : Color.green.opacity(0.6))
+                            action == .timer && (isPomodoroRunning || isPomodoroPaused)
+                                ? (pomodoroMode == .focus ? Color.purple.opacity(0.7) : Color.green.opacity(0.7))
                                 : Color.white.opacity(0.1),
                             lineWidth: 1.5
                         )

@@ -31,3 +31,14 @@ You can freely switch between English and Vietnamese at any time:
 
 - If the menu bar icon appears crowded, drag it with `Command + Left Click` to reorder its position on the macOS menu bar.
 - The status bar icon is rendered as an alpha-channel template image; if you use third-party menu bar colorizers, MacStash respects the active system appearance palette automatically.
+
+## Pomodoro Duration Scrubbing & Dial Interaction
+
+- To adjust session duration when the timer is idle, drag the outer dial arc band (outside the central circular badge). The dial tracks precisely from 1 to 60 minutes with subtle haptic detents.
+- Tapping directly on the center badge starts or pauses the timer and will never overwrite your configured session minutes.
+- Use the satellite buttons inside the dial to quickly Reset or Skip to the next mode.
+
+## Right Edge Slider Visibility
+
+- The right-edge vertical slider is completely hidden when idle to keep your display clean and unobstructed.
+- To reveal the slider, move your mouse cursor to the rightmost edge of your screen. It will smoothly glide into view, allowing quick adjustment of volume or display brightness.

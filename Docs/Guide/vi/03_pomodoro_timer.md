@@ -17,9 +17,10 @@ Bộ máy Pomodoro trong MacStash được tích hợp trực tiếp vào vòng 
    - Nút Đặt lại: Khôi phục phiên về thời lượng ban đầu đã thiết lập.
    - Thanh tiến trình mini hiển thị tỷ lệ thời gian còn lại trực quan.
 
-4. **Tương Tác Thông Minh Với Vòng Xoay Góc Màn Hình**:
-   - Khi đang chạy: Vòng cung thể hiện tỷ lệ tiến trình thu hẹp dần. Chạm vào huy hiệu trung tâm để tạm dừng hoặc tiếp tục. Thao tác kéo rê được bảo vệ an toàn để không vô tình xoá phiên làm việc.
-   - Khi ở trạng thái chờ: Xoay vòng núm để điều chỉnh nhanh thời lượng phiên tập trung mong muốn (từ 1 đến 60 phút).
+4. **Tương Tác Thông Minh Với Vòng Xoay & Cụm Nút Phụ**:
+   - Khi đang chạy hoặc tạm dừng: Vòng cung thể hiện tỷ lệ tiến trình thu hẹp dần. Chạm vào huy hiệu trung tâm để tạm dừng hoặc tiếp tục. Thao tác kéo rê được bảo vệ an toàn để không vô tình xoá phiên làm việc. Huy hiệu trung tâm hiển thị các chấm tròn chỉ báo hiệp làm việc hiện tại (ví dụ Hiệp 1/4).
+   - Khi ở trạng thái chờ: Kéo rê vành ngoài của vòng xoay để điều chỉnh chính xác thời lượng phiên (từ 1 đến 60 phút) kèm phản hồi rung xúc giác mỗi 5 phút. Vành cung thể hiện đúng mốc phút đã chọn mà không bị nhảy. Chạm vào nút Bắt đầu ở giữa để khởi động phiên đúng thời lượng đã kéo mà không bị trả về mặc định.
+   - Nút phụ tiện lợi tích hợp: Hai nút bấm mini Đặt lại và Bỏ qua hiệp được bố trí tinh tế ngay trong góc xoay, cho phép thao tác một chạm mà không cần mở menu bar.
    - Màu sắc nhận diện rõ ràng: Màu tím cho phiên làm việc, màu xanh lá cho phiên nghỉ ngơi.
 
 5. **Đồng Hồ Đơn Điệu Và Bền Bỉ Qua Sleep/Wake**:

@@ -1,3 +1,16 @@
+# Có Gì Mới Trong Phiên Bản 2.3.1
+
+MacStash 2.3.1 khắc phục triệt để lỗi nhảy thời gian Pomodoro, cải tiến trải nghiệm góc xoay với cụm nút phụ tiện ích và ẩn hoàn toàn thanh trượt cạnh phải khi ở trạng thái nghỉ.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.3.1
+
+- Khắc phục lỗi nhảy thời gian Pomodoro: Loại bỏ xung đột cử chỉ khiến thao tác chạm nút giữa bị tính nhầm thành kéo vòng xoay, chấm dứt hiện tượng thời gian bị nhảy về 24 hoặc 23 phút.
+- Hiển thị vành cung chuẩn xác: Vành xoay ở trạng thái chờ thể hiện chính xác mốc phút đã chọn theo mặt đồng hồ 60 phút mà không bị nhảy vọt lên 100% khi thả chuột.
+- Tích hợp nút phụ mini tiện ích: Bổ sung hai nút bấm Đặt lại và Bỏ qua hiệp trực tiếp bên trong góc xoay, thao tác nhanh mà không cần mở menu bar.
+- Chỉ báo hiệp làm việc trực quan: Huy hiệu trung tâm hiển thị các chấm tròn tiến trình cho biết số hiệp đã hoàn thành trong chu kỳ.
+- Ẩn hoàn toàn thanh trượt cạnh phải: Thanh trượt cạnh phải được ẩn 100% khi nghỉ, chỉ trượt ra khi con trỏ chạm sát mép ngoài màn hình.
+- Giữ hiển thị khi tạm dừng: Menu bar tiếp tục hiển thị thời gian còn lại khi phiên đếm đang tạm dừng.
+
 # Có Gì Mới Trong Phiên Bản 2.3.0
 
 MacStash 2.3.0 mang đến các cải tiến toàn diện về trải nghiệm âm thanh, điều khiển độ sáng đa màn hình, hồ sơ ứng dụng tùy biến và thanh trượt cạnh màn hình.

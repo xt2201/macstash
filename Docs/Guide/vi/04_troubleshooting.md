@@ -31,3 +31,14 @@ Người dùng có thể chuyển đổi linh hoạt giữa Tiếng Việt và E
 
 - Người dùng có thể giữ phím `Command` và kéo chuột trái để sắp xếp lại vị trí của icon MacStash trên thanh Menu Bar.
 - Biểu tượng status bar sử dụng kênh alpha đơn sắc tự nhiên, tự động thích ứng với độ trong suốt và chủ đề nền sáng / tối của hệ điều hành macOS.
+
+## Kéo Chỉnh Thời Gian Pomodoro & Thao Tác Góc Xoay
+
+- Để chỉnh thời lượng khi đồng hồ ở trạng thái chờ, hãy kéo rê ở vành ngoài vòng xoay (phần rãnh cong bên ngoài nút tròn ở giữa). Vành xoay nhận diện chính xác từ 1 đến 60 phút kèm rung xúc giác nhẹ.
+- Nhấp chuột trực tiếp vào nút tròn ở giữa để Bắt đầu hoặc Tạm dừng mà không lo bị ghi đè thời lượng đã chọn.
+- Sử dụng hai nút phụ mini bên trong góc xoay để Đặt lại hoặc Chuyển nhanh sang hiệp nghỉ/làm việc kế tiếp.
+
+## Cơ Chế Ẩn Của Thanh Trượt Cạnh Màn Hình (Edge Slider)
+
+- Thanh trượt cạnh phải được ẩn hoàn toàn khi ở trạng thái nghỉ nhằm giữ cho màn hình thoáng đãng và không che khuất nội dung của các ứng dụng khác.
+- Để gọi thanh trượt, chỉ cần di chuyển con trỏ chuột chạm vào sát mép ngoài cùng bên phải của màn hình. Thanh trượt sẽ trượt ra mượt mà để bạn điều chỉnh nhanh âm lượng hoặc độ sáng.

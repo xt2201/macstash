@@ -17,9 +17,10 @@ The built-in Pomodoro engine integrates into corner dials and the menu bar statu
    - Reset Button: Restores the current session to its configured starting duration.
    - Compact Progress Bar: Visually depicts elapsed and remaining time at a glance.
 
-4. **Smart Corner Dial Interaction**:
-   - While running: The radial arc reflects the progress ring narrowing toward completion. Tapping the central badge pauses or resumes the session. Accidental cursor dragging is guarded against to prevent wiping active sessions.
-   - While idle: Rotating or dragging the dial allows quick scrubbing of focus session durations (from 1 to 60 minutes).
+4. **Smart Corner Dial Interaction & Micro-Controls**:
+   - While running or paused: The radial arc reflects the progress ring narrowing toward completion. Tapping the central badge pauses or resumes the session. Accidental cursor dragging is guarded against to prevent wiping active sessions. The center badge displays current round progression pips (such as Round 1 of 4).
+   - While idle: Dragging the dial ring allows precision scrubbing of session duration (from 1 to 60 minutes) with haptic detents every 5 minutes. The arc precisely mirrors the selected minute mark on the 60-minute dial without jumping. Tapping the center Play button starts the session at the selected duration without resetting.
+   - Satellite micro-buttons: Dedicated translucent Reset and Skip mode buttons are integrated directly into the corner dial quadrant, allowing one-click resets and mode advances without having to access the menu bar.
    - Distinctive colors: Purple accents for focus sessions and emerald green accents for rest periods.
 
 5. **Monotonic Timing and Sleep/Wake Invariance**:

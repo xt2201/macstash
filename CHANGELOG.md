@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.3.1] - 2026-11-06
+
+### Added
+- Integrated satellite micro-buttons (Reset and Skip mode) directly inside the Pomodoro Corner Dial quadrant for immediate one-click actions.
+- Round progression indicators with clean circular pips inside the center badge showing completed vs total intervals.
+- Status bar title now retains countdown visibility while a session is paused.
+
+### Changed
+- Edge Slider is now completely hidden when idle (100% transparent and pushed off-screen with 0 pixels visible), smoothly gliding into view upon hovering near the screen edge.
+- Idle Pomodoro dial arc precisely tracks the configured duration on the 60-minute dial without jumping to 100% on mouse release.
+
+### Fixed
+- Fixed gesture touch conflict on Corner Dial CenterActionBadge where clicking Play/Pause was misidentified as a radial drag, jumping session duration to 24 or 23 minutes.
+- Fixed duration scrubbing in CornerDialView: drag events within radius 58 are ignored to protect the Play button, and minimum drag distance is enforced.
+- Fixed Pomodoro settings synchronization where saving preferences would reset custom scrubbed minutes back to 25.
+
+---
+
 ## [2.3.0] - 2026-11-06
 
 ### Added

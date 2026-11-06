@@ -1,3 +1,16 @@
+# What's New in Version 2.3.1
+
+MacStash 2.3.1 resolves Pomodoro duration jumping glitches, enhances corner dial UX with integrated satellite micro-controls, and completely hides edge sliders when idle.
+
+## Key Enhancements in Version 2.3.1
+
+- Pomodoro Dial Precision & Stability: Resolved gesture conflict where center badge taps were misidentified as radial drags, eliminating unexpected jumps to 24 or 23 minutes.
+- Dial Arc Accuracy: The idle radial arc precisely mirrors the selected minute mark on the 60-minute dial without jumping to 100% on release.
+- Integrated Satellite Micro-Buttons: Added translucent Reset and Skip mode buttons directly inside the corner dial quadrant for instant one-click actions.
+- Round Progression Indicators: Center badge displays circular pips indicating completed vs total focus intervals.
+- Completely Hidden Edge Slider: The right-edge vertical slider is now 100% hidden when idle with zero pixels on screen, smoothly gliding into view when hovering near the display edge.
+- Paused Status Bar Countdown: The Menu Bar title retains countdown visibility during paused sessions.
+
 # What's New in Version 2.3.0
 
 MacStash 2.3.0 delivers major polish across audio controls, multi-monitor brightness, custom application profiles, and gesture edge sliders.

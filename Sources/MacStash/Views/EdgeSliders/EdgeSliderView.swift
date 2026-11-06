@@ -35,24 +35,23 @@ public struct EdgeSliderView: View {
             if isVisible {
                 let isExpanded = isHovered || isDragging || appState.isRightSliderActive
 
-                HStack(spacing: 0) {
-                    if edge == .right {
-                        // Slider body
-                        sliderContent(isExpanded: isExpanded)
-                            .offset(x: isExpanded ? 0 : (sliderWidth - 6))
-                    } else {
-                        sliderContent(isExpanded: isExpanded)
-                            .offset(x: isExpanded ? 0 : -(sliderWidth - 6))
-                    }
-                }
-                .animation(.spring(response: 0.35, dampingFraction: 0.75), value: isExpanded)
-                .onHover { hovering in
-                    isHovered = hovering
-                    appState.isRightSliderActive = hovering
-                }
+                // Completely hidden when idle, smoothly slides into view on hover
+                sliderContent(isExpanded: isExpanded)
+                    .offset(x: isExpanded ? 0 : (edge == .right ? (sliderWidth + 20) : -(sliderWidth + 20)))
+                    .opacity(isExpanded ? 1.0 : 0.0)
+                    .animation(.spring(response: 0.32, dampingFraction: 0.76), value: isExpanded)
+
+                // Invisible touch sensor strip along physical screen edge
+                Color.clear
+                    .frame(width: 14)
+                    .contentShape(Rectangle())
             }
         }
         .frame(width: sliderWidth + 10)
+        .onHover { hovering in
+            isHovered = hovering
+            appState.isRightSliderActive = hovering
+        }
     }
 
     @ViewBuilder

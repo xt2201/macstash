@@ -34,6 +34,8 @@ public enum PomodoroEngineTests {
         testPomodoroCycleAndBreakTransitions()
         testAutoStartBreaksConfiguration()
         testSkipToNextMode()
+        testPomodoroStateIsPausedProperty()
+        testDurationScrubbingPreservesExactMinutesWithoutJump()
     }
 
     private static func testStartAndProgressWithMonotonicClock() {
@@ -220,5 +222,52 @@ public enum PomodoroEngineTests {
         let mode2 = engine.skipToNextMode()
         TestAssertion.assertEqual(mode2, .focus)
         TestAssertion.assertEqual(engine.completedRounds, 1)
+    }
+
+    private static func testPomodoroStateIsPausedProperty() {
+        let mockClock = MockClock()
+        let engine = PomodoroEngine(clock: mockClock)
+
+        TestAssertion.assertFalse(engine.state.isPaused)
+        TestAssertion.assertFalse(engine.state.isRunning)
+
+        engine.start(durationSeconds: 1500)
+        TestAssertion.assertTrue(engine.state.isRunning)
+        TestAssertion.assertFalse(engine.state.isPaused)
+
+        engine.pause()
+        TestAssertion.assertFalse(engine.state.isRunning)
+        TestAssertion.assertTrue(engine.state.isPaused)
+
+        engine.resume()
+        TestAssertion.assertTrue(engine.state.isRunning)
+        TestAssertion.assertFalse(engine.state.isPaused)
+
+        engine.reset()
+        TestAssertion.assertFalse(engine.state.isRunning)
+        TestAssertion.assertFalse(engine.state.isPaused)
+    }
+
+    private static func testDurationScrubbingPreservesExactMinutesWithoutJump() {
+        let mockClock = MockClock()
+        let engine = PomodoroEngine(clock: mockClock)
+
+        // Simulate user dragging dial to 15 minutes
+        let mins15: TimeInterval = 15 * 60
+        engine.reset(toDurationSeconds: mins15)
+        TestAssertion.assertEqual(engine.durationForCurrentMode(), mins15)
+        TestAssertion.assertEqual(engine.remainingSeconds, mins15)
+        TestAssertion.assertEqual(engine.totalDurationSeconds, mins15)
+
+        // Starting from this duration should start at exactly 15 minutes
+        engine.start()
+        TestAssertion.assertTrue(engine.state.isRunning)
+        TestAssertion.assertEqual(engine.totalDurationSeconds, mins15)
+        TestAssertion.assertEqual(engine.remainingSeconds, mins15)
+
+        // Simulate user dragging dial to 45 minutes when idle
+        engine.reset(toDurationSeconds: 45 * 60)
+        TestAssertion.assertEqual(engine.durationForCurrentMode(), TimeInterval(45 * 60))
+        TestAssertion.assertEqual(engine.remainingSeconds, TimeInterval(45 * 60))
     }
 }

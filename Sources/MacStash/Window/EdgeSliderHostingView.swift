@@ -59,8 +59,8 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return super.hitTest(point)
         }
 
-        // When collapsed, only intercept along the thin outer edge strip (10 pt)
-        let edgeHitZone: CGFloat = 10
+        // When collapsed, only intercept along the thin outer edge strip (12 pt)
+        let edgeHitZone: CGFloat = 12
         let triggerRect = (edge == .right)
             ? NSRect(x: bounds.maxX - edgeHitZone, y: bounds.minY, width: edgeHitZone, height: bounds.height)
             : NSRect(x: bounds.minX, y: bounds.minY, width: edgeHitZone, height: bounds.height)

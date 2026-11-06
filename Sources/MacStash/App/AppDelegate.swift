@@ -108,10 +108,10 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupStatusItemSubscribers() {
-        Publishers.CombineLatest3(appState.$isPomodoroRunning, appState.$pomodoroRemainingSeconds, appState.$pomodoroMode)
+        Publishers.CombineLatest4(appState.$isPomodoroRunning, appState.$pomodoroRemainingSeconds, appState.$pomodoroMode, appState.$isPomodoroPaused)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] isRunning, remaining, mode in
-                self?.updateStatusItem(isRunning: isRunning, remaining: remaining, mode: mode)
+            .sink { [weak self] isRunning, remaining, mode, isPaused in
+                self?.updateStatusItem(isRunning: isRunning, remaining: remaining, mode: mode, isPaused: isPaused)
             }
             .store(in: &cancellables)
     }
@@ -178,12 +178,12 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         return img
     }
 
-    public func updateStatusItem(isRunning: Bool, remaining: TimeInterval, mode: PomodoroMode) {
+    public func updateStatusItem(isRunning: Bool, remaining: TimeInterval, mode: PomodoroMode, isPaused: Bool = false) {
         guard let button = statusItem?.button else { return }
         button.image = loadStatusImage(active: isRunning)
         button.imagePosition = .imageLeading
 
-        if isRunning {
+        if isRunning || isPaused {
             let total = max(0, Int(round(remaining)))
             let mins = total / 60
             let secs = total % 60
@@ -198,7 +198,8 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         updateStatusItem(
             isRunning: appState.isPomodoroRunning,
             remaining: appState.pomodoroRemainingSeconds,
-            mode: appState.pomodoroMode
+            mode: appState.pomodoroMode,
+            isPaused: appState.isPomodoroPaused
         )
     }
 

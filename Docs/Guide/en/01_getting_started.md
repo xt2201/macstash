@@ -15,9 +15,17 @@ MacStash is designed to remain completely invisible and zero-resource until you 
 ### Outer Corners vs Inner Display Junctions
 On multi-monitor setups, MacStash utilizes geometric outer corner detection. Dials will only trigger at true desktop perimeter boundaries. When your cursor transitions across adjacent displays along an interior border, MacStash will not interrupt cursor movement.
 
+### Edge Sliders
+In addition to corner dials, MacStash provides an Edge Slider on the outer right edge of your screen. Resting your cursor along the right display edge smoothly reveals a vertical slider for quick adjustment of volume or brightness without obscuring corner controls.
+
 ## Brand Identity & Menu Bar Indicator
 
 MacStash features a dedicated brand identity centered on the **Radial Corner Bloom** motif: an anchor node positioned at the physical corner vertex paired with an expanding precision dial arc.
+
+### Menu Bar Quick Controls
+- **Audio Controls**: Click the speaker icon to quickly mute or unmute audio, or use the audio output selector dropdown to switch active audio devices on the fly.
+- **Multi-Monitor Brightness**: When multiple displays are attached, individual brightness sliders appear with monitor names and icons.
+- **Pomodoro Timer**: Live countdown badge in the menu bar and one-click play, pause, skip, and reset controls in the popover.
 
 ### Menu Bar States
 - **Idle State**: A clean monochrome quarter-arc with a corner anchor pip, resting quietly in your status bar.

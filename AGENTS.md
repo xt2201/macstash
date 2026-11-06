@@ -11,17 +11,19 @@
 **Quy trình**: đọc code trước khi sửa; commit nhỏ theo Conventional Commits; mỗi commit build được; sửa lỗi thì có test tái hiện.
 
 **Definition of Done**: một thay đổi chỉ hoàn thành khi:
-1. Build sạch, test pass, không thêm warning.
+1. Build sạch, test pass, không thêm warning (`make test`).
 2. Tài liệu `Docs/Guide` (cả vi và en) cập nhật nếu thay đổi ảnh hưởng tính năng, Settings, phím tắt, hành vi hoặc quyền. Tính năng mới thêm mục mới; sửa lỗi cập nhật mục liên quan và phần Xử lý sự cố.
 3. `CHANGELOG.md` có dòng mới (Added / Changed / Fixed), version tăng đúng semver (sửa lỗi: patch; tính năng tương thích: minor; thay đổi phá vỡ tương thích: major).
-4. DMG build lại bằng `scripts/build_dmg.sh` với version mới; báo đường dẫn và SHA-256. Không build được thì nói rõ lý do, không bỏ qua âm thầm.
-5. Báo cáo cuối có mục "Docs đã cập nhật" và "DMG đã build".
-Với thay đổi nội bộ không ảnh hưởng người dùng cuối (refactor): vẫn rebuild DMG, ghi "không cần đổi docs".
+4. DMG và update ZIP build lại bằng `scripts/build_dmg.sh` với version mới; báo đường dẫn và SHA-256. Không build được thì nói rõ lý do, không bỏ qua âm thầm.
+5. Commit code theo chuẩn Conventional Commits.
+6. Luôn tạo git tag phiên bản tương ứng (ví dụ `git tag v<version>`) và đẩy cả branch cùng tag lên remote repository (`git push origin <branch> && git push origin v<version>`). Tuyệt đối không bao giờ để lại commit hoặc tag dở dang chỉ ở local mà không push lên remote.
+7. Báo cáo cuối có mục "Docs đã cập nhật", "DMG đã build", và "Git tag/commit đã push".
+Với thay đổi nội bộ không ảnh hưởng người dùng cuối (refactor): vẫn rebuild DMG, tạo tag và push đầy đủ, ghi "không cần đổi docs".
 
 **Auto-Update & Release Pipeline (Sparkle 2)**:
 - Cơ chế cập nhật: Tự động ngầm 1 chạm bằng Sparkle 2. Feed cập nhật là `appcast.xml` ở gốc repo.
 - Xác thực Ed25519: Mọi bản zip cập nhật phải được ký mã hóa Ed25519 bằng Apple `CryptoKit` (`Scripts/sign_sparkle_update.swift`). Public key lưu tại `SUPublicEDKey` trong `Info.plist`.
 - Bảo mật khóa: Private key lưu trên GitHub Secrets (`SPARKLE_PRIVATE_KEY`) và local `Scripts/.sparkle_keys.json` (được đưa vào `.gitignore`). Tuyệt đối không commit khóa bí mật lên repository.
-- Tự động hóa CI/CD: Đẩy tag git `v*` kích hoạt GitHub Actions kiểm thử, biên dịch universal binary, ký gói zip, cập nhật `appcast.xml`, và tạo GitHub Release.
+- Tự động hóa CI/CD & Bắt buộc Push Tag: Mỗi khi hoàn thành phiên bản hoặc sửa đổi tính năng, agent bắt buộc phải commit, tạo git tag `v<version>` và push lên remote (`git push origin <branch> && git push origin v<version>`). Hành động này sẽ kích hoạt GitHub Actions kiểm thử, biên dịch universal binary, ký gói zip, cập nhật `appcast.xml`, và tạo GitHub Release tự động.
 
 **Không được làm**: tự ý thêm dependency lớn; commit bí mật; sửa phần đang chạy tốt ngoài phạm vi; che lỗi bằng `try?` hoặc timeout cứng; báo "xong" khi chưa kiểm chứng.

@@ -7,22 +7,22 @@
         <language>en</language>
         <item>
             <title>Version 2.3.1</title>
-            <pubDate>Fri, 06 Nov 2026 13:27:23 +0700</pubDate>
+            <pubDate>Fri, 06 Nov 2026 13:33:07 +0700</pubDate>
             <sparkle:version>2.3.1</sparkle:version>
             <sparkle:shortVersionString>2.3.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
             <description><![CDATA[
 <h2>What's New in Stash 2.3.1</h2>
 <ul>
-    <li>Industry standard 1-click in-place background auto-updates via Sparkle 2.</li>
-    <li>Ed25519 cryptographic update signing and verification.</li>
-    <li>Screen corner responsiveness and dynamic display tracking improvements.</li>
-    <li>Menu bar icon and native macOS visual polish.</li>
+    <li>Integrated satellite micro-buttons (Reset and Skip) inside Pomodoro Corner Dial.</li>
+    <li>Round progression indicators with clean circular pips inside the center badge.</li>
+    <li>Edge Slider completely hidden when idle, smoothly gliding into view on hover.</li>
+    <li>Fixed gesture touch conflict on CenterActionBadge preventing accidental time jumps.</li>
 </ul>
             ]]></description>
             <enclosure
                 url="https://github.com/xt2201/macstash/releases/download/v2.3.1/Stash-2.3.1.zip"
-                sparkle:edSignature="uE0ZEo01PUgHFjZAgDE0JrXlkfFjyvIxcM86PMH0MJd42O874qUcjlzMRZKqHJmjeA6bmMtRNB5TT/MVek0KBQ=="
+                sparkle:edSignature="IVDn8hixTr6rCJIpiMjHw0j6aPu9gN16sF/DixjwRZOwbi3EBVOGazOMoOuZj91HlTZKyO1FWLUz+lEwWtG6Dg=="
                 length="5560685"
                 type="application/octet-stream" />
         </item>

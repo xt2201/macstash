@@ -42,6 +42,10 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
         fatalError("init(rootView:) has not been implemented")
     }
 
+    public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
+
     public override func hitTest(_ point: NSPoint) -> NSView? {
         guard appState.isEnabled && appState.isCornerDialsEnabled else {
             return nil

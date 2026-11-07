@@ -26,7 +26,7 @@ public final class StashShelfManager: ObservableObject {
                     detailText: url.deletingLastPathComponent().path,
                     itemType: isImage ? .image : .file,
                     sourceURL: url,
-                    fileSizeBytes: size ?? 0
+                    fileSizeBytes: size
                 ),
                 at: 0
             )
@@ -56,6 +56,48 @@ public final class StashShelfManager: ObservableObject {
         )
         enforceCapacity()
         HapticManager.shared.performBoundaryClick()
+    }
+
+    public var totalSizeBytes: Int64 {
+        items.reduce(0) { $0 + $1.fileSizeBytes }
+    }
+
+    public var totalFormattedSize: String {
+        let bytes = totalSizeBytes
+        guard bytes > 0 else { return "" }
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useAll]
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: bytes)
+    }
+
+    public func openShelf() {
+        isShelfOpen = true
+        isDropTargetActive = true
+        HapticManager.shared.performDetentTick()
+    }
+
+    public func closeShelf() {
+        isShelfOpen = false
+        isDropTargetActive = false
+    }
+
+    public func copyAllFilesToClipboard() {
+        let urls = items.compactMap { $0.sourceURL }
+        guard !urls.isEmpty else {
+            // Fallback to text snippets if only snippets exist
+            let texts = items.compactMap { $0.stringContent ?? $0.title }
+            if !texts.isEmpty {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(texts.joined(separator: "\n"), forType: .string)
+                HapticManager.shared.performDetentTick()
+            }
+            return
+        }
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.writeObjects(urls as [NSURL])
+        HapticManager.shared.performDetentTick()
     }
 
     public func removeItem(id: UUID) {

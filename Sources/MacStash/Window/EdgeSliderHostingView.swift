@@ -30,6 +30,10 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         fatalError("init(rootView:) has not been implemented")
     }
 
+    public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
+
     public override func hitTest(_ point: NSPoint) -> NSView? {
         guard appState.isEnabled && appState.isEdgeSlidersEnabled else {
             return nil
@@ -60,8 +64,8 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return super.hitTest(point)
         }
 
-        // When collapsed, only intercept along the thin outer edge strip (12 pt)
-        let edgeHitZone: CGFloat = 12
+        // When collapsed, only intercept along the thin outer edge strip (14 pt)
+        let edgeHitZone: CGFloat = 14
         let triggerRect = (edge == .right)
             ? NSRect(x: bounds.maxX - edgeHitZone, y: bounds.minY, width: edgeHitZone, height: bounds.height)
             : NSRect(x: bounds.minX, y: bounds.minY, width: edgeHitZone, height: bounds.height)

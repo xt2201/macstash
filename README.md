@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.7.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.8.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.7.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.8.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -93,9 +93,12 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Low-latency synchronization with macOS CoreAudio subsystem.
 
 ### 5. Tactile Stash Drop Shelf &amp; Quick Scratchpad
-- **The Stash Shelf**: The core namesake feature of MacStash. When dragging files, images, links, or text snippets in macOS, dragging toward the left screen edge smoothly slides out a frosted glass Stash Shelf to hold items temporarily while navigating across Spaces, full-screen apps, or displays.
-- **Quick Drag Export**: Drag stashed items back out to any application, email, or Finder folder anytime.
-- **Quick Scratchpad Drawer**: Ephemeral glassmorphic notepad accessible along the left edge or via global hotkey for capturing OTP codes, thoughts, terminal commands, and drafts with live word/character counters and automatic persistence.
+- **The Stash Shelf**: The core namesake feature of MacStash. A frosted glass drop shelf sliding smoothly from the left screen edge to hold files, images, links, and text snippets when dragging across spaces, displays, or apps.
+- **Shake-to-Summon Drag Gesture**: Wiggle or shake the mouse cursor back and forth while dragging any file, photo, or snippet to immediately summon the Stash Shelf at your cursor with tactile mechanical detents.
+- **Zero-Footprint Background Pass-Through**: Floating edge panels strictly ignore mouse events when idle, guaranteeing 100% unimpeded clicks in underlying macOS apps (Finder sidebar, Safari tabs, Xcode editor, Terminal).
+- **Immediate First-Mouse Interaction**: Every button (Clear All, Copy Path, Reveal in Finder, Remove, Close) triggers on the very first mouse-up with zero swallowed clicks.
+- **Quick Drag Export &amp; Copy All**: Drag stashed items back out to any application, email, or Finder folder anytime, or click "Copy All" to copy all file references to the clipboard at once.
+- **Quick Scratchpad Drawer**: Ephemeral glassmorphic notepad with dynamic key window keyboard focus for immediate typing, live word and character counters, automatic local persistence, and standard macOS keyboard shortcuts (`Cmd+A`, `Cmd+C`, `Cmd+V`, `Cmd+Z`, `Esc`).
 
 ### 6. Keep Awake (Caffeine) Radial Dial
 - Hardware-level macOS I/O Kit power assertions (`IOPMAssertionCreateWithName`) prevent display and system sleep during video exports, large downloads, or presentations.
@@ -144,7 +147,7 @@ Because the macOS mouse cursor cannot travel beyond the physical boundary of the
 ## Installation
 
 ### Method 1: Direct DMG Download (Recommended)
-1. Download the latest universal disk image: **[MacStash-v2.3.5.dmg](https://github.com/xt2201/macstash/releases/latest)**.
+1. Download the latest universal disk image: **[MacStash-v2.7.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
 2. Open the disk image and drag **MacStash** into your `Applications` folder.
 3. Launch MacStash from Launchpad, Spotlight, or `Applications`.
 

@@ -8,6 +8,8 @@ public struct ScratchpadView: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var manager = ScratchpadManager.shared
 
+    @State private var copyFeedback: Bool = false
+
     private let drawerWidth: CGFloat = Defaults.Scratchpad.defaultWidthPoints
     private let drawerHeight: CGFloat = Defaults.Scratchpad.defaultHeightPoints
 
@@ -16,51 +18,41 @@ public struct ScratchpadView: View {
     }
 
     public var body: some View {
-        let isVisible = appState.isEnabled && appState.settings.isScratchpadEnabled
-        let isOpen = manager.isScratchpadOpen
+        VStack(spacing: 0) {
+            // 1. Header Bar
+            headerBar
 
-        ZStack(alignment: .leading) {
-            if isVisible && isOpen {
-                VStack(spacing: 0) {
-                    // 1. Header
-                    headerBar
+            Divider()
+                .background(Color.white.opacity(0.12))
 
-                    Divider()
-                        .background(Color.white.opacity(0.12))
-
-                    // 2. Text Editor Area
-                    editorArea
-                }
-                .frame(width: drawerWidth, height: drawerHeight)
-                .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: Color.black.opacity(0.35), radius: 16, x: 4, y: 4)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(
-                            LinearGradient(
-                                colors: [Color.green.opacity(0.6), Color.white.opacity(0.15)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.0
-                        )
-                )
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading).combined(with: .opacity),
-                    removal: .move(edge: .leading).combined(with: .opacity)
-                ))
-            }
+            // 2. Text Editor Area
+            editorArea
         }
-        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: isOpen)
+        .frame(width: drawerWidth, height: drawerHeight)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .shadow(color: Color.black.opacity(0.35), radius: 20, x: 4, y: 6)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.green.opacity(0.6), Color.white.opacity(0.12)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.0
+                )
+        )
     }
+
+    // MARK: - Header Bar
 
     private var headerBar: some View {
         HStack(spacing: 8) {
             Image(systemName: "note.text")
-                .font(.system(size: 14, weight: .bold))
+                .font(.system(size: 13, weight: .bold))
                 .foregroundColor(.green)
 
             Text("SCRATCHPAD")
@@ -70,29 +62,53 @@ public struct ScratchpadView: View {
             Spacer()
 
             Text("\(manager.wordCount)w · \(manager.characterCount)c")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .font(.system(size: 9, weight: .medium, design: .monospaced))
                 .foregroundColor(.secondary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Capsule().fill(Color.white.opacity(0.08)))
 
-            Button(action: { manager.copyAll() }) {
-                Image(systemName: "doc.on.doc")
+            // Copy All Button
+            Button(action: {
+                manager.copyAll()
+                withAnimation(.easeInOut(duration: 0.15)) { copyFeedback = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    withAnimation(.easeInOut(duration: 0.15)) { copyFeedback = false }
+                }
+            }) {
+                Image(systemName: copyFeedback ? "checkmark" : "doc.on.doc")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(copyFeedback ? .green : .secondary)
                     .frame(width: 24, height: 24)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .fill(Color.white.opacity(0.08))
+                    )
             }
             .buttonStyle(.plain)
-            .help("Copy All")
+            .help("Copy All to Clipboard")
 
-            Button(action: { manager.clear() }) {
+            // Clear Button
+            Button(action: {
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                    manager.clear()
+                }
+            }) {
                 Image(systemName: "trash")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.secondary)
                     .frame(width: 24, height: 24)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .fill(Color.white.opacity(0.08))
+                    )
             }
             .buttonStyle(.plain)
-            .help("Clear")
+            .help("Clear All")
 
+            // Close Button
             Button(action: {
-                withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
                     manager.isScratchpadOpen = false
                 }
             }) {
@@ -102,11 +118,13 @@ public struct ScratchpadView: View {
                     .frame(width: 24, height: 24)
             }
             .buttonStyle(.plain)
-            .help("Close")
+            .help("Close (Esc)")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
     }
+
+    // MARK: - Editor Area
 
     private var editorArea: some View {
         ZStack(alignment: .topLeading) {
@@ -116,6 +134,7 @@ public struct ScratchpadView: View {
                     .foregroundColor(.secondary.opacity(0.6))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 12)
+                    .allowsHitTesting(false)
             }
 
             TextEditor(text: $manager.text)

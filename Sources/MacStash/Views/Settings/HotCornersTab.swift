@@ -137,6 +137,12 @@ public struct HotCornersTab: View {
                     Toggle(appState.effectiveLanguage == "vi" ? "Kệ thả tệp Stash Shelf" : "Stash Drop Shelf", isOn: $appState.settings.isStashShelfEnabled)
                     Toggle(appState.effectiveLanguage == "vi" ? "Ghi chú nhanh Scratchpad" : "Quick Scratchpad", isOn: $appState.settings.isScratchpadEnabled)
                     Toggle(appState.effectiveLanguage == "vi" ? "Vòng xoay tại con trỏ chuột" : "Cursor Radial Palette", isOn: $appState.settings.isCursorPaletteEnabled)
+
+                    Text(appState.effectiveLanguage == "vi"
+                         ? "Mẹo: Lắc nhẹ chuột qua lại khi đang kéo tệp để mở nhanh Stash Shelf. Phím Esc để đóng nhanh."
+                         : "Tip: Wiggle or shake the cursor while dragging a file to instantly summon Stash Shelf. Press Esc to close.")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
                 }
                 .padding(8)
             }

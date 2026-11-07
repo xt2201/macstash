@@ -1,9 +1,28 @@
+# What's New in Version 2.8.0
+
+MacStash 2.8.0 delivers a premier macOS UX/UI overhaul, zero-footprint background mouse pass-through, shake-to-summon drag gestures, key window typing focus for Quick Scratchpad, immediate first-mouse responsive clicks, and total size metrics.
+
+## Key Enhancements in Version 2.8.0
+
+- Shake-to-Summon Drag Gesture: Simply wiggle or shake the mouse cursor back and forth while dragging any file, photo, or text snippet to instantly summon the Stash Shelf at your cursor with tactile mechanical detents.
+- Zero-Footprint Mouse Pass-Through: Floating edge panels now strictly set ignoresMouseEvents = true when idle, ensuring background macOS applications (Finder sidebar, Safari tabs, Xcode editor, Terminal) receive 100% of mouse clicks without any edge blockage or interception.
+- Non-Intrusive Edge Peek Affordance: Replaced intrusive permanent floating edge bars with an ultra-sleek, 3.5pt resting glass notch that expands into an interactive quick launcher only upon intentional cursor hover.
+- Immediate First-Mouse Responsive Clicks: Integrated InteractiveHostingView and MacStashInteractivePanel across all floating overlay surfaces, ensuring action buttons (Clear All, Copy Path, Reveal in Finder, Delete, Close) trigger reliably on the very first click without discarded activation clicks.
+- Key Window Focus for Quick Scratchpad: Scratchpad now dynamically gains key window status on summon, allowing immediate typing, text selection, and standard macOS keyboard shortcuts (Cmd+A, Cmd+C, Cmd+V, Cmd+Z, Esc).
+- Copy All Files & Total Size Metrics: Added one-click "Copy All" and live formatted total file size (X items · Y MB) in Stash Shelf header.
+
 # What's New in Version 2.7.0
 
-MacStash 2.7.0 introduces a dedicated MediaRemote platform-binary bridge for macOS 15.4 and newer, dynamic album artwork color extraction for the dancing audio visualizer, and 120Hz zero-latency EdgeBar vertical slider scrubbing.
+MacStash 2.7.0 delivers a premier macOS UX/UI overhaul, zero-footprint background mouse pass-through, shake-to-summon drag gestures, key window typing focus for Quick Scratchpad, immediate first-mouse responsive clicks, and the native MediaRemote platform-binary bridge.
 
 ## Key Enhancements in Version 2.7.0
 
+- Shake-to-Summon Drag Gesture: Simply wiggle or shake the mouse cursor back and forth while dragging any file, photo, or text snippet to instantly summon the Stash Shelf at your cursor with tactile mechanical detents.
+- Zero-Footprint Mouse Pass-Through: Floating edge panels now strictly set `ignoresMouseEvents = true` when idle, ensuring background macOS applications (Finder sidebar, Safari tabs, Xcode editor, Terminal) receive 100% of mouse clicks without any edge blockage or interception.
+- Non-Intrusive Edge Peek Affordance: Replaced intrusive permanent floating edge bars with an ultra-sleek, 3.5pt resting glass notch that expands into an interactive quick launcher only upon intentional cursor hover.
+- Immediate First-Mouse Responsive Clicks: Integrated `InteractiveHostingView` and `MacStashInteractivePanel` across all floating overlay surfaces, ensuring action buttons (Clear All, Copy Path, Reveal in Finder, Delete, Close) trigger reliably on the very first click without discarded activation clicks.
+- Key Window Focus for Quick Scratchpad: Scratchpad now dynamically gains key window status on summon, allowing immediate typing, text selection, and standard macOS keyboard shortcuts (Cmd+A, Cmd+C, Cmd+V, Cmd+Z, Esc).
+- Copy All Files & Total Size Metrics: Added one-click "Copy All" and live formatted total file size (X items · Y MB) in Stash Shelf header.
 - Universal Browser & App Now Playing Capture on macOS 15.4+: Powered by a native platform-binary bridge (`now-playing.pl` and `libMacStashNowPlaying.dylib`) using `MRPlayerPath`, MacStash reliably captures live track title, artist, playback state, and full album artwork from any browser (including Crest playing SoundCloud, Safari, Chrome, Arc) as well as Spotify, Apple Music, and VLC.
 - Artwork Dominant Color Tinting: Extracts the most vibrant dominant color palette directly from the current track's album cover to dynamically tint the 5-bar dancing equalizer, artwork border glow, and Play/Pause button.
 - Real-Time Rhythm Visualizer Envelope: 30fps multi-band rhythm generator with fast attack and smooth decay that dances to the beat of the active audio session and rests smoothly when paused.

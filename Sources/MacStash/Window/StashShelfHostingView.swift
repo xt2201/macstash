@@ -26,6 +26,12 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
         fatalError("init(rootView:) has not been implemented")
     }
 
+    /// Essential for non-activating panels: ensures all buttons, tabs, and action icons
+    /// trigger immediately on the very first mouse-click without requiring an activation click.
+    public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
+
     public override func hitTest(_ point: NSPoint) -> NSView? {
         guard appState.isEnabled && (appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled) else {
             return nil
@@ -42,13 +48,18 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
             return nil
         }
 
-        // When shelf or scratchpad is open, whole view is interactive
+        // When shelf or scratchpad is actively open, route clicks within drawer bounds
         if shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen {
-            return super.hitTest(point)
+            let activeDrawerWidth: CGFloat = 330.0
+            let activeRect = NSRect(x: bounds.minX, y: bounds.minY, width: activeDrawerWidth, height: bounds.height)
+            if activeRect.contains(point) {
+                return super.hitTest(point)
+            }
+            return nil
         }
 
-        // When collapsed, only intercept along the thin left edge strip (14 pt)
-        let edgeHitZone: CGFloat = 14
+        // When collapsed, only hit test the subtle peek tab along the left edge
+        let edgeHitZone: CGFloat = 22.0
         let triggerRect = NSRect(x: bounds.minX, y: bounds.minY, width: edgeHitZone, height: bounds.height)
 
         if triggerRect.contains(point) {

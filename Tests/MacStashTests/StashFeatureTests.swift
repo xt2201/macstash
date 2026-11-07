@@ -7,8 +7,17 @@ public enum StashFeatureTests {
         testPowerAssertionService()
         testStashItemModel()
         testScratchpadStorage()
+        testScratchpadCounters()
         testOuterLeftEdgeGeometry()
         testNewControlActions()
+    }
+
+    private static func testScratchpadCounters() {
+        let sample = "Hello World! This is MacStash.\nSecond line with 6 words."
+        let words = sample.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
+        let chars = sample.count
+        TestAssertion.assertEqual(words, 10, "Word count should be 10")
+        TestAssertion.assertEqual(chars, 56, "Char count should be 56")
     }
 
     private static func testPowerAssertionService() {

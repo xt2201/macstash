@@ -1,9 +1,28 @@
+# Có Gì Mới Trong Phiên Bản 2.8.0
+
+MacStash 2.8.0 nâng cấp toàn diện trải nghiệm UI/UX chuẩn mực macOS, cơ chế truyền sự kiện chuột hoàn toàn không chặn ứng dụng nền, cử chỉ lắc chuột mở nhanh kệ tệp Stash Shelf, khả năng nhận diện phím gõ tức thì cho bảng ghi chú Scratchpad, phản hồi nhấp chuột tức thì ngay lần chạm đầu tiên, và nút sao chép toàn bộ tệp.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.8.0
+
+- Cử Chỉ Lắc Chuột Mở Nhanh Khi Kéo Tệp (Shake-to-Summon): Chỉ cần lắc nhẹ con trỏ chuột qua lại khi đang kéo bất kỳ tệp, hình ảnh hoặc đoạn văn bản nào, Kệ Stash Shelf sẽ lập tức xuất hiện ngay tại con trỏ kèm phản hồi rung xúc giác chân thực.
+- Cơ Chế Chuột Không Xâm Lấn Ứng Dụng Nền: Các panel nổi ở mép màn hình mặc định kích hoạt ignoresMouseEvents = true khi ở trạng thái nghỉ, đảm bảo mọi cú nhấp chuột vào ứng dụng phía dưới (thanh bên Finder, tab Safari, trình soạn thảo Xcode, Terminal) hoạt động trơn tru 100% không bị che khuất hay nuốt sự kiện.
+- Gờ Chạm Tinh Tế Kiểu Dáng Notch Kính Mờ: Thay thế thanh nổi vướng víu cũ bằng một gờ chỉ thị kính mờ thanh mảnh 3.5pt ôm sát viền màn hình, chỉ mở rộng thành thanh điều khiển nhanh khi rê chuột có chủ đích.
+- Phản Hồi Nhấp Chuột Tức Thì (First-Mouse Clicks): Tích hợp InteractiveHostingView và MacStashInteractivePanel trên toàn bộ các lớp phủ nổi, đảm bảo tất cả nút bấm (Xóa hết, Sao chép đường dẫn, Mở trong Finder, Xóa mục, Đóng) kích hoạt chuẩn xác ngay lần nhấp đầu tiên mà không bị nuốt sự kiện kích hoạt cửa sổ.
+- Nhập Liệu Tức Thì Cho Bảng Ghi Chú Scratchpad: Cửa sổ Scratchpad được cấp quyền nhận sự kiện bàn phím động ngay khi mở, cho phép nhấp vào gõ chữ ngay, chọn khối văn bản và sử dụng đầy đủ các tổ hợp phím tắt chuẩn macOS (Cmd+A, Cmd+C, Cmd+V, Cmd+Z, Esc).
+- Sao Chép Toàn Bộ & Thước Đo Kích Thước Tệp: Bổ sung nút bấm một chạm "Sao chép tất cả" và dòng chỉ báo dung lượng tổng định dạng chuẩn (X mục · Y MB) trên thanh tiêu đề Stash Shelf.
+
 # Có Gì Mới Trong Phiên Bản 2.7.0
 
-MacStash 2.7.0 nâng cấp cầu nối MediaRemote cấp hệ thống cho macOS 15.4 trở lên, trích xuất màu sắc chủ đạo từ ảnh bìa bài hát cho hiệu ứng sóng nhạc nhảy theo điệu, và tối ưu hóa độ mượt 120Hz cho thanh trượt dọc EdgeBar.
+MacStash 2.7.0 nâng cấp toàn diện trải nghiệm UI/UX chuẩn mực macOS, cơ chế truyền sự kiện chuột hoàn toàn không chặn ứng dụng nền, cử chỉ lắc chuột mở nhanh kệ tệp Stash Shelf, khả năng nhận diện phím gõ tức thì cho bảng ghi chú Scratchpad, phản hồi nhấp chuột tức thì ngay lần chạm đầu tiên, và tích hợp cầu nối MediaRemote cấp hệ thống.
 
 ## Những Cải Tiến Nổi Bật Trong Bản 2.7.0
 
+- Cử Chỉ Lắc Chuột Mở Nhanh Khi Kéo Tệp (Shake-to-Summon): Chỉ cần lắc nhẹ con trỏ chuột qua lại khi đang kéo bất kỳ tệp, hình ảnh hoặc đoạn văn bản nào, Kệ Stash Shelf sẽ lập tức xuất hiện ngay tại con trỏ kèm phản hồi rung xúc giác chân thực.
+- Cơ Chế Chuột Không Xâm Lấn Ứng Dụng Nền: Các panel nổi ở mép màn hình mặc định kích hoạt `ignoresMouseEvents = true` khi ở trạng thái nghỉ, đảm bảo mọi cú nhấp chuột vào ứng dụng phía dưới (thanh bên Finder, tab Safari, trình soạn thảo Xcode, Terminal) hoạt động trơn tru 100% không bị che khuất hay nuốt sự kiện.
+- Gờ Chạm Tinh Tế Kiểu Dáng Notch Kính Mờ: Thay thế thanh nổi vướng víu cũ bằng một gờ chỉ thị kính mờ thanh mảnh 3.5pt ôm sát viền màn hình, chỉ mở rộng thành thanh điều khiển nhanh khi rê chuột có chủ đích.
+- Phản Hồi Nhấp Chuột Tức Thì (First-Mouse Clicks): Tích hợp `InteractiveHostingView` và `MacStashInteractivePanel` trên toàn bộ các lớp phủ nổi, đảm bảo tất cả nút bấm (Xóa hết, Sao chép đường dẫn, Mở trong Finder, Xóa mục, Đóng) kích hoạt chuẩn xác ngay lần nhấp đầu tiên mà không bị nuốt sự kiện kích hoạt cửa sổ.
+- Nhập Liệu Tức Thì Cho Bảng Ghi Chú Scratchpad: Cửa sổ Scratchpad được cấp quyền nhận sự kiện bàn phím động ngay khi mở, cho phép nhấp vào gõ chữ ngay, chọn khối văn bản và sử dụng đầy đủ các tổ hợp phím tắt chuẩn macOS (Cmd+A, Cmd+C, Cmd+V, Cmd+Z, Esc).
+- Sao Chép Toàn Bộ & Thước Đo Kích Thước Tệp: Bổ sung nút bấm một chạm "Sao chép tất cả" và dòng chỉ báo dung lượng tổng định dạng chuẩn (X mục · Y MB) trên thanh tiêu đề Stash Shelf.
 - Bắt Nhạc & Ảnh Bìa Đa Trình Duyệt Trên macOS 15.4+: Sử dụng cầu nối `now-playing.pl` và `libMacStashNowPlaying.dylib` thông qua `MRPlayerPath`, giúp bắt chính xác tên bài hát, nghệ sĩ, trạng thái phát và ảnh bìa album từ mọi trình duyệt (bao gồm trình duyệt Crest đang phát SoundCloud, Safari, Chrome, Arc) cũng như Spotify, Apple Music và VLC.
 - Hiệu Ứng Sóng Nhạc Đổi Màu Theo Ảnh Bìa: Tự động phân tích phổ màu từ ảnh bìa của bài hát đang phát để nhuộm màu đồng bộ cho 5 thanh sóng nhạc equalizer, viền phát sáng quanh ảnh bìa và nút Phát/Tạm dừng.
 - Nhịp Điệu Sóng Nhạc Thời Gian Thực 30fps: Bộ tạo nhịp đa băng tần mô phỏng độ nảy âm trầm và âm cao sống động theo bài hát đang phát và tự động hạ nhịp êm ái khi tạm dừng.

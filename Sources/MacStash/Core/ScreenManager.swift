@@ -25,6 +25,9 @@ public final class ScreenManager: ObservableObject {
     private var dwellWorkItem: DispatchWorkItem?
     private var hideWorkItem: DispatchWorkItem?
 
+    // Drag-and-Drop Gesture Tracking (Shake to summon)
+    private var dragHistory: [(point: NSPoint, time: Date)] = []
+
     private init() {}
 
     public func start(appState: AppState) {
@@ -32,8 +35,44 @@ public final class ScreenManager: ObservableObject {
         rebuildInstances()
         observeScreenChanges()
         observeWorkspaceEvents()
+        observeStateChanges()
         startCursorTracking()
         setupGlobalHotkeys()
+    }
+
+    private func observeStateChanges() {
+        Publishers.CombineLatest(appState.stashShelf.$isShelfOpen, appState.scratchpad.$isScratchpadOpen)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] shelfOpen, padOpen in
+                guard let self = self else { return }
+                let isOpen = shelfOpen || padOpen || self.appState.stashShelf.isDropTargetActive
+                for instance in self.instances.values {
+                    instance.setLeftEdgeInteractive(isOpen, allowsKey: padOpen)
+                }
+            }
+            .store(in: &cancellables)
+
+        appState.stashShelf.$isDropTargetActive
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] dropActive in
+                guard let self = self else { return }
+                if dropActive {
+                    for instance in self.instances.values {
+                        instance.setLeftEdgeInteractive(true, allowsKey: false)
+                    }
+                }
+            }
+            .store(in: &cancellables)
+
+        appState.$isRightSliderActive
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] sliderActive in
+                guard let self = self else { return }
+                for instance in self.instances.values {
+                    instance.setRightEdgeInteractive(sliderActive)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func observeScreenChanges() {
@@ -190,8 +229,17 @@ public final class ScreenManager: ObservableObject {
             return
         }
 
+        let isDragging = (NSEvent.pressedMouseButtons != 0 && !isClick)
+        if isDragging {
+            detectDragShake(mouseLoc: mouseLoc)
+        } else {
+            dragHistory.removeAll()
+        }
+
+        updateEdgePanelsInteractivity(mouseLoc: mouseLoc, isDragging: isDragging)
+
         // 1. Mouse Dragging / Pressed Suppression (only when dial is NOT already active)
-        if appState.activeCorner == nil && appState.settings.suppressWhenMousePressed && NSEvent.pressedMouseButtons != 0 && !isClick {
+        if appState.activeCorner == nil && appState.settings.suppressWhenMousePressed && isDragging {
             cancelPendingDwell()
             return
         }
@@ -273,6 +321,92 @@ public final class ScreenManager: ObservableObject {
             }
             if !foundCandidate {
                 cancelPendingDwell()
+            }
+        }
+    }
+
+    // MARK: - Edge Panels Interactivity & Gestures
+
+    private func detectDragShake(mouseLoc: NSPoint) {
+        guard appState.isEnabled && appState.settings.isStashShelfEnabled else { return }
+        guard !appState.stashShelf.isShelfOpen else { return }
+
+        let now = Date()
+        dragHistory.append((point: mouseLoc, time: now))
+        dragHistory.removeAll { now.timeIntervalSince($0.time) > 0.6 }
+
+        guard dragHistory.count >= 6 else { return }
+
+        var reversals = 0
+        var lastDirection: CGFloat = 0
+
+        for i in 1..<dragHistory.count {
+            let dx = dragHistory[i].point.x - dragHistory[i-1].point.x
+            if abs(dx) > 16 {
+                let dir: CGFloat = dx > 0 ? 1 : -1
+                if lastDirection != 0 && dir != lastDirection {
+                    reversals += 1
+                }
+                lastDirection = dir
+            }
+        }
+
+        if reversals >= 3 {
+            appState.stashShelf.isShelfOpen = true
+            appState.stashShelf.isDropTargetActive = true
+            HapticManager.shared.performBoundaryClick()
+            AppLogger.lifecycle.info("Shake-to-summon gesture activated Stash Shelf")
+            dragHistory.removeAll()
+        }
+    }
+
+    private func updateEdgePanelsInteractivity(mouseLoc: NSPoint, isDragging: Bool) {
+        guard appState.isEnabled else { return }
+        let shelf = appState.stashShelf
+        let scratchpad = appState.scratchpad
+
+        for (_, instance) in instances {
+            let screen = instance.screen
+            let frame = screen.frame
+
+            // 1. Left Edge Panel Interactivity
+            if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
+                let leftRect = instance.leftEdgeRect(in: frame)
+                let isOpen = shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen
+
+                if isOpen {
+                    instance.setLeftEdgeInteractive(true, allowsKey: scratchpad.isScratchpadOpen)
+                } else if isDragging {
+                    if mouseLoc.x >= frame.minX && mouseLoc.x <= frame.minX + 60 &&
+                       mouseLoc.y >= leftRect.minY && mouseLoc.y <= leftRect.maxY {
+                        instance.setLeftEdgeInteractive(true, allowsKey: false)
+                        shelf.isShelfOpen = true
+                        shelf.isDropTargetActive = true
+                        HapticManager.shared.performDetentTick()
+                    } else {
+                        instance.setLeftEdgeInteractive(false, allowsKey: false)
+                    }
+                } else {
+                    let peekRect = NSRect(x: frame.minX, y: leftRect.minY, width: 26, height: leftRect.height)
+                    let isHovering = peekRect.contains(mouseLoc)
+                    instance.setLeftEdgeInteractive(isHovering, allowsKey: false)
+                }
+            } else {
+                instance.setLeftEdgeInteractive(false, allowsKey: false)
+            }
+
+            // 2. Right Edge Slider Interactivity
+            if appState.isEdgeSlidersEnabled && appState.activeProfile.rightEdgeAction != .none {
+                let rightRect = instance.rightEdgeRect(in: frame)
+                if appState.isRightSliderActive {
+                    instance.setRightEdgeInteractive(true)
+                } else {
+                    let rightTriggerRect = NSRect(x: frame.maxX - 22, y: rightRect.minY, width: 22, height: rightRect.height)
+                    let isHovering = rightTriggerRect.contains(mouseLoc)
+                    instance.setRightEdgeInteractive(isHovering)
+                }
+            } else {
+                instance.setRightEdgeInteractive(false)
             }
         }
     }
@@ -510,7 +644,7 @@ public final class ScreenManager: ObservableObject {
 
     // MARK: - Cursor Radial Palette
 
-    private var cursorPalettePanel: NSPanel?
+    private var cursorPalettePanel: MacStashInteractivePanel?
     private var paletteObserver: AnyCancellable?
 
     public func toggleCursorPalette() {
@@ -523,30 +657,30 @@ public final class ScreenManager: ObservableObject {
 
     public func showCursorPalette() {
         let mouse = NSEvent.mouseLocation
-        let side: CGFloat = 250
+        let side: CGFloat = 260
         let rect = NSRect(x: mouse.x - side / 2, y: mouse.y - side / 2, width: side, height: side)
 
         if cursorPalettePanel == nil {
-            let panel = NSPanel(
+            let panel = MacStashInteractivePanel(
                 contentRect: rect,
                 styleMask: [.borderless, .nonactivatingPanel],
                 backing: .buffered,
                 defer: false
             )
-            panel.level = .floating
-            panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
-            panel.isOpaque = false
-            panel.backgroundColor = .clear
-            panel.hasShadow = false
-            panel.contentView = NSHostingView(rootView: CursorPaletteView(appState: appState))
+            panel.allowsKeyWindow = true
+            panel.contentView = InteractiveHostingView(rootView: CursorPaletteView(appState: appState))
             cursorPalettePanel = panel
             paletteObserver = appState.$isCursorPalettePresented
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] presented in
-                    if !presented { self?.cursorPalettePanel?.orderOut(nil) }
+                    if !presented {
+                        self?.cursorPalettePanel?.orderOut(nil)
+                        self?.cursorPalettePanel?.ignoresMouseEvents = true
+                    }
                 }
         }
 
+        cursorPalettePanel?.ignoresMouseEvents = false
         cursorPalettePanel?.setFrame(rect, display: true)
         cursorPalettePanel?.orderFrontRegardless()
         appState.isCursorPalettePresented = true
@@ -555,6 +689,7 @@ public final class ScreenManager: ObservableObject {
 
     public func dismissCursorPalette() {
         cursorPalettePanel?.orderOut(nil)
+        cursorPalettePanel?.ignoresMouseEvents = true
         appState.isCursorPalettePresented = false
     }
 }

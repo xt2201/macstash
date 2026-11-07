@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import MacStashCore
 
-/// Manages floating overlay panels (4 corners) for one specific display
+/// Manages floating overlay panels (4 corners, left edge shelf, and right edge slider) for one specific display
 @MainActor
 public final class ScreenOverlayInstance {
     public let displayID: CGDirectDisplayID
@@ -11,9 +11,9 @@ public final class ScreenOverlayInstance {
 
     private var cornerPanels: [CornerPosition: NSPanel] = [:]
     private var passThroughViews: [CornerPosition: PassThroughHostingView<CornerDialView>] = [:]
-    private var rightEdgePanel: NSPanel?
+    private var rightEdgePanel: MacStashInteractivePanel?
     private var edgeHostingView: EdgeSliderHostingView?
-    private var leftEdgePanel: NSPanel?
+    private var leftEdgePanel: MacStashInteractivePanel?
     private var stashHostingView: StashShelfHostingView?
 
     private var cornerSize: CGFloat {
@@ -50,6 +50,32 @@ public final class ScreenOverlayInstance {
             if interactive {
                 panel.orderFrontRegardless()
             }
+        }
+    }
+
+    public func setLeftEdgeInteractive(_ interactive: Bool, allowsKey: Bool = false) {
+        guard let panel = leftEdgePanel else { return }
+        panel.ignoresMouseEvents = !interactive
+        panel.allowsKeyWindow = allowsKey
+
+        if interactive {
+            panel.orderFrontRegardless()
+            if allowsKey {
+                panel.makeKey()
+            }
+        } else {
+            panel.allowsKeyWindow = false
+            if NSApplication.shared.keyWindow === panel {
+                panel.resignKey()
+            }
+        }
+    }
+
+    public func setRightEdgeInteractive(_ interactive: Bool) {
+        guard let panel = rightEdgePanel else { return }
+        panel.ignoresMouseEvents = !interactive
+        if interactive {
+            panel.orderFrontRegardless()
         }
     }
 
@@ -96,9 +122,9 @@ public final class ScreenOverlayInstance {
         stashHostingView = hostingView
     }
 
-    private func leftEdgeRect(in frame: NSRect) -> NSRect {
-        let panelWidth: CGFloat = 360
-        let panelHeight: CGFloat = 480
+    public func leftEdgeRect(in frame: NSRect) -> NSRect {
+        let panelWidth: CGFloat = 350
+        let panelHeight: CGFloat = 500
         let panelY = frame.minY + (frame.height - panelHeight) / 2
         return NSRect(x: frame.minX, y: panelY, width: panelWidth, height: panelHeight)
     }
@@ -121,6 +147,14 @@ public final class ScreenOverlayInstance {
 
         self.rightEdgePanel = panel
         self.edgeHostingView = hostingView
+    }
+
+    public func rightEdgeRect(in frame: NSRect) -> NSRect {
+        let panelWidth: CGFloat = 260
+        let panelHeight: CGFloat = 440
+        let panelY = frame.minY + (frame.height - panelHeight) / 2
+        let panelX = frame.maxX - panelWidth
+        return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
     }
 
     public func repositionPanels() {
@@ -188,30 +222,15 @@ public final class ScreenOverlayInstance {
         stashHostingView = nil
     }
 
-    private func rightEdgeRect(in frame: NSRect) -> NSRect {
-        let panelWidth: CGFloat = 260
-        let panelHeight: CGFloat = 440
-        let panelY = frame.minY + (frame.height - panelHeight) / 2
-        let panelX = frame.maxX - panelWidth
-        return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
-    }
-
-    private func makeEdgePanel(contentRect: NSRect) -> NSPanel {
-        let panel = NSPanel(
+    private func makeEdgePanel(contentRect: NSRect) -> MacStashInteractivePanel {
+        let panel = MacStashInteractivePanel(
             contentRect: contentRect,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
-        panel.level = .floating
-        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
-        panel.isOpaque = false
-        panel.backgroundColor = .clear
-        panel.hasShadow = false
-        panel.acceptsMouseMovedEvents = true
-        panel.ignoresMouseEvents = false
-        panel.isMovable = false
-        panel.isMovableByWindowBackground = false
+        // Default to passive (ignoring mouse events) so underlying macOS apps receive all clicks cleanly
+        panel.ignoresMouseEvents = true
         return panel
     }
 

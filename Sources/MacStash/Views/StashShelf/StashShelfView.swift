@@ -10,6 +10,7 @@ public struct StashShelfView: View {
 
     @State private var isTargeted: Bool = false
     @State private var hoveredItemID: UUID? = nil
+    @State private var copyFeedback: Bool = false
 
     private let shelfWidth: CGFloat = Defaults.StashShelf.defaultWidthPoints
 
@@ -18,39 +19,6 @@ public struct StashShelfView: View {
     }
 
     public var body: some View {
-        let isVisible = appState.isEnabled && appState.settings.isStashShelfEnabled
-        let isOpen = shelf.isShelfOpen || isTargeted
-
-        ZStack(alignment: .leading) {
-            if isVisible {
-                // Shelf Content Container
-                shelfContent
-                    .frame(width: shelfWidth)
-                    .offset(x: isOpen ? 0 : -(shelfWidth + 20))
-                    .opacity(isOpen ? 1.0 : 0.0)
-                    .animation(.spring(response: 0.32, dampingFraction: 0.76), value: isOpen)
-
-                // Invisible touch sensor strip along screen edge (14pt)
-                Color.clear
-                    .frame(width: 14)
-                    .contentShape(Rectangle())
-                    .onHover { hovering in
-                        if hovering && !shelf.isShelfOpen {
-                            withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
-                                shelf.isShelfOpen = true
-                            }
-                        }
-                    }
-            }
-        }
-        .frame(width: isOpen ? (shelfWidth + 10) : 14, alignment: .leading)
-        .onDrop(of: [.fileURL, .utf8PlainText, .url], isTargeted: $isTargeted) { providers in
-            handleDrop(providers: providers)
-        }
-    }
-
-    @ViewBuilder
-    private var shelfContent: some View {
         VStack(spacing: 0) {
             // 1. Header Bar
             headerBar
@@ -65,32 +33,33 @@ public struct StashShelfView: View {
                 itemsListView
             }
         }
-        .frame(width: shelfWidth, height: 460)
+        .frame(width: shelfWidth, height: 470)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.32), radius: 16, x: 4, y: 4)
+                .shadow(color: Color.black.opacity(0.35), radius: 20, x: 4, y: 6)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(
                     LinearGradient(
-                        colors: isTargeted
+                        colors: (isTargeted || shelf.isDropTargetActive)
                             ? [Color.cyan, Color.blue]
                             : [Color.white.opacity(0.25), Color.white.opacity(0.06)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: isTargeted ? 2.0 : 1.0
+                    lineWidth: (isTargeted || shelf.isDropTargetActive) ? 2.0 : 1.0
                 )
         )
-        .padding(.leading, 6)
     }
+
+    // MARK: - Header Bar
 
     private var headerBar: some View {
         HStack(spacing: 8) {
             Image(systemName: "tray.2.fill")
-                .font(.system(size: 14, weight: .bold))
+                .font(.system(size: 13, weight: .bold))
                 .foregroundColor(.cyan)
 
             Text("STASH SHELF")
@@ -98,30 +67,68 @@ public struct StashShelfView: View {
                 .foregroundColor(.primary)
 
             if !shelf.items.isEmpty {
-                Text("\(shelf.items.count)")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Capsule().fill(Color.cyan.opacity(0.7)))
+                HStack(spacing: 4) {
+                    Text("\(shelf.items.count)")
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 1.5)
+                        .background(Capsule().fill(Color.cyan))
+
+                    if !shelf.totalFormattedSize.isEmpty {
+                        Text(shelf.totalFormattedSize)
+                            .font(.system(size: 9, weight: .medium, design: .monospaced))
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
 
             Spacer()
 
             if !shelf.items.isEmpty {
-                Button(action: { shelf.clearAll() }) {
+                // Copy All Button
+                Button(action: {
+                    shelf.copyAllFilesToClipboard()
+                    withAnimation(.easeInOut(duration: 0.15)) { copyFeedback = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        withAnimation(.easeInOut(duration: 0.15)) { copyFeedback = false }
+                    }
+                }) {
+                    Image(systemName: copyFeedback ? "checkmark" : "doc.on.doc")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(copyFeedback ? .green : .secondary)
+                        .frame(width: 24, height: 24)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(Color.white.opacity(0.08))
+                        )
+                }
+                .buttonStyle(.plain)
+                .help("Copy All to Clipboard")
+
+                // Clear All Button
+                Button(action: {
+                    withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                        shelf.clearAll()
+                    }
+                }) {
                     Image(systemName: "trash")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.secondary)
                         .frame(width: 24, height: 24)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(Color.white.opacity(0.08))
+                        )
                 }
                 .buttonStyle(.plain)
-                .help("Clear All")
+                .help("Clear Shelf")
             }
 
+            // Close Shelf Button
             Button(action: {
-                withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
-                    shelf.isShelfOpen = false
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                    shelf.closeShelf()
                 }
             }) {
                 Image(systemName: "xmark.circle.fill")
@@ -130,37 +137,52 @@ public struct StashShelfView: View {
                     .frame(width: 24, height: 24)
             }
             .buttonStyle(.plain)
-            .help("Close Shelf")
+            .help("Close Shelf (Esc)")
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
     }
+
+    // MARK: - Empty Drop Zone
 
     private var emptyDropZone: some View {
         VStack(spacing: 12) {
             Spacer()
 
-            Image(systemName: isTargeted ? "arrow.down.circle.fill" : "arrow.down.doc")
-                .font(.system(size: 32, weight: .light))
-                .foregroundColor(isTargeted ? .cyan : .secondary.opacity(0.6))
-                .scaleEffect(isTargeted ? 1.15 : 1.0)
-                .animation(.spring(response: 0.25, dampingFraction: 0.65), value: isTargeted)
+            ZStack {
+                Circle()
+                    .stroke(
+                        Color.cyan.opacity(shelf.isDropTargetActive ? 0.8 : 0.25),
+                        style: StrokeStyle(lineWidth: 1.5, dash: [4, 4])
+                    )
+                    .frame(width: 64, height: 64)
 
-            Text(isTargeted ? "Drop Here to Stash" : "Drop Files or Text Here")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.secondary)
+                Image(systemName: shelf.isDropTargetActive ? "arrow.down.circle.fill" : "arrow.down.doc")
+                    .font(.system(size: 26, weight: .light))
+                    .foregroundColor(shelf.isDropTargetActive ? .cyan : .secondary.opacity(0.7))
+                    .scaleEffect(shelf.isDropTargetActive ? 1.15 : 1.0)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.65), value: shelf.isDropTargetActive)
+            }
 
-            Text("Hold items while switching apps & spaces")
-                .font(.system(size: 10))
-                .foregroundColor(.secondary.opacity(0.7))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 20)
+            VStack(spacing: 4) {
+                Text(shelf.isDropTargetActive ? "Release to Stash" : "Drop Files or Text Here")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.primary)
+
+                Text("Wiggle mouse while dragging to summon\nPress Esc to dismiss")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
+            }
 
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(16)
     }
+
+    // MARK: - Items List View
 
     private var itemsListView: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -173,70 +195,111 @@ public struct StashShelfView: View {
         }
     }
 
+    // MARK: - Stash Item Card (Clean Separation of Drag vs Button Hit Areas)
+
     private func stashItemCard(item: StashItem) -> some View {
         let isHovered = hoveredItemID == item.id
 
         return HStack(spacing: 8) {
-            // File or Item Icon
-            itemIconView(for: item)
-                .frame(width: 30, height: 30)
+            // Draggable Section: Grip Handle + Icon + Metadata
+            // Keeping .onDrag exclusively on this sub-view allows trailing action buttons to receive clicks freely!
+            HStack(spacing: 8) {
+                // Drag Grip
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.secondary.opacity(0.6))
+                    .frame(width: 12)
 
-            // Titles
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.title)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+                // Item Icon
+                itemIconView(for: item)
+                    .frame(width: 28, height: 28)
 
-                HStack(spacing: 4) {
-                    if !item.formattedSize.isEmpty {
-                        Text(item.formattedSize)
-                            .font(.system(size: 9, weight: .medium, design: .monospaced))
-                            .foregroundColor(.secondary)
-                    }
-                    if item.itemType == .url {
-                        Text("Link")
-                            .font(.system(size: 9))
-                            .foregroundColor(.cyan)
+                // Title & Details
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(item.title)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+
+                    HStack(spacing: 4) {
+                        if !item.formattedSize.isEmpty {
+                            Text(item.formattedSize)
+                                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                                .foregroundColor(.secondary)
+                        }
+                        if item.itemType == .url {
+                            Text("Link")
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundColor(.cyan)
+                        } else if let ext = item.sourceURL?.pathExtension.uppercased(), !ext.isEmpty {
+                            Text(ext)
+                                .font(.system(size: 8, weight: .bold, design: .monospaced))
+                                .foregroundColor(.secondary.opacity(0.8))
+                                .padding(.horizontal, 3)
+                                .padding(.vertical, 0.5)
+                                .background(RoundedRectangle(cornerRadius: 3).fill(Color.white.opacity(0.1)))
+                        }
                     }
                 }
+            }
+            .contentShape(Rectangle())
+            .onDrag {
+                shelf.createItemProvider(for: item)
             }
 
             Spacer()
 
-            // Quick actions on hover
-            if isHovered {
-                HStack(spacing: 2) {
-                    if item.isExistingFile {
-                        Button(action: { shelf.revealInFinder(id: item.id) }) {
-                            Image(systemName: "magnifyingglass")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.secondary)
-                                .frame(width: 20, height: 20)
-                        }
-                        .buttonStyle(.plain)
-                        .help("Reveal in Finder")
-
-                        Button(action: { shelf.copyPathToClipboard(id: item.id) }) {
-                            Image(systemName: "doc.on.doc")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.secondary)
-                                .frame(width: 20, height: 20)
-                        }
-                        .buttonStyle(.plain)
-                        .help("Copy Path")
-                    }
-
-                    Button(action: { shelf.removeItem(id: item.id) }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 9, weight: .bold))
+            // Isolated Trailing Action Buttons (NOT wrapped in .onDrag to ensure 100% reliable clicks)
+            HStack(spacing: 4) {
+                if item.isExistingFile {
+                    Button(action: {
+                        shelf.revealInFinder(id: item.id)
+                    }) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.secondary)
-                            .frame(width: 20, height: 20)
+                            .frame(width: 22, height: 22)
+                            .background(
+                                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                    .fill(Color.white.opacity(0.08))
+                            )
                     }
                     .buttonStyle(.plain)
-                    .help("Remove")
+                    .help("Reveal in Finder")
+
+                    Button(action: {
+                        shelf.copyPathToClipboard(id: item.id)
+                    }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.secondary)
+                            .frame(width: 22, height: 22)
+                            .background(
+                                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                    .fill(Color.white.opacity(0.08))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .help("Copy Path")
                 }
+
+                Button(action: {
+                    withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
+                        shelf.removeItem(id: item.id)
+                    }
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundColor(.secondary)
+                        .frame(width: 22, height: 22)
+                        .background(
+                            RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                .fill(Color.white.opacity(0.08))
+                        )
+                }
+                .buttonStyle(.plain)
+                .help("Remove")
             }
         }
         .padding(.horizontal, 8)
@@ -245,12 +308,8 @@ public struct StashShelfView: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(isHovered ? Color.white.opacity(0.12) : Color.white.opacity(0.05))
         )
-        .contentShape(Rectangle())
         .onHover { hovering in
             hoveredItemID = hovering ? item.id : nil
-        }
-        .onDrag {
-            shelf.createItemProvider(for: item)
         }
     }
 
@@ -267,43 +326,9 @@ public struct StashShelfView: View {
                     .fill(Color.cyan.opacity(0.18))
 
                 Image(systemName: item.itemType == .url ? "link" : (item.itemType == .image ? "photo" : "doc.text"))
-                    .font(.system(size: 14))
+                    .font(.system(size: 13))
                     .foregroundColor(.cyan)
             }
         }
-    }
-
-    private func handleDrop(providers: [NSItemProvider]) -> Bool {
-        var didHandle = false
-        for provider in providers {
-            if provider.hasItemConformingToTypeIdentifier("public.file-url") {
-                provider.loadItem(forTypeIdentifier: "public.file-url", options: nil) { item, _ in
-                    if let data = item as? Data, let url = URL(dataRepresentation: data, relativeTo: nil) {
-                        Task { @MainActor in
-                            shelf.addFileURLs([url])
-                        }
-                    } else if let url = item as? URL {
-                        Task { @MainActor in
-                            shelf.addFileURLs([url])
-                        }
-                    }
-                }
-                didHandle = true
-            } else if provider.hasItemConformingToTypeIdentifier("public.utf8-plain-text") {
-                provider.loadItem(forTypeIdentifier: "public.utf8-plain-text", options: nil) { item, _ in
-                    if let str = item as? String {
-                        Task { @MainActor in
-                            shelf.addTextSnippet(str)
-                        }
-                    } else if let data = item as? Data, let str = String(data: data, encoding: .utf8) {
-                        Task { @MainActor in
-                            shelf.addTextSnippet(str)
-                        }
-                    }
-                }
-                didHandle = true
-            }
-        }
-        return didHandle
     }
 }

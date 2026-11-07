@@ -239,7 +239,14 @@ public struct MenuBarExtraView: View {
 
                 // Stash Shelf & Scratchpad quick access
                 HStack(spacing: 6) {
-                    Button(action: { appState.stashShelf.isShelfOpen.toggle() }) {
+                    Button(action: {
+                        if appState.stashShelf.isShelfOpen {
+                            appState.stashShelf.closeShelf()
+                        } else {
+                            appState.scratchpad.isScratchpadOpen = false
+                            appState.stashShelf.openShelf()
+                        }
+                    }) {
                         Label("Stash (\(appState.stashShelf.items.count))", systemImage: "tray.2.fill")
                             .font(.system(size: 10, weight: .medium))
                             .frame(maxWidth: .infinity)
@@ -248,7 +255,14 @@ public struct MenuBarExtraView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Button(action: { appState.scratchpad.isScratchpadOpen.toggle() }) {
+                    Button(action: {
+                        if appState.scratchpad.isScratchpadOpen {
+                            appState.scratchpad.isScratchpadOpen = false
+                        } else {
+                            appState.stashShelf.closeShelf()
+                            appState.scratchpad.isScratchpadOpen = true
+                        }
+                    }) {
                         Label("Notes", systemImage: "note.text")
                             .font(.system(size: 10, weight: .medium))
                             .frame(maxWidth: .infinity)

@@ -7,7 +7,7 @@
         <language>en</language>
         <item>
             <title>Version 2.9.9</title>
-            <pubDate>Mon, 09 Nov 2026 14:44:20 +0700</pubDate>
+            <pubDate>Mon, 09 Nov 2026 07:46:51 +0000</pubDate>
             <sparkle:version>299</sparkle:version>
             <sparkle:shortVersionString>2.9.9</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
@@ -22,8 +22,8 @@
             ]]></description>
             <enclosure
                 url="https://github.com/xt2201/macstash/releases/download/v2.9.9/Stash-2.9.9.zip"
-                sparkle:edSignature="QW0zo/u8ZaS9Y8Pfb15ObT4dNeAGxXWvkGGxjyjE2DmD3IsKwWJLd070rxuxPEkswNAGJ9XVZBbmH5XknndyDg=="
-                length="6695026"
+                sparkle:edSignature="2N1v8qeEEJXPzrX1HBKZMx82VA+YfYwV/CT60yXcaXgWyT1pGIcTUiP76vU5uRex2JgZs9JNHYHsHgHb/MCVAw=="
+                length="5009664"
                 type="application/octet-stream" />
         </item>
         <item>
@@ -42,7 +42,7 @@
 </ul>
             ]]></description>
             <enclosure
-                url="https://raw.githubusercontent.com/xt2201/macstash/release-binaries/Stash-2.9.8.zip"
+                url="https://github.com/xt2201/macstash/releases/download/v2.9.8/Stash-2.9.8.zip"
                 sparkle:edSignature="mnP2jkcp7TzMfswxyisHd4F6UDGLS7XUswtYolsQRriLLmBaBj/3XMcA7jcv/B9S27yj2ux1LFrTgkUeTF45BA=="
                 length="4987807"
                 type="application/octet-stream" />

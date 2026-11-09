@@ -463,7 +463,7 @@ public final class AppState: ObservableObject {
     public func toggleAction(_ action: ControlAction, displayID: CGDirectDisplayID = 0) {
         switch action {
         case .volume:
-            isAudioDevicePickerPresented.toggle()
+            audio.toggleMute()
             haptics.performBoundaryClick()
             sound.playAccent(enabled: isSoundEnabled)
         case .timer:

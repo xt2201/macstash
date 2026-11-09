@@ -33,6 +33,9 @@ public struct CornerDialView: View {
         if isDragging {
             return dragValue
         }
+        if action == .volume && appState.audio.isMuted {
+            return 0.0
+        }
         return appState.getValue(for: action, displayID: displayID)
     }
 

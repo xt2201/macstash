@@ -10,7 +10,6 @@ public struct EdgeSliderView: View {
     public let displayID: CGDirectDisplayID
     public let edge: EdgePosition
 
-    @State private var isHovered: Bool = false
     @State private var isDragging: Bool = false
     @State private var dragValue: Float = 0.5
 
@@ -38,6 +37,9 @@ public struct EdgeSliderView: View {
         if isDragging {
             return dragValue
         }
+        if action == .volume && appState.audio.isMuted {
+            return 0.0
+        }
         if let live = appState.liveEdgeSliderValue {
             return live
         }
@@ -46,7 +48,7 @@ public struct EdgeSliderView: View {
 
     public var body: some View {
         let isVisible = appState.isEnabled && appState.isEdgeSlidersEnabled && action != .none
-        let isExpanded = isHovered || isDragging || appState.isRightSliderActive
+        let isExpanded = isDragging || appState.isRightSliderActive
 
         ZStack(alignment: edge == .right ? .trailing : .leading) {
             if isVisible {
@@ -59,7 +61,6 @@ public struct EdgeSliderView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .trailing : .leading)
         .onHover { hovering in
-            isHovered = hovering
             if !hovering && !isDragging && appState.isRightSliderActive {
                 ScreenManager.shared.scheduleRightEdgeHideTimer()
             }
@@ -71,17 +72,27 @@ public struct EdgeSliderView: View {
         VStack(spacing: 0) {
             // 1. Primary Slider Section (Volume / Brightness / Keyboard / Timer)
             VStack(spacing: 10) {
-                // Action Icon
-                Image(systemName: action.systemImage)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: action.accentColors,
-                            startPoint: .top,
-                            endPoint: .bottom
+                // Action Icon (Tap to toggle mute / silent for volume)
+                Button(action: {
+                    if action == .volume {
+                        appState.audio.toggleMute()
+                        HapticManager.shared.performDetentTick()
+                        SoundEffectManager.shared.playAccent()
+                    }
+                }) {
+                    Image(systemName: (action == .volume && appState.audio.isMuted) ? "speaker.slash.fill" : action.systemImage)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(
+                            (action == .volume && appState.audio.isMuted)
+                                ? AnyShapeStyle(Color.red)
+                                : AnyShapeStyle(LinearGradient(colors: action.accentColors, startPoint: .top, endPoint: .bottom))
                         )
-                    )
-                    .padding(.top, 12)
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help((action == .volume && appState.audio.isMuted) ? appState.localized("menubar.unmute") : appState.localized("menubar.mute"))
+                .padding(.top, 8)
 
                 // Vertical Track Bar (wide interactive hit zone around sleek 14pt track capsule)
                 GeometryReader { geo in
@@ -101,11 +112,9 @@ public struct EdgeSliderView: View {
                         // Fill level
                         Capsule()
                             .fill(
-                                LinearGradient(
-                                    colors: action.accentColors,
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
+                                (action == .volume && appState.audio.isMuted)
+                                    ? LinearGradient(colors: [Color.red.opacity(0.8), Color.red.opacity(0.5)], startPoint: .top, endPoint: .bottom)
+                                    : LinearGradient(colors: action.accentColors, startPoint: .top, endPoint: .bottom)
                             )
                             .frame(width: 14, height: max(6, fillH))
 
@@ -141,11 +150,18 @@ public struct EdgeSliderView: View {
                 .frame(width: 44, height: shouldShowMediaControls ? 110 : 140)
                 .padding(.horizontal, 3)
 
-                // Percentage label
-                Text("\(Int(currentValue * 100))%")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
-                    .padding(.bottom, shouldShowMediaControls ? 6 : 12)
+                // Percentage / MUTE label
+                if action == .volume && appState.audio.isMuted {
+                    Text("MUTE")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(.red)
+                        .padding(.bottom, shouldShowMediaControls ? 6 : 12)
+                } else {
+                    Text("\(Int(currentValue * 100))%")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                        .padding(.bottom, shouldShowMediaControls ? 6 : 12)
+                }
             }
 
             // 2. Vertical Media Controller (Shown directly beneath the volume slider)

@@ -1,3 +1,14 @@
+# Có Gì Mới Trong Phiên Bản 2.9.4
+
+MacStash 2.9.4 khắc phục triệt để hiện tượng mở sớm thanh trượt cạnh phải bằng cơ chế chạm viền vật lý chuẩn xác, đồng bộ hóa hai chiều trạng thái Im lặng / Mute phần cứng của macOS, và hỗ trợ bật/tắt im lặng 1-chạm.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.4
+
+- Kích Hoạt Cạnh Phải Chuẩn Xác Tuyệt Đối: Thanh trượt cạnh phải chỉ mở ra khi con trỏ chuột chạm sát mép màn hình vật lý (khoảng cách <= 2.0pt) và dừng lại có chủ đích, loại bỏ việc mở ngoài ý muốn khi rê chuột gần thanh cuộn của ứng dụng khác.
+- Đồng Bộ Hóa Hai Chiều Trạng Thái Mute: Bổ sung bộ lắng nghe sự kiện phần cứng CoreAudio cho thuộc tính tắt tiếng và âm lượng scalar, kết hợp kiểm tra nền 0.5s để cập nhật ngay lập tức khi bạn bấm nút Mute trên bàn phím Mac hoặc Control Center.
+- Bật/Tắt Im Lặng (Silent / Unsilent) 1-Chạm: Nhấp vào biểu tượng loa trên thanh trượt cạnh phải hoặc huy hiệu trung tâm của núm xoay góc dưới bên phải để bật/tắt âm lượng tức thì kèm rung phản hồi haptic.
+- Nhận Diện Trực Quan Khi Tắt Tiếng: Khi ở chế độ tắt tiếng, các chỉ báo âm thanh hiển thị rõ ràng biểu tượng loa gạch chéo màu đỏ, nhãn MUTE màu đỏ và thanh mức về 0.
+
 # Có Gì Mới Trong Phiên Bản 2.9.3
 
 MacStash 2.9.3 đồng bộ hóa toàn diện cử chỉ vuốt ngón và hướng làm đầy vành xoay trên cả bốn góc màn hình theo quy chuẩn vật lý tự nhiên hướng lên trên.

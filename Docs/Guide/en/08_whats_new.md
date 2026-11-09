@@ -1,3 +1,14 @@
+# What's New in Version 2.9.4
+
+MacStash 2.9.4 eliminates premature opening of the Right Edge Slider with strict extreme-edge boundary gating, delivers bidirectional macOS Silent/Mute hardware synchronization, and introduces 1-click silent toggling across all audio controls.
+
+## Key Enhancements in Version 2.9.4
+
+- Strict Physical Edge Triggering: The Right Edge Slider now strictly requires the cursor to touch the physical screen edge (within 2.0pt) and dwell intentionally, removing container hover expansions so background scrollbars and rightmost windows remain undisturbed.
+- Bidirectional Silent / Mute Synchronization: Real-time hardware listeners for CoreAudio mute and volume events guarantee immediate reflection of macOS keyboard mute and Control Center changes.
+- 1-Click Silent / Unmute: Clicking the speaker icon on the Right Edge Slider or the center action badge on the Bottom-Right dial toggles mute with tactile haptic confirmation.
+- Distinct Visual Silent Indication: When muted, audio indicators clearly display a red speaker-slash icon, red MUTE label, and 0-level gauge tracks.
+
 # What's New in Version 2.9.3
 
 MacStash 2.9.3 harmonizes corner dial gestures and radial gauge filling across all four quadrants with intuitive, unified upward-increasing gesture physics.

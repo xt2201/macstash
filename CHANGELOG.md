@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.9.4] - 2026-11-09
+
+### Fixed
+- Fixed Right Edge Slider premature expansion: Removed hover state expansion from the 80pt slider container and tightened edge detection strictly to the physical display boundary (`<= 2.0pt`) with a 150ms intentional dwell delay, completely eliminating unintended slider popouts when moving mouse near the right margin.
+- Fixed bidirectional macOS Silent / Mute synchronization: Added CoreAudio property listeners for `kAudioDevicePropertyMute` and scalar volume, alongside a 0.5s background polling synchronization to instantly reflect system-level mute changes.
+- Added 1-Click Silent / Unmute toggle: Clicking the volume icon on the Right Edge Slider or the center action badge on the Bottom-Right corner dial now immediately toggles system mute/unmute with tactile haptic and audio feedback.
+- Restored visual silent feedback: When muted, both the corner dial and right edge slider drop to 0 level, display a red `speaker.slash.fill` icon, and show a clear `MUTE` label.
+
+---
+
 ## [2.9.3] - 2026-11-09
 
 ### Fixed

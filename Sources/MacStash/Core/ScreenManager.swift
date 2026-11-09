@@ -461,10 +461,10 @@ public final class ScreenManager: ObservableObject {
                             scheduleRightEdgeHideTimer()
                         }
                     } else {
-                        // Extreme edge (<= 3pt) requirement with dwell delay matching corner trigger policy
-                        let extremeEdgeRect = NSRect(x: frame.maxX - 3.0, y: rightRect.minY, width: 3.0, height: rightRect.height)
+                        // Extreme edge (<= 2.0pt) requirement with intentional dwell delay matching corner trigger policy
+                        let extremeEdgeRect = NSRect(x: frame.maxX - 2.0, y: rightRect.minY, width: 2.0, height: rightRect.height)
                         if extremeEdgeRect.contains(mouseLoc) {
-                            scheduleRightEdgeDwellTimer(displayID: instance.displayID, screenFrame: frame)
+                            scheduleRightEdgeDwellTimer(displayID: instance.displayID, screenFrame: frame, verticalRange: rightRect)
                         } else {
                             cancelPendingRightEdgeDwell()
                             instance.setRightEdgeInteractive(false)
@@ -479,18 +479,18 @@ public final class ScreenManager: ObservableObject {
         }
     }
 
-    private func scheduleRightEdgeDwellTimer(displayID: CGDirectDisplayID, screenFrame: NSRect) {
+    private func scheduleRightEdgeDwellTimer(displayID: CGDirectDisplayID, screenFrame: NSRect, verticalRange: NSRect) {
         if pendingRightEdgeDisplayID == displayID { return }
         cancelPendingRightEdgeDwell()
         pendingRightEdgeDisplayID = displayID
 
-        let delay = max(0.12, appState.cornerDwellDelay)
+        let delay = max(0.15, appState.cornerDwellDelay)
         let item = DispatchWorkItem { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 guard self.pendingRightEdgeDisplayID == displayID else { return }
                 let cur = NSEvent.mouseLocation
-                if cur.x >= screenFrame.maxX - 4.0 {
+                if cur.x >= screenFrame.maxX - 2.0 && cur.y >= verticalRange.minY && cur.y <= verticalRange.maxY {
                     self.appState.isRightSliderActive = true
                     self.instances[displayID]?.setRightEdgeInteractive(true)
                     HapticManager.shared.performDetentTick()

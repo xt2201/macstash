@@ -21,7 +21,11 @@ public final class AudioManager: ObservableObject {
 
     private var defaultOutputDeviceID: AudioDeviceID = 0
     private var volumeListenerBlock: AudioObjectPropertyListenerBlock?
+    private var scalarVolumeListenerBlock: AudioObjectPropertyListenerBlock?
+    private var muteListenerBlock: AudioObjectPropertyListenerBlock?
     private var defaultDeviceListenerBlock: AudioObjectPropertyListenerBlock?
+    private var syncTimer: Timer?
+    private var preMuteVolume: Float = 0.35
     private let hardwareQueue = DispatchQueue(label: "com.macstash.audio.hardware", qos: .userInteractive)
     private var lastUserVolumeSetTime: TimeInterval = 0
 
@@ -31,6 +35,16 @@ public final class AudioManager: ObservableObject {
         setupListeners()
         setupDefaultDeviceListener()
         updateVolumeFromHardware(force: true)
+        setupPeriodicSync()
+    }
+
+    private func setupPeriodicSync() {
+        syncTimer?.invalidate()
+        syncTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.updateVolumeFromHardware(force: false)
+            }
+        }
     }
 
 
@@ -245,6 +259,10 @@ public final class AudioManager: ObservableObject {
         }
         guard defaultOutputDeviceID != 0 else { return }
 
+        if mute && volume > 0.02 {
+            preMuteVolume = volume
+        }
+
         var muteVal: UInt32 = mute ? 1 : 0
         let size = UInt32(MemoryLayout.size(ofValue: muteVal))
         var address = AudioObjectPropertyAddress(
@@ -262,8 +280,28 @@ public final class AudioManager: ObservableObject {
             &muteVal
         )
 
-        if status == noErr {
-            self.isMuted = mute
+        self.isMuted = mute
+
+        if mute {
+            if status != noErr {
+                setVolume(0.0)
+            }
+        } else {
+            // When unmuting: restore preMuteVolume if volume was at 0
+            if volume <= 0.01 {
+                setVolume(max(0.20, preMuteVolume))
+            } else if status != noErr {
+                setVolume(volume)
+            }
+        }
+
+        // Background AppleScript trigger as robust system-wide fallback
+        DispatchQueue.global(qos: .userInitiated).async {
+            let script = "set volume output muted \(mute ? "true" : "false")"
+            if let appleScript = NSAppleScript(source: script) {
+                var err: NSDictionary?
+                appleScript.executeAndReturnError(&err)
+            }
         }
     }
 
@@ -317,7 +355,7 @@ public final class AudioManager: ObservableObject {
             mElement: kAudioObjectPropertyElementMain
         )
 
-        _ = AudioObjectGetPropertyData(
+        let muteStatus = AudioObjectGetPropertyData(
             defaultOutputDeviceID,
             &muteAddress,
             0,
@@ -326,10 +364,16 @@ public final class AudioManager: ObservableObject {
             &muteVal
         )
 
+        let hardwareMuted = (muteStatus == noErr && muteVal == 1)
+        let isEffectivelySilent = hardwareMuted || (status == noErr && vol <= 0.001)
+
         if status == noErr {
             self.volume = vol
+            if vol > 0.02 {
+                self.preMuteVolume = vol
+            }
         }
-        self.isMuted = (muteVal == 1)
+        self.isMuted = isEffectivelySilent
     }
 
     // MARK: - Real-time Listeners
@@ -363,18 +407,17 @@ public final class AudioManager: ObservableObject {
     private func setupListeners() {
         guard defaultOutputDeviceID != 0 else { return }
 
+        // 1. Virtual Main Volume Listener
         var volumeAddress = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
             mScope: kAudioObjectPropertyScopeOutput,
             mElement: kAudioObjectPropertyElementMain
         )
-
         volumeListenerBlock = { [weak self] (_, _) in
             Task { @MainActor [weak self] in
                 self?.updateVolumeFromHardware(force: false)
             }
         }
-
         if let block = volumeListenerBlock {
             AudioObjectAddPropertyListenerBlock(
                 defaultOutputDeviceID,
@@ -383,20 +426,94 @@ public final class AudioManager: ObservableObject {
                 block
             )
         }
-    }
 
-    private func removeListeners() {
-        guard defaultOutputDeviceID != 0, let block = volumeListenerBlock else { return }
-        var volumeAddress = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
+        // 2. Scalar Volume Listener (fallback for devices that do not expose virtual main volume)
+        var scalarAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyVolumeScalar,
             mScope: kAudioObjectPropertyScopeOutput,
             mElement: kAudioObjectPropertyElementMain
         )
-        AudioObjectRemovePropertyListenerBlock(
-            defaultOutputDeviceID,
-            &volumeAddress,
-            DispatchQueue.main,
-            block
+        scalarVolumeListenerBlock = { [weak self] (_, _) in
+            Task { @MainActor [weak self] in
+                self?.updateVolumeFromHardware(force: false)
+            }
+        }
+        if let block = scalarVolumeListenerBlock {
+            AudioObjectAddPropertyListenerBlock(
+                defaultOutputDeviceID,
+                &scalarAddress,
+                DispatchQueue.main,
+                block
+            )
+        }
+
+        // 3. Hardware Mute / Silent Listener
+        var muteAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyMute,
+            mScope: kAudioObjectPropertyScopeOutput,
+            mElement: kAudioObjectPropertyElementMain
         )
+        muteListenerBlock = { [weak self] (_, _) in
+            Task { @MainActor [weak self] in
+                self?.updateVolumeFromHardware(force: true)
+            }
+        }
+        if let block = muteListenerBlock {
+            AudioObjectAddPropertyListenerBlock(
+                defaultOutputDeviceID,
+                &muteAddress,
+                DispatchQueue.main,
+                block
+            )
+        }
+    }
+
+    private func removeListeners() {
+        guard defaultOutputDeviceID != 0 else { return }
+
+        if let block = volumeListenerBlock {
+            var volumeAddress = AudioObjectPropertyAddress(
+                mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
+                mScope: kAudioObjectPropertyScopeOutput,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            AudioObjectRemovePropertyListenerBlock(
+                defaultOutputDeviceID,
+                &volumeAddress,
+                DispatchQueue.main,
+                block
+            )
+            volumeListenerBlock = nil
+        }
+
+        if let block = scalarVolumeListenerBlock {
+            var scalarAddress = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyVolumeScalar,
+                mScope: kAudioObjectPropertyScopeOutput,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            AudioObjectRemovePropertyListenerBlock(
+                defaultOutputDeviceID,
+                &scalarAddress,
+                DispatchQueue.main,
+                block
+            )
+            scalarVolumeListenerBlock = nil
+        }
+
+        if let block = muteListenerBlock {
+            var muteAddress = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyMute,
+                mScope: kAudioObjectPropertyScopeOutput,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            AudioObjectRemovePropertyListenerBlock(
+                defaultOutputDeviceID,
+                &muteAddress,
+                DispatchQueue.main,
+                block
+            )
+            muteListenerBlock = nil
+        }
     }
 }

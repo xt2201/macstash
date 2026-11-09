@@ -1,4 +1,6 @@
 import SwiftUI
+import AppKit
+import UniformTypeIdentifiers
 import SideDockCore
 import SideDockWidgets
 
@@ -146,6 +148,18 @@ public struct DockSettingsTabView: View {
                             .frame(maxWidth: 240)
 
                             Spacer()
+
+                            Button {
+                                exportCurrentProfile()
+                            } label: {
+                                Label("Export...", systemImage: "square.and.arrow.up")
+                            }
+
+                            Button {
+                                importProfileFromFile()
+                            } label: {
+                                Label("Import...", systemImage: "square.and.arrow.down")
+                            }
 
                             Button {
                                 isCreatingProfile = true
@@ -321,5 +335,37 @@ public struct DockSettingsTabView: View {
         config.profiles.remove(at: idx)
         config.activeProfileId = config.profiles.first?.id ?? UUID()
         onSave(true)
+    }
+
+    private func exportCurrentProfile() {
+        let prof = config.profiles[activeProfileIndex]
+        let service = DockProfileTransferService()
+        guard let data = try? service.exportProfileJSON(profile: prof) else { return }
+
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.json]
+        savePanel.nameFieldStringValue = "\(prof.name.replacingOccurrences(of: " ", with: "_")).sidedock-profile"
+        savePanel.prompt = "Export"
+
+        if savePanel.runModal() == .OK, let url = savePanel.url {
+            try? data.write(to: url)
+        }
+    }
+
+    private func importProfileFromFile() {
+        let openPanel = NSOpenPanel()
+        openPanel.allowedContentTypes = [.json]
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.prompt = "Import"
+
+        if openPanel.runModal() == .OK, let url = openPanel.url, let data = try? Data(contentsOf: url) {
+            let service = DockProfileTransferService()
+            if let imported = try? service.importProfile(from: data) {
+                config.profiles.append(imported)
+                config.activeProfileId = imported.id
+                onSave(true)
+            }
+        }
     }
 }

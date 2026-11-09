@@ -41,3 +41,8 @@ This log records major technical and architecture decisions for SideDock with ra
 - **Context:** FR-CORE-10 requires reserving screen space for fixed dock configurations without private WindowServer APIs.
 - **Decision:** Implement pure domain `ReserveSpacePolicy` for frame geometry math, coupled with `ReserveSpaceManager` using public Accessibility `AXUIElement` APIs to adjust frontmost non-desktop windows when enabled.
 - **Rationale:** 100% compliant with public Apple APIs, respects user privacy with opt-in default OFF configuration.
+
+## ADR-009: Profile Export/Import and Phase 2 Local Widgets
+- **Context:** Users need to backup, share, and migrate dock profiles between setups, and access fast utility widgets (clipboard, notes, screenshots, color picker, converter, bookmarks).
+- **Decision:** Implement `DockProfileTransferService` with standardized `.sidedock-profile` JSON envelope, generating fresh UUIDs on import to prevent profile collisions. Add 6 local-first Phase 2 widgets without external network dependencies.
+- **Rationale:** 100% offline, privacy-first, zero telemetry, seamless user customization.

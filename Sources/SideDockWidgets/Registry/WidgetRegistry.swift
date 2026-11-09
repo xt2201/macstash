@@ -102,6 +102,60 @@ public final class WidgetRegistry: @unchecked Sendable {
                 description: "Drop temporary files onto the dock to hold and reuse across apps.",
                 supportedSizes: [.small, .medium],
                 requiredPermissions: [.none]
+            ),
+            WidgetDescriptor(
+                id: "clipboard",
+                displayName: "Clipboard History",
+                category: .utility,
+                systemIconName: "doc.on.clipboard",
+                description: "Local clipboard history monitor with quick click-to-copy.",
+                supportedSizes: [.small, .medium, .large],
+                requiredPermissions: [.none]
+            ),
+            WidgetDescriptor(
+                id: "quickNote",
+                displayName: "Quick Note",
+                category: .productivity,
+                systemIconName: "note.text",
+                description: "Lightweight scratchpad for instant notes on your dock.",
+                supportedSizes: [.small, .medium, .large],
+                requiredPermissions: [.none]
+            ),
+            WidgetDescriptor(
+                id: "screenshot",
+                displayName: "Screenshot Launcher",
+                category: .utility,
+                systemIconName: "camera.viewfinder",
+                description: "One-click interactive area, fullscreen capture, and screen recording.",
+                supportedSizes: [.small, .medium],
+                requiredPermissions: [.none]
+            ),
+            WidgetDescriptor(
+                id: "colorPicker",
+                displayName: "Color Picker",
+                category: .utility,
+                systemIconName: "eyedropper",
+                description: "Sample pixel color anywhere on screen and copy HEX codes.",
+                supportedSizes: [.small, .medium],
+                requiredPermissions: [.none]
+            ),
+            WidgetDescriptor(
+                id: "unitConverter",
+                displayName: "Unit Converter",
+                category: .utility,
+                systemIconName: "ruler",
+                description: "Offline converter for Length, Temp, Weight, and Currency reference rates.",
+                supportedSizes: [.small, .medium, .large],
+                requiredPermissions: [.none]
+            ),
+            WidgetDescriptor(
+                id: "bookmarks",
+                displayName: "Bookmarks",
+                category: .utility,
+                systemIconName: "bookmark.fill",
+                description: "Quick links to your most frequent websites and developer docs.",
+                supportedSizes: [.small, .medium],
+                requiredPermissions: [.none]
             )
         ]
     }
@@ -160,6 +214,24 @@ public final class WidgetRegistry: @unchecked Sendable {
         case "fileShelf":
             let config = (try? JSONDecoder().decode(FileShelfConfig.self, from: item.configurationData ?? Data())) ?? FileShelfConfig()
             FileShelfWidgetView(config: config, size: item.size)
+        case "clipboard":
+            let config = (try? JSONDecoder().decode(ClipboardConfig.self, from: item.configurationData ?? Data())) ?? ClipboardConfig()
+            ClipboardWidgetView(config: config, size: item.size)
+        case "quickNote":
+            let config = (try? JSONDecoder().decode(QuickNoteConfig.self, from: item.configurationData ?? Data())) ?? QuickNoteConfig()
+            QuickNoteWidgetView(config: config, size: item.size)
+        case "screenshot":
+            let config = (try? JSONDecoder().decode(ScreenshotConfig.self, from: item.configurationData ?? Data())) ?? ScreenshotConfig()
+            ScreenshotWidgetView(config: config, size: item.size)
+        case "colorPicker":
+            let config = (try? JSONDecoder().decode(ColorPickerConfig.self, from: item.configurationData ?? Data())) ?? ColorPickerConfig()
+            ColorPickerWidgetView(config: config, size: item.size)
+        case "unitConverter":
+            let config = (try? JSONDecoder().decode(UnitConverterConfig.self, from: item.configurationData ?? Data())) ?? UnitConverterConfig()
+            UnitConverterWidgetView(config: config, size: item.size)
+        case "bookmarks":
+            let config = (try? JSONDecoder().decode(BookmarksConfig.self, from: item.configurationData ?? Data())) ?? BookmarksConfig()
+            BookmarksWidgetView(config: config, size: item.size)
         default:
             HStack {
                 Image(systemName: "exclamationmark.triangle")

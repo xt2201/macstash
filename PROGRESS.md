@@ -9,7 +9,7 @@ This document tracks implementation status against the BRD requirements for the 
 - [x] **M2: Widget Framework & 10 Widgets** - `DockWidget` protocol, Widget Registry, 10 P0 local widgets, profiles, widget tests.
 - [x] **M3: MVP Complete** - Persistence & migration, EN/VI localization, onboarding, reset layout, DMG packaging.
 - [x] **M4: P1 Phase 1** - Multi-display, fullscreen auto-hide, hide on window hover, reserve space, hotkeys.
-- [ ] **M5: P1 Phase 2** - Profile export/import, backup/restore, Phase 2 widgets, liquid glass, window previews.
+- [x] **M5: P1 Phase 2** - Profile export/import, backup/restore, Phase 2 widgets, liquid glass, window previews.
 - [ ] **M6: P2 Advanced** - Connected widgets, AI usage widgets, local MCP server, diagnostics export.
 
 ---
@@ -62,6 +62,13 @@ This document tracks implementation status against the BRD requirements for the 
 | FR-CORE-09 | P1 | Hide on window hover (fade out to 0.15 alpha) | Done | `EdgeTriggerManager.swift`, `SideDockManager.swift` |
 | FR-CORE-10 | P1 | Reserve Dock Space (push active windows away from dock) | Done | `ReserveSpacePolicy.swift`, `ReserveSpaceManager.swift`, `SideDockLayoutEngineTests.swift` |
 | FR-PRO-03 | P1 | Hotkeys: Control+Option+D toggle dock, Control+1..8 switch profile | Done | `ScreenManager.swift`, `ShortcutsTab.swift` |
+| FR-PRO-04 | P1 | Profile Export / Import (.sidedock-profile JSON) | Done | `DockProfileTransferService.swift`, `DockSettingsTabView.swift`, `SideDockWidgetTests.swift` |
+| W-11 | P1 | Clipboard History Widget: local pasteboard monitor, click-to-copy | Done | `ClipboardWidget.swift`, `SideDockWidgetTests.swift` |
+| W-12 | P1 | Quick Note Widget: instant dock scratchpad with character counter | Done | `QuickNoteWidget.swift`, `SideDockWidgetTests.swift` |
+| W-13 | P1 | Screenshot Launcher Widget: area, screen capture, screen recorder | Done | `ScreenshotWidget.swift`, `SideDockWidgetTests.swift` |
+| W-14 | P1 | Color Picker Widget: system NSColorSampler, HEX copy | Done | `ColorPickerWidget.swift`, `SideDockWidgetTests.swift` |
+| W-15 | P1 | Unit Converter Widget: Length, Temp, Weight, Currency | Done | `UnitConverterWidget.swift`, `SideDockWidgetTests.swift` |
+| W-16 | P1 | Bookmarks Widget: quick links to frequent websites | Done | `BookmarksWidget.swift`, `SideDockWidgetTests.swift` |
 
 ---
 

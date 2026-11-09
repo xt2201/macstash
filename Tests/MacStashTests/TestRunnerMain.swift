@@ -2,6 +2,7 @@ import Foundation
 
 @main
 enum TestRunnerMain {
+    @MainActor
     static func main() {
         let startTime = ProcessInfo.processInfo.systemUptime
         print("Running MacStash Domain Unit Tests...")

@@ -1,7 +1,7 @@
 import Foundation
 
 public struct DockProfile: Codable, Identifiable, Equatable, Sendable {
-    public let id: UUID
+    public var id: UUID
     public var name: String
     public var items: [DockItem]
     public var layoutConfig: DockLayoutConfig

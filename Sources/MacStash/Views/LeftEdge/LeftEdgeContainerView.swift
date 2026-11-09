@@ -9,8 +9,6 @@ public struct LeftEdgeContainerView: View {
     @ObservedObject private var shelf = StashShelfManager.shared
     @ObservedObject private var scratchpad = ScratchpadManager.shared
 
-    @State private var isHandleHovered: Bool = false
-
     public init(appState: AppState) {
         self.appState = appState
     }
@@ -40,97 +38,10 @@ public struct LeftEdgeContainerView: View {
                             ))
                     }
                 }
-            } else {
-                // When closed: Minimalist, elegant Peek Handle flush with physical screen edge
-                restingPeekHandle
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .animation(.spring(response: 0.28, dampingFraction: 0.82), value: isOpen)
-    }
-
-    // MARK: - Resting Peek Handle (Zero Obtrusion)
-
-    private var restingPeekHandle: some View {
-        ZStack(alignment: .leading) {
-            // Generous hover & click sensor zone (44pt wide, 84pt high centered)
-            Color.clear
-                .frame(width: 44, height: 84)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
-                        scratchpad.isScratchpadOpen = false
-                        shelf.openShelf()
-                    }
-                }
-
-            // Visual handle
-            HStack(spacing: 0) {
-                if isHandleHovered {
-                    // Expanded state on hover: Frosted pill with quick launcher icons
-                    VStack(spacing: 8) {
-                        Button(action: {
-                            withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
-                                scratchpad.isScratchpadOpen = false
-                                shelf.openShelf()
-                            }
-                        }) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.cyan.opacity(0.25))
-                                    .frame(width: 24, height: 24)
-
-                                Image(systemName: "tray.2.fill")
-                                    .font(.system(size: 11, weight: .semibold))
-                                    .foregroundColor(.cyan)
-                            }
-                            .circularLiquidGlass(tint: .cyan, specularIntensity: 0.9, causticOpacity: 0.25, isHighlighted: true)
-                        }
-                        .buttonStyle(.plain)
-                        .help("Open Stash Shelf (⌥S)")
-
-                        Button(action: {
-                            withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
-                                shelf.closeShelf()
-                                scratchpad.isScratchpadOpen = true
-                            }
-                        }) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.green.opacity(0.25))
-                                    .frame(width: 24, height: 24)
-
-                                Image(systemName: "note.text")
-                                    .font(.system(size: 11, weight: .semibold))
-                                    .foregroundColor(.green)
-                            }
-                            .circularLiquidGlass(tint: .green, specularIntensity: 0.9, causticOpacity: 0.25, isHighlighted: false)
-                        }
-                        .buttonStyle(.plain)
-                        .help("Open Quick Scratchpad (⌥N)")
-                    }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 4)
-                    .liquidGlass(cornerRadius: 16, tint: .cyan, specularIntensity: 1.0, causticOpacity: 0.15, shadowRadius: 10)
-                    .transition(.move(edge: .leading).combined(with: .opacity))
-                } else {
-                    // Resting state: Subtle 3.5pt vertical indicator
-                    RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(Color.white.opacity(0.28))
-                        .frame(width: 3.5, height: 48)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 3, style: .continuous)
-                                .stroke(Color.white.opacity(0.4), lineWidth: 0.5)
-                        )
-                        .shadow(color: Color.black.opacity(0.25), radius: 3, x: 1, y: 1)
-                }
-            }
-        }
-        .onHover { hovering in
-            withAnimation(.spring(response: 0.22, dampingFraction: 0.8)) {
-                isHandleHovered = hovering
-            }
-        }
     }
 
     // MARK: - Drawer Tab Bar (Mode Switcher when Open)

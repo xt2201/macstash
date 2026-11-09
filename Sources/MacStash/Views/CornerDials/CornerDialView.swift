@@ -12,7 +12,13 @@ public struct CornerDialView: View {
     @State private var isResetHovered: Bool = false
     @State private var isSkipHovered: Bool = false
 
-    private let dialSize: CGFloat = Defaults.HotCorner.defaultDialRadiusPoints
+    private var dialSize: CGFloat {
+        appState.settings.dialRadiusPoints
+    }
+
+    private var totalSize: CGFloat {
+        dialSize + Defaults.HotCorner.cornerWindowPaddingPoints
+    }
 
     public init(appState: AppState, corner: CornerPosition, displayID: CGDirectDisplayID = 0) {
         self.appState = appState
@@ -44,7 +50,7 @@ public struct CornerDialView: View {
     public var body: some View {
         let isVisible = appState.isEnabled && appState.isCornerDialsEnabled && action != .none
 
-        ZStack {
+        ZStack(alignment: alignment(for: corner)) {
             if isVisible {
                 let geom = RadialDialGeometry(
                     corner: corner,
@@ -149,6 +155,7 @@ public struct CornerDialView: View {
                     }
                     .buttonStyle(.plain)
                 }
+                .frame(width: dialSize, height: dialSize)
                 .scaleEffect(isExpanded ? 1.0 : 0.05, anchor: unitPoint(for: corner))
                 .opacity(isExpanded ? appState.settings.dialOpacity : 0.0)
                 .animation(
@@ -200,7 +207,16 @@ public struct CornerDialView: View {
                 )
             }
         }
-        .frame(width: dialSize, height: dialSize)
+        .frame(width: totalSize, height: totalSize, alignment: alignment(for: corner))
+    }
+
+    private func alignment(for corner: CornerPosition) -> Alignment {
+        switch corner {
+        case .topLeft: return .topLeading
+        case .topRight: return .topTrailing
+        case .bottomLeft: return .bottomLeading
+        case .bottomRight: return .bottomTrailing
+        }
     }
 
     private func unitPoint(for corner: CornerPosition) -> UnitPoint {

@@ -60,7 +60,7 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
         let dist = hypot(point.x - vertex.x, point.y - vertex.y)
         let dialRadius = appState.settings.dialRadiusPoints
 
-        if dist <= dialRadius + 20 {
+        if dist <= dialRadius + 5 {
             return super.hitTest(point)
         }
 

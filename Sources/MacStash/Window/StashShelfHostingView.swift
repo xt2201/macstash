@@ -18,6 +18,8 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
             .string,
             .URL,
             .html,
+            .tiff,
+            .png,
             NSPasteboard.PasteboardType("NSFilenamesPboardType")
         ])
     }
@@ -56,8 +58,12 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
 
         // When shelf or scratchpad is actively open, route clicks within drawer bounds
         if shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen {
-            let activeDrawerWidth: CGFloat = scratchpad.isScratchpadOpen ? 370.0 : 335.0
-            let activeHeight: CGFloat = scratchpad.isScratchpadOpen ? 400.0 : 485.0
+            let activeDrawerWidth: CGFloat = scratchpad.isScratchpadOpen
+                ? Defaults.LeftEdgeDrawer.scratchpadTotalWidthPoints
+                : Defaults.LeftEdgeDrawer.shelfTotalWidthPoints
+            let activeHeight: CGFloat = scratchpad.isScratchpadOpen
+                ? Defaults.LeftEdgeDrawer.scratchpadTotalHeightPoints
+                : Defaults.LeftEdgeDrawer.shelfTotalHeightPoints
             let activeY = (bounds.height - activeHeight) / 2.0
             let activeRect = NSRect(x: bounds.minX, y: activeY, width: activeDrawerWidth, height: activeHeight)
             if activeRect.contains(point) {
@@ -66,15 +72,7 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
             return nil
         }
 
-        // When collapsed, hit test the peek handle zone along the left edge
-        let handleHeight: CGFloat = 84.0
-        let handleY = (bounds.height - handleHeight) / 2.0
-        let triggerRect = NSRect(x: bounds.minX, y: handleY, width: 44.0, height: handleHeight)
-
-        if triggerRect.contains(point) {
-            return super.hitTest(point)
-        }
-
+        // When collapsed, return nil completely so background windows and controls are unobstructed
         return nil
     }
 
@@ -149,6 +147,21 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
             }
             shelf.addTextSnippet(first)
             return true
+        }
+
+        // 4. Direct Image drop (from web browser or clipboard)
+        if let images = pasteboard.readObjects(forClasses: [NSImage.self], options: nil) as? [NSImage], let firstImage = images.first {
+            let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("MacStashDrops", isDirectory: true)
+            try? FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+            let tempURL = tempDir.appendingPathComponent("Stashed_Image_\(Int(Date().timeIntervalSince1970)).png")
+            if let tiffData = firstImage.tiffRepresentation,
+               let bitmap = NSBitmapImageRep(data: tiffData),
+               let pngData = bitmap.representation(using: .png, properties: [:]) {
+                if (try? pngData.write(to: tempURL, options: .atomic)) != nil {
+                    shelf.addFileURLs([tempURL])
+                    return true
+                }
+            }
         }
 
         return false

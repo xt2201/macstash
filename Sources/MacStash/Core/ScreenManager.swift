@@ -30,11 +30,14 @@ public final class ScreenManager: ObservableObject {
     private var rightEdgeDwellWorkItem: DispatchWorkItem?
     private var rightEdgeHideWorkItem: DispatchWorkItem?
 
-    // Left Edge Hide State (Auto-close shelf on mouse exit)
+    // Left Edge Dwell and Hide State
+    private var pendingLeftEdgeDisplayID: CGDirectDisplayID?
+    private var leftEdgeDwellWorkItem: DispatchWorkItem?
     private var leftEdgeHideWorkItem: DispatchWorkItem?
 
     // Drag-and-Drop Gesture Tracking (Shake to summon)
     private var dragHistory: [(point: NSPoint, time: Date)] = []
+    private var lastMouseEvalTime: TimeInterval = 0
 
     private init() {}
 
@@ -212,25 +215,16 @@ public final class ScreenManager: ObservableObject {
 
     private func startCursorTracking() {
         cursorTrackingTimer?.invalidate()
-        cursorTrackingTimer = Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.evaluateMousePosition(NSEvent.mouseLocation)
-            }
-        }
-        if let t = cursorTrackingTimer {
-            RunLoop.main.add(t, forMode: .common)
-        }
+        cursorTrackingTimer = nil
 
         globalMouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .leftMouseDown]) { [weak self] event in
-            Task { @MainActor [weak self] in
+            DispatchQueue.main.async { [weak self] in
                 self?.evaluateMousePosition(NSEvent.mouseLocation, isClick: event.type == .leftMouseDown)
             }
         }
 
         localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .leftMouseDown]) { [weak self] event in
-            Task { @MainActor [weak self] in
-                self?.evaluateMousePosition(NSEvent.mouseLocation, isClick: event.type == .leftMouseDown)
-            }
+            self?.evaluateMousePosition(NSEvent.mouseLocation, isClick: event.type == .leftMouseDown)
             return event
         }
     }
@@ -242,6 +236,14 @@ public final class ScreenManager: ObservableObject {
             }
             return
         }
+
+        let now = ProcessInfo.processInfo.systemUptime
+        if !isClick {
+            if now - lastMouseEvalTime < 0.012 {
+                return
+            }
+        }
+        lastMouseEvalTime = now
 
         let isDragging = (NSEvent.pressedMouseButtons != 0 && !isClick)
         if isDragging {
@@ -322,8 +324,12 @@ public final class ScreenManager: ObservableObject {
                 for instance in instances.values {
                     let frame = instance.screen.frame
                     let leftRect = instance.leftEdgeRect(in: frame)
-                    let activeWidth: CGFloat = appState.scratchpad.isScratchpadOpen ? 370.0 : 335.0
-                    let activeHeight: CGFloat = appState.scratchpad.isScratchpadOpen ? 400.0 : 485.0
+                    let activeWidth: CGFloat = appState.scratchpad.isScratchpadOpen
+                        ? Defaults.LeftEdgeDrawer.scratchpadTotalWidthPoints
+                        : Defaults.LeftEdgeDrawer.shelfTotalWidthPoints
+                    let activeHeight: CGFloat = appState.scratchpad.isScratchpadOpen
+                        ? Defaults.LeftEdgeDrawer.scratchpadTotalHeightPoints
+                        : Defaults.LeftEdgeDrawer.shelfTotalHeightPoints
                     let activeY = leftRect.minY + (leftRect.height - activeHeight) / 2.0
                     let drawerRect = NSRect(x: frame.minX, y: activeY, width: activeWidth, height: activeHeight)
                     if drawerRect.contains(mouseLoc) {
@@ -332,8 +338,12 @@ public final class ScreenManager: ObservableObject {
                     }
                 }
                 if !clickedInsideDrawer {
-                    appState.stashShelf.closeShelf()
-                    appState.scratchpad.isScratchpadOpen = false
+                    if !appState.stashShelf.isPinned {
+                        appState.stashShelf.closeShelf()
+                    }
+                    if !appState.scratchpad.isPinned {
+                        appState.scratchpad.isScratchpadOpen = false
+                    }
                 }
             }
         }
@@ -414,7 +424,7 @@ public final class ScreenManager: ObservableObject {
         }
 
         if reversals >= 3 {
-            appState.stashShelf.openShelf()
+            appState.stashShelf.openShelf(transient: true)
             AppLogger.lifecycle.info("Shake-to-summon gesture activated Stash Shelf")
             dragHistory.removeAll()
         }
@@ -425,8 +435,8 @@ public final class ScreenManager: ObservableObject {
         let shelf = appState.stashShelf
         let scratchpad = appState.scratchpad
 
-        // Handle auto-close for Stash Shelf when mouse exits the drawer zone
-        if shelf.isShelfOpen && !shelf.isDropTargetActive && !isDragging {
+        // Handle auto-close for Stash Shelf when mouse exits the drawer zone (only when opened transiently and not pinned)
+        if shelf.isShelfOpen && !shelf.isPinned && shelf.isTransientOpen && !shelf.isDropTargetActive && !isDragging {
             if isMouseInsideLeftDrawer(mouseLoc) {
                 cancelPendingLeftEdgeHide()
             } else {
@@ -436,39 +446,75 @@ public final class ScreenManager: ObservableObject {
             cancelPendingLeftEdgeHide()
         }
 
-        for (_, instance) in instances {
-            let screen = instance.screen
-            let frame = screen.frame
+        // 1. Left Edge Interactivity & Extreme Edge Dwell
+        if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
+            let allFrames = NSScreen.screens.map { $0.frame }
+            let isOpen = shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen
 
-            // 1. Left Edge Panel Interactivity
-            if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
-                let leftRect = instance.leftEdgeRect(in: frame)
-                let isOpen = shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen
-
-                if isOpen {
+            if isOpen {
+                for instance in instances.values {
                     instance.setLeftEdgeInteractive(true, allowsKey: (shelf.isShelfOpen || scratchpad.isScratchpadOpen))
-                } else if isDragging {
+                }
+            } else if isDragging {
+                cancelPendingLeftEdgeDwell()
+                for instance in instances.values {
+                    let frame = instance.screen.frame
+                    let leftRect = instance.leftEdgeRect(in: frame)
                     if mouseLoc.x >= frame.minX && mouseLoc.x <= frame.minX + 60 &&
                        mouseLoc.y >= leftRect.minY && mouseLoc.y <= leftRect.maxY {
                         instance.setLeftEdgeInteractive(true, allowsKey: false)
                         if !shelf.isShelfOpen {
-                            shelf.openShelf()
+                            shelf.openShelf(transient: true)
                         }
                     } else {
                         instance.setLeftEdgeInteractive(false, allowsKey: false)
                     }
-                } else {
-                    // Peek Handle: centered edge zone (height: 84pt, width: 44pt)
-                    let handleHeight: CGFloat = 84.0
-                    let handleY = leftRect.midY - (handleHeight / 2.0)
-                    let peekRect = NSRect(x: frame.minX, y: handleY, width: 44.0, height: handleHeight)
-                    let isHovering = peekRect.contains(mouseLoc)
-                    instance.setLeftEdgeInteractive(isHovering, allowsKey: false)
                 }
             } else {
+                // Extreme edge (<= 2.5pt) requirement with intentional dwell delay across candidate displays
+                var candidateInstance: ScreenOverlayInstance?
+                var candidateFrame: NSRect = .zero
+                var candidateLeftRect: NSRect = .zero
+
+                for instance in instances.values {
+                    let frame = instance.screen.frame
+                    let isOuterLeft: Bool
+                    if appState.settings.onlyOuterCorners {
+                        isOuterLeft = CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames)
+                    } else {
+                        isOuterLeft = true
+                    }
+
+                    guard isOuterLeft else {
+                        instance.setLeftEdgeInteractive(false, allowsKey: false)
+                        continue
+                    }
+
+                    let leftRect = instance.leftEdgeRect(in: frame)
+                    let isAtEdgeX = mouseLoc.x <= (frame.minX + 2.5) && mouseLoc.x >= (frame.minX - 1.0)
+                    let isWithinEdgeY = mouseLoc.y >= leftRect.minY && mouseLoc.y <= leftRect.maxY
+
+                    if isAtEdgeX && isWithinEdgeY {
+                        candidateInstance = instance
+                        candidateFrame = frame
+                        candidateLeftRect = leftRect
+                        break
+                    } else {
+                        instance.setLeftEdgeInteractive(false, allowsKey: false)
+                    }
+                }
+
+                if let candidate = candidateInstance {
+                    scheduleLeftEdgeDwellTimer(displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateLeftRect)
+                } else {
+                    cancelPendingLeftEdgeDwell()
+                }
+            }
+        } else {
+            cancelPendingLeftEdgeDwell()
+            for instance in instances.values {
                 instance.setLeftEdgeInteractive(false, allowsKey: false)
             }
-
         }
 
         // 2. Right Edge Slider Interactivity
@@ -627,8 +673,12 @@ public final class ScreenManager: ObservableObject {
         for instance in instances.values {
             let frame = instance.screen.frame
             let leftRect = instance.leftEdgeRect(in: frame)
-            let activeWidth: CGFloat = (appState.scratchpad.isScratchpadOpen ? 370.0 : 335.0) + 25.0
-            let activeHeight: CGFloat = (appState.scratchpad.isScratchpadOpen ? 400.0 : 485.0) + 25.0
+            let activeWidth: CGFloat = (appState.scratchpad.isScratchpadOpen
+                ? Defaults.LeftEdgeDrawer.scratchpadTotalWidthPoints
+                : Defaults.LeftEdgeDrawer.shelfTotalWidthPoints) + 25.0
+            let activeHeight: CGFloat = (appState.scratchpad.isScratchpadOpen
+                ? Defaults.LeftEdgeDrawer.scratchpadTotalHeightPoints
+                : Defaults.LeftEdgeDrawer.shelfTotalHeightPoints) + 25.0
             let activeY = leftRect.minY + (leftRect.height - activeHeight) / 2.0
             let drawerRect = NSRect(x: frame.minX, y: activeY, width: activeWidth, height: activeHeight)
             if drawerRect.contains(point) {
@@ -646,7 +696,7 @@ public final class ScreenManager: ObservableObject {
                 let cur = NSEvent.mouseLocation
                 let stillInside = self.isMouseInsideLeftDrawer(cur)
                 let isDragging = (NSEvent.pressedMouseButtons != 0)
-                if !stillInside && !isDragging && !self.appState.stashShelf.isDropTargetActive {
+                if !stillInside && !isDragging && !self.appState.stashShelf.isDropTargetActive && !self.appState.stashShelf.isPinned {
                     withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
                         self.appState.stashShelf.closeShelf()
                     }
@@ -661,6 +711,41 @@ public final class ScreenManager: ObservableObject {
     public func cancelPendingLeftEdgeHide() {
         leftEdgeHideWorkItem?.cancel()
         leftEdgeHideWorkItem = nil
+    }
+
+    private func scheduleLeftEdgeDwellTimer(displayID: CGDirectDisplayID, screenFrame: NSRect, verticalRange: NSRect) {
+        if pendingLeftEdgeDisplayID == displayID { return }
+        cancelPendingLeftEdgeDwell()
+        pendingLeftEdgeDisplayID = displayID
+
+        let delay = max(0.15, appState.cornerDwellDelay)
+        let item = DispatchWorkItem { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                guard self.pendingLeftEdgeDisplayID == displayID else { return }
+                let cur = NSEvent.mouseLocation
+                let isAtEdgeX = cur.x <= (screenFrame.minX + 2.5) && cur.x >= (screenFrame.minX - 1.0)
+                let isWithinEdgeY = cur.y >= verticalRange.minY && cur.y <= verticalRange.maxY
+                if isAtEdgeX && isWithinEdgeY {
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
+                        self.appState.stashShelf.openShelf(transient: true)
+                    }
+                    for (id, inst) in self.instances {
+                        inst.setLeftEdgeInteractive(id == displayID, allowsKey: true)
+                    }
+                    HapticManager.shared.performDetentTick()
+                }
+                self.pendingLeftEdgeDisplayID = nil
+            }
+        }
+        self.leftEdgeDwellWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+    }
+
+    private func cancelPendingLeftEdgeDwell() {
+        leftEdgeDwellWorkItem?.cancel()
+        leftEdgeDwellWorkItem = nil
+        pendingLeftEdgeDisplayID = nil
     }
 
     private func scheduleDwellTimer(corner: CornerPosition, displayID: CGDirectDisplayID, screenFrame: NSRect) {
@@ -681,7 +766,8 @@ public final class ScreenManager: ObservableObject {
                 let cur = NSEvent.mouseLocation
                 let v = self.cornerVertex(for: corner, in: screenFrame)
                 let dist = hypot(cur.x - v.x, cur.y - v.y)
-                if dist <= self.appState.settings.dialRadiusPoints {
+                let sensitivity = max(Defaults.HotCorner.minHitZoneSizePoints, self.appState.cornerSensitivityRadius)
+                if dist <= sensitivity {
                     self.activateDial(corner: corner, displayID: displayID)
                 }
                 self.pendingDwellCorner = nil

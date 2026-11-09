@@ -35,6 +35,7 @@ public enum Defaults {
 
         public static let defaultDialRadiusPoints: CGFloat = 145.0
         public static let defaultOuterPaddingPoints: CGFloat = 30.0
+        public static let cornerWindowPaddingPoints: CGFloat = 20.0
         public static let defaultAnimationDurationSeconds: TimeInterval = 0.18
     }
 
@@ -67,11 +68,22 @@ public enum Defaults {
 
     public enum StashShelf {
         public static let maxItems: Int = 50
-        public static let defaultWidthPoints: CGFloat = 280.0
+        public static let defaultWidthPoints: CGFloat = 310.0
     }
 
     public enum Scratchpad {
-        public static let defaultWidthPoints: CGFloat = 320.0
-        public static let defaultHeightPoints: CGFloat = 380.0
+        public static let defaultWidthPoints: CGFloat = 340.0
+        public static let defaultHeightPoints: CGFloat = 400.0
+    }
+
+    public enum LeftEdgeDrawer {
+        public static let tabBarWidthPoints: CGFloat = 36.0
+        public static let spacingPoints: CGFloat = 6.0
+        public static let panelWidthPoints: CGFloat = 410.0
+        public static let panelHeightPoints: CGFloat = 520.0
+        public static let shelfTotalWidthPoints: CGFloat = 352.0
+        public static let shelfTotalHeightPoints: CGFloat = 485.0
+        public static let scratchpadTotalWidthPoints: CGFloat = 382.0
+        public static let scratchpadTotalHeightPoints: CGFloat = 410.0
     }
 }

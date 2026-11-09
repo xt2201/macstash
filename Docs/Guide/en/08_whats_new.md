@@ -1,3 +1,19 @@
+# What's New in Version 2.10.0
+
+MacStash 2.10.0 delivers seamless corner dial alignment that sits flush against physical monitor corners with zero offset, eliminates background polling and cursor tracking task churn, brings robust local disk persistence and pinning to the Stash Shelf, and introduces debounced saves and zero-allocation word counting to the Quick Scratchpad.
+
+## Key Enhancements in Version 2.10.0
+
+- Flush Corner Dial Alignment: Anchored all four corner dials flush against the physical monitor corners with zero offset gap, routing window shadow padding strictly towards the screen interior.
+- High-Performance Cursor Tracking: Eliminated redundant 40ms polling timers and unstructured task churn on mouse move events, throttling tracking calculations and integrating OverlayStateMachine for flawless state transitions.
+- Ghost Dwell Pop Elimination: Re-verified cursor coordinates strictly against the corner sensitivity radius when dwell timers expire, preventing dials from popping open after the mouse has moved away.
+- Stash Shelf Local Disk Persistence: Added JSON disk storage via StashShelfStorage, retaining stashed files, links, and snippets across system restarts and application updates.
+- Drawer Pinning and Clear Undo: Added quick pin toggle buttons to both Stash Shelf and Scratchpad headers to keep drawers open during multi-window tasks, alongside instant Undo recovery for accidentally cleared items.
+- High-DPI Retina Icon Cache: Upgraded StashIconCache with high-resolution 2x backing bitmap representations, delivering pixel-perfect file icons on Retina screens.
+- Scratchpad Debounce and Zero-Allocation Counter: Optimized text persistence with a 400ms debounce to eliminate main-thread freezes, and replaced array-allocating string splits with an O(N) zero-allocation scalar word counter.
+- Left Drawer Hit-Testing Alignment: Expanded left edge NSPanel to 410pt and aligned hit-testing bounds to 352pt (Shelf) and 382pt (Scratchpad), fixing unclickable buttons on the right edge of drawers.
+- Direct Image Drops: Added support for dropping raw image representations (TIFF/PNG from browsers and screenshots) directly onto Stash Shelf.
+
 # What's New in Version 2.9.9
 
 MacStash 2.9.9 delivers automatic drawer dismissal on mouse leave for the Stash Shelf, resolves multi-display menu bar popover placement issues, establishes absolute mathematical symmetry across Corner Dials, and introduces the Tactical HUD Instrument Hub with hierarchical iconography and precision micro-typography.

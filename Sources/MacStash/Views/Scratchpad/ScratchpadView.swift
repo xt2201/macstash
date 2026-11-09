@@ -10,6 +10,7 @@ public struct ScratchpadView: View {
     @ObservedObject private var manager = ScratchpadManager.shared
 
     @State private var copyFeedback: Bool = false
+    @FocusState private var isEditorFocused: Bool
 
     private let drawerWidth: CGFloat = Defaults.Scratchpad.defaultWidthPoints
     private let drawerHeight: CGFloat = Defaults.Scratchpad.defaultHeightPoints
@@ -93,6 +94,26 @@ public struct ScratchpadView: View {
             .buttonStyle(.plain)
             .help("Copy All to Clipboard")
 
+            // Undo Clear Button (if available)
+            if manager.canUndoClear {
+                Button(action: {
+                    manager.undoClear()
+                }) {
+                    Image(systemName: "arrow.uturn.backward")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.green)
+                        .frame(width: 26, height: 26)
+                        .circularLiquidGlass(
+                            tint: .green,
+                            specularIntensity: 0.8,
+                            causticOpacity: 0.2,
+                            isHighlighted: true
+                        )
+                }
+                .buttonStyle(.plain)
+                .help("Restore Cleared Notes")
+            }
+
             // Clear Button
             Button(action: {
                 withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
@@ -111,6 +132,24 @@ public struct ScratchpadView: View {
             }
             .buttonStyle(.plain)
             .help("Clear All")
+
+            // Pin / Keep Open Button
+            Button(action: {
+                manager.togglePin()
+            }) {
+                Image(systemName: manager.isPinned ? "pin.fill" : "pin")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(manager.isPinned ? .green : .secondary)
+                    .frame(width: 26, height: 26)
+                    .circularLiquidGlass(
+                        tint: manager.isPinned ? .green : .clear,
+                        specularIntensity: 0.8,
+                        causticOpacity: manager.isPinned ? 0.25 : 0.15,
+                        isHighlighted: manager.isPinned
+                    )
+            }
+            .buttonStyle(.plain)
+            .help(manager.isPinned ? "Unpin Scratchpad" : "Pin Scratchpad (Keep Open)")
 
             // Close Button
             Button(action: {
@@ -151,9 +190,15 @@ public struct ScratchpadView: View {
             TextEditor(text: $manager.text)
                 .font(.system(size: 12, design: .monospaced))
                 .scrollContentBackground(.hidden)
+                .focused($isEditorFocused)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        isEditorFocused = true
+                    }
+                }
         }
     }
 }

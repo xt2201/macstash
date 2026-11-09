@@ -17,7 +17,7 @@ public final class ScreenOverlayInstance {
     private var stashHostingView: StashShelfHostingView?
 
     private var cornerSize: CGFloat {
-        appState.settings.dialRadiusPoints + 15
+        appState.settings.dialRadiusPoints + Defaults.HotCorner.cornerWindowPaddingPoints
     }
 
     public init(displayID: CGDirectDisplayID, screen: NSScreen, appState: AppState) {
@@ -123,8 +123,8 @@ public final class ScreenOverlayInstance {
     }
 
     public func leftEdgeRect(in frame: NSRect) -> NSRect {
-        let panelWidth: CGFloat = 380
-        let panelHeight: CGFloat = 500
+        let panelWidth: CGFloat = Defaults.LeftEdgeDrawer.panelWidthPoints
+        let panelHeight: CGFloat = Defaults.LeftEdgeDrawer.panelHeightPoints
         let panelY = frame.minY + (frame.height - panelHeight) / 2
         return NSRect(x: frame.minX, y: panelY, width: panelWidth, height: panelHeight)
     }

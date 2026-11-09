@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.10.0] - 2026-11-09
+
+### Added
+- Left Edge Extreme Dwell Trigger: Calibrated left edge activation to match the precision behavior of Right Edge Bar — requires pushing the cursor flush against the physical left screen edge with dwell detection before sliding open.
+- Stash Shelf Local Persistence & Pinning: Added persistent disk storage for stashed items across app launches and a pin toggle to keep drawer open when required.
+
+### Changed
+- Zero-Obtrusion Left Edge: Removed the persistent thin peek handle along the left screen border, allowing 100% unobstructed clicks and interactions with underlying background applications and left-docked panels.
+
+### Fixed
+- Left Edge Hit-Testing: Completely disabled hit-testing when the left drawer is collapsed so background application windows receive mouse events directly.
+
+---
+
 ## [2.9.9] - 2026-11-09
 
 ### Added

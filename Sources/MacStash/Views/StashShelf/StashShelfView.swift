@@ -132,7 +132,43 @@ public struct StashShelfView: View {
                 }
                 .buttonStyle(.plain)
                 .help("Clear Shelf")
+            } else if shelf.canUndoClear {
+                // Undo Clear Button
+                Button(action: {
+                    shelf.undoClear()
+                }) {
+                    Image(systemName: "arrow.uturn.backward")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.cyan)
+                        .frame(width: 26, height: 26)
+                        .circularLiquidGlass(
+                            tint: .cyan,
+                            specularIntensity: 0.8,
+                            causticOpacity: 0.2,
+                            isHighlighted: true
+                        )
+                }
+                .buttonStyle(.plain)
+                .help("Restore Cleared Items")
             }
+
+            // Pin / Keep Open Toggle Button
+            Button(action: {
+                shelf.togglePin()
+            }) {
+                Image(systemName: shelf.isPinned ? "pin.fill" : "pin")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(shelf.isPinned ? .cyan : .secondary)
+                    .frame(width: 26, height: 26)
+                    .circularLiquidGlass(
+                        tint: shelf.isPinned ? .cyan : .clear,
+                        specularIntensity: 0.8,
+                        causticOpacity: shelf.isPinned ? 0.25 : 0.15,
+                        isHighlighted: shelf.isPinned
+                    )
+            }
+            .buttonStyle(.plain)
+            .help(shelf.isPinned ? "Unpin Shelf" : "Pin Shelf (Keep Open)")
 
             // Close Shelf Button
             Button(action: {
@@ -291,7 +327,7 @@ private struct StashItemCardView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            // Draggable Section: Grip Handle + Icon + Metadata
+            // Left Drag Handle + Icon (Instant Drag Activation)
             HStack(spacing: 8) {
                 Image(systemName: "line.3.horizontal")
                     .font(.system(size: 10, weight: .medium))
@@ -300,39 +336,8 @@ private struct StashItemCardView: View {
 
                 itemIconView
                     .frame(width: 28, height: 28)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.title)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.primary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-
-                    HStack(spacing: 4) {
-                        if !item.formattedSize.isEmpty {
-                            Text(item.formattedSize)
-                                .font(.system(size: 9, weight: .medium, design: .monospaced))
-                                .foregroundColor(.secondary)
-                        }
-                        if item.itemType == .url {
-                            Text("Link")
-                                .font(.system(size: 9, weight: .semibold))
-                                .foregroundColor(.cyan)
-                        } else if let ext = item.sourceURL?.pathExtension.uppercased(), !ext.isEmpty {
-                            Text(ext)
-                                .font(.system(size: 8, weight: .bold, design: .monospaced))
-                                .foregroundColor(.secondary.opacity(0.8))
-                                .padding(.horizontal, 3)
-                                .padding(.vertical, 0.5)
-                                .background(RoundedRectangle(cornerRadius: 3).fill(Color.white.opacity(0.1)))
-                        }
-                    }
-                }
             }
             .contentShape(Rectangle())
-            .onTapGesture {
-                onSelect()
-            }
             .onDrag({
                 itemProvider()
             }, preview: {
@@ -356,6 +361,47 @@ private struct StashItemCardView: View {
                         .stroke(Color.cyan.opacity(0.4), lineWidth: 1)
                 )
             })
+
+            // Text Metadata (Tap to select)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(item.sourceURL != nil && !item.isExistingFile ? .secondary : .primary)
+                    .strikethrough(item.sourceURL != nil && !item.isExistingFile, color: .orange)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+
+                HStack(spacing: 4) {
+                    if item.sourceURL != nil && !item.isExistingFile {
+                        Text("Missing")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundColor(.orange)
+                            .padding(.horizontal, 3)
+                            .padding(.vertical, 0.5)
+                            .background(RoundedRectangle(cornerRadius: 3).fill(Color.orange.opacity(0.15)))
+                    } else if !item.formattedSize.isEmpty {
+                        Text(item.formattedSize)
+                            .font(.system(size: 9, weight: .medium, design: .monospaced))
+                            .foregroundColor(.secondary)
+                    }
+                    if item.itemType == .url {
+                        Text("Link")
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundColor(.cyan)
+                    } else if let ext = item.sourceURL?.pathExtension.uppercased(), !ext.isEmpty {
+                        Text(ext)
+                            .font(.system(size: 8, weight: .bold, design: .monospaced))
+                            .foregroundColor(.secondary.opacity(0.8))
+                            .padding(.horizontal, 3)
+                            .padding(.vertical, 0.5)
+                            .background(RoundedRectangle(cornerRadius: 3).fill(Color.white.opacity(0.1)))
+                    }
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onSelect()
+            }
 
             Spacer()
 
@@ -459,6 +505,15 @@ private struct StashItemCardView: View {
             Image(nsImage: icon)
                 .resizable()
                 .scaledToFit()
+        } else if item.sourceURL != nil && !item.isExistingFile {
+            ZStack {
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(Color.orange.opacity(0.18))
+
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(.orange)
+            }
         } else {
             ZStack {
                 RoundedRectangle(cornerRadius: 6, style: .continuous)

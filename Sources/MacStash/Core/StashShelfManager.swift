@@ -4,16 +4,24 @@ import SwiftUI
 import Combine
 import MacStashCore
 
-/// Holds files, images, links and snippets temporarily on the Stash Shelf.
+/// Holds files, images, links and snippets temporarily on the Stash Shelf with persistent local disk storage.
 @MainActor
 public final class StashShelfManager: ObservableObject {
     public static let shared = StashShelfManager()
 
+    private let storage: StashShelfStorage
+    private var undoStack: [StashItem]? = nil
+
     @Published public private(set) var items: [StashItem] = []
     @Published public var isShelfOpen: Bool = false
     @Published public var isDropTargetActive: Bool = false
+    @Published public var isPinned: Bool = false
+    @Published public var isTransientOpen: Bool = false
 
-    private init() {}
+    public init(storage: StashShelfStorage = StashShelfStorage()) {
+        self.storage = storage
+        self.items = storage.load()
+    }
 
     public func addFileURLs(_ urls: [URL]) {
         var added = 0
@@ -39,6 +47,7 @@ public final class StashShelfManager: ObservableObject {
             withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
                 enforceCapacity()
             }
+            storage.save(items)
             HapticManager.shared.performBoundaryClick()
             AppLogger.lifecycle.info("Stashed \(added) files on shelf")
         }
@@ -62,6 +71,7 @@ public final class StashShelfManager: ObservableObject {
             )
             enforceCapacity()
         }
+        storage.save(items)
         HapticManager.shared.performBoundaryClick()
     }
 
@@ -78,7 +88,8 @@ public final class StashShelfManager: ObservableObject {
         return formatter.string(fromByteCount: bytes)
     }
 
-    public func openShelf() {
+    public func openShelf(transient: Bool = false) {
+        isTransientOpen = transient
         isShelfOpen = true
         isDropTargetActive = true
         HapticManager.shared.performDetentTick()
@@ -87,6 +98,12 @@ public final class StashShelfManager: ObservableObject {
     public func closeShelf() {
         isShelfOpen = false
         isDropTargetActive = false
+        isTransientOpen = false
+    }
+
+    public func togglePin() {
+        isPinned.toggle()
+        HapticManager.shared.performDetentTick()
     }
 
     public func copyAllFilesToClipboard() {
@@ -109,12 +126,30 @@ public final class StashShelfManager: ObservableObject {
 
     public func removeItem(id: UUID) {
         items.removeAll { $0.id == id }
+        storage.save(items)
         HapticManager.shared.performDetentTick()
     }
 
     public func clearAll() {
+        guard !items.isEmpty else { return }
+        undoStack = items
         items.removeAll()
+        storage.save(items)
         StashIconCache.shared.clear()
+        HapticManager.shared.performBoundaryClick()
+    }
+
+    public var canUndoClear: Bool {
+        undoStack != nil && !(undoStack?.isEmpty ?? true)
+    }
+
+    public func undoClear() {
+        guard let restored = undoStack, !restored.isEmpty else { return }
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+            items = restored
+        }
+        undoStack = nil
+        storage.save(items)
         HapticManager.shared.performBoundaryClick()
     }
 

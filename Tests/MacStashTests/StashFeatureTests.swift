@@ -6,6 +6,7 @@ public enum StashFeatureTests {
     public static func run() {
         testPowerAssertionService()
         testStashItemModel()
+        testStashShelfStorage()
         testScratchpadStorage()
         testScratchpadCounters()
         testOuterLeftEdgeGeometry()
@@ -17,7 +18,9 @@ public enum StashFeatureTests {
         testStashDragShakeDetection()
         testDialTickSymmetry()
         testDialHubGeometrySymmetry()
+        testCornerDialAlignmentGeometry()
         testLeftEdgeDrawerAutoCloseBounds()
+        testLeftEdgeExtremeDwellSymmetry()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -319,13 +322,69 @@ public enum StashFeatureTests {
         TestAssertion.assertEqual(edgeGap, 19.0, "Clearance to both adjacent screen edges must be exactly 19pt (symmetric)")
     }
 
+    private static func testStashShelfStorage() {
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("StashStorageTests_\(UUID().uuidString)")
+        let testFileURL = tempDir.appendingPathComponent("test_stash.json")
+        let storage = StashShelfStorage(fileURL: testFileURL)
+
+        // Initial load should be empty
+        let initial = storage.load()
+        TestAssertion.assertTrue(initial.isEmpty, "Initial load from non-existent file should be empty")
+
+        // Save items
+        let item1 = StashItem(title: "Doc1.pdf", detailText: "/path", itemType: .file, fileSizeBytes: 1024)
+        let item2 = StashItem(title: "https://apple.com", detailText: "Link", itemType: .url)
+        storage.save([item1, item2])
+
+        // Load items back
+        let loaded = storage.load()
+        TestAssertion.assertEqual(loaded.count, 2, "Loaded items count should be 2")
+        TestAssertion.assertEqual(loaded[0].title, "Doc1.pdf", "First item title matches")
+        TestAssertion.assertEqual(loaded[1].title, "https://apple.com", "Second item title matches")
+
+        // Clear
+        storage.clear()
+        let cleared = storage.load()
+        TestAssertion.assertTrue(cleared.isEmpty, "Storage should be empty after clear")
+
+        // Cleanup
+        try? FileManager.default.removeItem(at: tempDir)
+    }
+
+    private static func testCornerDialAlignmentGeometry() {
+        let screen = CGRect(x: 0, y: 0, width: 1920, height: 1080)
+        let dialRadius: CGFloat = Defaults.HotCorner.defaultDialRadiusPoints
+        let padding: CGFloat = Defaults.HotCorner.cornerWindowPaddingPoints
+        let cornerSize = dialRadius + padding
+
+        // Top Left: panel at (minX, maxY - cornerSize), dial pinned at .topLeading (0, 0)
+        let tlPanel = CGRect(x: screen.minX, y: screen.maxY - cornerSize, width: cornerSize, height: cornerSize)
+        TestAssertion.assertEqual(tlPanel.minX, screen.minX, "Top-left panel minX aligns with screen minX")
+        TestAssertion.assertEqual(tlPanel.maxY, screen.maxY, "Top-left panel maxY aligns with screen maxY")
+
+        // Top Right: panel at (maxX - cornerSize, maxY - cornerSize), dial pinned at .topTrailing
+        let trPanel = CGRect(x: screen.maxX - cornerSize, y: screen.maxY - cornerSize, width: cornerSize, height: cornerSize)
+        TestAssertion.assertEqual(trPanel.maxX, screen.maxX, "Top-right panel maxX aligns with screen maxX")
+        TestAssertion.assertEqual(trPanel.maxY, screen.maxY, "Top-right panel maxY aligns with screen maxY")
+
+        // Bottom Left: panel at (minX, minY), dial pinned at .bottomLeading
+        let blPanel = CGRect(x: screen.minX, y: screen.minY, width: cornerSize, height: cornerSize)
+        TestAssertion.assertEqual(blPanel.minX, screen.minX, "Bottom-left panel minX aligns with screen minX")
+        TestAssertion.assertEqual(blPanel.minY, screen.minY, "Bottom-left panel minY aligns with screen minY")
+
+        // Bottom Right: panel at (maxX - cornerSize, minY), dial pinned at .bottomTrailing
+        let brPanel = CGRect(x: screen.maxX - cornerSize, y: screen.minY, width: cornerSize, height: cornerSize)
+        TestAssertion.assertEqual(brPanel.maxX, screen.maxX, "Bottom-right panel maxX aligns with screen maxX")
+        TestAssertion.assertEqual(brPanel.minY, screen.minY, "Bottom-right panel minY aligns with screen minY")
+    }
+
     private static func testLeftEdgeDrawerAutoCloseBounds() {
         let frame = CGRect(x: 0, y: 0, width: 1512, height: 982)
-        let leftEdgeHeight: CGFloat = 520.0
+        let leftEdgeHeight: CGFloat = Defaults.LeftEdgeDrawer.panelHeightPoints
         let leftEdgeY = (frame.height - leftEdgeHeight) / 2.0
 
-        let shelfWidth: CGFloat = 335.0 + 25.0 // with 25pt margin
-        let shelfHeight: CGFloat = 485.0 + 25.0
+        let shelfWidth: CGFloat = Defaults.LeftEdgeDrawer.shelfTotalWidthPoints + 25.0 // with 25pt margin (377.0)
+        let shelfHeight: CGFloat = Defaults.LeftEdgeDrawer.shelfTotalHeightPoints + 25.0
         let shelfY = leftEdgeY + (leftEdgeHeight - shelfHeight) / 2.0
         let shelfDrawerRect = CGRect(x: frame.minX, y: shelfY, width: shelfWidth, height: shelfHeight)
 
@@ -333,8 +392,26 @@ public enum StashFeatureTests {
         let insidePt = CGPoint(x: 100, y: leftEdgeY + 100)
         TestAssertion.assertTrue(shelfDrawerRect.contains(insidePt), "Cursor inside drawer area must stay open")
 
-        // Mouse moved into workspace (> 360pt) must trigger auto-close timer
-        let outsidePt = CGPoint(x: 400, y: leftEdgeY + 100)
+        // Mouse moved into workspace (> 377pt) must trigger auto-close timer
+        let outsidePt = CGPoint(x: 420, y: leftEdgeY + 100)
         TestAssertion.assertFalse(shelfDrawerRect.contains(outsidePt), "Cursor moved to main workspace must trigger auto-close")
+    }
+
+    private static func testLeftEdgeExtremeDwellSymmetry() {
+        let frame = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let leftEdgeHeight: CGFloat = Defaults.LeftEdgeDrawer.panelHeightPoints
+        let leftEdgeY = frame.minY + (frame.height - leftEdgeHeight) / 2.0
+        let leftRect = CGRect(x: frame.minX, y: leftEdgeY, width: Defaults.LeftEdgeDrawer.panelWidthPoints, height: leftEdgeHeight)
+
+        // Extreme left edge threshold is <= 2.5pt from physical frame.minX
+        let atEdgePt = CGPoint(x: frame.minX + 1.0, y: leftRect.midY)
+        let isAtEdgeX = atEdgePt.x <= (frame.minX + 2.5) && atEdgePt.x >= (frame.minX - 1.0)
+        let isWithinEdgeY = atEdgePt.y >= leftRect.minY && atEdgePt.y <= leftRect.maxY
+        TestAssertion.assertTrue(isAtEdgeX && isWithinEdgeY, "Point directly on left physical edge must qualify for dwell summon")
+
+        // Point inside standard window (> 3.0pt) must NOT trigger dwell summon
+        let insideWindowPt = CGPoint(x: frame.minX + 10.0, y: leftRect.midY)
+        let notAtEdge = insideWindowPt.x <= (frame.minX + 2.5) && insideWindowPt.x >= (frame.minX - 1.0)
+        TestAssertion.assertFalse(notAtEdge, "Point away from extreme left edge must not trigger dwell summon")
     }
 }

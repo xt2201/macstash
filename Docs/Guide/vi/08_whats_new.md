@@ -1,3 +1,19 @@
+# Có Gì Mới Trong Phiên Bản 2.10.0
+
+MacStash 2.10.0 căn chỉnh vòng xoay 4 góc ôm sát hoàn hảo vào đỉnh góc vật lý của màn hình không còn khoảng hở, loại bỏ triệt để timer polling và nghẽn luồng theo dõi chuột, bổ sung lưu trữ đĩa bền vững và tính năng ghim cho Stash Shelf, đồng thời tối ưu hóa độ trễ lưu đĩa và bộ đếm từ zero-allocation cho Quick Scratchpad.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.10.0
+
+- Căn Chỉnh Vòng Xoay Góc Ôm Khít Màn Hình: Cố định 4 núm xoay góc bám sát 100% vào các đỉnh góc vật lý của màn hình không còn độ lệch khoảng cách, định hướng phần đệm bóng đổ cửa sổ chỉ mở rộng vào phía trong lòng màn hình.
+- Theo Dõi Chuột Hiệu Năng Cao: Loại bỏ timer polling 40ms chạy ngầm và hiện tượng spam hàng ngàn Task bất đồng bộ khi di chuột, điều tiết tính toán hình học mượt mà và kết nối trực tiếp OverlayStateMachine cho các bước chuyển trạng thái tin cậy.
+- Triệt Tiêu Hiện Tượng Bung Góc Ma: Tái kiểm tra toạ độ con trỏ chuột nghiêm ngặt theo bán kính nhạy góc khi bộ đếm dwell hoàn tất, ngăn chặn tình trạng núm xoay tự bung sau khi chuột đã rời khỏi góc.
+- Lưu Trữ Đĩa Cục Bộ Cho Stash Shelf: Tích hợp StashShelfStorage lưu trữ định dạng JSON trong thư mục Application Support, giữ nguyên vẹn toàn bộ danh sách tệp, liên kết và đoạn trích sau khi khởi động lại máy hoặc cập nhật ứng dụng.
+- Ghim Ngăn Kéo Và Khôi Phục Undo: Thêm nút chuyển đổi ghim (Pin) trên thanh tiêu đề của cả Stash Shelf và Scratchpad giúp giữ ngăn kéo luôn mở khi xử lý tác vụ đa cửa sổ, cùng khả năng khôi phục Undo tức thì nếu lỡ tay bấm xóa toàn bộ.
+- Bộ Nhớ Đệm Biểu Tượng Chuẩn Retina Sắc Nét: Nâng cấp StashIconCache với cấu trúc bitmap 2x độ phân giải cao, hiển thị biểu tượng tệp sắc nét chuẩn mực trên màn hình Retina.
+- Cơ Chế Debounce Và Đếm Từ Siêu Tốc Cho Scratchpad: Trì hoãn ghi đĩa 400ms loại bỏ hiện tượng đơ cứng luồng chính khi gõ phím, thay thế hàm tách chuỗi tốn bộ nhớ bằng thuật toán duyệt ký tự zero-allocation nhanh vượt trội.
+- Chuẩn Hóa Vùng Chạm Cạnh Trái: Mở rộng khung panel cạnh trái lên 410pt và đồng bộ vùng hit-testing đạt 352pt (Shelf) và 382pt (Scratchpad), khắc phục lỗi không nhấp được các nút ở rìa phải ngăn kéo.
+- Kéo Thả Trực Tiếp Ảnh Từ Trình Duyệt: Hỗ trợ kéo các định dạng ảnh thô (TIFF/PNG từ Safari, Chrome và ảnh chụp màn hình) thả trực tiếp vào Stash Shelf.
+
 # Có Gì Mới Trong Phiên Bản 2.9.9
 
 MacStash 2.9.9 bổ sung tính năng tự động ẩn Stash Shelf khi di chuột ra ngoài, khắc phục triệt để lỗi menu popover mở nhầm màn hình ngoài, tái lập tính cân đối hình học tuyệt đối loại bỏ cảm giác khó chịu OCD và ra mắt Cụm Điều Khiển HUD Chiến Thuật với biểu tượng phân cấp chuyên nghiệp.

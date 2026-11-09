@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.9.8-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.9.9-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.9.8.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.9.9.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -72,6 +72,8 @@ MacStash assigns high-frequency system controls to the four physical display ver
 ### 1. Sculpted Liquid Glass Radial Corner Dials
 - Invisibly docked at the screen corners with zero desktop clutter.
 - **Apple Liquid Glass Optical Realism**: Multi-layer frosted refraction, dual-path specular bevel highlights (135° virtual light source), and dynamic caustic ambient color halos.
+- **Tactical HUD Precision Instrument Hub**: Center action hubs engineered with studio-grade optical glass bezels, multi-color hierarchical SF Symbols, and precision micro-typography with tabular figures (`.monospacedDigit()`).
+- **Mathematical Symmetry & 4-Quadrant Balance**: Perfectly aligned along the 45° diagonal axis of symmetry with uniform 19pt clearance to both adjacent screen borders, inner concentric guide arcs, and 21 symmetrical ticks with major indicators placed at 0%, 25%, 50%, 75%, and 100%.
 - **Luminous Fluid Meniscus**: Active levels (Volume, Brightness, Keyboard, Timer) are rendered as glowing fluid inside a sculpted crystal arc with a curved droplet meniscus head and illuminated laser-etched tick marks.
 - **Natural Two-Axis Trackpad Scrubbing**: Synchronized with macOS Natural Scrolling via `event.isDirectionInvertedFromDevice`. Glide two fingers UP or RIGHT on your trackpad to smoothly increase volume, brightness, backlight, or timer duration, or DOWN and LEFT to decrease.
 - Drag along the radial arc or use vertical/horizontal trackpad scrolling for fluid adjustments.
@@ -103,7 +105,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - **1-Click Launch from Edge Peek Handle**: Hover or click the subtle 44pt left-edge indicator to slide out the shelf without delay, with full protection against edge jitter or accidental collapse.
 - **Double-Click to Launch**: Double-clicking any file, image, or link on Stash Shelf immediately launches it with the default macOS system app.
 - **Zero-Footprint Background Pass-Through**: Floating edge panels strictly ignore mouse events when idle and center resting peek handles on a slim strip, guaranteeing 100% unimpeded clicks in underlying macOS apps (Finder sidebar, Safari tabs, Xcode editor, Terminal).
-- **Outside-Click Auto-Dismiss**: Clicking anywhere outside the Stash Shelf, Scratchpad, or Edge Slider immediately collapses the overlays and returns window focus cleanly to your active application.
+- **Outside-Click & Mouse-Exit Auto-Dismiss**: Moving the mouse out of the drawer area into the workspace automatically schedules a smooth auto-dismiss timer, while clicking outside collapses the shelf immediately and returns window focus cleanly to your active application. Drop operations stay safely active during drag sessions.
 - **Immediate First-Mouse Interaction**: Every button (Clear All, Copy Path, Reveal in Finder, Remove, Close) triggers on the very first mouse-up with zero swallowed clicks.
 - **Quick Drag Export & Copy All**: Drag stashed items back out to any application, email, or Finder folder anytime, or click "Copy All" to copy all file references to the clipboard at once.
 - **Quick Scratchpad Drawer**: Ephemeral liquid glass writing slate with dynamic key window keyboard focus for immediate typing, glowing emerald rim, live word and character counters, automatic local persistence, and standard macOS keyboard shortcuts (`Cmd+A`, `Cmd+C`, `Cmd+V`, `Cmd+Z`, `Esc`).

@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.9.9] - 2026-11-09
+
+### Added
+- Tactical HUD Precision Instrument Hub: Re-engineered Corner Dial center action hubs with studio-grade optical glass bezels, multi-color hierarchical SF Symbols, and precision micro-typography with tabular digits.
+- Inner Concentric Guide Ring: Introduced a laser-etched concentric guide arc framing the center hub into the radial dial, unifying radial perspective across all 4 quadrants.
+
+### Fixed
+- Stash Shelf Auto-Dismiss on Mouse Exit: Implemented continuous boundary monitoring in `ScreenManager` that automatically schedules a smooth auto-close timer when the cursor exits the left shelf drawer into the workspace, while safely preserving openness during active drag-and-drop operations.
+- Multi-Monitor Menu Bar Popover Screen Targeting: Fixed AppKit bug where clicking the menu bar app icon on a secondary/Mac screen mistakenly dropped down the popover on the external monitor. Ensured anchor windows are strictly created on the clicked monitor coordinate space with post-presentation bounding verification.
+- Radial Dial Mathematical Symmetry & OCD Balance: Re-aligned the central hub along the exact 45° diagonal axis of symmetry, maintaining uniform clearance to both adjacent screen borders (19pt) and balanced distance to the arc track.
+- Symmetrical 4-Quadrant Tick Marks: Upgraded dial tick count to 21 with major indicator lines placed symmetrically at 0%, 25%, 50%, 75%, and 100%, and removed rogue white meniscus tick artifacts.
+
+---
+
 ## [2.9.8] - 2026-11-09
 
 ### Fixed

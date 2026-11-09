@@ -1,3 +1,16 @@
+# What's New in Version 2.9.9
+
+MacStash 2.9.9 delivers automatic drawer dismissal on mouse leave for the Stash Shelf, resolves multi-display menu bar popover placement issues, establishes absolute mathematical symmetry across Corner Dials, and introduces the Tactical HUD Instrument Hub with hierarchical iconography and precision micro-typography.
+
+## Key Enhancements in Version 2.9.9
+
+- Stash Shelf Auto-Dismiss on Mouse Exit: Added continuous edge drawer boundary monitoring in ScreenManager that automatically schedules a smooth auto-close timer when the cursor moves away from the left shelf drawer into the workspace, while keeping the shelf securely open during active drag-and-drop operations.
+- Accurate Multi-Monitor Menu Bar Popover Placement: Resolved the AppKit window placement bug where clicking the menu bar app icon on a Mac built-in screen incorrectly displayed the popover on the external monitor. Anchor windows are strictly bound to the clicked monitor coordinate space with post-presentation bounding checks.
+- Corner Dial Mathematical Symmetry & OCD Balance: Re-aligned the central action hub along the exact 45-degree diagonal axis of symmetry, maintaining uniform 19pt clearance to both adjacent screen borders and balanced spacing to the arc track.
+- Symmetrical 4-Quadrant Tick Marks: Upgraded dial tick count to 21 with major indicator lines placed symmetrically at 0%, 25%, 50%, 75%, and 100%, and eliminated rogue white meniscus tick artifacts.
+- Tactical HUD Precision Instrument Hub: Re-engineered Center Action Badges with studio-grade optical glass bezels, multi-color hierarchical SF Symbols, and precision micro-typography with tabular digits.
+- Concentric Guide Ring: Added a laser-etched concentric guide arc framing the center hub into the radial dial, unifying radial perspective across all 4 quadrants.
+
 # What's New in Version 2.9.8
 
 MacStash 2.9.8 resolves the issue where the Right Edge Bar would not open when an external display was connected, delivering seamless multi-monitor edge dwell detection, inclusive physical boundary checks, and isolated per-display edge activation.

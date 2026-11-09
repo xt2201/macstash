@@ -226,16 +226,17 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func togglePopover(_ sender: AnyObject? = nil) {
         guard let button = statusItem.button else { return }
 
-        let buttonScreen = button.window?.screen
         let mouseLoc = NSEvent.mouseLocation
         let clickedScreen = NSScreen.screens.first { NSMouseInRect(mouseLoc, $0.frame, false) }
-            ?? buttonScreen
+            ?? button.window?.screen
             ?? NSScreen.main
             ?? NSScreen.screens.first
 
+        guard let targetScreen = clickedScreen else { return }
+
         if popover.isShown {
             let currentWindowScreen = popover.contentViewController?.view.window?.screen
-            if currentWindowScreen == clickedScreen {
+            if currentWindowScreen == targetScreen {
                 popover.performClose(nil)
                 cleanupAnchorWindow()
                 return
@@ -250,24 +251,24 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         appState.audio.updateVolumeFromHardware()
 
         // Ensure popover content size is accurately computed before showing to prevent upward expansion over the menu bar
-        updatePopoverContentSize(on: clickedScreen)
+        updatePopoverContentSize(on: targetScreen)
 
-        let isClickOnButton = button.window?.frame.insetBy(dx: -4, dy: -4).contains(mouseLoc) ?? false
-        let isTargetScreenCurrentButtonScreen = isClickOnButton || (buttonScreen != nil && clickedScreen == buttonScreen)
+        // Calculate accurate anchor on the target screen
+        let menuBarHeight = max(24, targetScreen.frame.maxY - targetScreen.visibleFrame.maxY)
+        let anchorWidth: CGFloat = 24
+        var anchorX: CGFloat = mouseLoc.x - (anchorWidth / 2)
 
-        if isTargetScreenCurrentButtonScreen, clickedScreen != nil {
-            cleanupAnchorWindow()
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            popover.contentViewController?.view.window?.makeKey()
-        } else if let clickedScreen = clickedScreen {
-            let menuBarHeight = max(24, clickedScreen.frame.maxY - clickedScreen.visibleFrame.maxY)
-            let anchorWidth: CGFloat = 24
-            let anchorX = min(max(mouseLoc.x - anchorWidth / 2, clickedScreen.frame.minX), clickedScreen.frame.maxX - anchorWidth)
-            let anchorY = clickedScreen.frame.maxY - menuBarHeight
-            let anchorRect = NSRect(x: anchorX, y: anchorY, width: anchorWidth, height: menuBarHeight)
-
-            showPopover(anchoredAt: anchorRect, on: clickedScreen)
+        // If button's window resides on the target screen, prefer aligning to button bounds
+        if let buttonWin = button.window, buttonWin.screen == targetScreen {
+            let buttonScreenRect = buttonWin.convertToScreen(button.bounds)
+            anchorX = buttonScreenRect.midX - (anchorWidth / 2)
         }
+
+        anchorX = min(max(anchorX, targetScreen.frame.minX + 8), targetScreen.frame.maxX - anchorWidth - 8)
+        let anchorY = targetScreen.frame.maxY - menuBarHeight
+        let anchorRect = NSRect(x: anchorX, y: anchorY, width: anchorWidth, height: menuBarHeight)
+
+        showPopover(anchoredAt: anchorRect, on: targetScreen)
     }
 
     private func showPopover(anchoredAt rect: NSRect, on screen: NSScreen) {
@@ -293,6 +294,17 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         updatePopoverContentSize(on: screen)
         popover.show(relativeTo: anchorView.bounds, of: anchorView, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
+
+        // Post-display safety check: ensure popover window is strictly bounded within target screen
+        if let popoverWindow = popover.contentViewController?.view.window {
+            let visFrame = screen.visibleFrame
+            var currentFrame = popoverWindow.frame
+            if !screen.frame.intersects(currentFrame) || popoverWindow.screen != screen {
+                currentFrame.origin.x = min(max(rect.midX - (currentFrame.width / 2), visFrame.minX + 8), visFrame.maxX - currentFrame.width - 8)
+                currentFrame.origin.y = min(rect.minY - currentFrame.height, visFrame.maxY - currentFrame.height)
+                popoverWindow.setFrame(currentFrame, display: true, animate: false)
+            }
+        }
     }
 
     private func cleanupAnchorWindow() {

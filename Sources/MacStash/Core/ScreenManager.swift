@@ -30,6 +30,9 @@ public final class ScreenManager: ObservableObject {
     private var rightEdgeDwellWorkItem: DispatchWorkItem?
     private var rightEdgeHideWorkItem: DispatchWorkItem?
 
+    // Left Edge Hide State (Auto-close shelf on mouse exit)
+    private var leftEdgeHideWorkItem: DispatchWorkItem?
+
     // Drag-and-Drop Gesture Tracking (Shake to summon)
     private var dragHistory: [(point: NSPoint, time: Date)] = []
 
@@ -50,6 +53,9 @@ public final class ScreenManager: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] shelfOpen, padOpen in
                 guard let self = self else { return }
+                if !shelfOpen {
+                    self.cancelPendingLeftEdgeHide()
+                }
                 let isOpen = shelfOpen || padOpen || self.appState.stashShelf.isDropTargetActive
                 let allowKey = shelfOpen || padOpen
                 for instance in self.instances.values {
@@ -419,6 +425,17 @@ public final class ScreenManager: ObservableObject {
         let shelf = appState.stashShelf
         let scratchpad = appState.scratchpad
 
+        // Handle auto-close for Stash Shelf when mouse exits the drawer zone
+        if shelf.isShelfOpen && !shelf.isDropTargetActive && !isDragging {
+            if isMouseInsideLeftDrawer(mouseLoc) {
+                cancelPendingLeftEdgeHide()
+            } else {
+                scheduleLeftEdgeHideTimer()
+            }
+        } else {
+            cancelPendingLeftEdgeHide()
+        }
+
         for (_, instance) in instances {
             let screen = instance.screen
             let frame = screen.frame
@@ -604,6 +621,46 @@ public final class ScreenManager: ObservableObject {
                 instance.setRightEdgeInteractive(false)
             }
         }
+    }
+
+    public func isMouseInsideLeftDrawer(_ point: NSPoint) -> Bool {
+        for instance in instances.values {
+            let frame = instance.screen.frame
+            let leftRect = instance.leftEdgeRect(in: frame)
+            let activeWidth: CGFloat = (appState.scratchpad.isScratchpadOpen ? 370.0 : 335.0) + 25.0
+            let activeHeight: CGFloat = (appState.scratchpad.isScratchpadOpen ? 400.0 : 485.0) + 25.0
+            let activeY = leftRect.minY + (leftRect.height - activeHeight) / 2.0
+            let drawerRect = NSRect(x: frame.minX, y: activeY, width: activeWidth, height: activeHeight)
+            if drawerRect.contains(point) {
+                return true
+            }
+        }
+        return false
+    }
+
+    public func scheduleLeftEdgeHideTimer() {
+        guard leftEdgeHideWorkItem == nil else { return }
+        let item = DispatchWorkItem { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                let cur = NSEvent.mouseLocation
+                let stillInside = self.isMouseInsideLeftDrawer(cur)
+                let isDragging = (NSEvent.pressedMouseButtons != 0)
+                if !stillInside && !isDragging && !self.appState.stashShelf.isDropTargetActive {
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
+                        self.appState.stashShelf.closeShelf()
+                    }
+                }
+                self.leftEdgeHideWorkItem = nil
+            }
+        }
+        self.leftEdgeHideWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
+    }
+
+    public func cancelPendingLeftEdgeHide() {
+        leftEdgeHideWorkItem?.cancel()
+        leftEdgeHideWorkItem = nil
     }
 
     private func scheduleDwellTimer(corner: CornerPosition, displayID: CGDirectDisplayID, screenFrame: NSRect) {

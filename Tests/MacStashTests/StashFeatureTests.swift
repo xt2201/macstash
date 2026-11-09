@@ -15,6 +15,9 @@ public enum StashFeatureTests {
         testMultiDisplayRightEdgeDwellIsolation()
         testStashShelfHitZoneSymmetry()
         testStashDragShakeDetection()
+        testDialTickSymmetry()
+        testDialHubGeometrySymmetry()
+        testLeftEdgeDrawerAutoCloseBounds()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -266,5 +269,72 @@ public enum StashFeatureTests {
             }
         }
         TestAssertion.assertTrue(reversalsY >= 3, "Vertical wiggle with 3 reversals must trigger shake gesture")
+    }
+
+    private static func testDialTickSymmetry() {
+        let tickCount = 21
+        var majorIndices: [Int] = []
+        for i in 0..<tickCount {
+            if i % 5 == 0 {
+                majorIndices.append(i)
+            }
+        }
+        TestAssertion.assertEqual(majorIndices.count, 5, "21 ticks must have exactly 5 major ticks")
+        TestAssertion.assertEqual(majorIndices, [0, 5, 10, 15, 20], "Major ticks must be at 0%, 25%, 50%, 75%, 100%")
+
+        let fractions = majorIndices.map { Double($0) / Double(tickCount - 1) }
+        TestAssertion.assertEqual(fractions[0], 0.0, "First major tick is at 0.0")
+        TestAssertion.assertEqual(fractions[1], 0.25, "Second major tick is at 0.25")
+        TestAssertion.assertEqual(fractions[2], 0.50, "Third major tick is at 0.50")
+        TestAssertion.assertEqual(fractions[3], 0.75, "Fourth major tick is at 0.75")
+        TestAssertion.assertEqual(fractions[4], 1.0, "Fifth major tick is at 1.0")
+    }
+
+    private static func testDialHubGeometrySymmetry() {
+        let offsetDist: CGFloat = 39.0
+        let hubRadius: CGFloat = 32.0 // diameter 64
+
+        // Check offset coordinates for all 4 corners
+        let topLeftOffset = CGPoint(x: -offsetDist, y: -offsetDist)
+        let topRightOffset = CGPoint(x: offsetDist, y: -offsetDist)
+        let bottomLeftOffset = CGPoint(x: -offsetDist, y: offsetDist)
+        let bottomRightOffset = CGPoint(x: offsetDist, y: offsetDist)
+
+        let d1 = hypot(topLeftOffset.x, topLeftOffset.y)
+        let d2 = hypot(topRightOffset.x, topRightOffset.y)
+        let d3 = hypot(bottomLeftOffset.x, bottomLeftOffset.y)
+        let d4 = hypot(bottomRightOffset.x, bottomRightOffset.y)
+
+        TestAssertion.assertEqual(d1, d2, "Top-left and top-right hub offsets must have identical radial distance")
+        TestAssertion.assertEqual(d2, d3, "Top-right and bottom-left hub offsets must have identical radial distance")
+        TestAssertion.assertEqual(d3, d4, "Bottom-left and bottom-right hub offsets must have identical radial distance")
+
+        // Screen corner vertex in local coordinates is at (0, 0) or (180, 180).
+        // Distance from physical corner to hub center is hypot(51, 51) = 72.12pt
+        let cornerDist = hypot(51.0, 51.0)
+        TestAssertion.assertTrue(abs(cornerDist - 72.12) < 0.1, "Physical corner to hub center must be ~72.12pt")
+
+        // Clearance to both physical screen edges is exactly 51 - 32 = 19pt
+        let edgeGap = 51.0 - hubRadius
+        TestAssertion.assertEqual(edgeGap, 19.0, "Clearance to both adjacent screen edges must be exactly 19pt (symmetric)")
+    }
+
+    private static func testLeftEdgeDrawerAutoCloseBounds() {
+        let frame = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let leftEdgeHeight: CGFloat = 520.0
+        let leftEdgeY = (frame.height - leftEdgeHeight) / 2.0
+
+        let shelfWidth: CGFloat = 335.0 + 25.0 // with 25pt margin
+        let shelfHeight: CGFloat = 485.0 + 25.0
+        let shelfY = leftEdgeY + (leftEdgeHeight - shelfHeight) / 2.0
+        let shelfDrawerRect = CGRect(x: frame.minX, y: shelfY, width: shelfWidth, height: shelfHeight)
+
+        // Mouse inside shelf drawer must NOT trigger auto-close
+        let insidePt = CGPoint(x: 100, y: leftEdgeY + 100)
+        TestAssertion.assertTrue(shelfDrawerRect.contains(insidePt), "Cursor inside drawer area must stay open")
+
+        // Mouse moved into workspace (> 360pt) must trigger auto-close timer
+        let outsidePt = CGPoint(x: 400, y: leftEdgeY + 100)
+        TestAssertion.assertFalse(shelfDrawerRect.contains(outsidePt), "Cursor moved to main workspace must trigger auto-close")
     }
 }

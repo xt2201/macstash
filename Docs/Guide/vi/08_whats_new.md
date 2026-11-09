@@ -1,3 +1,16 @@
+# Có Gì Mới Trong Phiên Bản 2.9.9
+
+MacStash 2.9.9 bổ sung tính năng tự động ẩn Stash Shelf khi di chuột ra ngoài, khắc phục triệt để lỗi menu popover mở nhầm màn hình ngoài, tái lập tính cân đối hình học tuyệt đối loại bỏ cảm giác khó chịu OCD và ra mắt Cụm Điều Khiển HUD Chiến Thuật với biểu tượng phân cấp chuyên nghiệp.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.9
+
+- Tự Động Ẩn Kệ Thả Tệp Stash Shelf Khi Di Chuột Ra Ngoài: Bổ sung cơ chế giám sát vùng biên ngăn kéo trong ScreenManager, tự động kích hoạt bộ đếm thời gian đóng mượt mà khi con trỏ chuột rời khỏi phạm vi kệ thả tệp để làm việc trên cửa sổ khác, đồng thời luôn duy trì mở khi đang thực hiện thao tác kéo thả tệp.
+- Định Vị Popover Menu Bar Chuẩn Xác Trên Hệ Thống Đa Màn Hình: Khắc phục lỗi điều phối cửa sổ của AppKit khiến việc nhấp vào biểu tượng ứng dụng ở thanh menu màn hình Mac lại mở popover trên màn hình ngoài. Cửa sổ neo luôn được tạo trực tiếp trên không gian tọa độ của màn hình được nhấp chuột kèm kiểm tra vùng hiển thị sau khi mở.
+- Cân Bằng Hình Học Tuyệt Đối Vòng Xoay 4 Góc: Căn chỉnh lại tâm cụm điều khiển trung tâm chính xác theo trục đối xứng đường chéo 45 độ, đảm bảo khoảng cách đối xứng hoàn hảo 19pt tới hai cạnh viền màn hình và cân bằng khoảng hở tới vòng cung đo.
+- Vạch Chia 4 Góc Phần Tư Đối Xứng Toàn Diện: Nâng cấp tổng số vạch chia lên 21 vạch với các vạch lớn xuất hiện chuẩn xác tại 0%, 25%, 50%, 75% và 100%, loại bỏ hoàn toàn hiện tượng vạch trắng lệch màu tại vị trí giọt đo.
+- Cụm Điều Khiển HUD Thủy Tinh Chiến Thuật Chuyên Nghiệp: Tái thiết kế biểu tượng trung tâm với viền vát quang học gia công cơ khí, biểu tượng SF Symbols phân cấp màu sắc tinh tế và kiểu chữ số bảng monospacedDigit chuẩn mực phòng thu.
+- Vòng Cung Định Hướng Đồng Tâm: Bổ sung đường cung định hướng khắc laser tại bán kính 106 pt ôm trọn cụm trung tâm, tạo nên khối đồng nhất giữa trung tâm và vòng đo chất lỏng.
+
 # Có Gì Mới Trong Phiên Bản 2.9.8
 
 MacStash 2.9.8 khắc phục triệt để sự cố thanh trượt cạnh phải không mở ra khi cắm màn hình ngoài, tối ưu hóa cơ chế nhận diện điểm dừng cạnh màn hình trên hệ thống đa màn hình và cô lập kích hoạt theo từng màn hình riêng biệt.

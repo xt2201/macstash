@@ -321,6 +321,8 @@ public struct QuarterCircleGlassBackdrop: View {
 
 // MARK: - Center Floating Glass Jewel Badge
 
+// MARK: - Tactical Pro HUD Center Action Hub
+
 public struct CenterActionBadge: View {
     public let action: ControlAction
     public let corner: CornerPosition
@@ -378,18 +380,135 @@ public struct CenterActionBadge: View {
     public var body: some View {
         let offset = badgeOffset(for: corner, in: dialSize)
 
-        VStack(spacing: 1.5) {
-            if action == .timer {
-                HStack(spacing: 3) {
-                    Image(systemName: isPomodoroRunning ? "pause.fill" : "play.fill")
-                        .font(.system(size: 8, weight: .bold))
-                        .foregroundColor(pomodoroMode == .focus ? .purple : .green)
+        VStack(spacing: 2) {
+            actionIconView
 
-                    Image(systemName: pomodoroMode == .focus ? "brain.head.profile" : "cup.and.saucer.fill")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(pomodoroMode == .focus ? .purple : .green)
+            actionReadoutView
+        }
+        .frame(width: 64, height: 64)
+        .background(
+            ZStack {
+                Circle().fill(.ultraThinMaterial)
+                Circle().fill(Color.black.opacity(0.38))
+                if tint != .clear {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [tint.opacity(isExpanded ? 0.32 : 0.18), Color.clear],
+                                center: .center,
+                                startRadius: 2,
+                                endRadius: 32
+                            )
+                        )
                 }
+            }
+        )
+        .overlay(
+            Circle()
+                .strokeBorder(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white.opacity(isExpanded ? 0.85 : 0.65), location: 0.0),
+                            .init(color: Color.white.opacity(0.20), location: 0.5),
+                            .init(color: (tint == .clear ? Color.white : tint).opacity(0.40), location: 1.0)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: isExpanded ? 1.4 : 1.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.35), radius: 7, x: 0, y: 3)
+        .offset(x: offset.x, y: offset.y)
+    }
 
+    @ViewBuilder
+    private var actionIconView: some View {
+        if action == .timer {
+            HStack(spacing: 3) {
+                Image(systemName: isPomodoroRunning ? "pause.fill" : "play.fill")
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundColor(pomodoroMode == .focus ? Color(red: 0.85, green: 0.45, blue: 1.0) : Color(red: 0.3, green: 0.9, blue: 0.55))
+
+                Image(systemName: pomodoroMode == .focus ? "brain.head.profile" : "cup.and.saucer.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(pomodoroMode == .focus ? Color.purple : Color.green)
+            }
+        } else if action == .keepAwake {
+            Image(systemName: "cup.and.saucer.fill")
+                .font(.system(size: 18, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(red: 1.0, green: 0.72, blue: 0.2), Color(red: 0.95, green: 0.45, blue: 0.1)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        } else if action == .stashShelf {
+            Image(systemName: "tray.2.fill")
+                .font(.system(size: 18, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(red: 0.2, green: 0.85, blue: 1.0), Color(red: 0.0, green: 0.55, blue: 0.95)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        } else if action == .scratchpad {
+            Image(systemName: "note.text")
+                .font(.system(size: 18, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(red: 0.3, green: 0.9, blue: 0.55), Color(red: 0.1, green: 0.65, blue: 0.35)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        } else if action == .volume {
+            Image(systemName: isMuted ? "speaker.slash.fill" : (value > 0.66 ? "speaker.wave.3.fill" : (value > 0.33 ? "speaker.wave.2.fill" : (value > 0.01 ? "speaker.wave.1.fill" : "speaker.fill"))))
+                .font(.system(size: 18, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(
+                    isMuted
+                        ? LinearGradient(colors: [Color(red: 1.0, green: 0.35, blue: 0.35), Color(red: 0.85, green: 0.15, blue: 0.15)], startPoint: .top, endPoint: .bottom)
+                        : LinearGradient(colors: [Color(red: 0.2, green: 0.8, blue: 1.0), Color(red: 0.05, green: 0.55, blue: 0.95)], startPoint: .top, endPoint: .bottom)
+                )
+        } else if action == .brightness {
+            Image(systemName: "sun.max.fill")
+                .font(.system(size: 18, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(red: 1.0, green: 0.84, blue: 0.20), Color(red: 1.0, green: 0.55, blue: 0.05)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        } else if action == .keyboardBrightness {
+            Image(systemName: isKeyboardSupported ? "keyboard.fill" : "keyboard.badge.ellipsis")
+                .font(.system(size: 18, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(
+                    isKeyboardSupported
+                        ? LinearGradient(colors: [Color(red: 0.85, green: 0.92, blue: 1.0), Color(red: 0.5, green: 0.75, blue: 0.98)], startPoint: .top, endPoint: .bottom)
+                        : LinearGradient(colors: [Color.secondary, Color.secondary.opacity(0.6)], startPoint: .top, endPoint: .bottom)
+                )
+        } else {
+            Image(systemName: action.systemImage)
+                .font(.system(size: 18, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundColor(action.accentColors.first ?? .accentColor)
+        }
+    }
+
+    @ViewBuilder
+    private var actionReadoutView: some View {
+        if action == .timer {
+            VStack(spacing: 1.5) {
                 Text(formattedTimer)
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(.primary)
@@ -399,82 +518,63 @@ public struct CenterActionBadge: View {
                         ForEach(0..<min(totalRounds, 6), id: \.self) { roundIndex in
                             Circle()
                                 .fill(roundIndex < completedRounds ? (pomodoroMode == .focus ? Color.purple : Color.green) : Color.secondary.opacity(0.35))
-                                .frame(width: 3.5, height: 3.5)
+                                .frame(width: 3.0, height: 3.0)
                         }
                     }
-                    .padding(.top, 0.5)
                 }
-            } else if action == .keepAwake {
-                Image(systemName: "cup.and.saucer.fill")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(value > 0 ? (action.accentColors.first ?? .orange) : .secondary)
-
-                Text(formattedKeepAwake)
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .foregroundColor(value > 0 ? .primary : .secondary)
-            } else if action == .stashShelf {
-                Image(systemName: "tray.2.fill")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(action.accentColors.first ?? .cyan)
-
+            }
+        } else if action == .keepAwake {
+            Text(formattedKeepAwake)
+                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                .foregroundColor(value > 0 ? .primary : .secondary)
+        } else if action == .stashShelf {
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text("\(stashItemCount)")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .font(.system(size: 13, weight: .heavy, design: .rounded))
+                    .monospacedDigit()
                     .foregroundColor(.primary)
-            } else if action == .scratchpad {
-                Image(systemName: "note.text")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(action.accentColors.first ?? .green)
-
-                Text("NOTES")
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .foregroundColor(.primary)
-            } else if action == .volume {
-                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(isMuted ? .red : (action.accentColors.first ?? .accentColor))
-
-                Text(isMuted ? "MUTE" : "\(Int(round(value * 100)))%")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundColor(isMuted ? .red : .primary)
-            } else if action == .keyboardBrightness && !isKeyboardSupported {
-                Image(systemName: "keyboard.badge.ellipsis")
-                    .font(.system(size: 18, weight: .bold))
+                Text("items")
+                    .font(.system(size: 8, weight: .semibold, design: .rounded))
                     .foregroundColor(.secondary)
-
-                Text("N/A")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundColor(.secondary)
-            } else {
-                Image(systemName: action.systemImage)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(action.accentColors.first ?? .accentColor)
-
-                Text("\(Int(round(value * 100)))%")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+            }
+        } else if action == .scratchpad {
+            Text("NOTES")
+                .font(.system(size: 9.5, weight: .heavy, design: .rounded))
+                .foregroundColor(.primary)
+        } else if action == .volume && isMuted {
+            Text("MUTE")
+                .font(.system(size: 9.5, weight: .heavy, design: .rounded))
+                .foregroundColor(.red)
+        } else if action == .keyboardBrightness && !isKeyboardSupported {
+            Text("N/A")
+                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                .foregroundColor(.secondary)
+        } else {
+            HStack(alignment: .firstTextBaseline, spacing: 1) {
+                Text("\(Int(round(value * 100)))")
+                    .font(.system(size: 13, weight: .heavy, design: .rounded))
+                    .monospacedDigit()
                     .foregroundColor(.primary)
+
+                Text("%")
+                    .font(.system(size: 8.5, weight: .bold, design: .rounded))
+                    .foregroundColor(.secondary)
             }
         }
-        .frame(width: 58, height: 58)
-        .circularLiquidGlass(
-            tint: tint,
-            specularIntensity: 1.0,
-            causticOpacity: 0.22,
-            isHighlighted: isExpanded
-        )
-        .offset(x: offset.x, y: offset.y)
     }
 
     private func badgeOffset(for corner: CornerPosition, in size: CGFloat) -> CGPoint {
-        let dist: CGFloat = 52
+        // Mathematically centered along the 45° line of symmetry (x = y = 51 from corner vertex)
+        let offsetDist: CGFloat = 39.0
         switch corner {
         case .topLeft:
-            return CGPoint(x: dist - (size / 2), y: dist - (size / 2))
+            return CGPoint(x: -offsetDist, y: -offsetDist)
         case .topRight:
-            return CGPoint(x: (size / 2) - dist, y: dist - (size / 2))
+            return CGPoint(x: offsetDist, y: -offsetDist)
         case .bottomLeft:
-            return CGPoint(x: dist - (size / 2), y: (size / 2) - dist)
+            return CGPoint(x: -offsetDist, y: offsetDist)
         case .bottomRight:
-            return CGPoint(x: (size / 2) - dist, y: (size / 2) - dist)
+            return CGPoint(x: offsetDist, y: offsetDist)
         }
     }
 }
@@ -499,6 +599,21 @@ public struct DialArcShape: View {
             let fullDeg = geometry.angle(for: 1.0)
             let isClockwise = geometry.corner == .bottomLeft || geometry.corner == .topLeft
 
+            // 0. Inner concentric guide arc (framing the central hub into the dial)
+            var guidePath = Path()
+            guidePath.addArc(
+                center: geometry.center,
+                radius: 106,
+                startAngle: .degrees(startDeg),
+                endAngle: .degrees(fullDeg),
+                clockwise: isClockwise
+            )
+            context.stroke(
+                guidePath,
+                with: .color(Color.white.opacity(0.06)),
+                style: StrokeStyle(lineWidth: 1.0)
+            )
+
             // 1. Concave glass trench groove (the channel where liquid flows)
             var trenchPath = Path()
             trenchPath.addArc(
@@ -511,7 +626,7 @@ public struct DialArcShape: View {
             context.stroke(
                 trenchPath,
                 with: .color(Color.white.opacity(0.08)),
-                style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                style: StrokeStyle(lineWidth: 9, lineCap: .round)
             )
 
             guard value > 0.01 else { return }
@@ -530,8 +645,8 @@ public struct DialArcShape: View {
             let primaryColor = gradientColors.first ?? .cyan
             context.stroke(
                 liquidPath,
-                with: .color(primaryColor.opacity(0.35)),
-                style: StrokeStyle(lineWidth: 14, lineCap: .round)
+                with: .color(primaryColor.opacity(0.32)),
+                style: StrokeStyle(lineWidth: 13, lineCap: .round)
             )
 
             // 3. Vibrant liquid core
@@ -542,16 +657,17 @@ public struct DialArcShape: View {
                     startPoint: geometry.point(radius: trackRadius, angleDegrees: startDeg),
                     endPoint: geometry.point(radius: trackRadius, angleDegrees: endDeg)
                 ),
-                style: StrokeStyle(lineWidth: 7.5, lineCap: .round)
+                style: StrokeStyle(lineWidth: 7.0, lineCap: .round)
             )
 
-            // 4. Fluid meniscus head (Droplet bulb with specular highlight)
+            // 4. Precision tactile thumb knob (Apple concentric ring indicator)
             let tipPoint = geometry.point(radius: trackRadius, angleDegrees: endDeg)
-            let tipBulb = Path(ellipseIn: CGRect(x: tipPoint.x - 6.5, y: tipPoint.y - 6.5, width: 13, height: 13))
-            context.fill(tipBulb, with: .color(primaryColor))
+            let outerKnob = Path(ellipseIn: CGRect(x: tipPoint.x - 7.5, y: tipPoint.y - 7.5, width: 15, height: 15))
+            context.fill(outerKnob, with: .color(primaryColor))
+            context.stroke(outerKnob, with: .color(Color.white.opacity(0.92)), lineWidth: 1.25)
 
-            let specularDrop = Path(ellipseIn: CGRect(x: tipPoint.x - 3.5, y: tipPoint.y - 3.5, width: 7, height: 7))
-            context.fill(specularDrop, with: .color(Color.white))
+            let innerCore = Path(ellipseIn: CGRect(x: tipPoint.x - 3.5, y: tipPoint.y - 3.5, width: 7, height: 7))
+            context.fill(innerCore, with: .color(Color.white))
         }
     }
 }

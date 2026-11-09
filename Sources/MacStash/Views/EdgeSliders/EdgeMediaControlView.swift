@@ -47,9 +47,11 @@ public struct EdgeMediaControlView: View {
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(isPrevHovered ? .primary : .secondary)
                         .frame(width: 26, height: 26)
-                        .background(
-                            Circle()
-                                .fill(isPrevHovered ? Color.white.opacity(0.18) : Color.clear)
+                        .circularLiquidGlass(
+                            tint: .clear,
+                            specularIntensity: 0.8,
+                            causticOpacity: 0.15,
+                            isHighlighted: isPrevHovered
                         )
                 }
                 .buttonStyle(.plain)
@@ -59,40 +61,18 @@ public struct EdgeMediaControlView: View {
                 // Play / Pause Toggle Button (Middle)
                 Button(action: { nowPlaying.togglePlayPause() }) {
                     ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: nowPlaying.isPlaying ? [
-                                        nowPlaying.artworkTint.opacity(isPlayHovered ? 0.42 : 0.30),
-                                        nowPlaying.artworkSecondaryTint.opacity(isPlayHovered ? 0.24 : 0.14)
-                                    ] : [
-                                        Color.white.opacity(isPlayHovered ? 0.32 : 0.22),
-                                        Color.white.opacity(isPlayHovered ? 0.16 : 0.08)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 34, height: 34)
-                            .overlay(
-                                Circle()
-                                    .stroke(
-                                        nowPlaying.isPlaying ? nowPlaying.artworkTint.opacity(0.45) : Color.white.opacity(0.18),
-                                        lineWidth: 1
-                                    )
-                            )
-                            .shadow(
-                                color: nowPlaying.isPlaying ? nowPlaying.artworkTint.opacity(0.35) : Color.black.opacity(0.25),
-                                radius: 5,
-                                x: 0,
-                                y: 2
-                            )
-
                         Image(systemName: nowPlaying.isPlaying ? "pause.fill" : "play.fill")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(.primary)
                             .offset(x: nowPlaying.isPlaying ? 0 : 1) // optical alignment for play triangle
                     }
+                    .frame(width: 34, height: 34)
+                    .circularLiquidGlass(
+                        tint: nowPlaying.isPlaying ? nowPlaying.artworkTint : .clear,
+                        specularIntensity: 1.2,
+                        causticOpacity: 0.35,
+                        isHighlighted: isPlayHovered
+                    )
                 }
                 .buttonStyle(.plain)
                 .help(nowPlaying.isPlaying ? appState.localized("corners.media.pause") : appState.localized("corners.media.play"))
@@ -104,9 +84,11 @@ public struct EdgeMediaControlView: View {
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(isNextHovered ? .primary : .secondary)
                         .frame(width: 26, height: 26)
-                        .background(
-                            Circle()
-                                .fill(isNextHovered ? Color.white.opacity(0.18) : Color.clear)
+                        .circularLiquidGlass(
+                            tint: .clear,
+                            specularIntensity: 0.8,
+                            causticOpacity: 0.15,
+                            isHighlighted: isNextHovered
                         )
                 }
                 .buttonStyle(.plain)

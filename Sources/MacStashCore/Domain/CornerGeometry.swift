@@ -124,12 +124,14 @@ public enum CornerGeometry {
             return true
         }
 
-        let midY = screen.midY
         let step = max(1.0, tolerancePoints)
-        let probe = CGPoint(x: screen.maxX + step, y: midY)
 
         for other in allScreens where other != screen {
-            if rectContains(other, probe) {
+            // Check if other screen is adjacent or overlapping to the right
+            let isAdjacentRight = (other.minX <= screen.maxX + step) && (other.maxX > screen.maxX)
+            // Check if their vertical spans overlap
+            let verticalOverlap = max(screen.minY, other.minY) < min(screen.maxY, other.maxY)
+            if isAdjacentRight && verticalOverlap {
                 return false
             }
         }
@@ -146,12 +148,14 @@ public enum CornerGeometry {
             return true
         }
 
-        let midY = screen.midY
         let step = max(1.0, tolerancePoints)
-        let probe = CGPoint(x: screen.minX - step, y: midY)
 
         for other in allScreens where other != screen {
-            if rectContains(other, probe) {
+            // Check if other screen is adjacent or overlapping to the left
+            let isAdjacentLeft = (other.maxX >= screen.minX - step) && (other.minX < screen.minX)
+            // Check if their vertical spans overlap
+            let verticalOverlap = max(screen.minY, other.minY) < min(screen.maxY, other.maxY)
+            if isAdjacentLeft && verticalOverlap {
                 return false
             }
         }

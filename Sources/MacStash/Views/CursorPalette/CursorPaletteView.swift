@@ -4,7 +4,8 @@ import MacStashCore
 
 /// Floating radial palette that blooms directly at the current mouse cursor location.
 /// Designed for Ultrawide monitors and power users to adjust Volume, Brightness,
-/// Keep-Awake, and Pomodoro Timer without moving the mouse all the way to screen corners.
+/// Keep-Awake, and Pomodoro Timer without moving the mouse all the way to screen corners,
+/// elevated with Apple Liquid Glass optical shading.
 public struct CursorPaletteView: View {
     @ObservedObject var appState: AppState
 
@@ -25,22 +26,17 @@ public struct CursorPaletteView: View {
 
     public var body: some View {
         ZStack {
-            // Backdrop Disc
+            // Liquid Glass Backdrop Compass Disc
             Circle()
-                .fill(.ultraThinMaterial)
+                .fill(.clear)
                 .frame(width: paletteRadius * 2, height: paletteRadius * 2)
-                .shadow(color: Color.black.opacity(0.35), radius: 18, x: 0, y: 6)
-                .overlay(
-                    Circle()
-                        .stroke(
-                            LinearGradient(
-                                colors: [Color.white.opacity(0.28), Color.white.opacity(0.08)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.5
-                        )
+                .circularLiquidGlass(
+                    tint: activeCausticTint,
+                    specularIntensity: 1.2,
+                    causticOpacity: 0.22,
+                    isHighlighted: hoveredSector != nil
                 )
+                .animation(.spring(response: 0.28, dampingFraction: 0.76), value: hoveredSector)
 
             // 4 Radial Sectors
             // 1. TOP: Brightness
@@ -87,28 +83,38 @@ public struct CursorPaletteView: View {
                 appState.toggleAction(.timer)
             }
 
-            // Center Badge: Dismiss / Stash Anchor
+            // Center Glass Jewel: Dismiss / Stash Anchor
             Button(action: {
                 withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
                     appState.isCursorPalettePresented = false
                 }
             }) {
                 ZStack {
-                    Circle()
-                        .fill(.ultraThickMaterial)
-                        .frame(width: 44, height: 44)
-                        .overlay(Circle().stroke(Color.white.opacity(0.18), lineWidth: 1))
-                        .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
-
                     Image(systemName: "xmark")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(.secondary)
                 }
+                .frame(width: 44, height: 44)
+                .circularLiquidGlass(
+                    tint: .clear,
+                    specularIntensity: 0.9,
+                    causticOpacity: 0.15
+                )
             }
             .buttonStyle(.plain)
             .help("Close Palette (Esc)")
         }
-        .frame(width: paletteRadius * 2 + 20, height: paletteRadius * 2 + 20)
+        .frame(width: paletteRadius * 2 + 24, height: paletteRadius * 2 + 24)
+    }
+
+    private var activeCausticTint: Color {
+        switch hoveredSector {
+        case .top: return Color.orange
+        case .right: return Color.blue
+        case .bottom: return Color.orange
+        case .left: return Color.purple
+        case .none: return Color.clear
+        }
     }
 
     private func sectorButton(
@@ -132,18 +138,34 @@ public struct CursorPaletteView: View {
                             endPoint: .bottom
                         )
                     )
+                    .shadow(color: isHovered ? (colors.first ?? .clear).opacity(0.4) : .clear, radius: 4, x: 0, y: 0)
 
                 Text(title)
                     .font(.system(size: 9, weight: .bold, design: .monospaced))
                     .foregroundColor(.primary)
             }
-            .frame(width: 52, height: 42)
+            .frame(width: 56, height: 46)
             .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(isHovered ? Color.white.opacity(0.15) : Color.clear)
+                ZStack {
+                    if isHovered {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color.white.opacity(0.14))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [Color.white.opacity(0.4), (colors.first ?? Color.white).opacity(0.3)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.0
+                                    )
+                            )
+                    }
+                }
             )
-            .scaleEffect(isHovered ? 1.08 : 1.0)
-            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isHovered)
+            .scaleEffect(isHovered ? 1.10 : 1.0)
+            .animation(.spring(response: 0.22, dampingFraction: 0.72), value: isHovered)
         }
         .buttonStyle(.plain)
         .offset(offset)

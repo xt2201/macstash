@@ -13,7 +13,13 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
     public init(rootView: LeftEdgeContainerView, appState: AppState) {
         self.appState = appState
         super.init(rootView: rootView)
-        registerForDraggedTypes([.fileURL, .string, .URL])
+        registerForDraggedTypes([
+            .fileURL,
+            .string,
+            .URL,
+            .html,
+            NSPasteboard.PasteboardType("NSFilenamesPboardType")
+        ])
     }
 
     @available(*, unavailable)
@@ -50,18 +56,20 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
 
         // When shelf or scratchpad is actively open, route clicks within drawer bounds
         if shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen {
-            let activeDrawerWidth: CGFloat = 330.0
-            let activeRect = NSRect(x: bounds.minX, y: bounds.minY, width: activeDrawerWidth, height: bounds.height)
+            let activeDrawerWidth: CGFloat = scratchpad.isScratchpadOpen ? 370.0 : 335.0
+            let activeHeight: CGFloat = scratchpad.isScratchpadOpen ? 400.0 : 485.0
+            let activeY = (bounds.height - activeHeight) / 2.0
+            let activeRect = NSRect(x: bounds.minX, y: activeY, width: activeDrawerWidth, height: activeHeight)
             if activeRect.contains(point) {
                 return super.hitTest(point)
             }
             return nil
         }
 
-        // When collapsed, only hit test the subtle peek tab vertically centered along the left edge
-        let handleHeight: CGFloat = 64.0
+        // When collapsed, hit test the peek handle zone along the left edge
+        let handleHeight: CGFloat = 84.0
         let handleY = (bounds.height - handleHeight) / 2.0
-        let triggerRect = NSRect(x: bounds.minX, y: handleY, width: 22.0, height: handleHeight)
+        let triggerRect = NSRect(x: bounds.minX, y: handleY, width: 44.0, height: handleHeight)
 
         if triggerRect.contains(point) {
             return super.hitTest(point)
@@ -86,9 +94,11 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
             return []
         }
 
-        shelf.isShelfOpen = true
+        if !shelf.isShelfOpen {
+            shelf.isShelfOpen = true
+            HapticManager.shared.performDetentTick()
+        }
         shelf.isDropTargetActive = true
-        HapticManager.shared.performDetentTick()
         return .copy
     }
 
@@ -104,12 +114,29 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
         shelf.isDropTargetActive = false
         let pasteboard = sender.draggingPasteboard
 
+        // 1. Direct file URLs
         if let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL], !urls.isEmpty {
             shelf.addFileURLs(urls)
             return true
         }
 
+        // 2. Legacy NSFilenamesPboardType (from older macOS apps or cross-platform drop sources)
+        if let filenames = pasteboard.propertyList(forType: NSPasteboard.PasteboardType("NSFilenamesPboardType")) as? [String], !filenames.isEmpty {
+            let urls = filenames.map { URL(fileURLWithPath: $0) }
+            shelf.addFileURLs(urls)
+            return true
+        }
+
+        // 3. String content (can be a file path, file:// URL, web link, or text snippet)
         if let strings = pasteboard.readObjects(forClasses: [NSString.self], options: nil) as? [String], let first = strings.first {
+            let trimmed = first.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.hasPrefix("/") && FileManager.default.fileExists(atPath: trimmed) {
+                shelf.addFileURLs([URL(fileURLWithPath: trimmed)])
+                return true
+            } else if trimmed.hasPrefix("file://"), let fileURL = URL(string: trimmed), fileURL.isFileURL {
+                shelf.addFileURLs([fileURL])
+                return true
+            }
             shelf.addTextSnippet(first)
             return true
         }

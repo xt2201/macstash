@@ -4,7 +4,7 @@ import MacStashCore
 /// EdgeBar vertical slider view that slides out from the physical screen edge.
 /// When configured for Volume action, seamlessly hosts the vertical Now Playing
 /// media controller directly below the slider with artwork, dancing visualizer,
-/// and vertical playback controls.
+/// and vertical playback controls, styled with Apple Liquid Glass aesthetics.
 public struct EdgeSliderView: View {
     @ObservedObject var appState: AppState
     public let displayID: CGDirectDisplayID
@@ -48,7 +48,7 @@ public struct EdgeSliderView: View {
 
     public var body: some View {
         let isVisible = appState.isEnabled && appState.isEdgeSlidersEnabled && action != .none
-        let isExpanded = isDragging || appState.isRightSliderActive
+        let isExpanded = isDragging || (appState.isRightSliderActive && (appState.activeDisplayID == displayID || appState.activeDisplayID == 0))
 
         ZStack(alignment: edge == .right ? .trailing : .leading) {
             if isVisible {
@@ -88,46 +88,34 @@ public struct EdgeSliderView: View {
                                 : AnyShapeStyle(LinearGradient(colors: action.accentColors, startPoint: .top, endPoint: .bottom))
                         )
                         .frame(width: 32, height: 32)
+                        .circularLiquidGlass(
+                            tint: (action == .volume && appState.audio.isMuted) ? .red : (action.accentColors.first ?? .clear),
+                            specularIntensity: 0.8,
+                            causticOpacity: 0.15
+                        )
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .help((action == .volume && appState.audio.isMuted) ? appState.localized("menubar.unmute") : appState.localized("menubar.mute"))
                 .padding(.top, 8)
 
-                // Vertical Track Bar (wide interactive hit zone around sleek 14pt track capsule)
+                // Precision Crystal Tube Liquid Track
                 GeometryReader { geo in
                     let trackH = max(1, geo.size.height)
-                    let fillH = trackH * CGFloat(currentValue)
 
-                    ZStack(alignment: .bottom) {
-                        // Full-width invisible hit zone so vertical drag never slips off the narrow track
+                    ZStack {
+                        // High-fidelity liquid track
+                        LiquidVerticalTrack(
+                            progress: Double(currentValue),
+                            primaryTint: action.accentColors.first ?? .cyan,
+                            secondaryTint: action.accentColors.last ?? .blue,
+                            trackWidth: 15,
+                            isMuted: action == .volume && appState.audio.isMuted
+                        )
+
+                        // Full-width hit zone so gesture never slips off
                         Color.clear
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                        // Visual Track background
-                        Capsule()
-                            .fill(Color.white.opacity(0.12))
-                            .frame(width: 14)
-
-                        // Fill level
-                        Capsule()
-                            .fill(
-                                (action == .volume && appState.audio.isMuted)
-                                    ? LinearGradient(colors: [Color.red.opacity(0.8), Color.red.opacity(0.5)], startPoint: .top, endPoint: .bottom)
-                                    : LinearGradient(colors: action.accentColors, startPoint: .top, endPoint: .bottom)
-                            )
-                            .frame(width: 14, height: max(6, fillH))
-
-                        // Thumb indicator
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 14, height: 14)
-                            .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 1)
-                            .offset(y: -(fillH - 7))
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .transaction { transaction in
-                        transaction.animation = nil
                     }
                     .contentShape(Rectangle())
                     .gesture(
@@ -150,7 +138,7 @@ public struct EdgeSliderView: View {
                 .frame(width: 44, height: shouldShowMediaControls ? 110 : 140)
                 .padding(.horizontal, 3)
 
-                // Percentage / MUTE label
+                // Percentage / MUTE label with monospaced tabular figures
                 if action == .volume && appState.audio.isMuted {
                     Text("MUTE")
                         .font(.system(size: 11, weight: .bold, design: .rounded))
@@ -158,7 +146,7 @@ public struct EdgeSliderView: View {
                         .padding(.bottom, shouldShowMediaControls ? 6 : 12)
                 } else {
                     Text("\(Int(currentValue * 100))%")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .foregroundColor(.primary)
                         .padding(.bottom, shouldShowMediaControls ? 6 : 12)
                 }
@@ -168,7 +156,13 @@ public struct EdgeSliderView: View {
             if shouldShowMediaControls {
                 // Subtle glass divider
                 Rectangle()
-                    .fill(Color.white.opacity(0.15))
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.2), Color.white.opacity(0.02)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .frame(width: 32, height: 1)
                     .padding(.vertical, 4)
 
@@ -177,21 +171,12 @@ public struct EdgeSliderView: View {
             }
         }
         .frame(width: sliderWidth, height: containerHeight)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.32), radius: 14, x: edge == .right ? -4 : 4, y: 4)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.3), Color.white.opacity(0.05)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
-                )
+        .liquidGlass(
+            cornerRadius: 18,
+            tint: action.accentColors.first ?? .clear,
+            specularIntensity: 1.1,
+            causticOpacity: 0.18,
+            shadowRadius: 16
         )
     }
 }

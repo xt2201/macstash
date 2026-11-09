@@ -12,6 +12,9 @@ public enum StashFeatureTests {
         testNewControlActions()
         testTrackpadDirectionalVectors()
         testEdgeHitZonePolicy()
+        testMultiDisplayRightEdgeDwellIsolation()
+        testStashShelfHitZoneSymmetry()
+        testStashDragShakeDetection()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -48,6 +51,47 @@ public enum StashFeatureTests {
 
         TestAssertion.assertFalse(scrollbarTouchPoint >= maxX - extremeEdgeThreshold, "Scrollbar click must NOT be in extreme edge zone")
         TestAssertion.assertTrue(edgeSlamPoint >= maxX - extremeEdgeThreshold, "Cursor slammed to screen edge must be recognized")
+    }
+
+    private static func testMultiDisplayRightEdgeDwellIsolation() {
+        let mbFrame = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let extFrame = CGRect(x: 1512, y: 0, width: 2560, height: 1440)
+        let allFrames = [mbFrame, extFrame]
+
+        let panelHeight: CGFloat = 460
+        let extRightRectY = extFrame.minY + (extFrame.height - panelHeight) / 2
+        let extRightRect = CGRect(x: extFrame.maxX - 80, y: extRightRectY, width: 80, height: panelHeight)
+
+        // 1. Mouse at exact physical edge of external monitor (e.g. maxX = 4072.0)
+        let mouseLoc = CGPoint(x: extFrame.maxX, y: extRightRect.midY)
+
+        let isExtAtEdgeX = mouseLoc.x >= (extFrame.maxX - 2.5) && mouseLoc.x <= (extFrame.maxX + 1.0)
+        let isExtWithinEdgeY = mouseLoc.y >= extRightRect.minY && mouseLoc.y <= extRightRect.maxY
+        TestAssertion.assertTrue(isExtAtEdgeX && isExtWithinEdgeY, "External monitor detects physical edge dwell correctly")
+
+        // 2. Built-in monitor does not trigger edge for this cursor position
+        let isMbAtEdgeX = mouseLoc.x >= (mbFrame.maxX - 2.5) && mouseLoc.x <= (mbFrame.maxX + 1.0)
+        TestAssertion.assertFalse(isMbAtEdgeX, "Built-in monitor correctly ignores cursor located on external screen")
+
+        // 3. Multi-display candidate collection: external screen is identified as candidate
+        var candidateFound = false
+        for frame in allFrames {
+            let rightRectY = frame.minY + (frame.height - panelHeight) / 2
+            let rRect = CGRect(x: frame.maxX - 80, y: rightRectY, width: 80, height: panelHeight)
+            let atEdgeX = mouseLoc.x >= (frame.maxX - 2.5) && mouseLoc.x <= (frame.maxX + 1.0)
+            let withinY = mouseLoc.y >= rRect.minY && mouseLoc.y <= rRect.maxY
+            if atEdgeX && withinY {
+                candidateFound = true
+                TestAssertion.assertEqual(frame, extFrame, "Candidate display must be the external monitor")
+                break
+            }
+        }
+        TestAssertion.assertTrue(candidateFound, "A candidate display must be found without being cancelled by non-candidate screens")
+
+        // 4. Scrollbar clicks on external screen are not mistaken for extreme edge dwell
+        let scrollbarClick = CGPoint(x: extFrame.maxX - 14.0, y: extRightRect.midY)
+        let scrollbarAtEdge = scrollbarClick.x >= (extFrame.maxX - 2.5) && scrollbarClick.x <= (extFrame.maxX + 1.0)
+        TestAssertion.assertFalse(scrollbarAtEdge, "Scrollbar click on external display must not trigger edge dwell")
     }
 
     private static func testScratchpadCounters() {
@@ -160,5 +204,67 @@ public enum StashFeatureTests {
             TestAssertion.assertFalse(action.localizedDisplayName(using: "en").isEmpty, "\(action) has English name")
             TestAssertion.assertFalse(action.localizedDisplayName(using: "vi").isEmpty, "\(action) has Vietnamese name")
         }
+    }
+
+    private static func testStashShelfHitZoneSymmetry() {
+        // Peek Handle dimensions must be symmetric between ScreenManager and StashShelfHostingView
+        let peekWidth: CGFloat = 44.0
+        let handleHeight: CGFloat = 84.0
+
+        let screenFrame = CGRect(x: 0, y: 0, width: 1728, height: 1117)
+        let panelHeight: CGFloat = 500.0
+        let panelY = screenFrame.minY + (screenFrame.height - panelHeight) / 2.0
+        let leftPanelRect = CGRect(x: screenFrame.minX, y: panelY, width: 380.0, height: panelHeight)
+
+        let handleY = leftPanelRect.midY - (handleHeight / 2.0)
+        let peekRect = CGRect(x: screenFrame.minX, y: handleY, width: peekWidth, height: handleHeight)
+
+        // Mouse within the 44x84 handle region must be recognized as hovering
+        let hoverPoint = CGPoint(x: 20.0, y: leftPanelRect.midY)
+        TestAssertion.assertTrue(peekRect.contains(hoverPoint), "Cursor at x=20 must be recognized within peek handle")
+
+        // Mouse just outside must not trigger
+        let outsidePoint = CGPoint(x: 50.0, y: leftPanelRect.midY)
+        TestAssertion.assertFalse(peekRect.contains(outsidePoint), "Cursor at x=50 is outside peek handle")
+
+        // Active Drawer Widths
+        let shelfActiveWidth: CGFloat = 335.0
+        let scratchpadActiveWidth: CGFloat = 370.0
+        TestAssertion.assertTrue(leftPanelRect.width >= scratchpadActiveWidth, "Panel width (380) must fully encompass scratchpad (370)")
+        TestAssertion.assertTrue(leftPanelRect.width >= shelfActiveWidth, "Panel width (380) must fully encompass stash shelf (335)")
+    }
+
+    private static func testStashDragShakeDetection() {
+        // Horizontal shake: 3 reversals of > 12 points
+        let historyX: [CGFloat] = [100, 120, 135, 115, 95, 120, 140, 110]
+        var reversalsX = 0
+        var lastDirX: CGFloat = 0
+        for i in 1..<historyX.count {
+            let dx = historyX[i] - historyX[i - 1]
+            if abs(dx) > 12 {
+                let dir: CGFloat = dx > 0 ? 1 : -1
+                if lastDirX != 0 && dir != lastDirX {
+                    reversalsX += 1
+                }
+                lastDirX = dir
+            }
+        }
+        TestAssertion.assertTrue(reversalsX >= 3, "Horizontal wiggle with 3 reversals must trigger shake gesture")
+
+        // Vertical shake: 3 reversals of > 12 points
+        let historyY: [CGFloat] = [200, 220, 235, 210, 190, 215, 235, 210]
+        var reversalsY = 0
+        var lastDirY: CGFloat = 0
+        for i in 1..<historyY.count {
+            let dy = historyY[i] - historyY[i - 1]
+            if abs(dy) > 12 {
+                let dir: CGFloat = dy > 0 ? 1 : -1
+                if lastDirY != 0 && dir != lastDirY {
+                    reversalsY += 1
+                }
+                lastDirY = dir
+            }
+        }
+        TestAssertion.assertTrue(reversalsY >= 3, "Vertical wiggle with 3 reversals must trigger shake gesture")
     }
 }

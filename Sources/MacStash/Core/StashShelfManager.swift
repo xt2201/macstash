@@ -107,6 +107,7 @@ public final class StashShelfManager: ObservableObject {
 
     public func clearAll() {
         items.removeAll()
+        StashIconCache.shared.clear()
         HapticManager.shared.performBoundaryClick()
     }
 
@@ -138,8 +139,10 @@ public final class StashShelfManager: ObservableObject {
     }
 
     public func createItemProvider(for item: StashItem) -> NSItemProvider {
-        if let url = item.sourceURL, item.itemType == .file || item.itemType == .image {
-            return NSItemProvider(contentsOf: url) ?? NSItemProvider(object: url as NSURL)
+        if let url = item.sourceURL, (item.itemType == .file || item.itemType == .image) {
+            let provider = NSItemProvider(object: url as NSURL)
+            provider.suggestedName = item.title
+            return provider
         }
         if let text = item.stringContent {
             return NSItemProvider(object: text as NSString)

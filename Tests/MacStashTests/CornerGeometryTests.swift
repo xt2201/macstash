@@ -11,6 +11,7 @@ public enum CornerGeometryTests {
         testHitZoneVertexContainment()
         testDirectCornerIsOuterCorner()
         testOuterRightEdge()
+        testOuterLeftEdge()
     }
 
     private static func testSingleDisplayAllCornersAreOuter() {
@@ -131,5 +132,28 @@ public enum CornerGeometryTests {
         let stacked = [d1, d3]
         TestAssertion.assertTrue(CornerGeometry.isOuterRightEdge(screen: d1, in: stacked))
         TestAssertion.assertTrue(CornerGeometry.isOuterRightEdge(screen: d3, in: stacked))
+
+        // Vertically offset dual monitors (MacBook 982pt tall and External 1440pt tall offset upwards)
+        let mb = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let extOffset = CGRect(x: 1512, y: 400, width: 2560, height: 1440)
+        let offsetDual = [mb, extOffset]
+        TestAssertion.assertFalse(CornerGeometry.isOuterRightEdge(screen: mb, in: offsetDual), "MB right edge touches ext screen even with vertical offset")
+        TestAssertion.assertTrue(CornerGeometry.isOuterRightEdge(screen: extOffset, in: offsetDual), "Ext right edge is outer right boundary")
+    }
+
+    private static func testOuterLeftEdge() {
+        let d1 = CGRect(x: 0, y: 0, width: 1920, height: 1080)
+        let d2 = CGRect(x: 1920, y: 0, width: 1920, height: 1080)
+        let dual = [d1, d2]
+
+        TestAssertion.assertTrue(CornerGeometry.isOuterLeftEdge(screen: d1, in: dual), "d1 left edge is physical outer boundary")
+        TestAssertion.assertFalse(CornerGeometry.isOuterLeftEdge(screen: d2, in: dual), "d2 left edge touches d1")
+
+        // Vertically offset dual monitors
+        let mb = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let extOffset = CGRect(x: 1512, y: 400, width: 2560, height: 1440)
+        let offsetDual = [mb, extOffset]
+        TestAssertion.assertTrue(CornerGeometry.isOuterLeftEdge(screen: mb, in: offsetDual), "MB left edge is outer")
+        TestAssertion.assertFalse(CornerGeometry.isOuterLeftEdge(screen: extOffset, in: offsetDual), "Ext left edge touches MB")
     }
 }

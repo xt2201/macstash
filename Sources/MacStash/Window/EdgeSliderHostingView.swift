@@ -7,15 +7,18 @@ import MacStashCore
 /// mouse events when hovered, active, or dragging.
 public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
     private let appState: AppState
+    public let displayID: CGDirectDisplayID
     private let edge: EdgePosition
     private var scrollEndWorkItem: DispatchWorkItem?
 
     public init(
         rootView: EdgeSliderView,
         appState: AppState,
+        displayID: CGDirectDisplayID = 0,
         edge: EdgePosition = .right
     ) {
         self.appState = appState
+        self.displayID = displayID
         self.edge = edge
         super.init(rootView: rootView)
     }
@@ -61,6 +64,9 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
 
         // When slider is active (expanded), intercept mouse events within the 80pt slider panel
         if appState.isRightSliderActive {
+            if appState.activeDisplayID != 0 && appState.activeDisplayID != displayID {
+                return nil
+            }
             return super.hitTest(point)
         }
 

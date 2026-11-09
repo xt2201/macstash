@@ -63,8 +63,12 @@ public struct SettingsView: View {
                         .padding(.vertical, 8)
                         .padding(.horizontal, 10)
                         .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(selectedTab == tab ? Color.accentColor.opacity(0.12) : Color.clear)
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(selectedTab == tab ? Color.accentColor.opacity(0.14) : Color.clear)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(selectedTab == tab ? Color.accentColor.opacity(0.35) : Color.clear, lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)

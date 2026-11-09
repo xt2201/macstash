@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// An audio-reactive equalizer waveform visualizer styled after Apple's Dynamic Island & Vorssaint.
-/// Renders 5 vertical bars that dance to the rhythm of the playing audio and dynamically adopt
+/// Renders 5 vertical liquid fluid bars that dance to the rhythm of the playing audio and dynamically adopt
 /// the dominant color tint extracted from the current track's album artwork.
 public struct DancingVisualizerView: View {
     public let isPlaying: Bool
@@ -34,23 +34,37 @@ public struct DancingVisualizerView: View {
         HStack(alignment: .center, spacing: barSpacing) {
             ForEach(0..<barCount, id: \.self) { index in
                 let h = computeBarHeight(index: index)
-                Capsule(style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [primaryTint, secondaryTint],
-                            startPoint: .bottom,
-                            endPoint: .top
+                ZStack(alignment: .top) {
+                    Capsule(style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [primaryTint.opacity(0.85), secondaryTint],
+                                startPoint: .bottom,
+                                endPoint: .top
+                            )
                         )
-                    )
-                    .frame(width: barWidth, height: h)
-                    .shadow(
-                        color: isPlaying ? primaryTint.opacity(0.45) : .clear,
-                        radius: 2.5,
-                        x: 0,
-                        y: 0
-                    )
-                    .animation(.spring(response: 0.15, dampingFraction: 0.72), value: h)
-                    .animation(.easeInOut(duration: 0.35), value: primaryTint)
+                        .frame(width: barWidth, height: h)
+
+                    // Luminous liquid meniscus cap
+                    if isPlaying && h > idleHeight + 2 {
+                        Circle()
+                            .fill(Color.white.opacity(0.8))
+                            .frame(width: barWidth - 0.8, height: barWidth - 0.8)
+                            .padding(.top, 0.6)
+                    }
+                }
+                .overlay(
+                    Capsule(style: .continuous)
+                        .stroke(Color.white.opacity(isPlaying ? 0.35 : 0.12), lineWidth: 0.5)
+                )
+                .shadow(
+                    color: isPlaying ? primaryTint.opacity(0.55) : .clear,
+                    radius: 3.5,
+                    x: 0,
+                    y: 0
+                )
+                .animation(.spring(response: 0.15, dampingFraction: 0.72), value: h)
+                .animation(.easeInOut(duration: 0.35), value: primaryTint)
             }
         }
         .frame(height: maxHeight)

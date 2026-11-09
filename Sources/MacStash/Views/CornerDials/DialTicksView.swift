@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Draws delicate radial tick marks around the dial arc
+/// Draws delicate laser-etched radial tick marks around the dial arc that illuminate
+/// as luminous liquid fills the gauge.
 public struct DialTicksView: View {
     public let geometry: RadialDialGeometry
     public let value: Double
@@ -20,6 +21,7 @@ public struct DialTicksView: View {
                 let deg = geometry.angle(for: frac)
                 let isMajor = (i % 4 == 0)
                 let isActive = frac <= value
+                let isAtMeniscus = abs(frac - value) < 0.06
 
                 let rInner = geometry.outerRadius - (isMajor ? 16 : 9)
                 let rOuter = geometry.outerRadius
@@ -31,14 +33,37 @@ public struct DialTicksView: View {
                 path.move(to: p1)
                 path.addLine(to: p2)
 
-                let color = isActive ? accentColor : Color.white.opacity(isMajor ? 0.35 : 0.15)
-                let lineWidth: CGFloat = isMajor ? 2.0 : 1.2
-
-                context.stroke(
-                    path,
-                    with: .color(color),
-                    lineWidth: lineWidth
-                )
+                if isActive {
+                    // Luminous illuminated notch with subtle optical bloom
+                    if isAtMeniscus {
+                        // Specular glisten at the liquid meniscus
+                        context.stroke(
+                            path,
+                            with: .color(Color.white),
+                            lineWidth: isMajor ? 2.6 : 1.8
+                        )
+                    } else {
+                        // Soft glow under-layer
+                        context.stroke(
+                            path,
+                            with: .color(accentColor.opacity(0.4)),
+                            lineWidth: isMajor ? 3.0 : 2.0
+                        )
+                        // Sharp glowing core
+                        context.stroke(
+                            path,
+                            with: .color(accentColor),
+                            lineWidth: isMajor ? 1.8 : 1.2
+                        )
+                    }
+                } else {
+                    // Laser-etched frosted groove on inactive glass surface
+                    context.stroke(
+                        path,
+                        with: .color(Color.white.opacity(isMajor ? 0.32 : 0.12)),
+                        lineWidth: isMajor ? 1.6 : 1.0
+                    )
+                }
             }
         }
     }

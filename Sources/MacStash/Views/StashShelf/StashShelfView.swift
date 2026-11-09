@@ -2,14 +2,13 @@ import SwiftUI
 import AppKit
 import MacStashCore
 
-/// Tactile Drop Shelf view that slides out from the screen edge to temporarily hold
-/// files, images, URLs, and text snippets when dragging across spaces, displays, or apps.
+/// Tactile Drop Shelf view elevated with Apple Liquid Glass optical shading.
+/// Slides out from the screen edge to temporarily hold files, images, URLs, and text snippets
+/// with dynamic refraction, liquid drop ripples, and glass tile elevation.
 public struct StashShelfView: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var shelf = StashShelfManager.shared
 
-    @State private var isTargeted: Bool = false
-    @State private var hoveredItemID: UUID? = nil
     @State private var selectedItemID: UUID? = nil
     @State private var copyFeedback: Bool = false
 
@@ -20,14 +19,27 @@ public struct StashShelfView: View {
     }
 
     public var body: some View {
+        let isDropActive = shelf.isDropTargetActive
+
         VStack(spacing: 0) {
-            // 1. Header Bar
+            // 1. Liquid Glass Header Bar
             headerBar
 
             Divider()
-                .background(Color.white.opacity(0.12))
+                .background(
+                    LinearGradient(
+                        colors: [Color.cyan.opacity(0.35), Color.white.opacity(0.06)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
 
-            // 2. Body List / Drop Zone
+            // 2. Drop banner when dragging over existing items
+            if isDropActive && !shelf.items.isEmpty {
+                dropBanner
+            }
+
+            // 3. Body List / Drop Zone
             if shelf.items.isEmpty {
                 emptyDropZone
             } else {
@@ -35,24 +47,15 @@ public struct StashShelfView: View {
             }
         }
         .frame(width: shelfWidth, height: 470)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.35), radius: 20, x: 4, y: 6)
+        .liquidGlass(
+            cornerRadius: 20,
+            tint: isDropActive ? .cyan : .clear,
+            specularIntensity: 1.15,
+            causticOpacity: isDropActive ? 0.28 : 0.12,
+            shadowRadius: 22,
+            isHighlighted: isDropActive
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(
-                    LinearGradient(
-                        colors: (isTargeted || shelf.isDropTargetActive)
-                            ? [Color.cyan, Color.blue]
-                            : [Color.white.opacity(0.25), Color.white.opacity(0.06)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: (isTargeted || shelf.isDropTargetActive) ? 2.0 : 1.0
-                )
-        )
+        .animation(.spring(response: 0.28, dampingFraction: 0.78), value: isDropActive)
     }
 
     // MARK: - Header Bar
@@ -62,6 +65,7 @@ public struct StashShelfView: View {
             Image(systemName: "tray.2.fill")
                 .font(.system(size: 13, weight: .bold))
                 .foregroundColor(.cyan)
+                .shadow(color: Color.cyan.opacity(0.4), radius: 3, x: 0, y: 0)
 
             Text("STASH SHELF")
                 .font(.system(size: 11, weight: .bold, design: .rounded))
@@ -75,6 +79,7 @@ public struct StashShelfView: View {
                         .padding(.horizontal, 6)
                         .padding(.vertical, 1.5)
                         .background(Capsule().fill(Color.cyan))
+                        .shadow(color: Color.cyan.opacity(0.4), radius: 4, x: 0, y: 1)
 
                     if !shelf.totalFormattedSize.isEmpty {
                         Text(shelf.totalFormattedSize)
@@ -98,10 +103,12 @@ public struct StashShelfView: View {
                     Image(systemName: copyFeedback ? "checkmark" : "doc.on.doc")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(copyFeedback ? .green : .secondary)
-                        .frame(width: 24, height: 24)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                .fill(Color.white.opacity(0.08))
+                        .frame(width: 26, height: 26)
+                        .circularLiquidGlass(
+                            tint: copyFeedback ? .green : .clear,
+                            specularIntensity: 0.8,
+                            causticOpacity: 0.2,
+                            isHighlighted: copyFeedback
                         )
                 }
                 .buttonStyle(.plain)
@@ -116,10 +123,11 @@ public struct StashShelfView: View {
                     Image(systemName: "trash")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.secondary)
-                        .frame(width: 24, height: 24)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                .fill(Color.white.opacity(0.08))
+                        .frame(width: 26, height: 26)
+                        .circularLiquidGlass(
+                            tint: .clear,
+                            specularIntensity: 0.8,
+                            causticOpacity: 0.15
                         )
                 }
                 .buttonStyle(.plain)
@@ -132,10 +140,15 @@ public struct StashShelfView: View {
                     shelf.closeShelf()
                 }
             }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.secondary.opacity(0.8))
-                    .frame(width: 24, height: 24)
+                Image(systemName: "xmark")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.secondary)
+                    .frame(width: 26, height: 26)
+                    .circularLiquidGlass(
+                        tint: .clear,
+                        specularIntensity: 0.8,
+                        causticOpacity: 0.15
+                    )
             }
             .buttonStyle(.plain)
             .help("Close Shelf (Esc)")
@@ -144,29 +157,77 @@ public struct StashShelfView: View {
         .padding(.vertical, 10)
     }
 
-    // MARK: - Empty Drop Zone
+    // MARK: - Drop Target Banner (Visible when dragging over populated list)
+
+    private var dropBanner: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "plus.circle.fill")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.cyan)
+
+            Text("Drop here to stash")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(.cyan)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.cyan.opacity(0.18))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color.cyan.opacity(0.55), lineWidth: 1.0)
+        )
+        .padding(.horizontal, 10)
+        .padding(.top, 8)
+        .transition(.move(edge: .top).combined(with: .opacity))
+    }
+
+    // MARK: - Empty Drop Zone (Liquid Ripple Aura)
 
     private var emptyDropZone: some View {
-        VStack(spacing: 12) {
+        let isDropActive = shelf.isDropTargetActive
+
+        return VStack(spacing: 12) {
             Spacer()
 
             ZStack {
+                // Expanding liquid ripple rings when drop is active
+                if isDropActive {
+                    Circle()
+                        .stroke(Color.cyan.opacity(0.35), lineWidth: 2)
+                        .frame(width: 84, height: 84)
+                        .scaleEffect(1.1)
+                }
+
                 Circle()
                     .stroke(
-                        Color.cyan.opacity(shelf.isDropTargetActive ? 0.8 : 0.25),
-                        style: StrokeStyle(lineWidth: 1.5, dash: [4, 4])
+                        LinearGradient(
+                            colors: isDropActive
+                                ? [Color.cyan, Color.blue]
+                                : [Color.white.opacity(0.3), Color.white.opacity(0.08)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        style: StrokeStyle(lineWidth: isDropActive ? 2.0 : 1.5, dash: isDropActive ? [] : [4, 4])
                     )
-                    .frame(width: 64, height: 64)
+                    .frame(width: 66, height: 66)
+                    .background(
+                        Circle()
+                            .fill(isDropActive ? Color.cyan.opacity(0.15) : Color.white.opacity(0.03))
+                    )
+                    .shadow(color: isDropActive ? Color.cyan.opacity(0.5) : Color.clear, radius: 10, x: 0, y: 0)
 
-                Image(systemName: shelf.isDropTargetActive ? "arrow.down.circle.fill" : "arrow.down.doc")
+                Image(systemName: isDropActive ? "arrow.down.circle.fill" : "arrow.down.doc")
                     .font(.system(size: 26, weight: .light))
-                    .foregroundColor(shelf.isDropTargetActive ? .cyan : .secondary.opacity(0.7))
-                    .scaleEffect(shelf.isDropTargetActive ? 1.15 : 1.0)
-                    .animation(.spring(response: 0.25, dampingFraction: 0.65), value: shelf.isDropTargetActive)
+                    .foregroundColor(isDropActive ? .cyan : .secondary.opacity(0.7))
+                    .scaleEffect(isDropActive ? 1.15 : 1.0)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.65), value: isDropActive)
             }
 
             VStack(spacing: 4) {
-                Text(shelf.isDropTargetActive ? "Release to Stash" : "Drop Files or Text Here")
+                Text(isDropActive ? "Release to Stash" : "Drop Files or Text Here")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(.primary)
 
@@ -187,36 +248,55 @@ public struct StashShelfView: View {
 
     private var itemsListView: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack(spacing: 6) {
+            VStack(spacing: 6) {
                 ForEach(shelf.items) { item in
-                    stashItemCard(item: item)
+                    StashItemCardView(
+                        item: item,
+                        isSelected: selectedItemID == item.id,
+                        onSelect: { selectedItemID = item.id },
+                        onOpen: { shelf.openItem(id: item.id) },
+                        onReveal: { shelf.revealInFinder(id: item.id) },
+                        onCopyPath: { shelf.copyPathToClipboard(id: item.id) },
+                        onRemove: {
+                            withAnimation(.spring(response: 0.22, dampingFraction: 0.8)) {
+                                shelf.removeItem(id: item.id)
+                            }
+                        },
+                        itemProvider: { shelf.createItemProvider(for: item) }
+                    )
                 }
             }
             .padding(10)
         }
     }
+}
 
-    // MARK: - Stash Item Card (Clean Separation of Drag vs Button Hit Areas)
+// MARK: - Isolated Stash Item Card View (High Performance, Zero Cross-Row Re-render)
 
-    private func stashItemCard(item: StashItem) -> some View {
-        let isHovered = hoveredItemID == item.id
-        let isSelected = selectedItemID == item.id
+private struct StashItemCardView: View {
+    let item: StashItem
+    let isSelected: Bool
+    let onSelect: () -> Void
+    let onOpen: () -> Void
+    let onReveal: () -> Void
+    let onCopyPath: () -> Void
+    let onRemove: () -> Void
+    let itemProvider: () -> NSItemProvider
 
-        return HStack(spacing: 8) {
+    @State private var isHovered: Bool = false
+
+    var body: some View {
+        HStack(spacing: 8) {
             // Draggable Section: Grip Handle + Icon + Metadata
-            // Keeping .onDrag exclusively on this sub-view allows trailing action buttons to receive clicks freely!
             HStack(spacing: 8) {
-                // Drag Grip
                 Image(systemName: "line.3.horizontal")
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.secondary.opacity(0.6))
+                    .foregroundColor(isHovered ? .secondary : .secondary.opacity(0.4))
                     .frame(width: 12)
 
-                // Item Icon
-                itemIconView(for: item)
+                itemIconView
                     .frame(width: 28, height: 28)
 
-                // Title & Details
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.title)
                         .font(.system(size: 11, weight: .semibold))
@@ -246,24 +326,18 @@ public struct StashShelfView: View {
                 }
             }
             .contentShape(Rectangle())
-            .onTapGesture(count: 2) {
-                shelf.openItem(id: item.id)
-            }
-            .onTapGesture(count: 1) {
-                selectedItemID = item.id
+            .onTapGesture {
+                onSelect()
             }
             .onDrag {
-                shelf.createItemProvider(for: item)
+                itemProvider()
             }
 
             Spacer()
 
-            // Isolated Trailing Action Buttons (NOT wrapped in .onDrag to ensure 100% reliable clicks)
+            // Isolated Trailing Action Buttons
             HStack(spacing: 4) {
-                // Quick Open Button
-                Button(action: {
-                    shelf.openItem(id: item.id)
-                }) {
+                Button(action: onOpen) {
                     Image(systemName: "arrow.up.forward.app")
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(isSelected ? .cyan : .secondary)
@@ -277,9 +351,7 @@ public struct StashShelfView: View {
                 .help("Open File")
 
                 if item.isExistingFile {
-                    Button(action: {
-                        shelf.revealInFinder(id: item.id)
-                    }) {
+                    Button(action: onReveal) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.secondary)
@@ -292,9 +364,7 @@ public struct StashShelfView: View {
                     .buttonStyle(.plain)
                     .help("Reveal in Finder")
 
-                    Button(action: {
-                        shelf.copyPathToClipboard(id: item.id)
-                    }) {
+                    Button(action: onCopyPath) {
                         Image(systemName: "doc.on.doc")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.secondary)
@@ -308,11 +378,7 @@ public struct StashShelfView: View {
                     .help("Copy Path")
                 }
 
-                Button(action: {
-                    withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
-                        shelf.removeItem(id: item.id)
-                    }
-                }) {
+                Button(action: onRemove) {
                     Image(systemName: "xmark")
                         .font(.system(size: 9, weight: .bold))
                         .foregroundColor(.secondary)
@@ -329,22 +395,43 @@ public struct StashShelfView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
         .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(isSelected ? Color.cyan.opacity(0.18) : (isHovered ? Color.white.opacity(0.12) : Color.white.opacity(0.05)))
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(isSelected ? Color.cyan.opacity(0.18) : (isHovered ? Color.white.opacity(0.12) : Color.white.opacity(0.05)))
+
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(
+                            RadialGradient(
+                                colors: [Color.cyan.opacity(0.15), Color.clear],
+                                center: .topLeading,
+                                startRadius: 5,
+                                endRadius: 100
+                            )
+                        )
+                }
+            }
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(isSelected ? Color.cyan.opacity(0.5) : Color.clear, lineWidth: 1.0)
+                .stroke(
+                    isSelected
+                        ? LinearGradient(colors: [Color.cyan, Color.blue.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        : (isHovered ? LinearGradient(colors: [Color.white.opacity(0.3), Color.white.opacity(0.05)], startPoint: .topLeading, endPoint: .bottomTrailing) : LinearGradient(colors: [Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing)),
+                    lineWidth: 1.0
+                )
         )
+        .scaleEffect(isHovered ? 1.015 : 1.0)
+        .animation(.spring(response: 0.2, dampingFraction: 0.75), value: isHovered)
         .onHover { hovering in
-            hoveredItemID = hovering ? item.id : nil
+            isHovered = hovering
         }
     }
 
     @ViewBuilder
-    private func itemIconView(for item: StashItem) -> some View {
+    private var itemIconView: some View {
         if let url = item.sourceURL, item.isExistingFile {
-            let icon = NSWorkspace.shared.icon(forFile: url.path)
+            let icon = StashIconCache.shared.icon(for: url)
             Image(nsImage: icon)
                 .resizable()
                 .scaledToFit()

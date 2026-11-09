@@ -1,3 +1,23 @@
+# What's New in Version 2.9.6
+
+MacStash 2.9.6 introduces a comprehensive Apple-grade Liquid Glass UI/UX transformation across the entire application, and resolves the issue where the Right Edge Bar would not open when an external display was connected.
+
+## Key Enhancements in Version 2.9.6
+
+- Apple Liquid Glass Optical Shading: Re-engineered all floating overlay panels with multi-layer refraction, dual-path 135° specular bevel highlights, and dynamic caustic ambient illumination.
+- Sculpted Radial Dials: 3D-curved glass quadrant backdrops with luminous fluid gauges, meniscus droplets, laser-etched illuminated notches, and floating glass jewel center badges.
+- The Liquid Docking Bay: The Stash Shelf features an interactive liquid ripple aura on file hover, elevated glass file tiles, and circular glass micro-actions.
+- Crystal Tube Slider & Dynamic Artwork Aurora: Precision crystal tube volume/brightness track with glowing fluid volume, dynamic album art aurora backlighting, and fluid dancing visualizers.
+- Floating Glass Writing Slate: Ephemeral scratchpad drawer with translucent writing surface, glowing emerald rim, and floating capsule word/char counter.
+- Liquid Glass Compass: 4-petal magnetic fluid palette blooming centered at the cursor for Ultrawide monitors.
+- Interactive Liquid Glass Studio Stage: Live interactive preview in Settings > Appearance for tuning dial radius, glass opacity, and testing tactile haptics and mechanical clicks in real-time.
+- Stash Shelf Performance & Zero-Lag Dragging: Re-architected Stash Shelf with in-memory icon caching (`StashIconCache`) and row-isolated view rendering (`StashItemCardView`), eliminating LaunchServices main-thread disk I/O and maintaining a locked 120 FPS. Replaced blocking file copies with instant direct URL item providers for effortless, zero-lag dragging out of the shelf.
+- Left-Edge Peek Handle & Drop Enhancements: Expanded hover hit-testing to 44pt to eliminate edge jitter and flickering, enabled 1-click shelf launch directly from the edge handle, enhanced shake-to-summon gesture with bidirectional horizontal/vertical detection, and introduced animated drop banners over populated lists.
+- Multi-Monitor Right Edge Bar Responsiveness: Fixed a race condition where non-candidate screens cancelled the edge dwell timer across displays, ensuring the slider opens reliably on any connected external monitor.
+- Inclusive Physical Edge Boundary Detection: Replaced open-interval rectangle containment checks with inclusive boundary clamping (`x >= maxX - 2.5 && x <= maxX + 1.0`), recognizing cursor slams pinned directly to the rightmost bezel.
+- Target Display Isolation: Right edge slider expansion and hit-testing are strictly scoped to the active display (`activeDisplayID`), keeping edge panels on other connected monitors completely passive.
+- Robust Multi-Screen Geometry: Updated outer edge boundary calculations in `CornerGeometry` with continuous vertical interval overlap analysis, properly handling vertically offset or mismatched external monitors.
+
 # What's New in Version 2.9.5
 
 MacStash 2.9.5 resolves the layout overlap issue when clicking the application menu bar icon, ensuring the popover panel anchors properly below the top menu bar with dynamic intrinsic content sizing.

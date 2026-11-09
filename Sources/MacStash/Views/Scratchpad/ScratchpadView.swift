@@ -3,7 +3,8 @@ import AppKit
 import MacStashCore
 
 /// An instant floating scratchpad drawer for capturing ephemeral thoughts,
-/// verification codes, terminal commands, or text snippets with automatic local persistence.
+/// verification codes, terminal commands, or text snippets with automatic local persistence,
+/// styled with Apple Liquid Glass optical shading.
 public struct ScratchpadView: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var manager = ScratchpadManager.shared
@@ -19,31 +20,28 @@ public struct ScratchpadView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            // 1. Header Bar
+            // 1. Liquid Glass Header Bar
             headerBar
 
             Divider()
-                .background(Color.white.opacity(0.12))
+                .background(
+                    LinearGradient(
+                        colors: [Color.green.opacity(0.4), Color.white.opacity(0.06)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
 
             // 2. Text Editor Area
             editorArea
         }
         .frame(width: drawerWidth, height: drawerHeight)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.35), radius: 20, x: 4, y: 6)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.green.opacity(0.6), Color.white.opacity(0.12)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.0
-                )
+        .liquidGlass(
+            cornerRadius: 20,
+            tint: .green,
+            specularIntensity: 1.15,
+            causticOpacity: 0.18,
+            shadowRadius: 22
         )
     }
 
@@ -54,6 +52,7 @@ public struct ScratchpadView: View {
             Image(systemName: "note.text")
                 .font(.system(size: 13, weight: .bold))
                 .foregroundColor(.green)
+                .shadow(color: Color.green.opacity(0.45), radius: 3, x: 0, y: 0)
 
             Text("SCRATCHPAD")
                 .font(.system(size: 11, weight: .bold, design: .rounded))
@@ -64,9 +63,13 @@ public struct ScratchpadView: View {
             Text("\(manager.wordCount)w · \(manager.characterCount)c")
                 .font(.system(size: 9, weight: .medium, design: .monospaced))
                 .foregroundColor(.secondary)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2.5)
                 .background(Capsule().fill(Color.white.opacity(0.08)))
+                .overlay(
+                    Capsule()
+                        .stroke(Color.white.opacity(0.15), lineWidth: 0.8)
+                )
 
             // Copy All Button
             Button(action: {
@@ -79,10 +82,12 @@ public struct ScratchpadView: View {
                 Image(systemName: copyFeedback ? "checkmark" : "doc.on.doc")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(copyFeedback ? .green : .secondary)
-                    .frame(width: 24, height: 24)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(Color.white.opacity(0.08))
+                    .frame(width: 26, height: 26)
+                    .circularLiquidGlass(
+                        tint: copyFeedback ? .green : .clear,
+                        specularIntensity: 0.8,
+                        causticOpacity: 0.2,
+                        isHighlighted: copyFeedback
                     )
             }
             .buttonStyle(.plain)
@@ -97,10 +102,11 @@ public struct ScratchpadView: View {
                 Image(systemName: "trash")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.secondary)
-                    .frame(width: 24, height: 24)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(Color.white.opacity(0.08))
+                    .frame(width: 26, height: 26)
+                    .circularLiquidGlass(
+                        tint: .clear,
+                        specularIntensity: 0.8,
+                        causticOpacity: 0.15
                     )
             }
             .buttonStyle(.plain)
@@ -112,10 +118,15 @@ public struct ScratchpadView: View {
                     manager.isScratchpadOpen = false
                 }
             }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.secondary.opacity(0.8))
-                    .frame(width: 24, height: 24)
+                Image(systemName: "xmark")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.secondary)
+                    .frame(width: 26, height: 26)
+                    .circularLiquidGlass(
+                        tint: .clear,
+                        specularIntensity: 0.8,
+                        causticOpacity: 0.15
+                    )
             }
             .buttonStyle(.plain)
             .help("Close (Esc)")

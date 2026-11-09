@@ -1,36 +1,33 @@
 import SwiftUI
 
-/// Reusable glassmorphic panel view with macOS blur, border highlight, and soft shadow
+/// Reusable glassmorphic panel view elevated with Apple Liquid Glass optical shading,
+/// specular edge highlights, caustic ambient tint, and soft spatial depth.
 public struct GlassmorphicPanel<Content: View>: View {
     public var cornerRadius: CGFloat
+    public var tint: Color
+    public var specularIntensity: Double
     public var content: () -> Content
 
-    public init(cornerRadius: CGFloat = 20, @ViewBuilder content: @escaping () -> Content) {
+    public init(
+        cornerRadius: CGFloat = 20,
+        tint: Color = .clear,
+        specularIntensity: Double = 1.0,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
         self.cornerRadius = cornerRadius
+        self.tint = tint
+        self.specularIntensity = specularIntensity
         self.content = content
     }
 
     public var body: some View {
         content()
-            .background(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .shadow(color: Color.black.opacity(0.25), radius: 15, x: 0, y: 8)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.35),
-                                Color.white.opacity(0.08),
-                                Color.white.opacity(0.02)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
+            .liquidGlass(
+                cornerRadius: cornerRadius,
+                tint: tint,
+                specularIntensity: specularIntensity,
+                causticOpacity: 0.16,
+                shadowRadius: 18
             )
     }
 }

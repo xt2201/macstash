@@ -123,7 +123,7 @@ public final class ScreenOverlayInstance {
     }
 
     public func leftEdgeRect(in frame: NSRect) -> NSRect {
-        let panelWidth: CGFloat = 350
+        let panelWidth: CGFloat = 380
         let panelHeight: CGFloat = 500
         let panelY = frame.minY + (frame.height - panelHeight) / 2
         return NSRect(x: frame.minX, y: panelY, width: panelWidth, height: panelHeight)
@@ -140,7 +140,7 @@ public final class ScreenOverlayInstance {
         let edgeFrame = rightEdgeRect(in: screen.frame)
         let panel = makeEdgePanel(contentRect: edgeFrame)
         let sliderView = EdgeSliderView(appState: appState, displayID: displayID, edge: .right)
-        let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, edge: .right)
+        let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID, edge: .right)
 
         panel.contentView = hostingView
         panel.orderFrontRegardless()

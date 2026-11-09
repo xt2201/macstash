@@ -46,17 +46,23 @@ public struct LeftEdgeContainerView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .animation(.spring(response: 0.30, dampingFraction: 0.82), value: isOpen)
+        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: isOpen)
     }
 
     // MARK: - Resting Peek Handle (Zero Obtrusion)
 
     private var restingPeekHandle: some View {
         ZStack(alignment: .leading) {
-            // Invisible hover sensor zone (22pt wide, 64pt high centered)
+            // Generous hover & click sensor zone (44pt wide, 84pt high centered)
             Color.clear
-                .frame(width: 22, height: 64)
+                .frame(width: 44, height: 84)
                 .contentShape(Rectangle())
+                .onTapGesture {
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+                        scratchpad.isScratchpadOpen = false
+                        shelf.openShelf()
+                    }
+                }
 
             // Visual handle
             HStack(spacing: 0) {
@@ -78,6 +84,7 @@ public struct LeftEdgeContainerView: View {
                                     .font(.system(size: 11, weight: .semibold))
                                     .foregroundColor(.cyan)
                             }
+                            .circularLiquidGlass(tint: .cyan, specularIntensity: 0.9, causticOpacity: 0.25, isHighlighted: true)
                         }
                         .buttonStyle(.plain)
                         .help("Open Stash Shelf (⌥S)")
@@ -97,27 +104,24 @@ public struct LeftEdgeContainerView: View {
                                     .font(.system(size: 11, weight: .semibold))
                                     .foregroundColor(.green)
                             }
+                            .circularLiquidGlass(tint: .green, specularIntensity: 0.9, causticOpacity: 0.25, isHighlighted: false)
                         }
                         .buttonStyle(.plain)
                         .help("Open Quick Scratchpad (⌥N)")
                     }
                     .padding(.vertical, 8)
                     .padding(.horizontal, 4)
-                    .background(
-                        Capsule()
-                            .fill(.ultraThinMaterial)
-                            .shadow(color: Color.black.opacity(0.3), radius: 8, x: 2, y: 2)
-                    )
-                    .overlay(
-                        Capsule()
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                    )
+                    .liquidGlass(cornerRadius: 16, tint: .cyan, specularIntensity: 1.0, causticOpacity: 0.15, shadowRadius: 10)
                     .transition(.move(edge: .leading).combined(with: .opacity))
                 } else {
                     // Resting state: Subtle 3.5pt vertical indicator
                     RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(Color.white.opacity(0.22))
+                        .fill(Color.white.opacity(0.28))
                         .frame(width: 3.5, height: 48)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 3, style: .continuous)
+                                .stroke(Color.white.opacity(0.4), lineWidth: 0.5)
+                        )
                         .shadow(color: Color.black.opacity(0.25), radius: 3, x: 1, y: 1)
                 }
             }
@@ -198,15 +202,7 @@ public struct LeftEdgeContainerView: View {
         .frame(width: 32, height: 160)
         .padding(.vertical, 8)
         .padding(.horizontal, 2)
-        .background(
-            Capsule()
-                .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.25), radius: 10, x: 2, y: 2)
-        )
-        .overlay(
-            Capsule()
-                .stroke(Color.white.opacity(0.15), lineWidth: 1)
-        )
+        .liquidGlass(cornerRadius: 16, tint: .cyan, specularIntensity: 0.9, causticOpacity: 0.12, shadowRadius: 10)
         .padding(.leading, 4)
     }
 }

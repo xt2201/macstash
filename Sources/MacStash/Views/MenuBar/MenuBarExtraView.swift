@@ -116,19 +116,37 @@ public struct MenuBarExtraView: View {
                     }
                 }
 
-                // Progress Bar
+                // Liquid Progress Bar
                 GeometryReader { geo in
+                    let totalW = geo.size.width
+                    let fillW = max(0, min(totalW, totalW * CGFloat(appState.pomodoroProgress)))
                     ZStack(alignment: .leading) {
                         Capsule()
-                            .fill(Color.secondary.opacity(0.15))
-                            .frame(height: 3)
+                            .fill(Color.white.opacity(0.1))
+                            .frame(height: 3.5)
 
-                        Capsule()
-                            .fill(appState.pomodoroMode == .focus ? Color.purple : Color.green)
-                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(appState.pomodoroProgress))), height: 3)
+                        if fillW > 2 {
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: appState.pomodoroMode == .focus
+                                            ? [Color.purple, Color(red: 0.8, green: 0.4, blue: 1.0)]
+                                            : [Color.green, Color(red: 0.4, green: 0.9, blue: 0.6)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: fillW, height: 3.5)
+                                .shadow(
+                                    color: (appState.pomodoroMode == .focus ? Color.purple : Color.green).opacity(0.5),
+                                    radius: 3,
+                                    x: 0,
+                                    y: 0
+                                )
+                        }
                     }
                 }
-                .frame(height: 3)
+                .frame(height: 3.5)
             }
             .padding(.horizontal, 12)
 

@@ -9,6 +9,8 @@ public struct CornerDialView: View {
 
     @State private var isDragging: Bool = false
     @State private var dragValue: Double = 0.5
+    @State private var isResetHovered: Bool = false
+    @State private var isSkipHovered: Bool = false
 
     private let dialSize: CGFloat = Defaults.HotCorner.defaultDialRadiusPoints
 
@@ -54,27 +56,28 @@ public struct CornerDialView: View {
                 let isExpanded = isDragging || (appState.activeCorner == corner && appState.activeDisplayID == displayID)
 
                 ZStack {
-                    // Quarter-circle backdrop disc
-                    QuarterCircleBackdrop(corner: corner)
-                        .fill(.ultraThinMaterial)
-                        .frame(width: dialSize, height: dialSize)
-                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+                    // 1. Sculpted Liquid Glass Quarter-Circle Backdrop Disc
+                    QuarterCircleGlassBackdrop(
+                        corner: corner,
+                        dialSize: dialSize,
+                        tint: actionColors.first ?? .clear
+                    )
 
-                    // Tick marks
+                    // 2. Laser-etched tick marks with liquid glow illumination
                     DialTicksView(
                         geometry: geom,
                         value: currentValue,
                         accentColor: actionColors.first ?? .accentColor
                     )
 
-                    // Active progress ring arc
+                    // 3. Precision Luminous Fluid Arc with meniscus droplet
                     DialArcShape(
                         geometry: geom,
                         value: currentValue,
                         gradientColors: actionColors
                     )
 
-                    // Satellite micro-controls for Pomodoro
+                    // 4. Satellite micro-controls for Pomodoro (Floating liquid mercury droplets)
                     if action == .timer && isExpanded {
                         let resetPt = geom.point(radius: 96, angleDegrees: geom.angle(for: 0.14))
                         Button(action: {
@@ -82,14 +85,20 @@ public struct CornerDialView: View {
                         }) {
                             Image(systemName: "arrow.counterclockwise")
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
-                                .frame(width: 22, height: 22)
-                                .background(Circle().fill(.ultraThinMaterial))
-                                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
-                                .shadow(color: Color.black.opacity(0.25), radius: 2, x: 0, y: 1)
+                                .foregroundColor(.primary)
+                                .frame(width: 24, height: 24)
+                                .circularLiquidGlass(
+                                    tint: .purple,
+                                    specularIntensity: 1.0,
+                                    causticOpacity: 0.25,
+                                    isHighlighted: isResetHovered
+                                )
+                                .scaleEffect(isResetHovered ? 1.15 : 1.0)
+                                .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isResetHovered)
                         }
                         .buttonStyle(.plain)
                         .help(appState.localized("menubar.reset"))
+                        .onHover { isResetHovered = $0 }
                         .position(x: resetPt.x, y: resetPt.y)
 
                         let skipPt = geom.point(radius: 96, angleDegrees: geom.angle(for: 0.86))
@@ -99,17 +108,23 @@ public struct CornerDialView: View {
                             Image(systemName: "forward.fill")
                                 .font(.system(size: 8, weight: .bold))
                                 .foregroundColor(appState.pomodoroMode == .focus ? .purple : .green)
-                                .frame(width: 22, height: 22)
-                                .background(Circle().fill(.ultraThinMaterial))
-                                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
-                                .shadow(color: Color.black.opacity(0.25), radius: 2, x: 0, y: 1)
+                                .frame(width: 24, height: 24)
+                                .circularLiquidGlass(
+                                    tint: appState.pomodoroMode == .focus ? .purple : .green,
+                                    specularIntensity: 1.0,
+                                    causticOpacity: 0.25,
+                                    isHighlighted: isSkipHovered
+                                )
+                                .scaleEffect(isSkipHovered ? 1.15 : 1.0)
+                                .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isSkipHovered)
                         }
                         .buttonStyle(.plain)
                         .help(appState.localized("menubar.skip"))
+                        .onHover { isSkipHovered = $0 }
                         .position(x: skipPt.x, y: skipPt.y)
                     }
 
-                    // Center Action Icon & Value readout (Tap to toggle)
+                    // 5. Floating Glass Jewel Center Action Badge
                     Button(action: {
                         appState.toggleAction(action, displayID: displayID)
                     }) {
@@ -128,7 +143,8 @@ public struct CornerDialView: View {
                             isMuted: appState.audio.isMuted,
                             isKeyboardSupported: appState.keyboard.isSupported,
                             formattedKeepAwake: appState.keepAwake.formattedRemaining,
-                            stashItemCount: appState.stashShelf.items.count
+                            stashItemCount: appState.stashShelf.items.count,
+                            tint: actionColors.first ?? .clear
                         )
                     }
                     .buttonStyle(.plain)
@@ -138,7 +154,7 @@ public struct CornerDialView: View {
                 .animation(
                     NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
                         ? .easeInOut(duration: 0.1)
-                        : .spring(response: 0.28 * appState.settings.animationSpeedMultiplier, dampingFraction: 0.72),
+                        : .spring(response: 0.30 * appState.settings.animationSpeedMultiplier, dampingFraction: 0.76),
                     value: isExpanded
                 )
                 .gesture(
@@ -224,26 +240,142 @@ public struct CornerDialView: View {
     }
 }
 
-// MARK: - Subviews
+// MARK: - Sculpted Liquid Glass Quarter-Circle Backdrop
 
-private struct CenterActionBadge: View {
-    let action: ControlAction
-    let corner: CornerPosition
-    let value: Double
-    let dialSize: CGFloat
-    let isExpanded: Bool
-    let formattedTimer: String
-    let isPomodoroRunning: Bool
-    let isPomodoroPaused: Bool
-    let pomodoroMode: PomodoroMode
-    let completedRounds: Int
-    let totalRounds: Int
-    let isMuted: Bool
-    let isKeyboardSupported: Bool
-    let formattedKeepAwake: String
-    let stashItemCount: Int
+public struct QuarterCircleGlassBackdrop: View {
+    public let corner: CornerPosition
+    public let dialSize: CGFloat
+    public let tint: Color
 
-    var body: some View {
+    public init(corner: CornerPosition, dialSize: CGFloat, tint: Color) {
+        self.corner = corner
+        self.dialSize = dialSize
+        self.tint = tint
+    }
+
+    public var body: some View {
+        ZStack {
+            // Layer 1: Frosted refractive glass substrate
+            QuarterCircleBackdrop(corner: corner)
+                .fill(.ultraThinMaterial)
+
+            // Layer 2: Caustic ambient reflection originating from screen vertex
+            QuarterCircleBackdrop(corner: corner)
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            tint.opacity(0.20),
+                            tint.opacity(0.06),
+                            Color.clear
+                        ],
+                        center: unitPoint(for: corner),
+                        startRadius: 15,
+                        endRadius: dialSize * 0.95
+                    )
+                )
+
+            // Layer 3: Glass surface gloss sheen
+            QuarterCircleBackdrop(corner: corner)
+                .fill(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white.opacity(0.12), location: 0.0),
+                            .init(color: Color.white.opacity(0.02), location: 0.4),
+                            .init(color: Color.clear, location: 0.7)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            // Layer 4: Dual-path specular perimeter bevel
+            QuarterCircleBackdrop(corner: corner)
+                .stroke(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white.opacity(0.55), location: 0.0),
+                            .init(color: Color.white.opacity(0.15), location: 0.45),
+                            .init(color: Color.white.opacity(0.04), location: 0.8),
+                            .init(color: tint.opacity(0.3), location: 1.0)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.2
+                )
+        }
+        .frame(width: dialSize, height: dialSize)
+        .shadow(color: Color.black.opacity(0.32), radius: 14, x: 0, y: 5)
+        .shadow(color: tint == .clear ? Color.clear : tint.opacity(0.15), radius: 10, x: 0, y: 0)
+    }
+
+    private func unitPoint(for corner: CornerPosition) -> UnitPoint {
+        switch corner {
+        case .topLeft: return .topLeading
+        case .topRight: return .topTrailing
+        case .bottomLeft: return .bottomLeading
+        case .bottomRight: return .bottomTrailing
+        }
+    }
+}
+
+// MARK: - Center Floating Glass Jewel Badge
+
+public struct CenterActionBadge: View {
+    public let action: ControlAction
+    public let corner: CornerPosition
+    public let value: Double
+    public let dialSize: CGFloat
+    public let isExpanded: Bool
+    public let formattedTimer: String
+    public let isPomodoroRunning: Bool
+    public let isPomodoroPaused: Bool
+    public let pomodoroMode: PomodoroMode
+    public let completedRounds: Int
+    public let totalRounds: Int
+    public let isMuted: Bool
+    public let isKeyboardSupported: Bool
+    public let formattedKeepAwake: String
+    public let stashItemCount: Int
+    public let tint: Color
+
+    public init(
+        action: ControlAction,
+        corner: CornerPosition,
+        value: Double,
+        dialSize: CGFloat,
+        isExpanded: Bool,
+        formattedTimer: String,
+        isPomodoroRunning: Bool,
+        isPomodoroPaused: Bool,
+        pomodoroMode: PomodoroMode,
+        completedRounds: Int,
+        totalRounds: Int,
+        isMuted: Bool,
+        isKeyboardSupported: Bool,
+        formattedKeepAwake: String,
+        stashItemCount: Int,
+        tint: Color
+    ) {
+        self.action = action
+        self.corner = corner
+        self.value = value
+        self.dialSize = dialSize
+        self.isExpanded = isExpanded
+        self.formattedTimer = formattedTimer
+        self.isPomodoroRunning = isPomodoroRunning
+        self.isPomodoroPaused = isPomodoroPaused
+        self.pomodoroMode = pomodoroMode
+        self.completedRounds = completedRounds
+        self.totalRounds = totalRounds
+        self.isMuted = isMuted
+        self.isKeyboardSupported = isKeyboardSupported
+        self.formattedKeepAwake = formattedKeepAwake
+        self.stashItemCount = stashItemCount
+        self.tint = tint
+    }
+
+    public var body: some View {
         let offset = badgeOffset(for: corner, in: dialSize)
 
         VStack(spacing: 1.5) {
@@ -323,19 +455,11 @@ private struct CenterActionBadge: View {
             }
         }
         .frame(width: 58, height: 58)
-        .background(
-            Circle()
-                .fill(.ultraThickMaterial)
-                .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
-                .overlay(
-                    Circle()
-                        .strokeBorder(
-                            action == .timer && (isPomodoroRunning || isPomodoroPaused)
-                                ? (pomodoroMode == .focus ? Color.purple.opacity(0.7) : Color.green.opacity(0.7))
-                                : Color.white.opacity(0.1),
-                            lineWidth: 1.5
-                        )
-                )
+        .circularLiquidGlass(
+            tint: tint,
+            specularIntensity: 1.0,
+            causticOpacity: 0.22,
+            isHighlighted: isExpanded
         )
         .offset(x: offset.x, y: offset.y)
     }
@@ -355,51 +479,93 @@ private struct CenterActionBadge: View {
     }
 }
 
-private struct DialArcShape: View {
-    let geometry: RadialDialGeometry
-    let value: Double
-    let gradientColors: [Color]
+// MARK: - Luminous Fluid Arc Shape with Meniscus Droplet
 
-    var body: some View {
+public struct DialArcShape: View {
+    public let geometry: RadialDialGeometry
+    public let value: Double
+    public let gradientColors: [Color]
+
+    public init(geometry: RadialDialGeometry, value: Double, gradientColors: [Color]) {
+        self.geometry = geometry
+        self.value = value
+        self.gradientColors = gradientColors
+    }
+
+    public var body: some View {
         Canvas { context, _ in
-            guard value > 0.01 else { return }
             let trackRadius = geometry.outerRadius - 20
             let startDeg = geometry.angle(for: 0.0)
+            let fullDeg = geometry.angle(for: 1.0)
+            let isClockwise = geometry.corner == .bottomLeft || geometry.corner == .topLeft
+
+            // 1. Concave glass trench groove (the channel where liquid flows)
+            var trenchPath = Path()
+            trenchPath.addArc(
+                center: geometry.center,
+                radius: trackRadius,
+                startAngle: .degrees(startDeg),
+                endAngle: .degrees(fullDeg),
+                clockwise: isClockwise
+            )
+            context.stroke(
+                trenchPath,
+                with: .color(Color.white.opacity(0.08)),
+                style: StrokeStyle(lineWidth: 10, lineCap: .round)
+            )
+
+            guard value > 0.01 else { return }
             let endDeg = geometry.angle(for: value)
 
-            var path = Path()
-            path.addArc(
+            var liquidPath = Path()
+            liquidPath.addArc(
                 center: geometry.center,
                 radius: trackRadius,
                 startAngle: .degrees(startDeg),
                 endAngle: .degrees(endDeg),
-                clockwise: geometry.corner == .bottomLeft || geometry.corner == .topLeft
+                clockwise: isClockwise
             )
 
+            // 2. Soft luminous fluid bloom (glow under-layer)
+            let primaryColor = gradientColors.first ?? .cyan
             context.stroke(
-                path,
+                liquidPath,
+                with: .color(primaryColor.opacity(0.35)),
+                style: StrokeStyle(lineWidth: 14, lineCap: .round)
+            )
+
+            // 3. Vibrant liquid core
+            context.stroke(
+                liquidPath,
                 with: .linearGradient(
                     Gradient(colors: gradientColors),
                     startPoint: geometry.point(radius: trackRadius, angleDegrees: startDeg),
                     endPoint: geometry.point(radius: trackRadius, angleDegrees: endDeg)
                 ),
-                style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                style: StrokeStyle(lineWidth: 7.5, lineCap: .round)
             )
 
-            // Tip indicator
+            // 4. Fluid meniscus head (Droplet bulb with specular highlight)
             let tipPoint = geometry.point(radius: trackRadius, angleDegrees: endDeg)
-            let tipCircle = Path(ellipseIn: CGRect(x: tipPoint.x - 5, y: tipPoint.y - 5, width: 10, height: 10))
-            context.fill(tipCircle, with: .color(Color.white))
+            let tipBulb = Path(ellipseIn: CGRect(x: tipPoint.x - 6.5, y: tipPoint.y - 6.5, width: 13, height: 13))
+            context.fill(tipBulb, with: .color(primaryColor))
+
+            let specularDrop = Path(ellipseIn: CGRect(x: tipPoint.x - 3.5, y: tipPoint.y - 3.5, width: 7, height: 7))
+            context.fill(specularDrop, with: .color(Color.white))
         }
     }
 }
 
 // MARK: - Shapes
 
-private struct QuarterCircleBackdrop: Shape {
-    let corner: CornerPosition
+public struct QuarterCircleBackdrop: Shape {
+    public let corner: CornerPosition
 
-    func path(in rect: CGRect) -> Path {
+    public init(corner: CornerPosition) {
+        self.corner = corner
+    }
+
+    public func path(in rect: CGRect) -> Path {
         var path = Path()
         switch corner {
         case .topLeft:

@@ -7,7 +7,7 @@ This document tracks implementation status against the BRD requirements for the 
 - [x] **M0: Bootstrap** - Multi-target architecture (SideDockCore, SideDockWidgets, SideDockUI, SideDockSystem), scripts, tracking docs, base runner.
 - [x] **M1: Dock Core** - NSPanel, floating & fixed bottom, app/folder management, running apps, glass styles, layout tests.
 - [x] **M2: Widget Framework & 10 Widgets** - `DockWidget` protocol, Widget Registry, 10 P0 local widgets, profiles, widget tests.
-- [ ] **M3: MVP Complete** - Persistence & migration, EN/VI localization, onboarding, reset layout, DMG packaging.
+- [x] **M3: MVP Complete** - Persistence & migration, EN/VI localization, onboarding, reset layout, DMG packaging.
 - [ ] **M4: P1 Phase 1** - Multi-display, fullscreen auto-hide, hide on window hover, reserve space, hotkeys.
 - [ ] **M5: P1 Phase 2** - Profile export/import, backup/restore, Phase 2 widgets, liquid glass, window previews.
 - [ ] **M6: P2 Advanced** - Connected widgets, AI usage widgets, local MCP server, diagnostics export.
@@ -57,7 +57,7 @@ This document tracks implementation status against the BRD requirements for the 
 
 | ID | Requirement | Status | Verification Method |
 |---|---|---|---|
-| NFR-01 | Universal binary (arm64 + x86_64), macOS 14+ | In Progress | `build_dmg.sh` with lipo |
+| NFR-01 | Universal binary (arm64 + x86_64), macOS 14+ | Done | `build_dmg.sh` with lipo |
 | NFR-02 | CPU idle < 1% with 10 widgets, profile switch < 150ms | Verified | Efficient timers with onAppear/onDisappear |
 | NFR-03 | RAM < 150MB after 30 min, bounded cache | Verified | Pure SwiftUI views, lightweight NSPanel |
 | NFR-04 | Debounced atomic config save (>= 1s) | Done | `SideDockConfigStoreTests.swift` |
@@ -65,7 +65,7 @@ This document tracks implementation status against the BRD requirements for the 
 | NFR-06 | Display state machine: sleep/wake, display add/remove safe | Done | `NSApplication.didChangeScreenParametersNotification` |
 | NFR-07 | "Reset Layout" emergency recovery | Done | `SideDockConfigStoreTests.swift` |
 | NFR-08 | Accessibility (VoiceOver labels, Reduce Motion) | Done | `reduceMotion` theme flag |
-| NFR-09 | Localization EN & VI in String Catalog | In Progress (M3) | `Localizable.xcstrings` |
+| NFR-09 | Localization EN & VI in String Catalog | Done | `Localizable.xcstrings`, `LocalizationService.swift` |
 | NFR-10 | Keychain + CryptoKit encrypted fallback | Planned (M6) | SecretStore |
 | NFR-11 | Schema migration & corruption recovery | Done | `SideDockConfigStoreTests.swift` |
-| NFR-12 | DMG packaging with Sparkle auto-update | Planned (M3) | `make dmg` |
+| NFR-12 | DMG packaging with Sparkle auto-update | Done | `make dmg`, `appcast.xml`, `sign_sparkle_update.swift` |

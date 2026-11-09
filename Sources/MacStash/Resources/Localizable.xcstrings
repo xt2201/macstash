@@ -2593,6 +2593,22 @@
         }
       }
     },
+    "tab.sideDock": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Second Dock"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thanh Dock thứ hai"
+          }
+        }
+      }
+    },
     "tab.pomodoro": {
       "localizations": {
         "en": {

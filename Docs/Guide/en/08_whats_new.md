@@ -1,3 +1,15 @@
+# What's New in Version 2.11.0
+
+MacStash 2.11.0 introduces the Second Dock feature, delivering an auxiliary live widget and application dock running alongside native macOS Dock without interference or overlap, equipped with 10 real-time local widgets, multi-profile customization, dynamic glass backdrop themes, and seamless pass-through interactions.
+
+## Key Enhancements in Version 2.11.0
+
+- Second Dock Core Architecture: High-performance non-activating NSPanel window operating across all macOS Spaces without stealing focus from active applications. Transparent and empty regions pass mouse clicks straight through to underlying windows.
+- Dual Layout Modes: Fixed Bottom layout neatly anchored directly above the native macOS Dock with zero overlap (calculated via visibleFrame screen geometry), alongside a free-floating draggable window with persistent screen-boundary clamping.
+- Live Widget Framework & Registry: Standardized extensible DockWidget protocol hosting 10 local widgets: Clock (digital, analog, flip), Date (untruncated full month name), Weather (Open-Meteo offline-first weather without mandatory GPS), Now Playing (Apple Music and Spotify controls with freshness TTL), Calendar (upcoming event countdown and video meeting join button), Reminders (due checklist with completion toggle and quick add), System Stats (CPU, RAM, battery metrics via kernel mach APIs and IOKit), Pomodoro focus timer, Spotlight search launcher, and File Shelf holding area.
+- Multi-Profile Workspaces: Manage up to 8 independent dock configurations (Default, Focus, Media, Coding) with instant switching, duplication, renaming, and profile switcher visibility toggles.
+- Glass Backdrop Customization: Studio-grade Light Glass, Dark Glass, Liquid Glass, and Clear frameless appearances with customizable scale factor (0.7x to 1.5x), tile spacing, edge offset, and auto-hide with configurable reveal delay (0.0s to 3.0s).
+
 # What's New in Version 2.10.0
 
 MacStash 2.10.0 delivers seamless corner dial alignment that sits flush against physical monitor corners with zero offset, eliminates background polling and cursor tracking task churn, brings robust local disk persistence and pinning to the Stash Shelf, and introduces debounced saves and zero-allocation word counting to the Quick Scratchpad.

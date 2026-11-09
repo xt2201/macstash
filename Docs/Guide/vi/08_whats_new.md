@@ -1,3 +1,15 @@
+# Có Gì Mới Trong Phiên Bản 2.11.0
+
+MacStash 2.11.0 ra mắt tính năng Thanh Dock Thứ Hai (Second Dock), mang đến thanh dock phụ trợ hiển thị widget sống và ứng dụng yêu thích chạy song song bên cạnh Dock gốc của macOS mà không gây che khuất hay xung đột, tích hợp sẵn 10 widget sống nội bộ, quản lý nhiều hồ sơ không gian làm việc, hiệu ứng kính mờ cao cấp và khả năng nhấp xuyên thấu mượt mà.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.11.0
+
+- Kiến Trúc Thanh Dock Phụ Trợ Hiệu Năng Cao: Khung panel NSPanel không chiếm quyền lấy nét (non-activating) hoạt động trên toàn bộ macOS Spaces mà không làm gián đoạn ứng dụng đang làm việc. Các vùng trống và trong suốt cho phép nhấp chuột xuyên thẳng xuống cửa sổ nền bên dưới.
+- Bố Cục Linh Hoạt Đa Dạng: Chế độ Đáy Cố Định (Fixed Bottom) neo chuẩn xác ngay phía trên Dock gốc của macOS với khoảng cách lớn hơn hoặc bằng 0px không chồng lấn (tính toán tự động theo visibleFrame của màn hình), cùng chế độ Cửa Sổ Trôi Nổi (Floating) tự do kéo thả với cơ chế bám giữ góc biên an toàn.
+- Hệ Thống Widget Sống Đa Năng: Chuẩn hóa kiến trúc DockWidget với 10 widget cục bộ phong phú: Đồng hồ (điện tử, kim, flip), Lịch ngày (hiển thị đầy đủ tên tháng), Thời tiết (tích hợp Open-Meteo không bắt buộc bật GPS), Bộ điều khiển nhạc Now Playing (Apple Music và Spotify kèm chỉ báo tươi mới TTL), Lịch biểu (đếm ngược sự kiện kế tiếp kèm nút bấm tham gia họp trực tuyến), Lời nhắc Reminders (danh sách công việc cần làm kèm thao tác đánh dấu hoàn tất và thêm nhanh), Thống kê hệ thống (CPU, RAM, pin qua kernel mach APIs và IOKit), Đồng hồ Pomodoro tập trung, Thanh tìm kiếm nhanh Spotlight và Khay thả tệp tạm thời File Shelf.
+- Quản Lý Đa Hồ Sơ Tiện Lợi: Hỗ trợ lên đến 8 hồ sơ dock độc lập (Mặc định, Tập trung, Đa phương tiện, Lập trình) kèm thao tác nhân bản, đổi tên, xóa và công tắc ẩn hiện thanh chuyển hồ sơ tức thì.
+- Tùy Biến Giao Diện Kính Mờ: Bốn phong cách hiển thị Light Glass, Dark Glass, Liquid Glass và Clear không viền, cùng thanh trượt điều chỉnh tỷ lệ phóng to thu nhỏ (0.7x đến 1.5x), khoảng cách biểu tượng, khoảng hở cạnh viền và cơ chế tự động ẩn với độ trễ mở rộng tùy chỉnh (0.0s đến 3.0s).
+
 # Có Gì Mới Trong Phiên Bản 2.10.0
 
 MacStash 2.10.0 căn chỉnh vòng xoay 4 góc ôm sát hoàn hảo vào đỉnh góc vật lý của màn hình không còn khoảng hở, loại bỏ triệt để timer polling và nghẽn luồng theo dõi chuột, bổ sung lưu trữ đĩa bền vững và tính năng ghim cho Stash Shelf, đồng thời tối ưu hóa độ trễ lưu đĩa và bộ đếm từ zero-allocation cho Quick Scratchpad.

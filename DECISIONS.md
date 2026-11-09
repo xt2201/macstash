@@ -31,3 +31,8 @@ This log records major technical and architecture decisions for SideDock with ra
 - **Context:** Need next event countdown and reminders checklist with quick-add.
 - **Decision:** Use Apple `EventKit` (`EKEventStore`) with lazy permission requests preceded by an informative in-app explainer dialog.
 - **Rationale:** Native macOS integration with built-in Calendar and Reminders apps; zero external network dependencies.
+
+## ADR-007: Release Packaging with Sparkle 2 and SemVer 2.11.0
+- **Context:** The addition of SideDock Second Dock constitutes a major new feature (backward-compatible minor release), requiring bump to v2.11.0 and synchronized updates across all 6 versioning locations.
+- **Decision:** Bump version to 2.11.0, sign zip archive using local Ed25519 key, update appcast.xml, and build universal ad-hoc signed DMG.
+- **Rationale:** Strict adherence to AGENTS.md single source of truth rules and Sparkle 2 background update verification.

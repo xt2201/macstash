@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.11.0] - 2026-11-09
+
+### Added
+- Second Dock (Auxiliary Live Widget & Application Dock): Introduced a customizable auxiliary dock running alongside macOS native Dock without interception or overlap, supporting both Fixed Bottom (docked above native Dock with >= 0px clearance) and Floating window layouts.
+- Live Widget Framework & Registry: Standardized `DockWidget` architecture powering 10 local live widgets: Clock (digital, analog, flip), Date (untruncated month and weekday), Weather (Open-Meteo offline-first weather without mandatory GPS), Now Playing (Apple Music & Spotify controller with freshness TTL), Calendar (next upcoming event with countdown and meeting join buttons), Reminders (upcoming checklist with fast toggle and task addition), System Stats (CPU, RAM, battery metrics via kernel mach APIs and IOKit), Pomodoro timer, Search bar (instant Spotlight launcher), and File Shelf (drag-and-drop holding tray).
+- Multi-Profile Dock Management: Switch between up to 8 independent dock workspaces (Default, Focus, Coding, Media) via built-in switcher or hotkeys, with real-time profile duplicate, rename, and isolation.
+- Glass Backdrop Themes: System-adaptive Light Glass, Dark Glass, Liquid Glass, and Clear frameless visual appearances with customizable scale, tile spacing, and edge offsets.
+- Click Pass-Through & Edge Auto-Hide: Native non-activating `NSPanel` (`.canJoinAllSpaces`) that does not steal focus, passes clicks on empty/transparent regions directly to underlying windows, and supports proximity auto-hide with 0.0-3.0s configurable reveal delay.
+
+---
+
 ## [2.10.0] - 2026-11-09
 
 ### Added

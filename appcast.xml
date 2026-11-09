@@ -6,6 +6,27 @@
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
         <item>
+            <title>Version 2.11.1</title>
+            <pubDate>Mon, 09 Nov 2026 17:13:15 +0700</pubDate>
+            <sparkle:version>2111</sparkle:version>
+            <sparkle:shortVersionString>2.11.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+<h2>What's New in Stash 2.11.1</h2>
+<ul>
+    <li>Industry standard 1-click in-place background auto-updates via Sparkle 2.</li>
+    <li>Ed25519 cryptographic update signing and verification.</li>
+    <li>Screen corner responsiveness and dynamic display tracking improvements.</li>
+    <li>Menu bar icon and native macOS visual polish.</li>
+</ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/xt2201/macstash/releases/download/v2.11.1/Stash-2.11.1.zip"
+                sparkle:edSignature="MFBPbs10tuqyt6JPrG7iuhB7k0K9lA8IYqaX0Fo8MxNn400zo/uVQl3UtkdX+/jUIGcCxPbvhHDZQ8fCuvMrDQ=="
+                length="8048216"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 2.11.0</title>
             <pubDate>Mon, 09 Nov 2026 10:07:48 +0000</pubDate>
             <sparkle:version>2110</sparkle:version>

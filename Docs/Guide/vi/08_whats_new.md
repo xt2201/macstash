@@ -1,3 +1,15 @@
+# Có Gì Mới Trong Phiên Bản 2.11.1
+
+MacStash 2.11.1 mở rộng hệ sinh thái Thanh Dock Thứ Hai với 6 widget sống tiện ích mới (nâng tổng số lên 16 widget), hỗ trợ xuất nhập hồ sơ (.sidedock-profile JSON) chia sẻ cấu hình, tính năng Dành Riêng Không Gian Dock (Reserve Dock Space) điều phối kích thước cửa sổ ứng dụng, chọn màn hình đích đa màn hình, bố cục dock dọc cuộn mượt mà và tự động ẩn khi toàn màn hình.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.11.1
+
+- Bổ Sung 6 Widget Sống Tiện Ích Giai Đoạn 2: Thêm Lịch sử Clipboard (theo dõi clipboard cục bộ với thao tác nhấp để sao chép), Ghi chú nhanh Quick Note (sổ tay tức thì ngay trên dock), Phím tắt chụp màn hình Screenshot Launcher (chụp vùng, toàn màn hình và quay video), Bộ chọn màu Color Picker (chấm màu pixel từ màn hình và sao chép mã HEX), Bộ chuyển đổi đơn vị Unit Converter (chuyển đổi ngoại tuyến chiều dài, nhiệt độ, cân nặng và tỷ giá tiền tệ) và Dấu trang Bookmarks (mở nhanh website yêu thích).
+- Xuất Và Nhập Hồ Sơ Dock (.sidedock-profile): Chia sẻ, sao lưu và đồng bộ cấu hình dock dễ dàng qua định dạng tệp JSON chuẩn hóa với cơ chế cấp phát UUID mới chống trùng lặp an toàn.
+- Dành Riêng Không Gian Cho Dock (Reserve Dock Space): Tự động phối hợp cùng hệ thống Accessibility để đẩy lùi và co giãn khung cửa sổ ứng dụng đang mở, ngăn không cho cửa sổ che khuất thanh dock cố định.
+- Tùy Chọn Màn Hình Đích Đa Màn Hình: Cho phép gắn cố định dock trên màn hình phụ bên ngoài hoặc tự động bám theo màn hình đang có con trỏ chuột.
+- Hỗ Trợ Bố Cục Dock Dọc Cuộn Mượt: Tối ưu hiển thị cho hai vị trí Cạnh Trái Cố Định và Cạnh Phải Cố Định với thanh cuộn dọc không viền và vạch ngăn cách thích ứng.
+
 # Có Gì Mới Trong Phiên Bản 2.11.0
 
 MacStash 2.11.0 ra mắt tính năng Thanh Dock Thứ Hai (Second Dock), mang đến thanh dock phụ trợ hiển thị widget sống và ứng dụng yêu thích chạy song song bên cạnh Dock gốc của macOS mà không gây che khuất hay xung đột, tích hợp sẵn 10 widget sống nội bộ, quản lý nhiều hồ sơ không gian làm việc, hiệu ứng kính mờ cao cấp và khả năng nhấp xuyên thấu mượt mà.

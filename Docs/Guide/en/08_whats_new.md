@@ -1,3 +1,15 @@
+# What's New in Version 2.11.1
+
+MacStash 2.11.1 expands the Second Dock ecosystem with 6 new live utility widgets (bringing the total to 16), adds comprehensive profile export and import packages (.sidedock-profile JSON), introduces Reserve Dock Space window management, multi-monitor display binding, vertical dock layouts, and fullscreen reveal auto-hide.
+
+## Key Enhancements in Version 2.11.1
+
+- Six New Phase 2 Live Widgets: Added Clipboard History (monitors clipboard changes with instant recall), Quick Note (lightweight dock scratchpad), Screenshot Launcher (one-click area, screen, and recording capture), Color Picker (system eyedropper with HEX copy), Unit Converter (offline conversion for length, temperature, weight, and currency), and Bookmarks (quick web links).
+- Profile Export and Import: Share and backup dock configurations via standardized .sidedock-profile JSON files with automatic ID collision protection and migration.
+- Reserve Dock Space: Coordinates with macOS Accessibility APIs to push frontmost application windows away from fixed dock boundaries, preventing overlapping windows.
+- Multi-Display Target Selection: Bind the dock to specific external monitors or follow the cursor's active display dynamically.
+- Vertical Scrollable Dock Layout: Support for Fixed Left and Fixed Right vertical dock layouts with smooth vertical scrolling and adaptive dividers.
+
 # What's New in Version 2.11.0
 
 MacStash 2.11.0 introduces the Second Dock feature, delivering an auxiliary live widget and application dock running alongside native macOS Dock without interference or overlap, equipped with 10 real-time local widgets, multi-profile customization, dynamic glass backdrop themes, and seamless pass-through interactions.

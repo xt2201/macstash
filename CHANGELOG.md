@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.11.1] - 2026-11-09
+
+### Added
+- Phase 2 Live Widgets Expansion: Added 6 new local utility widgets bringing the built-in library to 16 widgets: Clipboard History (auto-updating local pasteboard monitor with quick copy), Quick Note (instant dock scratchpad with word counter), Screenshot Launcher (one-click area, full-screen, and screen recorder tools), Color Picker (system `NSColorSampler` with HEX/RGB copy), Unit Converter (offline conversion for length, temperature, weight, and currency reference rates), and Bookmarks (instant web launchers).
+- Profile Export & Import: Added complete `.sidedock-profile` JSON export and import capabilities (`DockProfileTransferService`), enabling users to share, migrate, and backup customized dock workspaces with automatic ID collision protection.
+- Reserve Dock Space: Integrated accessibility window geometry coordinator (`ReserveSpaceManager`) that automatically repositions and resizes frontmost non-desktop application windows when fixed dock layouts are active.
+- Multi-Display Target Selection: Added target monitor picker in Settings allowing the dock to bind to specific external displays or dynamically follow the active screen.
+- Vertical Dock Orientation: Added vertical scrollable layout support for Fixed Left and Fixed Right placements with responsive drag handles and dividers.
+- Fullscreen Auto-Hide & Reveal: Added fullscreen app detection with customizable dwell edge reveal and hover fadeout (0.15 alpha).
+
+---
+
 ## [2.11.0] - 2026-11-09
 
 ### Added

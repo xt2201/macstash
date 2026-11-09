@@ -1,0 +1,69 @@
+name: SideDock
+options:
+  bundleIdPrefix: com.macstash
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+settings:
+  SWIFT_VERSION: "6.0"
+  MACOSX_DEPLOYMENT_TARGET: "14.0"
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.6.4
+targets:
+  SideDockCore:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/SideDockCore
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockCore
+
+  SideDockWidgets:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/SideDockWidgets
+    dependencies:
+      - target: SideDockCore
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockWidgets
+
+  SideDockUI:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/SideDockUI
+    dependencies:
+      - target: SideDockCore
+      - target: SideDockWidgets
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockUI
+
+  SideDockSystem:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/SideDockSystem
+    dependencies:
+      - target: SideDockCore
+      - target: SideDockWidgets
+      - target: SideDockUI
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockSystem
+
+  MacStash:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/MacStash
+    dependencies:
+      - target: SideDockCore
+      - target: SideDockWidgets
+      - target: SideDockUI
+      - target: SideDockSystem
+      - package: Sparkle
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.app
+      INFOPLIST_FILE: Scripts/Info.plist

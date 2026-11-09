@@ -8,7 +8,7 @@ This document tracks implementation status against the BRD requirements for the 
 - [x] **M1: Dock Core** - NSPanel, floating & fixed bottom, app/folder management, running apps, glass styles, layout tests.
 - [x] **M2: Widget Framework & 10 Widgets** - `DockWidget` protocol, Widget Registry, 10 P0 local widgets, profiles, widget tests.
 - [x] **M3: MVP Complete** - Persistence & migration, EN/VI localization, onboarding, reset layout, DMG packaging.
-- [ ] **M4: P1 Phase 1** - Multi-display, fullscreen auto-hide, hide on window hover, reserve space, hotkeys.
+- [x] **M4: P1 Phase 1** - Multi-display, fullscreen auto-hide, hide on window hover, reserve space, hotkeys.
 - [ ] **M5: P1 Phase 2** - Profile export/import, backup/restore, Phase 2 widgets, liquid glass, window previews.
 - [ ] **M6: P2 Advanced** - Connected widgets, AI usage widgets, local MCP server, diagnostics export.
 
@@ -50,6 +50,18 @@ This document tracks implementation status against the BRD requirements for the 
 | FR-PRO-02 | P0 | Dock profile switcher, hide switcher option, pass-through | Done | `SideDockBarView.swift` |
 | FR-UI-01 | P0 | Appearance themes: Light Glass, Dark Glass, Clear, auto-system | Done | `SideDockGlassBackdrop.swift` |
 | FR-UI-02 | P0 | Scale slider, tile spacing slider, bottom offset slider, crisp icons | Done | `DockSettingsTabView.swift` |
+
+---
+
+## P1 Functional Requirements (Phase 1 & 2)
+
+| ID | Priority | Description | Status | Evidence / Test |
+|---|---|---|---|---|
+| FR-CORE-07 | P1 | Fixed 6 positions including vertical scrollable dock | Done | `SideDockBarView.swift`, `SideDockLayoutEngineTests.swift` |
+| FR-CORE-08 | P1 | Hide in fullscreen with edge hover reveal (1-3s delay) | Done | `EdgeTriggerManager.swift` |
+| FR-CORE-09 | P1 | Hide on window hover (fade out to 0.15 alpha) | Done | `EdgeTriggerManager.swift`, `SideDockManager.swift` |
+| FR-CORE-10 | P1 | Reserve Dock Space (push active windows away from dock) | Done | `ReserveSpacePolicy.swift`, `ReserveSpaceManager.swift`, `SideDockLayoutEngineTests.swift` |
+| FR-PRO-03 | P1 | Hotkeys: Control+Option+D toggle dock, Control+1..8 switch profile | Done | `ScreenManager.swift`, `ShortcutsTab.swift` |
 
 ---
 

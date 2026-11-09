@@ -36,3 +36,8 @@ This log records major technical and architecture decisions for SideDock with ra
 - **Context:** The addition of SideDock Second Dock constitutes a major new feature (backward-compatible minor release), requiring bump to v2.11.0 and synchronized updates across all 6 versioning locations.
 - **Decision:** Bump version to 2.11.0, sign zip archive using local Ed25519 key, update appcast.xml, and build universal ad-hoc signed DMG.
 - **Rationale:** Strict adherence to AGENTS.md single source of truth rules and Sparkle 2 background update verification.
+
+## ADR-008: Reserve Space via Accessibility AXUIElement
+- **Context:** FR-CORE-10 requires reserving screen space for fixed dock configurations without private WindowServer APIs.
+- **Decision:** Implement pure domain `ReserveSpacePolicy` for frame geometry math, coupled with `ReserveSpaceManager` using public Accessibility `AXUIElement` APIs to adjust frontmost non-desktop windows when enabled.
+- **Rationale:** 100% compliant with public Apple APIs, respects user privacy with opt-in default OFF configuration.

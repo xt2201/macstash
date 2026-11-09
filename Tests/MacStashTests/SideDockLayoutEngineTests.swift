@@ -9,6 +9,7 @@ public enum SideDockLayoutEngineTests {
         testFixedEdgePositions()
         testEdgeTriggerDetection()
         testAutoFitScreenWidthConstraint()
+        testReserveSpacePolicy()
     }
 
     private static func testFloatingDockClamping() {

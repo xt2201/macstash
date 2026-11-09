@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import SwiftUI
 import Combine
 import MacStashCore
 
@@ -20,20 +21,24 @@ public final class StashShelfManager: ObservableObject {
             let size = (try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? Int64) ?? 0
             let ext = url.pathExtension.lowercased()
             let isImage = ["png", "jpg", "jpeg", "webp", "gif", "heic", "tiff", "svg"].contains(ext)
-            items.insert(
-                StashItem(
-                    title: url.lastPathComponent,
-                    detailText: url.deletingLastPathComponent().path,
-                    itemType: isImage ? .image : .file,
-                    sourceURL: url,
-                    fileSizeBytes: size
-                ),
-                at: 0
-            )
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+                items.insert(
+                    StashItem(
+                        title: url.lastPathComponent,
+                        detailText: url.deletingLastPathComponent().path,
+                        itemType: isImage ? .image : .file,
+                        sourceURL: url,
+                        fileSizeBytes: size
+                    ),
+                    at: 0
+                )
+            }
             added += 1
         }
         if added > 0 {
-            enforceCapacity()
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+                enforceCapacity()
+            }
             HapticManager.shared.performBoundaryClick()
             AppLogger.lifecycle.info("Stashed \(added) files on shelf")
         }
@@ -44,17 +49,19 @@ public final class StashShelfManager: ObservableObject {
         guard !trimmed.isEmpty else { return }
         let isURL = (trimmed.hasPrefix("http://") || trimmed.hasPrefix("https://")) && URL(string: trimmed) != nil
         let title = isURL ? trimmed : String((trimmed.components(separatedBy: .newlines).first ?? trimmed).prefix(40))
-        items.insert(
-            StashItem(
-                title: title,
-                detailText: isURL ? "Web Link" : "Text Snippet",
-                itemType: isURL ? .url : .text,
-                sourceURL: isURL ? URL(string: trimmed) : nil,
-                stringContent: trimmed
-            ),
-            at: 0
-        )
-        enforceCapacity()
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+            items.insert(
+                StashItem(
+                    title: title,
+                    detailText: isURL ? "Web Link" : "Text Snippet",
+                    itemType: isURL ? .url : .text,
+                    sourceURL: isURL ? URL(string: trimmed) : nil,
+                    stringContent: trimmed
+                ),
+                at: 0
+            )
+            enforceCapacity()
+        }
         HapticManager.shared.performBoundaryClick()
     }
 

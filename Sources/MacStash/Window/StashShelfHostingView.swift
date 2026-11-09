@@ -114,10 +114,20 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
         shelf.isDropTargetActive = false
         let pasteboard = sender.draggingPasteboard
 
-        // 1. Direct file URLs
+        // 1. Direct file and web URLs
         if let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL], !urls.isEmpty {
-            shelf.addFileURLs(urls)
-            return true
+            let fileURLs = urls.filter { $0.isFileURL }
+            let webURLs = urls.filter { !$0.isFileURL }
+
+            if !fileURLs.isEmpty {
+                shelf.addFileURLs(fileURLs)
+            }
+            for webURL in webURLs {
+                shelf.addTextSnippet(webURL.absoluteString)
+            }
+            if !fileURLs.isEmpty || !webURLs.isEmpty {
+                return true
+            }
         }
 
         // 2. Legacy NSFilenamesPboardType (from older macOS apps or cross-platform drop sources)

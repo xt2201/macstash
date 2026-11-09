@@ -264,6 +264,10 @@ public struct StashShelfView: View {
                         },
                         itemProvider: { shelf.createItemProvider(for: item) }
                     )
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .top).combined(with: .opacity),
+                        removal: .scale(scale: 0.95).combined(with: .opacity)
+                    ))
                 }
             }
             .padding(10)
@@ -329,9 +333,29 @@ private struct StashItemCardView: View {
             .onTapGesture {
                 onSelect()
             }
-            .onDrag {
+            .onDrag({
                 itemProvider()
-            }
+            }, preview: {
+                HStack(spacing: 8) {
+                    itemIconView
+                        .frame(width: 24, height: 24)
+                    Text(item.title)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.3), radius: 8, x: 2, y: 2)
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(Color.cyan.opacity(0.4), lineWidth: 1)
+                )
+            })
 
             Spacer()
 

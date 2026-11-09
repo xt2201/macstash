@@ -9,8 +9,8 @@ import MacStashCore
 public final class AutoUpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate {
     public static let shared = AutoUpdateManager()
 
-    @Published public private(set) var currentVersion: String = "2.3.5"
-    @Published public private(set) var latestVersion: String = "2.3.5"
+    @Published public private(set) var currentVersion: String = Defaults.appVersion
+    @Published public private(set) var latestVersion: String = Defaults.appVersion
     @Published public private(set) var updateAvailable: Bool = false
     @Published public private(set) var releaseNotes: String = ""
     @Published public private(set) var releaseURL: String = ""

@@ -435,8 +435,10 @@ public final class ScreenManager: ObservableObject {
         let shelf = appState.stashShelf
         let scratchpad = appState.scratchpad
 
-        // Handle auto-close for Stash Shelf when mouse exits the drawer zone (only when opened transiently and not pinned)
-        if shelf.isShelfOpen && !shelf.isPinned && shelf.isTransientOpen && !shelf.isDropTargetActive && !isDragging {
+        // Handle auto-close for Left Drawer (Shelf or Scratchpad) when mouse exits the drawer zone (unless pinned)
+        let isDrawerOpen = (shelf.isShelfOpen || scratchpad.isScratchpadOpen)
+        let isAnyPinned = (shelf.isShelfOpen && shelf.isPinned) || (scratchpad.isScratchpadOpen && scratchpad.isPinned)
+        if isDrawerOpen && !isAnyPinned && !shelf.isDropTargetActive && !isDragging {
             if isMouseInsideLeftDrawer(mouseLoc) {
                 cancelPendingLeftEdgeHide()
             } else {
@@ -696,9 +698,13 @@ public final class ScreenManager: ObservableObject {
                 let cur = NSEvent.mouseLocation
                 let stillInside = self.isMouseInsideLeftDrawer(cur)
                 let isDragging = (NSEvent.pressedMouseButtons != 0)
-                if !stillInside && !isDragging && !self.appState.stashShelf.isDropTargetActive && !self.appState.stashShelf.isPinned {
+                let shelf = self.appState.stashShelf
+                let scratchpad = self.appState.scratchpad
+                let isAnyPinned = (shelf.isShelfOpen && shelf.isPinned) || (scratchpad.isScratchpadOpen && scratchpad.isPinned)
+                if !stillInside && !isDragging && !shelf.isDropTargetActive && !isAnyPinned {
                     withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
-                        self.appState.stashShelf.closeShelf()
+                        shelf.closeShelf()
+                        scratchpad.isScratchpadOpen = false
                     }
                 }
                 self.leftEdgeHideWorkItem = nil

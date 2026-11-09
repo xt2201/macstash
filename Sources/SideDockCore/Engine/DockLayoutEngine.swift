@@ -55,14 +55,18 @@ public struct DockLayoutEngine: Sendable {
             return CGRect(x: x, y: y, width: effectiveWidth, height: effectiveHeight)
 
         case .fixedLeft:
+            let verticalWidth = max(50.0, min(140.0, effectiveWidth))
+            let verticalHeight = min(effectiveHeight, max(200.0, visibleFrame.height - 32.0))
             let x = visibleFrame.minX + CGFloat(config.bottomOffset)
-            let y = visibleFrame.midY - (effectiveHeight / 2.0)
-            return CGRect(x: x, y: y, width: effectiveWidth, height: effectiveHeight)
+            let y = visibleFrame.midY - (verticalHeight / 2.0)
+            return CGRect(x: x, y: y, width: verticalWidth, height: verticalHeight)
 
         case .fixedRight:
-            let x = visibleFrame.maxX - effectiveWidth - CGFloat(config.bottomOffset)
-            let y = visibleFrame.midY - (effectiveHeight / 2.0)
-            return CGRect(x: x, y: y, width: effectiveWidth, height: effectiveHeight)
+            let verticalWidth = max(50.0, min(140.0, effectiveWidth))
+            let verticalHeight = min(effectiveHeight, max(200.0, visibleFrame.height - 32.0))
+            let x = visibleFrame.maxX - verticalWidth - CGFloat(config.bottomOffset)
+            let y = visibleFrame.midY - (verticalHeight / 2.0)
+            return CGRect(x: x, y: y, width: verticalWidth, height: verticalHeight)
         }
     }
 

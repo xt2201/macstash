@@ -297,6 +297,19 @@ public struct MenuBarExtraView: View {
             // Quick Actions
             VStack(spacing: 2) {
                 Button(action: {
+                    appState.sideDock.toggleDock()
+                }) {
+                    HStack {
+                        Image(systemName: "dock.rectangle")
+                        Text(appState.sideDock.config.isDockVisible ? "Hide Second Dock" : "Show Second Dock")
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                }
+                .buttonStyle(.plain)
+
+                Button(action: {
                     appState.updater.checkForUpdates(silent: false)
                 }) {
                     HStack {

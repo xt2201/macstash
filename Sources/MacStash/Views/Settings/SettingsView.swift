@@ -1,6 +1,10 @@
 import SwiftUI
 import AppKit
 import MacStashCore
+import SideDockCore
+import SideDockWidgets
+import SideDockUI
+import SideDockSystem
 
 public struct SettingsView: View {
     @ObservedObject var appState: AppState
@@ -9,6 +13,7 @@ public struct SettingsView: View {
     public enum SettingsTab: String, CaseIterable, Identifiable {
         case general = "General"
         case hotCorners = "Hot Corners"
+        case sideDock = "Second Dock"
         case appearance = "Appearance"
         case displays = "Displays"
         case pomodoro = "Pomodoro"
@@ -22,6 +27,7 @@ public struct SettingsView: View {
             switch self {
             case .general: return appState.localized("tab.general")
             case .hotCorners: return appState.localized("tab.hotCorners")
+            case .sideDock: return appState.effectiveLanguage == "vi" ? "Thanh Dock" : "Second Dock"
             case .appearance: return appState.localized("tab.appearance")
             case .displays: return appState.localized("tab.displays")
             case .pomodoro: return appState.localized("tab.pomodoro")
@@ -34,6 +40,7 @@ public struct SettingsView: View {
             switch self {
             case .general: return "gearshape"
             case .hotCorners: return "hand.tap"
+            case .sideDock: return "dock.rectangle"
             case .appearance: return "paintpalette"
             case .displays: return "display.2"
             case .pomodoro: return "timer"
@@ -88,6 +95,22 @@ public struct SettingsView: View {
                         GeneralTab(appState: appState)
                     case .hotCorners:
                         HotCornersTab(appState: appState)
+                    case .sideDock:
+                        DockSettingsTabView(
+                            config: Binding(
+                                get: { appState.sideDock.config },
+                                set: { appState.sideDock.config = $0 }
+                            ),
+                            onSave: { immediate in
+                                appState.sideDock.configStore.updateConfig(immediate: immediate) { cfg in
+                                    cfg = appState.sideDock.config
+                                }
+                                appState.sideDock.updateDockLayout()
+                            },
+                            onResetLayout: {
+                                appState.sideDock.resetLayout()
+                            }
+                        )
                     case .appearance:
                         AppearanceTab(appState: appState)
                     case .displays:

@@ -2,6 +2,10 @@ import SwiftUI
 import Combine
 import CoreGraphics
 import MacStashCore
+import SideDockCore
+import SideDockWidgets
+import SideDockUI
+import SideDockSystem
 
 @MainActor
 public final class AppState: ObservableObject {
@@ -18,6 +22,7 @@ public final class AppState: ObservableObject {
     public let profiles = AppProfileManager.shared
     public let haptics = HapticManager.shared
     public let sound = SoundEffectManager.shared
+    public let sideDock = SideDockManager.shared
 
     public let persistence = SettingsPersistenceService()
     public let brightnessService = CompositeBrightnessService()

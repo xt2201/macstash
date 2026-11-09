@@ -42,7 +42,7 @@
 </ul>
             ]]></description>
             <enclosure
-                url="https://github.com/xt2201/macstash/releases/download/v2.9.8/Stash-2.9.8.zip"
+                url="https://raw.githubusercontent.com/xt2201/macstash/release-binaries/Stash-2.9.8.zip"
                 sparkle:edSignature="mnP2jkcp7TzMfswxyisHd4F6UDGLS7XUswtYolsQRriLLmBaBj/3XMcA7jcv/B9S27yj2ux1LFrTgkUeTF45BA=="
                 length="4987807"
                 type="application/octet-stream" />

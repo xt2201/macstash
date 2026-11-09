@@ -8,14 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [2.10.0] - 2026-11-09
 
 ### Added
+- Flush Corner Dial Alignment: Anchored all 4 corner dials flush against the physical monitor corners with zero offset, directing window shadow padding exclusively towards the display interior.
+- Stash Shelf Local Disk Persistence: Added persistent JSON storage (`StashShelfStorage`) preserving stashed files, links, and snippets across reboots and app updates.
+- Drawer Pinning & Clear Undo: Added Pin toggle buttons to both Stash Shelf and Scratchpad headers to keep drawers open during multi-window workflows, plus instant Undo recovery for cleared items.
+- High-DPI Retina Icon Cache: Upgraded `StashIconCache` with high-resolution 2x backing bitmap representations for crystal-clear icon rendering on Retina displays.
+- Scratchpad Debounce & Zero-Allocation Counter: Optimized text saving with a 400ms debounce to eliminate main-thread disk I/O freezes, and replaced array-allocating string splits with an O(N) zero-allocation scalar word counter.
 - Left Edge Extreme Dwell Trigger: Calibrated left edge activation to match the precision behavior of Right Edge Bar — requires pushing the cursor flush against the physical left screen edge with dwell detection before sliding open.
-- Stash Shelf Local Persistence & Pinning: Added persistent disk storage for stashed items across app launches and a pin toggle to keep drawer open when required.
 
 ### Changed
 - Zero-Obtrusion Left Edge: Removed the persistent thin peek handle along the left screen border, allowing 100% unobstructed clicks and interactions with underlying background applications and left-docked panels.
 
 ### Fixed
-- Left Edge Hit-Testing: Completely disabled hit-testing when the left drawer is collapsed so background application windows receive mouse events directly.
+- Eliminated Ghost Corner Dwell Pop: Re-verified cursor position strictly against hot corner sensitivity radius upon dwell timer completion, preventing dials from popping open after the cursor has left the corner.
+- Background Application Click Pass-Through: Throttled mouse tracking events to eliminate task churn, and scoped corner panel hit testing to within dial radius + 5pt so transparent window margins pass all mouse clicks through to underlying apps.
+- Left Drawer Hit-Testing & Window Clipping: Expanded left edge NSPanel to 410pt and aligned hit-testing bounds to 352pt (Shelf) and 382pt (Scratchpad), fixing unclickable buttons on the right edge of drawers.
+- Direct Image Drops: Added support for dropping raw image representations (TIFF/PNG from browsers and screenshots) directly onto Stash Shelf.
 
 ---
 

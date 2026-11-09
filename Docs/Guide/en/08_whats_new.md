@@ -1,3 +1,16 @@
+# What's New in Version 2.9.0
+
+MacStash 2.9.0 brings a comprehensive professional UX/UI upgrade, extreme-edge intentional dwell triggering for the Right Edge Slider, intuitive two-axis directional trackpad gestures for corner dials, double-click file launching on Stash Shelf, and complete elimination of edge click blockage.
+
+## Key Enhancements in Version 2.9.0
+
+- Extreme Edge Trigger & Dwell Delay: The Right Edge Slider now strictly requires moving the cursor to the physical edge boundary (x >= maxX - 3.0) with an intentional 180ms dwell delay, allowing you to use window scrollbars, editor minimaps, and rightmost click targets in Safari, Chrome, and Xcode without accidental activations.
+- Natural Directional Scrolling for Corner Dials: Synchronized trackpad and mouse wheel vectors with macOS Natural Scrolling via event.isDirectionInvertedFromDevice. Swiping fingers UP or RIGHT naturally increases volume and settings across all corner dials.
+- Lateral Two-Axis Vector Projection: Added horizontal trackpad delta support, enabling intuitive two-finger lateral scrubbing along the radial arc.
+- Complete Elimination of Edge Click Blockage: Collapsed edge hosting views return nil for hit-testing and restrict resting peek handles to centered 64pt strips, keeping Finder sidebars, Slack workspaces, and browser tabs 100% accessible.
+- Double-Click to Open on Stash Shelf: Double-clicking any file, image, or link on Stash Shelf immediately launches it with the default macOS application.
+- Outside-Click Auto-Dismiss: Clicking anywhere outside Stash Shelf, Scratchpad, or expanded Right Edge Slider immediately dismisses the floating overlays.
+
 # What's New in Version 2.8.1
 
 MacStash 2.8.1 resolves a critical startup crash caused by Swift Package Manager resource bundle resolution in packaged application bundles, and improves first-mouse interaction responsiveness.

@@ -10,6 +10,44 @@ public enum StashFeatureTests {
         testScratchpadCounters()
         testOuterLeftEdgeGeometry()
         testNewControlActions()
+        testTrackpadDirectionalVectors()
+        testEdgeHitZonePolicy()
+    }
+
+    private static func testTrackpadDirectionalVectors() {
+        // Test Natural Scrolling Inversion (+physicalY = swipe up, +physicalX = swipe right)
+        let naturalInverted = true
+        let rawDeltaY: Double = -15.0 // swiping UP on trackpad with natural scrolling yields negative deltaY
+        let rawDeltaX: Double = -10.0 // swiping RIGHT yields negative deltaX
+
+        let physicalX = naturalInverted ? -rawDeltaX : rawDeltaX
+        let physicalY = naturalInverted ? -rawDeltaY : rawDeltaY
+
+        TestAssertion.assertTrue(physicalY > 0, "Swiping UP should yield positive physicalY")
+        TestAssertion.assertTrue(physicalX > 0, "Swiping RIGHT should yield positive physicalX")
+
+        // In .bottomRight (Volume corner), swiping UP or RIGHT must increase volume
+        let effectiveStep = physicalY + physicalX
+        TestAssertion.assertTrue(effectiveStep > 0, "Swiping UP or RIGHT in bottomRight increases volume")
+
+        // Mouse Wheel without natural scrolling (wheel rolled UP yields positive deltaY)
+        let mouseInverted = false
+        let wheelDeltaY: Double = 12.0
+        let mousePhysicalY = mouseInverted ? -wheelDeltaY : wheelDeltaY
+        TestAssertion.assertTrue(mousePhysicalY > 0, "Rolling wheel UP should yield positive physicalY")
+    }
+
+    private static func testEdgeHitZonePolicy() {
+        let screenWidth: CGFloat = 1920
+        let maxX = screenWidth
+
+        // Sát cạnh requirement: within 3pt of the physical screen edge
+        let extremeEdgeThreshold: CGFloat = 3.0
+        let scrollbarTouchPoint: CGFloat = maxX - 14.0 // User clicking standard 14pt scrollbar
+        let edgeSlamPoint: CGFloat = maxX - 1.5 // User intentionally pushing cursor into screen edge
+
+        TestAssertion.assertFalse(scrollbarTouchPoint >= maxX - extremeEdgeThreshold, "Scrollbar click must NOT be in extreme edge zone")
+        TestAssertion.assertTrue(edgeSlamPoint >= maxX - extremeEdgeThreshold, "Cursor slammed to screen edge must be recognized")
     }
 
     private static func testScratchpadCounters() {

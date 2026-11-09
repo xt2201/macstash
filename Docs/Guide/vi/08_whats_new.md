@@ -1,3 +1,16 @@
+# Có Gì Mới Trong Phiên Bản 2.9.0
+
+MacStash 2.9.0 nâng cấp toàn diện trải nghiệm UX/UI chuyên nghiệp, chuẩn hóa cơ chế kích hoạt sát mép màn hình kèm độ trễ dừng chuột cho thanh trượt phải, cử chỉ vuốt 2 ngón tay tự nhiên trên trackpad cho vòng xoay âm lượng, thao tác nhấp đúp mở tệp trên Kệ Stash, và triệt tiêu hoàn toàn hiện tượng che khuất click của ứng dụng nền.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.0
+
+- Kích Hoạt Sát Cạnh Kèm Độ Trễ Dừng Chuột: Thanh trượt cạnh phải hiện yêu cầu con trỏ di chuyển tới sát mép vật lý (x >= maxX - 3.0) và dừng lại 180ms mới xuất hiện, loại bỏ hoàn toàn tình trạng vô tình kích hoạt khi người dùng kéo thanh cuộn, minimap hoặc các nút bấm cạnh phải trong Safari, Chrome hay Xcode.
+- Chuẩn Hóa Chiều Vuốt Ngón Trackpad Cho Vòng Xoay Âm Lượng: Đồng bộ vector chuyển động ngón tay với cơ chế Cuộn Tự Nhiên (Natural Scrolling) của macOS thông qua event.isDirectionInvertedFromDevice. Thao tác vuốt lên hoặc sang phải luôn làm tăng âm lượng và thông số trực quan ở mọi góc.
+- Hỗ Trợ Vector Hai Trục Ngang Dọc: Bổ sung khả năng nhận diện độ dịch chuyển ngang (scrollingDeltaX), cho phép dùng 2 ngón tay vuốt chéo hoặc vuốt ngang linh hoạt dọc theo vành xoay góc.
+- Triệt Tiêu Vùng Chết Chặn Click Ứng Dụng Nền: Khi thu gọn, các panel cạnh trả quyền nhận chuột 100% cho ứng dụng bên dưới và giới hạn gờ kéo kính mờ ở dải 64pt giữa màn hình, giữ cho thanh bên Finder, ứng dụng Slack hay tab trình duyệt luôn hoạt động trơn tru.
+- Nhấp Đúp Mở Tệp Trực Tiếp Trên Kệ Stash: Nhấp đúp chuột vào bất kỳ tệp, hình ảnh hay đường dẫn nào trên Kệ Stash để mở ngay lập tức bằng ứng dụng mặc định của hệ thống macOS.
+- Tự Động Thu Hồi Khi Nhấp Chuột Ra Ngoài: Nhấp chuột ra ngoài vùng Kệ Stash, Scratchpad hoặc thanh trượt phải sẽ ngay lập tức đóng các lớp phủ và trả lại quyền tập trung cho ứng dụng đang làm việc.
+
 # Có Gì Mới Trong Phiên Bản 2.8.1
 
 MacStash 2.8.1 khắc phục triệt để sự cố ứng dụng bị thoát đột ngột khi khởi chạy sau khi cập nhật do cơ chế tìm kiếm tài nguyên Bundle.module của Swift Package Manager, đồng thời tăng cường độ nhạy khi nhấp chuột lần đầu vào vòng xoay góc.

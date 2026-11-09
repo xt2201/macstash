@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.9.0] - 2026-11-09
+
+### Changed
+- Extreme Edge Trigger & Dwell Delay for Right Edge Bar: Right Edge Slider now strictly requires the cursor to reach the physical screen edge (`x >= maxX - 3.0`) with a 180ms intentional dwell delay, completely eliminating accidental triggers when interacting with window scrollbars or controls in background applications.
+- Natural Directional Scrolling for Corner Dials: Synchronized trackpad and scroll wheel vectors with macOS Natural Scrolling via `event.isDirectionInvertedFromDevice`. Swiping fingers UP or RIGHT now naturally turns up volume on Bottom-Right corner dial and adjusts values across all quadrants.
+- Two-Axis Vector Projection: Added horizontal scroll delta (`scrollingDeltaX`) support across corner dials, enabling fluid two-finger lateral scrubbing along the radial arc.
+
+### Fixed
+- Fixed background application click blockage on left and right edges: Collapsed edge hosting views now strictly return nil for hit-testing and restrict peek handle hit zones to 64pt centered strips, keeping Finder sidebars, Slack workspaces, and browser scrollbars 100% responsive.
+- Fixed unclickable controls on Stash Shelf: Granted Key Window capability to Stash Shelf when active, ensuring immediate first-click responses for all action buttons and enabling keyboard shortcuts (Esc to close, Space to open).
+- Added Outside-Click Auto-Dismiss: Clicking anywhere outside Stash Shelf, Scratchpad, or expanded Right Edge Slider immediately collapses the overlays and returns window focus to the underlying application.
+- Added Double-Click to Open: Double-clicking any file, image, or link on Stash Shelf immediately launches it in the default macOS application.
+
+---
+
 ## [2.8.1] - 2026-11-09
 
 ### Fixed

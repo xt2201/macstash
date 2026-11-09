@@ -64,16 +64,8 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return super.hitTest(point)
         }
 
-        // When collapsed, only intercept along the thin outer edge strip (14 pt)
-        let edgeHitZone: CGFloat = 14
-        let triggerRect = (edge == .right)
-            ? NSRect(x: bounds.maxX - edgeHitZone, y: bounds.minY, width: edgeHitZone, height: bounds.height)
-            : NSRect(x: bounds.minX, y: bounds.minY, width: edgeHitZone, height: bounds.height)
-
-        if triggerRect.contains(point) {
-            return super.hitTest(point)
-        }
-
+        // When collapsed, return nil completely so background application scrollbars,
+        // window controls, and rightmost click targets remain 100% unobstructed.
         return nil
     }
 
@@ -96,8 +88,12 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return
         }
 
-        let deltaY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
-        guard abs(deltaY) > 0.001 else { return }
+        let rawDeltaY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
+        guard abs(rawDeltaY) > 0.001 else { return }
+
+        // With Natural Scrolling on macOS, swiping fingers UP produces negative rawDeltaY.
+        // On a vertical slider, swiping fingers UP should slide the slider UP (increase).
+        let deltaY: CGFloat = event.isDirectionInvertedFromDevice ? -rawDeltaY : rawDeltaY
 
         let sensitivity: Float = 0.005
         let step = Float(deltaY) * sensitivity

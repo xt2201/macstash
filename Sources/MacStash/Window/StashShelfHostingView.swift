@@ -58,15 +58,25 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
             return nil
         }
 
-        // When collapsed, only hit test the subtle peek tab along the left edge
-        let edgeHitZone: CGFloat = 22.0
-        let triggerRect = NSRect(x: bounds.minX, y: bounds.minY, width: edgeHitZone, height: bounds.height)
+        // When collapsed, only hit test the subtle peek tab vertically centered along the left edge
+        let handleHeight: CGFloat = 64.0
+        let handleY = (bounds.height - handleHeight) / 2.0
+        let triggerRect = NSRect(x: bounds.minX, y: handleY, width: 22.0, height: handleHeight)
 
         if triggerRect.contains(point) {
             return super.hitTest(point)
         }
 
         return nil
+    }
+
+    public override func keyDown(with event: NSEvent) {
+        if event.keyCode == 53 { // Esc
+            shelf.closeShelf()
+            scratchpad.isScratchpadOpen = false
+            return
+        }
+        super.keyDown(with: event)
     }
 
     // MARK: - Native Drag Destination

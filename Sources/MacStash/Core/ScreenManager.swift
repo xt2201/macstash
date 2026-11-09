@@ -25,6 +25,11 @@ public final class ScreenManager: ObservableObject {
     private var dwellWorkItem: DispatchWorkItem?
     private var hideWorkItem: DispatchWorkItem?
 
+    // Right Edge Dwell and Hide State
+    private var pendingRightEdgeDisplayID: CGDirectDisplayID?
+    private var rightEdgeDwellWorkItem: DispatchWorkItem?
+    private var rightEdgeHideWorkItem: DispatchWorkItem?
+
     // Drag-and-Drop Gesture Tracking (Shake to summon)
     private var dragHistory: [(point: NSPoint, time: Date)] = []
 
@@ -46,8 +51,9 @@ public final class ScreenManager: ObservableObject {
             .sink { [weak self] shelfOpen, padOpen in
                 guard let self = self else { return }
                 let isOpen = shelfOpen || padOpen || self.appState.stashShelf.isDropTargetActive
+                let allowKey = shelfOpen || padOpen
                 for instance in self.instances.values {
-                    instance.setLeftEdgeInteractive(isOpen, allowsKey: padOpen)
+                    instance.setLeftEdgeInteractive(isOpen, allowsKey: allowKey)
                 }
             }
             .store(in: &cancellables)
@@ -285,6 +291,41 @@ public final class ScreenManager: ObservableObject {
             return
         }
 
+        // Outside Click Handling for Transient Panels (Right Slider, Stash Shelf, Scratchpad)
+        if isClick {
+            if appState.isRightSliderActive {
+                var clickedInsideSlider = false
+                for instance in instances.values {
+                    let frame = instance.screen.frame
+                    let rightRect = instance.rightEdgeRect(in: frame)
+                    let expandedHitRect = NSRect(x: frame.maxX - 260, y: rightRect.minY, width: 260, height: rightRect.height)
+                    if expandedHitRect.contains(mouseLoc) {
+                        clickedInsideSlider = true
+                        break
+                    }
+                }
+                if !clickedInsideSlider {
+                    dismissRightSlider()
+                }
+            }
+
+            if appState.stashShelf.isShelfOpen || appState.scratchpad.isScratchpadOpen {
+                var clickedInsideDrawer = false
+                for instance in instances.values {
+                    let frame = instance.screen.frame
+                    let leftRect = instance.leftEdgeRect(in: frame)
+                    if leftRect.contains(mouseLoc) {
+                        clickedInsideDrawer = true
+                        break
+                    }
+                }
+                if !clickedInsideDrawer {
+                    appState.stashShelf.closeShelf()
+                    appState.scratchpad.isScratchpadOpen = false
+                }
+            }
+        }
+
         // 5. Check Hot Corner Dwell (when no dial is active)
         if appState.isCornerDialsEnabled {
             var foundCandidate = false
@@ -375,7 +416,7 @@ public final class ScreenManager: ObservableObject {
                 let isOpen = shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen
 
                 if isOpen {
-                    instance.setLeftEdgeInteractive(true, allowsKey: scratchpad.isScratchpadOpen)
+                    instance.setLeftEdgeInteractive(true, allowsKey: (shelf.isShelfOpen || scratchpad.isScratchpadOpen))
                 } else if isDragging {
                     if mouseLoc.x >= frame.minX && mouseLoc.x <= frame.minX + 60 &&
                        mouseLoc.y >= leftRect.minY && mouseLoc.y <= leftRect.maxY {
@@ -387,7 +428,10 @@ public final class ScreenManager: ObservableObject {
                         instance.setLeftEdgeInteractive(false, allowsKey: false)
                     }
                 } else {
-                    let peekRect = NSRect(x: frame.minX, y: leftRect.minY, width: 26, height: leftRect.height)
+                    // Peek Handle: subtle centered zone (height: 64pt, width: 4.0pt at extreme screen edge)
+                    let handleHeight: CGFloat = 64.0
+                    let handleY = leftRect.midY - (handleHeight / 2.0)
+                    let peekRect = NSRect(x: frame.minX, y: handleY, width: 4.0, height: handleHeight)
                     let isHovering = peekRect.contains(mouseLoc)
                     instance.setLeftEdgeInteractive(isHovering, allowsKey: false)
                 }
@@ -397,17 +441,105 @@ public final class ScreenManager: ObservableObject {
 
             // 2. Right Edge Slider Interactivity
             if appState.isEdgeSlidersEnabled && appState.activeProfile.rightEdgeAction != .none {
-                let rightRect = instance.rightEdgeRect(in: frame)
-                if appState.isRightSliderActive {
-                    instance.setRightEdgeInteractive(true)
+                let isOuterRight: Bool
+                if appState.settings.onlyOuterCorners {
+                    isOuterRight = CornerGeometry.isOuterRightEdge(screen: frame, in: NSScreen.screens.map { $0.frame })
                 } else {
-                    let rightTriggerRect = NSRect(x: frame.maxX - 22, y: rightRect.minY, width: 22, height: rightRect.height)
-                    let isHovering = rightTriggerRect.contains(mouseLoc)
-                    instance.setRightEdgeInteractive(isHovering)
+                    isOuterRight = true
+                }
+
+                if isOuterRight {
+                    let rightRect = instance.rightEdgeRect(in: frame)
+                    if appState.isRightSliderActive {
+                        let expandedHitRect = NSRect(x: frame.maxX - 260, y: rightRect.minY, width: 260, height: rightRect.height)
+                        if expandedHitRect.contains(mouseLoc) {
+                            rightEdgeHideWorkItem?.cancel()
+                            rightEdgeHideWorkItem = nil
+                            instance.setRightEdgeInteractive(true)
+                        } else {
+                            scheduleRightEdgeHideTimer()
+                        }
+                    } else {
+                        // Extreme edge (<= 3pt) requirement with dwell delay matching corner trigger policy
+                        let extremeEdgeRect = NSRect(x: frame.maxX - 3.0, y: rightRect.minY, width: 3.0, height: rightRect.height)
+                        if extremeEdgeRect.contains(mouseLoc) {
+                            scheduleRightEdgeDwellTimer(displayID: instance.displayID, screenFrame: frame)
+                        } else {
+                            cancelPendingRightEdgeDwell()
+                            instance.setRightEdgeInteractive(false)
+                        }
+                    }
+                } else {
+                    instance.setRightEdgeInteractive(false)
                 }
             } else {
                 instance.setRightEdgeInteractive(false)
             }
+        }
+    }
+
+    private func scheduleRightEdgeDwellTimer(displayID: CGDirectDisplayID, screenFrame: NSRect) {
+        if pendingRightEdgeDisplayID == displayID { return }
+        cancelPendingRightEdgeDwell()
+        pendingRightEdgeDisplayID = displayID
+
+        let delay = max(0.12, appState.cornerDwellDelay)
+        let item = DispatchWorkItem { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                guard self.pendingRightEdgeDisplayID == displayID else { return }
+                let cur = NSEvent.mouseLocation
+                if cur.x >= screenFrame.maxX - 4.0 {
+                    self.appState.isRightSliderActive = true
+                    self.instances[displayID]?.setRightEdgeInteractive(true)
+                    HapticManager.shared.performDetentTick()
+                }
+                self.pendingRightEdgeDisplayID = nil
+            }
+        }
+        self.rightEdgeDwellWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+    }
+
+    private func cancelPendingRightEdgeDwell() {
+        rightEdgeDwellWorkItem?.cancel()
+        rightEdgeDwellWorkItem = nil
+        pendingRightEdgeDisplayID = nil
+    }
+
+    private func scheduleRightEdgeHideTimer() {
+        guard rightEdgeHideWorkItem == nil else { return }
+        let item = DispatchWorkItem { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                let cur = NSEvent.mouseLocation
+                var stillInside = false
+                for instance in self.instances.values {
+                    let frame = instance.screen.frame
+                    let rightRect = instance.rightEdgeRect(in: frame)
+                    let expandedHitRect = NSRect(x: frame.maxX - 260, y: rightRect.minY, width: 260, height: rightRect.height)
+                    if expandedHitRect.contains(cur) {
+                        stillInside = true
+                        break
+                    }
+                }
+                if !stillInside {
+                    self.dismissRightSlider()
+                }
+                self.rightEdgeHideWorkItem = nil
+            }
+        }
+        rightEdgeHideWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28, execute: item)
+    }
+
+    public func dismissRightSlider() {
+        cancelPendingRightEdgeDwell()
+        rightEdgeHideWorkItem?.cancel()
+        rightEdgeHideWorkItem = nil
+        appState.isRightSliderActive = false
+        for instance in instances.values {
+            instance.setRightEdgeInteractive(false)
         }
     }
 
@@ -519,9 +651,11 @@ public final class ScreenManager: ObservableObject {
             if appState.isCursorPalettePresented {
                 dismissCursorPalette()
             } else if appState.stashShelf.isShelfOpen {
-                appState.stashShelf.isShelfOpen = false
+                appState.stashShelf.closeShelf()
             } else if appState.scratchpad.isScratchpadOpen {
                 appState.scratchpad.isScratchpadOpen = false
+            } else if appState.isRightSliderActive {
+                dismissRightSlider()
             }
             return
         }

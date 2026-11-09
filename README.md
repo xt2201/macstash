@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.8.1-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.9.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.8.1.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.9.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -72,8 +72,8 @@ MacStash assigns high-frequency system controls to the four physical display ver
 ### 1. Quarter-Circle Radial Corner Dials
 - Invisibly docked at the screen corners with zero desktop clutter.
 - Gentle bloom animation on dwell (0.2s configurable threshold, tight 5–8pt hit-zone) or instant click-to-activate.
-- **Two-Finger Scroll to Adjust**: Glide two fingers up or down on your trackpad (or roll the scroll wheel) to immediately adjust volume, brightness, backlight, or Pomodoro duration without clicking and holding.
-- Drag along the radial arc or use vertical trackpad scrolling for fluid adjustments.
+- **Natural Two-Axis Trackpad Scrubbing**: Synchronized with macOS Natural Scrolling via `event.isDirectionInvertedFromDevice`. Glide two fingers UP or RIGHT on your trackpad to smoothly increase volume, brightness, backlight, or timer duration, or DOWN and LEFT to decrease.
+- Drag along the radial arc or use vertical/horizontal trackpad scrolling for fluid adjustments.
 - Instant collapse when the cursor departs the quadrant area.
 
 ### 2. Multi-Monitor Hardware Brightness (DDC/CI &amp; Native)
@@ -95,7 +95,9 @@ MacStash assigns high-frequency system controls to the four physical display ver
 ### 5. Tactile Stash Drop Shelf &amp; Quick Scratchpad
 - **The Stash Shelf**: The core namesake feature of MacStash. A frosted glass drop shelf sliding smoothly from the left screen edge to hold files, images, links, and text snippets when dragging across spaces, displays, or apps.
 - **Shake-to-Summon Drag Gesture**: Wiggle or shake the mouse cursor back and forth while dragging any file, photo, or snippet to immediately summon the Stash Shelf at your cursor with tactile mechanical detents.
-- **Zero-Footprint Background Pass-Through**: Floating edge panels strictly ignore mouse events when idle, guaranteeing 100% unimpeded clicks in underlying macOS apps (Finder sidebar, Safari tabs, Xcode editor, Terminal).
+- **Double-Click to Launch**: Double-clicking any file, image, or link on Stash Shelf immediately launches it with the default macOS system app.
+- **Zero-Footprint Background Pass-Through**: Floating edge panels strictly ignore mouse events when idle and center resting peek handles on a slim 64pt strip, guaranteeing 100% unimpeded clicks in underlying macOS apps (Finder sidebar, Safari tabs, Xcode editor, Terminal).
+- **Outside-Click Auto-Dismiss**: Clicking anywhere outside the Stash Shelf, Scratchpad, or Edge Slider immediately collapses the overlays and returns window focus cleanly to your active application.
 - **Immediate First-Mouse Interaction**: Every button (Clear All, Copy Path, Reveal in Finder, Remove, Close) triggers on the very first mouse-up with zero swallowed clicks.
 - **Quick Drag Export &amp; Copy All**: Drag stashed items back out to any application, email, or Finder folder anytime, or click "Copy All" to copy all file references to the clipboard at once.
 - **Quick Scratchpad Drawer**: Ephemeral glassmorphic notepad with dynamic key window keyboard focus for immediate typing, live word and character counters, automatic local persistence, and standard macOS keyboard shortcuts (`Cmd+A`, `Cmd+C`, `Cmd+V`, `Cmd+Z`, `Esc`).
@@ -111,7 +113,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 
 ### 8. Hidden Edge Slider &amp; Now Playing Media Controls
 - Rides flush against your screen border with configurable actions in Settings (Volume, Brightness, Keyboard, Timer, Keep Awake, Stash Shelf, Scratchpad) and 120Hz ProMotion vertical drag/scroll smoothness.
-- Smoothly slides into view when hovering the edge.
+- **Extreme Edge &amp; Dwell Triggering**: Requires moving cursor to the physical edge boundary (`x >= maxX - 3.0`) with an intentional 180ms dwell delay, completely eliminating accidental expansions when using window scrollbars or controls in background apps.
 - **Universal Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, a 5-bar rhythm audio visualizer dynamically tinted to match the track's artwork color, and vertical transport controls (Previous on top, Play/Pause in middle, Next at bottom) across all browsers (Crest, Safari, Chrome, Arc) and native players (Spotify, Apple Music, VLC).
 - **Hover Track Tooltip**: Floating glassmorphic card previews full track title, artist, album, and source app on hover.
 - **Two-Finger Edge Scrubbing**: Seamlessly tune volume, brightness, or your chosen action on the edge slider using natural two-finger vertical scrolling.

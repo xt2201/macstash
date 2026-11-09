@@ -49,23 +49,17 @@ public struct EdgeSliderView: View {
         let isExpanded = isHovered || isDragging || appState.isRightSliderActive
 
         ZStack(alignment: edge == .right ? .trailing : .leading) {
-            if isVisible {
-                // Completely hidden when idle, smoothly slides into view on hover
+            if isVisible && isExpanded {
+                // Completely hidden when idle, smoothly slides into view when activated
                 sliderContent(isExpanded: isExpanded)
                     .offset(x: isExpanded ? 0 : (edge == .right ? (sliderWidth + 24) : -(sliderWidth + 24)))
                     .opacity(isExpanded ? 1.0 : 0.0)
-                    .animation(.spring(response: 0.32, dampingFraction: 0.78), value: isExpanded)
-
-                // Invisible touch sensor strip along physical screen edge
-                Color.clear
-                    .frame(width: 14)
-                    .contentShape(Rectangle())
+                    .animation(.spring(response: 0.30, dampingFraction: 0.82), value: isExpanded)
             }
         }
-        .frame(width: isExpanded ? 260 : (sliderWidth + 10), alignment: edge == .right ? .trailing : .leading)
+        .frame(width: isExpanded ? 260 : 0, alignment: edge == .right ? .trailing : .leading)
         .onHover { hovering in
             isHovered = hovering
-            appState.isRightSliderActive = hovering
         }
     }
 

@@ -122,6 +122,21 @@ public final class StashShelfManager: ObservableObject {
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
+    public func openItem(id: UUID) {
+        guard let item = items.first(where: { $0.id == id }) else { return }
+        if let url = item.sourceURL, item.isExistingFile {
+            NSWorkspace.shared.open(url)
+            HapticManager.shared.performDetentTick()
+        } else if item.itemType == .url, let url = item.sourceURL {
+            NSWorkspace.shared.open(url)
+            HapticManager.shared.performDetentTick()
+        } else if let text = item.stringContent {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(text, forType: .string)
+            HapticManager.shared.performDetentTick()
+        }
+    }
+
     public func createItemProvider(for item: StashItem) -> NSItemProvider {
         if let url = item.sourceURL, item.itemType == .file || item.itemType == .image {
             return NSItemProvider(contentsOf: url) ?? NSItemProvider(object: url as NSURL)

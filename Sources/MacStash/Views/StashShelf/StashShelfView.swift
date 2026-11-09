@@ -10,6 +10,7 @@ public struct StashShelfView: View {
 
     @State private var isTargeted: Bool = false
     @State private var hoveredItemID: UUID? = nil
+    @State private var selectedItemID: UUID? = nil
     @State private var copyFeedback: Bool = false
 
     private let shelfWidth: CGFloat = Defaults.StashShelf.defaultWidthPoints
@@ -199,6 +200,7 @@ public struct StashShelfView: View {
 
     private func stashItemCard(item: StashItem) -> some View {
         let isHovered = hoveredItemID == item.id
+        let isSelected = selectedItemID == item.id
 
         return HStack(spacing: 8) {
             // Draggable Section: Grip Handle + Icon + Metadata
@@ -244,6 +246,12 @@ public struct StashShelfView: View {
                 }
             }
             .contentShape(Rectangle())
+            .onTapGesture(count: 2) {
+                shelf.openItem(id: item.id)
+            }
+            .onTapGesture(count: 1) {
+                selectedItemID = item.id
+            }
             .onDrag {
                 shelf.createItemProvider(for: item)
             }
@@ -252,6 +260,22 @@ public struct StashShelfView: View {
 
             // Isolated Trailing Action Buttons (NOT wrapped in .onDrag to ensure 100% reliable clicks)
             HStack(spacing: 4) {
+                // Quick Open Button
+                Button(action: {
+                    shelf.openItem(id: item.id)
+                }) {
+                    Image(systemName: "arrow.up.forward.app")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(isSelected ? .cyan : .secondary)
+                        .frame(width: 22, height: 22)
+                        .background(
+                            RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                .fill(Color.white.opacity(0.08))
+                        )
+                }
+                .buttonStyle(.plain)
+                .help("Open File")
+
                 if item.isExistingFile {
                     Button(action: {
                         shelf.revealInFinder(id: item.id)
@@ -306,7 +330,11 @@ public struct StashShelfView: View {
         .padding(.vertical, 6)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(isHovered ? Color.white.opacity(0.12) : Color.white.opacity(0.05))
+                .fill(isSelected ? Color.cyan.opacity(0.18) : (isHovered ? Color.white.opacity(0.12) : Color.white.opacity(0.05)))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(isSelected ? Color.cyan.opacity(0.5) : Color.clear, lineWidth: 1.0)
         )
         .onHover { hovering in
             hoveredItemID = hovering ? item.id : nil

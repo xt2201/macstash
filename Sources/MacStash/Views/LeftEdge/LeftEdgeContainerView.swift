@@ -53,9 +53,9 @@ public struct LeftEdgeContainerView: View {
 
     private var restingPeekHandle: some View {
         ZStack(alignment: .leading) {
-            // Invisible hover sensor zone (22pt wide)
+            // Invisible hover sensor zone (22pt wide, 64pt high centered)
             Color.clear
-                .frame(width: 22, height: 120)
+                .frame(width: 22, height: 64)
                 .contentShape(Rectangle())
 
             // Visual handle

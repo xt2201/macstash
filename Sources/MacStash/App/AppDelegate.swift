@@ -97,7 +97,6 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 260, height: 350)
         popover.behavior = .transient
         popover.delegate = self
 
@@ -105,6 +104,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.openSettings()
         }
         popover.contentViewController = NSHostingController(rootView: menuBarView)
+        updatePopoverContentSize()
 
         setupStatusItemSubscribers()
     }
@@ -209,16 +209,29 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
+    private func updatePopoverContentSize(on screen: NSScreen? = nil) {
+        guard let contentVC = popover.contentViewController else { return }
+        contentVC.view.layoutSubtreeIfNeeded()
+        let fitting = contentVC.view.fittingSize
+        let currentScreen = screen ?? statusItem?.button?.window?.screen ?? NSScreen.main
+        let maxHeight = max(200, (currentScreen?.visibleFrame.height ?? 800) - 40)
+        let target = NSSize(
+            width: max(260, fitting.width),
+            height: min(max(100, fitting.height), maxHeight)
+        )
+        contentVC.preferredContentSize = target
+        popover.contentSize = target
+    }
+
     @objc private func togglePopover(_ sender: AnyObject? = nil) {
         guard let button = statusItem.button else { return }
 
+        let buttonScreen = button.window?.screen
         let mouseLoc = NSEvent.mouseLocation
         let clickedScreen = NSScreen.screens.first { NSMouseInRect(mouseLoc, $0.frame, false) }
-            ?? button.window?.screen
+            ?? buttonScreen
             ?? NSScreen.main
             ?? NSScreen.screens.first
-
-        let isTargetScreenCurrentButtonScreen = (button.window?.screen != nil && clickedScreen == button.window?.screen)
 
         if popover.isShown {
             let currentWindowScreen = popover.contentViewController?.view.window?.screen
@@ -235,6 +248,12 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
         appState.keyboard.updateBrightnessFromHardware()
         appState.audio.updateVolumeFromHardware()
+
+        // Ensure popover content size is accurately computed before showing to prevent upward expansion over the menu bar
+        updatePopoverContentSize(on: clickedScreen)
+
+        let isClickOnButton = button.window?.frame.insetBy(dx: -4, dy: -4).contains(mouseLoc) ?? false
+        let isTargetScreenCurrentButtonScreen = isClickOnButton || (buttonScreen != nil && clickedScreen == buttonScreen)
 
         if isTargetScreenCurrentButtonScreen, clickedScreen != nil {
             cleanupAnchorWindow()
@@ -271,6 +290,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         anchor.orderFrontRegardless()
 
         self.anchorWindow = anchor
+        updatePopoverContentSize(on: screen)
         popover.show(relativeTo: anchorView.bounds, of: anchorView, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
     }

@@ -1,3 +1,13 @@
+# What's New in Version 2.9.5
+
+MacStash 2.9.5 resolves the layout overlap issue when clicking the application menu bar icon, ensuring the popover panel anchors properly below the top menu bar with dynamic intrinsic content sizing.
+
+## Key Enhancements in Version 2.9.5
+
+- Dynamic Popover Intrinsic Sizing: Eliminated the obsolete hardcoded 350pt content height constraint, dynamically measuring the full fitting size of the menu bar panel before presentation to anchor its top edge accurately beneath the menu bar.
+- Downward Layout Expansion: Guaranteed that the menu bar popover expands strictly downwards and remains within visible screen bounds, eliminating upward drift over the macOS menu bar and notch.
+- Enhanced Menu Bar Button Hit-Testing: Added boundary verification with margin inset for the status item window, ensuring clicks on the status item icon always route cleanly to the physical button.
+
 # What's New in Version 2.9.4
 
 MacStash 2.9.4 eliminates premature opening of the Right Edge Slider with strict extreme-edge boundary gating, delivers bidirectional macOS Silent/Mute hardware synchronization, and introduces 1-click silent toggling across all audio controls.

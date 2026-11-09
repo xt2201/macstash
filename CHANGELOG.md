@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.9.5] - 2026-11-09
+
+### Fixed
+- Fixed menu bar popover overlapping the macOS menu bar: Replaced obsolete hardcoded `350pt` content size with dynamic intrinsic sizing (`updatePopoverContentSize`) computed prior to popover presentation. This anchors the popover window strictly below the status item button and ensures all content expansion flows downwards without covering the top menu bar or protruding off-screen.
+- Enhanced status item click detection: Added button window frame boundary verification with margin inset to guarantee clicks on the menu bar status icon are reliably routed to the physical status button without spawning misaligned anchor panels on external displays.
+
+---
+
 ## [2.9.4] - 2026-11-09
 
 ### Fixed

@@ -12,6 +12,7 @@ public enum VersionConsistencyTests {
         testDynamicLocalizationVersion()
         testNoStaleHardcodedVersionsInCatalog()
         testNoBundleModuleUsage()
+        testMenuBarPopoverDynamicSizing()
     }
 
     private static func findRepoRoot() -> URL? {
@@ -149,5 +150,23 @@ public enum VersionConsistencyTests {
         }
 
         TestAssertion.assertTrue(offenders.isEmpty, "Sources must not use 'Bundle.module' (causes fatalError in macOS .app bundles). Found in: \(offenders.joined(separator: ", "))")
+    }
+
+    private static func testMenuBarPopoverDynamicSizing() {
+        guard let root = findRepoRoot() else { return }
+        let appDelegatePath = root.appendingPathComponent("Sources/MacStash/App/AppDelegate.swift").path
+        guard let content = try? String(contentsOfFile: appDelegatePath, encoding: .utf8) else {
+            TestAssertion.assertTrue(false, "AppDelegate.swift must exist and be readable")
+            return
+        }
+
+        TestAssertion.assertFalse(
+            content.contains("popover.contentSize = NSSize(width: 260, height: 350)"),
+            "AppDelegate.swift must not hardcode popover.contentSize to 350pt (causes popover to overlap menu bar)"
+        )
+        TestAssertion.assertTrue(
+            content.contains("updatePopoverContentSize"),
+            "AppDelegate.swift must implement dynamic popover sizing via updatePopoverContentSize"
+        )
     }
 }

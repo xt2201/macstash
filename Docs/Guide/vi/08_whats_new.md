@@ -1,3 +1,13 @@
+# Có Gì Mới Trong Phiên Bản 2.9.5
+
+MacStash 2.9.5 xử lý triệt để lỗi giao diện khi nhấp vào biểu tượng ứng dụng trên thanh Menu Bar, đảm bảo bảng menu mở rộng được cố định chuẩn xác bên dưới thanh Menu Bar với kích thước nội dung động.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.5
+
+- Đo Lường Kích Thước Popover Tự Động: Loại bỏ giới hạn chiều cao 350pt cố định cũ, tự động đo lường kích thước nội dung thực tế trước khi hiển thị để cố định mép trên của bảng điều khiển nằm ngay dưới thanh Menu Bar.
+- Mở Rộng Xuống Dưới Chuẩn Xác: Đảm bảo toàn bộ bảng Menu Bar luôn mở rộng xuống phía dưới và nằm trọn trong phạm vi hiển thị màn hình, triệt tiêu hoàn toàn hiện tượng trôi ngược lên đè lên thanh Menu Bar và vùng tai thỏ notch.
+- Nhận Diện Nhấp Chuột Nút Menu Bar Chuẩn Xác: Thêm vùng đệm nhận diện khung cửa sổ của nút trạng thái, đảm bảo thao tác nhấp chuột vào biểu tượng trên Menu Bar luôn được xử lý chuẩn xác trên nút bấm vật lý.
+
 # Có Gì Mới Trong Phiên Bản 2.9.4
 
 MacStash 2.9.4 khắc phục triệt để hiện tượng mở sớm thanh trượt cạnh phải bằng cơ chế chạm viền vật lý chuẩn xác, đồng bộ hóa hai chiều trạng thái Im lặng / Mute phần cứng của macOS, và hỗ trợ bật/tắt im lặng 1-chạm.

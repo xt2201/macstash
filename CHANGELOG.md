@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.9.3] - 2026-11-09
+
+### Fixed
+- Fixed corner dial swipe directions: Unified physical gesture dynamics across all 4 screen corner dials (Bottom-Right volume, Top-Right brightness, Bottom-Left timer, Top-Left keyboard brightness). Swiping fingers UP or RIGHT now consistently and intuitively increases values, while swiping DOWN or LEFT decreases values.
+- Fixed radial gauge filling orientation: Corrected Bottom-Left and Top-Right radial gauges so that 0% starts at the lowest perimeter and rises upward to 100%, perfectly synchronizing visual arc filling with natural finger swiping.
+- Resolved local application running state: Replaced running application in `/Applications/Stash.app` with fresh universal binary release, preventing obsolete 2.9.1 instances from exhibiting old detached hover boxes.
+
+---
+
 ## [2.9.2] - 2026-11-09
 
 ### Fixed

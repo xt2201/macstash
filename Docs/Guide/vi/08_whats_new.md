@@ -1,3 +1,13 @@
+# Có Gì Mới Trong Phiên Bản 2.9.3
+
+MacStash 2.9.3 đồng bộ hóa toàn diện cử chỉ vuốt ngón và hướng làm đầy vành xoay trên cả bốn góc màn hình theo quy chuẩn vật lý tự nhiên hướng lên trên.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.3
+
+- Đồng Bộ Hoàn Toàn Hướng Vuốt Ngón 4 Góc: Cả bốn góc màn hình (âm lượng, độ sáng, đồng hồ đếm ngược, đèn nền bàn phím) đều áp dụng quy chuẩn nhất quán. Vuốt ngón LÊN hoặc SANG PHẢI để tăng giá trị, vuốt XUỐNG hoặc SANG TRÁI để giảm giá trị.
+- Đồng Nhất Chiều Làm Đầy Vành Xoay: Căn chỉnh vành xoay góc dưới bên trái và góc trên bên phải sao cho mức 0% bắt đầu ở đáy và tiến dần lên mức 100% ở phía trên, đồng bộ hoàn hảo giữa chuyển động thị giác và cảm giác vuốt ngón tay.
+- Tự Động Làm Mới Ứng Dụng Đang Chạy: Đảm bảo bản phát hành mới nhất được cập nhật và kích hoạt trực tiếp trong thư mục Ứng dụng (/Applications/Stash.app), loại bỏ hiện tượng hiển thị giao diện cũ.
+
 # Có Gì Mới Trong Phiên Bản 2.9.2
 
 MacStash 2.9.2 khắc phục triệt để hiện tượng tràn bố cục và cấn viền trên thanh trượt cạnh phải, đảm bảo toàn bộ viền bo góc tròn hiển thị trọn vẹn và loại bỏ thẻ nổi bị lỗi.

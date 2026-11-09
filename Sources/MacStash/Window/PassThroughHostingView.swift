@@ -109,24 +109,11 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
         let totalMotion = hypot(physicalX, physicalY)
         guard totalMotion > 0.001 else { return }
 
-        // Compute quadrant-specific directional step
-        let effectiveStep: Double
-        switch corner {
-        case .bottomRight:
-            // Volume corner: 0% is left (bottom screen edge), 100% is up (right screen edge).
-            // Swiping UP (+physicalY) or RIGHT (+physicalX) turns UP the volume.
-            // Swiping DOWN (-physicalY) or LEFT (-physicalX) turns DOWN the volume.
-            effectiveStep = physicalY + physicalX
-        case .bottomLeft:
-            // 0% is up, 100% is right. Swiping UP or RIGHT increases value.
-            effectiveStep = (abs(physicalY) > abs(physicalX)) ? physicalY : physicalX
-        case .topRight:
-            // Brightness corner: Swiping UP or RIGHT increases value; swiping DOWN or LEFT decreases.
-            effectiveStep = (abs(physicalY) > abs(physicalX)) ? physicalY : physicalX
-        case .topLeft:
-            // Swiping UP or RIGHT increases value; swiping DOWN or LEFT decreases.
-            effectiveStep = (abs(physicalY) > abs(physicalX)) ? physicalY : physicalX
-        }
+        // Unified natural swipe physics across all 4 corner dials:
+        // 0% is aligned at the bottom/lower perimeter, 100% rises to the top/upper edge.
+        // Swiping fingers UP (+physicalY) or RIGHT (+physicalX) turns UP the value.
+        // Swiping fingers DOWN (-physicalY) or LEFT (-physicalX) turns DOWN the value.
+        let effectiveStep: Double = physicalY + physicalX
 
         let sensitivity: Double = 0.005
         let step = effectiveStep * sensitivity

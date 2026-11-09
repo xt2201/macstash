@@ -34,16 +34,16 @@ public struct RadialDialGeometry {
         let clamped = max(0.0, min(1.0, value))
         switch corner {
         case .bottomRight:
-            // 180° (left) to 270° (up)
+            // 180° (left/bottom edge) rising to 270° (up/right edge)
             return 180.0 + (clamped * 90.0)
         case .bottomLeft:
-            // 270° (up) to 360° (right)
-            return 270.0 + (clamped * 90.0)
+            // 360° (right/bottom edge) rising to 270° (up/left edge)
+            return 360.0 - (clamped * 90.0)
         case .topRight:
-            // 180° (left) to 90° (down)
-            return 180.0 - (clamped * 90.0)
+            // 90° (down/right edge) rising to 180° (up/top edge)
+            return 90.0 + (clamped * 90.0)
         case .topLeft:
-            // 90° (down) to 0° (right)
+            // 90° (down/left edge) rising to 0° (up/top edge)
             return 90.0 - (clamped * 90.0)
         }
     }
@@ -73,15 +73,15 @@ public struct RadialDialGeometry {
             if deg > 315 { return 0.0 }
             return Double((deg - 180.0) / 90.0)
         case .bottomLeft:
-            // Range 270° to 360°
-            if deg < 225 { return 0.0 }
-            if deg < 270 { return 0.0 }
-            return Double((deg - 270.0) / 90.0)
+            // Range 360° down to 270° (0.0 at 360°, 1.0 at 270°)
+            if deg < 225 { return 1.0 }
+            if deg < 270 { return 1.0 }
+            return Double((360.0 - deg) / 90.0)
         case .topRight:
-            // Range 180° down to 90°
-            if deg < 45 { return 1.0 }
-            if deg > 225 { return 0.0 }
-            return Double((180.0 - deg) / 90.0)
+            // Range 90° to 180° (0.0 at 90°, 1.0 at 180°)
+            if deg < 45 { return 0.0 }
+            if deg > 225 { return 1.0 }
+            return Double((deg - 90.0) / 90.0)
         case .topLeft:
             // Range 90° down to 0°
             if deg > 135 { return 0.0 }

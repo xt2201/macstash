@@ -1,3 +1,13 @@
+# What's New in Version 2.9.3
+
+MacStash 2.9.3 harmonizes corner dial gestures and radial gauge filling across all four quadrants with intuitive, unified upward-increasing gesture physics.
+
+## Key Enhancements in Version 2.9.3
+
+- Unified Natural Swipe Directions: All four corner dials (volume, brightness, timer, keyboard brightness) now strictly follow unified gesture physics. Swiping UP or RIGHT turns values up; swiping DOWN or LEFT turns values down.
+- Harmonized Gauge Filling: Aligned Bottom-Left and Top-Right radial gauges so 0% aligns at the bottom and 100% rises toward the top, matching visual arcs with physical finger movement.
+- Local Deployment Verification: Automatically synchronizes and refreshes the installed application bundle in /Applications/Stash.app with the latest release build.
+
 # What's New in Version 2.9.2
 
 MacStash 2.9.2 eliminates layout shifting and screen edge clipping on the Right Edge Slider, ensuring all rounded borders remain fully visible and removing detached hover cards.

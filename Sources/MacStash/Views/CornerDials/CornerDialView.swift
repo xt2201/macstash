@@ -210,10 +210,10 @@ public struct CornerDialView: View {
             var deg = degrees
             if deg < 180.0 { deg += 360.0 }
             let clamped = max(270.0, min(360.0, deg))
-            return (clamped - 270.0) / 90.0
+            return (360.0 - clamped) / 90.0
         case .topRight:
             let clamped = max(90.0, min(180.0, degrees))
-            return (180.0 - clamped) / 90.0
+            return (clamped - 90.0) / 90.0
         case .topLeft:
             let clamped = max(0.0, min(90.0, degrees))
             return (90.0 - clamped) / 90.0
@@ -370,7 +370,7 @@ private struct DialArcShape: View {
                 radius: trackRadius,
                 startAngle: .degrees(startDeg),
                 endAngle: .degrees(endDeg),
-                clockwise: geometry.corner == .topRight || geometry.corner == .topLeft
+                clockwise: geometry.corner == .bottomLeft || geometry.corner == .topLeft
             )
 
             context.stroke(

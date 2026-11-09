@@ -1,3 +1,13 @@
+# Có Gì Mới Trong Phiên Bản 2.9.1
+
+MacStash 2.9.1 tinh chỉnh thanh trượt cạnh phải với vị trí đặt chuẩn xác ở chính giữa màn hình, hiệu ứng trượt vào trượt ra mượt mà dạng lò xo, và tự động thu hồi ngay khi di chuột ra khỏi viền.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.1
+
+- Canh Giữa Màn Hình Tuyệt Đối: Thanh trượt cạnh phải được canh chuẩn xác vào đúng tâm chiều cao màn hình trên mọi thiết bị.
+- Hiệu Ứng Lò Xo Trượt Ra Vào Mượt Mà: Cấu trúc view được giữ trong quá trình đóng giúp hoạt ảnh trượt lò xo lướt êm ái ra mép màn hình thay vì biến mất đột ngột.
+- Tự Động Thu Hồi Khi Rời Viền Chuột: Tích hợp sự kiện NSTrackingArea của AppKit và thu hẹp vùng tương tác còn 80pt, đảm bảo thanh trượt lập tức ẩn đi khi con trỏ di chuyển vào ứng dụng làm việc.
+
 # Có Gì Mới Trong Phiên Bản 2.9.0
 
 MacStash 2.9.0 nâng cấp toàn diện trải nghiệm UX/UI chuyên nghiệp, chuẩn hóa cơ chế kích hoạt sát mép màn hình kèm độ trễ dừng chuột cho thanh trượt phải, cử chỉ vuốt 2 ngón tay tự nhiên trên trackpad cho vòng xoay âm lượng, thao tác nhấp đúp mở tệp trên Kệ Stash, và triệt tiêu hoàn toàn hiện tượng che khuất click của ứng dụng nền.

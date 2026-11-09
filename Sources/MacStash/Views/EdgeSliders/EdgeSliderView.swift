@@ -49,17 +49,20 @@ public struct EdgeSliderView: View {
         let isExpanded = isHovered || isDragging || appState.isRightSliderActive
 
         ZStack(alignment: edge == .right ? .trailing : .leading) {
-            if isVisible && isExpanded {
-                // Completely hidden when idle, smoothly slides into view when activated
+            if isVisible {
+                // Smoothly slides into view when activated and glides off-screen when dismissed
                 sliderContent(isExpanded: isExpanded)
-                    .offset(x: isExpanded ? 0 : (edge == .right ? (sliderWidth + 24) : -(sliderWidth + 24)))
+                    .offset(x: isExpanded ? -8 : (edge == .right ? 85 : -85))
                     .opacity(isExpanded ? 1.0 : 0.0)
-                    .animation(.spring(response: 0.30, dampingFraction: 0.82), value: isExpanded)
+                    .animation(.spring(response: 0.28, dampingFraction: 0.82), value: isExpanded)
             }
         }
-        .frame(width: isExpanded ? 260 : 0, alignment: edge == .right ? .trailing : .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .trailing : .leading)
         .onHover { hovering in
             isHovered = hovering
+            if !hovering && !isDragging && appState.isRightSliderActive {
+                ScreenManager.shared.scheduleRightEdgeHideTimer()
+            }
         }
     }
 

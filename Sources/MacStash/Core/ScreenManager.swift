@@ -298,7 +298,7 @@ public final class ScreenManager: ObservableObject {
                 for instance in instances.values {
                     let frame = instance.screen.frame
                     let rightRect = instance.rightEdgeRect(in: frame)
-                    let expandedHitRect = NSRect(x: frame.maxX - 260, y: rightRect.minY, width: 260, height: rightRect.height)
+                    let expandedHitRect = NSRect(x: frame.maxX - 80, y: rightRect.minY, width: 80, height: rightRect.height)
                     if expandedHitRect.contains(mouseLoc) {
                         clickedInsideSlider = true
                         break
@@ -451,7 +451,8 @@ public final class ScreenManager: ObservableObject {
                 if isOuterRight {
                     let rightRect = instance.rightEdgeRect(in: frame)
                     if appState.isRightSliderActive {
-                        let expandedHitRect = NSRect(x: frame.maxX - 260, y: rightRect.minY, width: 260, height: rightRect.height)
+                        // The visual slider is docked within the rightmost 80pt
+                        let expandedHitRect = NSRect(x: frame.maxX - 80, y: rightRect.minY, width: 80, height: rightRect.height)
                         if expandedHitRect.contains(mouseLoc) {
                             rightEdgeHideWorkItem?.cancel()
                             rightEdgeHideWorkItem = nil
@@ -507,7 +508,7 @@ public final class ScreenManager: ObservableObject {
         pendingRightEdgeDisplayID = nil
     }
 
-    private func scheduleRightEdgeHideTimer() {
+    public func scheduleRightEdgeHideTimer() {
         guard rightEdgeHideWorkItem == nil else { return }
         let item = DispatchWorkItem { [weak self] in
             Task { @MainActor [weak self] in
@@ -517,7 +518,7 @@ public final class ScreenManager: ObservableObject {
                 for instance in self.instances.values {
                     let frame = instance.screen.frame
                     let rightRect = instance.rightEdgeRect(in: frame)
-                    let expandedHitRect = NSRect(x: frame.maxX - 260, y: rightRect.minY, width: 260, height: rightRect.height)
+                    let expandedHitRect = NSRect(x: frame.maxX - 80, y: rightRect.minY, width: 80, height: rightRect.height)
                     if expandedHitRect.contains(cur) {
                         stillInside = true
                         break
@@ -530,7 +531,7 @@ public final class ScreenManager: ObservableObject {
             }
         }
         rightEdgeHideWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28, execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18, execute: item)
     }
 
     public func dismissRightSlider() {
@@ -538,8 +539,12 @@ public final class ScreenManager: ObservableObject {
         rightEdgeHideWorkItem?.cancel()
         rightEdgeHideWorkItem = nil
         appState.isRightSliderActive = false
-        for instance in instances.values {
-            instance.setRightEdgeInteractive(false)
+        // Allow the 0.28s spring slide-out animation to complete before disabling mouse interactivity
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self = self, !self.appState.isRightSliderActive else { return }
+            for instance in self.instances.values {
+                instance.setRightEdgeInteractive(false)
+            }
         }
     }
 

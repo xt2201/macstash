@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.9.1] - 2026-11-09
+
+### Fixed
+- Fixed vertical centering of Right Edge Bar: Edge slider is now precisely centered on the physical screen height across all display configurations.
+- Fixed buttery-smooth slide-in and slide-out animation: Kept slider content in view hierarchy so spring exit animations glide off-screen smoothly without popping out abruptly.
+- Fixed reliable auto-hide when cursor departs edge: Integrated native AppKit `NSTrackingArea` with `mouseExited` callbacks and reduced expanded hit zone from 260pt to the exact 80pt slider body, ensuring instant auto-hide when moving into background applications.
+
+---
+
 ## [2.9.0] - 2026-11-09
 
 ### Changed

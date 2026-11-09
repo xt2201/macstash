@@ -59,14 +59,56 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return nil
         }
 
-        // When slider is active (expanded), full frame is interactive
+        // When slider is active (expanded), only intercept mouse events within the 80pt slider body
+        // or the floating track details card to the left, so clicks outside the slider body pass through cleanly.
         if appState.isRightSliderActive {
-            return super.hitTest(point)
+            let activeWidth: CGFloat = 80.0
+            let activeRect = (edge == .right)
+                ? NSRect(x: bounds.maxX - activeWidth, y: bounds.minY, width: activeWidth, height: bounds.height)
+                : NSRect(x: bounds.minX, y: bounds.minY, width: activeWidth, height: bounds.height)
+
+            if activeRect.contains(point) {
+                return super.hitTest(point)
+            }
+
+            // Check if floating track info card on the left is active
+            if NowPlayingManager.shared.hasMedia {
+                let flyoutRect = NSRect(x: bounds.minX, y: bounds.minY, width: bounds.width - activeWidth, height: bounds.height)
+                if flyoutRect.contains(point) {
+                    return super.hitTest(point)
+                }
+            }
+
+            return nil
         }
 
         // When collapsed, return nil completely so background application scrollbars,
         // window controls, and rightmost click targets remain 100% unobstructed.
         return nil
+    }
+
+    // MARK: - Mouse Exit & Tracking Area
+
+    private var sliderTrackingArea: NSTrackingArea?
+
+    public override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        if let existing = sliderTrackingArea {
+            removeTrackingArea(existing)
+        }
+        let area = NSTrackingArea(
+            rect: bounds,
+            options: [.mouseEnteredAndExited, .mouseMoved, .activeAlways],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(area)
+        self.sliderTrackingArea = area
+    }
+
+    public override func mouseExited(with event: NSEvent) {
+        super.mouseExited(with: event)
+        ScreenManager.shared.scheduleRightEdgeHideTimer()
     }
 
     public override func scrollWheel(with event: NSEvent) {

@@ -1,3 +1,13 @@
+# What's New in Version 2.9.1
+
+MacStash 2.9.1 refines the Right Edge Slider with perfect vertical screen centering, fluid spring slide-in and slide-out animations, and rapid auto-hide when the cursor departs the edge.
+
+## Key Enhancements in Version 2.9.1
+
+- Exact Vertical Screen Centering: The right edge bar is now precisely centered on the physical screen height across all displays.
+- Fluid Spring Slide-In and Slide-Out: The slider view hierarchy remains active during dismissal, allowing spring slide-out animations to glide off-screen smoothly without popping out of existence.
+- Reliable Auto-Hide on Mouse Exit: Integrated native AppKit NSTrackingArea callbacks and tightened the active footprint to 80pt, ensuring instant auto-hide when moving your cursor away from the screen edge.
+
 # What's New in Version 2.9.0
 
 MacStash 2.9.0 brings a comprehensive professional UX/UI upgrade, extreme-edge intentional dwell triggering for the Right Edge Slider, intuitive two-axis directional trackpad gestures for corner dials, double-click file launching on Stash Shelf, and complete elimination of edge click blockage.

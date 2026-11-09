@@ -1,3 +1,13 @@
+# Có Gì Mới Trong Phiên Bản 2.9.2
+
+MacStash 2.9.2 khắc phục triệt để hiện tượng tràn bố cục và cấn viền trên thanh trượt cạnh phải, đảm bảo toàn bộ viền bo góc tròn hiển thị trọn vẹn và loại bỏ thẻ nổi bị lỗi.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.2
+
+- Loại Bỏ Hiện Tượng Cấn Viền Màn Hình: Xử lý triệt để nguyên nhân tràn kích thước từ bộ điều khiển nhạc, khôi phục khoảng cách lề 8pt sắc sảo và viền bo tròn hoàn hảo ở cả hai phía.
+- Tinh Gọn Bộ Điều Khiển Nhạc: Thay thế hộp thoại nổi bị tràn viền bằng tooltip chuẩn macOS và cử chỉ nhấp chuột vào ảnh bìa để mở nhanh ứng dụng phát nhạc.
+- Ổn Định Tuyệt Đối Bố Cục: Cố định độ rộng thanh trượt chuẩn 50pt, triệt tiêu hoàn toàn tình trạng trôi lệch sang mép phải màn hình.
+
 # Có Gì Mới Trong Phiên Bản 2.9.1
 
 MacStash 2.9.1 tinh chỉnh thanh trượt cạnh phải với vị trí đặt chuẩn xác ở chính giữa màn hình, hiệu ứng trượt vào trượt ra mượt mà dạng lò xo, và tự động thu hồi ngay khi di chuột ra khỏi viền.

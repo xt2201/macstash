@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.9.2] - 2026-11-09
+
+### Fixed
+- Fixed Right Edge Bar clipping on screen edge: Eliminated layout overflow from detached flyout card in media controls, restoring crisp 8pt margins and unclipped rounded borders on both left and right sides.
+- Fixed glitchy floating artwork card: Replaced overflowing detached hover box with native macOS tooltips and click-to-activate gesture on album artwork.
+- Streamlined Edge Media Controller to strict 50pt column width, guaranteeing zero layout shifts or rightward drift.
+
+---
+
 ## [2.9.1] - 2026-11-09
 
 ### Fixed

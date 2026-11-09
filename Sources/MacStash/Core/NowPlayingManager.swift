@@ -540,6 +540,15 @@ public final class NowPlayingManager: ObservableObject {
         sendSystemMediaKey(key: 18)
     }
 
+    public func activateCurrentApp() {
+        guard !appBundleID.isEmpty else { return }
+        if let app = NSRunningApplication.runningApplications(withBundleIdentifier: appBundleID).first {
+            app.activate(options: [.activateIgnoringOtherApps])
+        } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: appBundleID) {
+            NSWorkspace.shared.openApplication(at: appURL, configuration: NSWorkspace.OpenConfiguration())
+        }
+    }
+
     private func sendSystemMediaKey(key: Int32) {
         let downEvent = NSEvent.otherEvent(
             with: .systemDefined,

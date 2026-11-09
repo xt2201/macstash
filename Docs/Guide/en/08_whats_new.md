@@ -1,3 +1,13 @@
+# What's New in Version 2.9.2
+
+MacStash 2.9.2 eliminates layout shifting and screen edge clipping on the Right Edge Slider, ensuring all rounded borders remain fully visible and removing detached hover cards.
+
+## Key Enhancements in Version 2.9.2
+
+- Elimination of Edge Clipping: Removed width overflow from media controls, restoring crisp 8pt edge margins and fully unclipped rounded capsule borders.
+- Streamlined Media Controls: Replaced overflowing detached hover popups with native macOS tooltips and click-to-activate app gestures on album artwork.
+- Exact Layout Stability: Constrained the edge slider strictly to 50pt width, preventing rightward drift.
+
 # What's New in Version 2.9.1
 
 MacStash 2.9.1 refines the Right Edge Slider with perfect vertical screen centering, fluid spring slide-in and slide-out animations, and rapid auto-hide when the cursor departs the edge.

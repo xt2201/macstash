@@ -59,27 +59,9 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return nil
         }
 
-        // When slider is active (expanded), only intercept mouse events within the 80pt slider body
-        // or the floating track details card to the left, so clicks outside the slider body pass through cleanly.
+        // When slider is active (expanded), intercept mouse events within the 80pt slider panel
         if appState.isRightSliderActive {
-            let activeWidth: CGFloat = 80.0
-            let activeRect = (edge == .right)
-                ? NSRect(x: bounds.maxX - activeWidth, y: bounds.minY, width: activeWidth, height: bounds.height)
-                : NSRect(x: bounds.minX, y: bounds.minY, width: activeWidth, height: bounds.height)
-
-            if activeRect.contains(point) {
-                return super.hitTest(point)
-            }
-
-            // Check if floating track info card on the left is active
-            if NowPlayingManager.shared.hasMedia {
-                let flyoutRect = NSRect(x: bounds.minX, y: bounds.minY, width: bounds.width - activeWidth, height: bounds.height)
-                if flyoutRect.contains(point) {
-                    return super.hitTest(point)
-                }
-            }
-
-            return nil
+            return super.hitTest(point)
         }
 
         // When collapsed, return nil completely so background application scrollbars,

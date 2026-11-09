@@ -95,11 +95,14 @@ MacStash assigns high-frequency system controls to the four physical display ver
 
 ### 5. The Liquid Docking Bay (Stash Drop Shelf) & Quick Scratchpad
 - **The Stash Shelf**: The core namesake feature of MacStash. A sculpted liquid glass docking bay sliding smoothly from the left screen edge to hold files, images, links, and text snippets when dragging across spaces, displays, or apps.
-- **Liquid Ripple Drop Aura**: Hovering a dragged file over the drop zone summons an animated pulsating liquid ripple wave that magnetically expands to receive items.
+- **Silky-Smooth 120 FPS Performance**: Isolated row rendering (`StashItemCardView`) and in-memory icon caching (`StashIconCache`) eliminate LaunchServices disk I/O during mouse hover and scroll, guaranteeing locked 120 FPS fluid interaction.
+- **Instant Zero-Copy Drag Out**: Items dragged from the shelf provide direct file URL references without main-thread temporary file duplications, starting drag gestures instantaneously with zero freeze or stutter.
+- **Liquid Ripple Drop Aura**: Hovering a dragged file over the drop zone summons an animated pulsating liquid ripple wave that magnetically expands to receive items. A top drop banner guides drag-and-drop even over populated lists.
 - **Elevated Glass File Tiles**: Stashed items rest on translucent frosted glass tiles with continuous squircle corners, 3D hover elevation, and crystal micro-action buttons.
-- **Shake-to-Summon Drag Gesture**: Wiggle or shake the mouse cursor back and forth while dragging any file, photo, or snippet to immediately summon the Stash Shelf at your cursor with tactile mechanical detents.
+- **Bidirectional Shake-to-Summon Gesture**: Wiggle or shake the mouse cursor horizontally or vertically while dragging any file, photo, or snippet to immediately summon the Stash Shelf at your cursor with tactile mechanical detents.
+- **1-Click Launch from Edge Peek Handle**: Hover or click the subtle 44pt left-edge indicator to slide out the shelf without delay, with full protection against edge jitter or accidental collapse.
 - **Double-Click to Launch**: Double-clicking any file, image, or link on Stash Shelf immediately launches it with the default macOS system app.
-- **Zero-Footprint Background Pass-Through**: Floating edge panels strictly ignore mouse events when idle and center resting peek handles on a slim 64pt strip, guaranteeing 100% unimpeded clicks in underlying macOS apps (Finder sidebar, Safari tabs, Xcode editor, Terminal).
+- **Zero-Footprint Background Pass-Through**: Floating edge panels strictly ignore mouse events when idle and center resting peek handles on a slim strip, guaranteeing 100% unimpeded clicks in underlying macOS apps (Finder sidebar, Safari tabs, Xcode editor, Terminal).
 - **Outside-Click Auto-Dismiss**: Clicking anywhere outside the Stash Shelf, Scratchpad, or Edge Slider immediately collapses the overlays and returns window focus cleanly to your active application.
 - **Immediate First-Mouse Interaction**: Every button (Clear All, Copy Path, Reveal in Finder, Remove, Close) triggers on the very first mouse-up with zero swallowed clicks.
 - **Quick Drag Export & Copy All**: Drag stashed items back out to any application, email, or Finder folder anytime, or click "Copy All" to copy all file references to the clipboard at once.

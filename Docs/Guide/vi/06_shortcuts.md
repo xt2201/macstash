@@ -21,6 +21,7 @@ Người dùng có thể tùy biến tổ hợp phím toàn cục để bật/t�
 
 - Option+Space: mở vòng xoay tại con trỏ chuột.
 - Control+Option+S: bật hoặc tắt kệ thả tệp Stash.
+- Control+Option+D: bật hoặc tắt thanh Dock thứ hai.
 - Control+Option+N: bật hoặc tắt ghi chú nhanh Scratchpad.
 - Escape: đóng vòng xoay, kệ hoặc ghi chú.
 

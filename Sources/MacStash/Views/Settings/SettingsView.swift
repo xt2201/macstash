@@ -27,7 +27,7 @@ public struct SettingsView: View {
             switch self {
             case .general: return appState.localized("tab.general")
             case .hotCorners: return appState.localized("tab.hotCorners")
-            case .sideDock: return appState.effectiveLanguage == "vi" ? "Thanh Dock" : "Second Dock"
+            case .sideDock: return appState.localized("tab.sideDock")
             case .appearance: return appState.localized("tab.appearance")
             case .displays: return appState.localized("tab.displays")
             case .pomodoro: return appState.localized("tab.pomodoro")

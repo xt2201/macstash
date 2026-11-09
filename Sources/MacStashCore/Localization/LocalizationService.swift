@@ -83,6 +83,7 @@ public final class LocalizationService: @unchecked Sendable {
             // Tabs
             "tab.general": "General",
             "tab.hotCorners": "Hot Corners",
+            "tab.sideDock": "Second Dock",
             "tab.appearance": "Appearance",
             "tab.displays": "Displays",
             "tab.pomodoro": "Pomodoro",
@@ -296,6 +297,7 @@ public final class LocalizationService: @unchecked Sendable {
             // Tabs
             "tab.general": "Tổng quan",
             "tab.hotCorners": "Góc nóng",
+            "tab.sideDock": "Thanh Dock thứ hai",
             "tab.appearance": "Giao diện",
             "tab.displays": "Màn hình",
             "tab.pomodoro": "Đồng hồ Pomodoro",

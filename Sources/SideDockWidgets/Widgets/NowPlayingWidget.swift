@@ -125,7 +125,9 @@ public struct NowPlayingWidgetView: View {
         stopPolling()
         updatePlaybackState()
         pollTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in
-            updatePlaybackState()
+            Task { @MainActor in
+                self.updatePlaybackState()
+            }
         }
     }
 

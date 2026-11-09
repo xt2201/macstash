@@ -80,7 +80,7 @@ public struct PomodoroWidgetView: View {
     private func startTimer() {
         isRunning = true
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak timer] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             Task { @MainActor in
                 if self.remainingSeconds > 0 {
                     self.remainingSeconds -= 1

@@ -138,6 +138,25 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Monochrome template status bar icon that illuminates during active Pomodoro intervals.
 - Full-featured Preferences window (`Command + ,`).
 
+### 12. Second Dock with Live Interactive Widgets
+- **Auxiliary Second Dock**: An elegant live widget dock running alongside your native macOS Dock with zero conflict or overlap.
+- **10 Native Local Widgets**:
+  1. *Clock*: Digital, analog face, or flip clock with full multi-timezone world clock support.
+  2. *Date*: Clear calendar date with weekday and untruncated full month name.
+  3. *Weather*: Current conditions and multi-day forecast powered by Open-Meteo with zero API keys required and manual city search (no location permission needed).
+  4. *Now Playing*: Interactive playback controls, track title, artist, progress bar, and freshness validation for Apple Music and Spotify.
+  5. *Calendar*: Upcoming events, countdown timer, and 1-click video meeting Join buttons for Zoom, Google Meet, Teams, and Webex.
+  6. *Reminders*: Due tasks checklist, quick-add input, and 1-tap task completion synced with Apple Reminders.
+  7. *System Stats*: Real-time CPU usage, RAM utilization, battery percentage, charging state, and disk space without external tools.
+  8. *Pomodoro*: Focus sprints, short/long breaks, and desktop notifications.
+  9. *Search*: Spotlight application and file search bar with instant keyboard execution.
+  10. *File Shelf*: Drop temporary files, links, and snippets onto the dock to hold and reuse across apps.
+- **7 Layout Placements & Auto-Fit**: Fixed Bottom (perfectly positioned above the native macOS Dock with distance >= 0 px), Floating Window with drag handle, Fixed Top, Fixed Left, Fixed Right, and auto-fit screen width.
+- **Smart Edge Triggers & Auto-Hide**: Customizable slide reveal delay (0.0s to 3.0s) and edge trigger activation thickness (2px to 20px).
+- **Zero-Interference Pass-Through**: Mouse clicks on empty/transparent regions pass straight through to background windows.
+- **Profile Switcher & Widget Gallery**: Supports multiple independent dock profiles (Work, Focus, Default) with instant switching and a searchable widget catalog.
+- **Glass Styling**: Light Glass, Dark Glass, Liquid Glass, and Clear frameless themes.
+
 ---
 
 ## How It Works: Fitts's Law &amp; Zero-Pixel Hit-Zones
@@ -182,6 +201,7 @@ MacStash is committed to absolute user privacy. It operates **100% locally and o
 | **Accessibility** | `AXUIElement` | Used to anchor floating dial overlays at physical display corners and track cursor proximity. | **None (Offline)** |
 | **Input Monitoring** | `CGEvent` tap | Detects corner hover gestures and global hotkey shortcuts. Does not record keystrokes or text. | **None (Offline)** |
 | **Apple Events** | `NSAppleScript` | Coordinates hardware brightness, audio levels, and active application detection. | **None (Offline)** |
+| **Calendars & Reminders** | `EventKit` | Reads upcoming events and todos for Calendar and Reminders widgets (100% on-device). | **None (Offline)** |
 
 ---
 
@@ -191,6 +211,7 @@ MacStash is committed to absolute user privacy. It operates **100% locally and o
 |---|---|---|
 | `Option + Space` | Bloom Cursor Radial Palette | Global |
 | `Control + Option + S` | Toggle Stash Drop Shelf | Global |
+| `Control + Option + D` | Toggle Second Dock | Global |
 | `Control + Option + N` | Toggle Quick Scratchpad | Global |
 | `Option + S` | Toggle Screen Hot Corner Dials | Global |
 | `Command + ,` | Open MacStash Preferences | Global / In-App |

@@ -21,6 +21,7 @@ You can customize the global shortcut for toggling corner dials in Settings > Sh
 
 - Option+Space: bloom the Cursor Radial Palette at the pointer.
 - Control+Option+S: toggle the Stash Drop Shelf.
+- Control+Option+D: toggle the Second Dock.
 - Control+Option+N: toggle the Quick Scratchpad.
 - Escape: close the palette, shelf or scratchpad.
 

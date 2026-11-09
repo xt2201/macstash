@@ -66,7 +66,7 @@ public struct StashBrandLogoView: View {
     }
 
     private func loadAppIcon() -> NSImage? {
-        if let url = Bundle.module.url(forResource: "AppIcon", withExtension: "icns"),
+        if let url = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
            let img = NSImage(contentsOf: url) {
             return img
         }

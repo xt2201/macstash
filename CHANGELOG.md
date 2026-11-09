@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.8.1] - 2026-11-09
+
+### Fixed
+- Fixed fatal crash on startup (`could not load resource bundle: from /Applications/Stash.app/MacStash_MacStash.bundle`): Eliminated usage of SPM's auto-generated `Bundle.module` in favor of standard macOS `Bundle.main` resource loading, preventing launch assertion failures in standalone application bundles.
+- Excluded unhandled resource folder from SPM executable target to prevent unwanted bundle accessor synthesis and ensure robust code signing conformance.
+- Enhanced Corner Dials first-mouse responsiveness: Ensured immediate interaction on first click across all corner dials without requiring an initial window focus click.
+
+---
+
 ## [2.8.0] - 2026-11-07
 
 ### Added

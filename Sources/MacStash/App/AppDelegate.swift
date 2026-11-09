@@ -120,8 +120,12 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func loadStatusImage(active: Bool) -> NSImage {
         let name = active ? "stash_menubar_active" : "stash_menubar"
-        if let url = Bundle.module.url(forResource: name, withExtension: "png"),
+        if let url = Bundle.main.url(forResource: name, withExtension: "png"),
            let img = NSImage(contentsOf: url) {
+            img.isTemplate = true
+            return img
+        }
+        if let img = NSImage(named: name) {
             img.isTemplate = true
             return img
         }

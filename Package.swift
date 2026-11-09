@@ -44,8 +44,8 @@ let package = Package(
                 .product(name: "Sparkle", package: "Sparkle")
             ],
             path: "Sources/MacStash",
-            resources: [
-                .process("Resources")
+            exclude: [
+                "Resources"
             ],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")

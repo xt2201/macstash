@@ -11,6 +11,7 @@ public enum VersionConsistencyTests {
         testReadmeMatchesVersion()
         testDynamicLocalizationVersion()
         testNoStaleHardcodedVersionsInCatalog()
+        testNoBundleModuleUsage()
     }
 
     private static func findRepoRoot() -> URL? {
@@ -129,5 +130,24 @@ public enum VersionConsistencyTests {
         guard let content = try? String(contentsOfFile: xcstringsPath, encoding: .utf8) else { return }
         TestAssertion.assertFalse(content.contains("Version 2.1.1"), "Localizable.xcstrings does not contain hardcoded 'Version 2.1.1'")
         TestAssertion.assertFalse(content.contains("Phiên bản 2.1.1"), "Localizable.xcstrings does not contain hardcoded 'Phiên bản 2.1.1'")
+    }
+
+    private static func testNoBundleModuleUsage() {
+        guard let root = findRepoRoot() else { return }
+        let sourcesURL = root.appendingPathComponent("Sources")
+        let fileManager = FileManager.default
+
+        guard let enumerator = fileManager.enumerator(at: sourcesURL, includingPropertiesForKeys: [.isRegularFileKey]) else { return }
+
+        var offenders: [String] = []
+        for case let fileURL as URL in enumerator {
+            guard fileURL.pathExtension == "swift" else { continue }
+            guard let content = try? String(contentsOf: fileURL, encoding: .utf8) else { continue }
+            if content.contains("Bundle.module") {
+                offenders.append(fileURL.lastPathComponent)
+            }
+        }
+
+        TestAssertion.assertTrue(offenders.isEmpty, "Sources must not use 'Bundle.module' (causes fatalError in macOS .app bundles). Found in: \(offenders.joined(separator: ", "))")
     }
 }

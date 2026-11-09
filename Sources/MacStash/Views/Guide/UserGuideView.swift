@@ -120,7 +120,7 @@ public struct UserGuideView: View {
                 }
             }
             if let bundleUrl = Bundle.main.url(forResource: filename, withExtension: nil, subdirectory: "Docs/Guide/\(folder)") ??
-                               Bundle.module.url(forResource: filename, withExtension: nil) {
+                               Bundle.main.url(forResource: filename, withExtension: nil) {
                 if let s = try? String(contentsOf: bundleUrl, encoding: .utf8), !s.isEmpty {
                     return s
                 }

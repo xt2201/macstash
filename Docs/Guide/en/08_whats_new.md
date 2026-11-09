@@ -1,3 +1,13 @@
+# What's New in Version 2.8.1
+
+MacStash 2.8.1 resolves a critical startup crash caused by Swift Package Manager resource bundle resolution in packaged application bundles, and improves first-mouse interaction responsiveness.
+
+## Key Enhancements in Version 2.8.1
+
+- Elimination of Launch Crash: Replaced SPM auto-generated Bundle.module lookups with standard macOS Bundle.main resource access, eliminating the startup crash (could not load resource bundle) on updated application bundles.
+- Strict macOS Bundle Architecture Conformance: Cleaned up Swift Package definitions so that resources are bundled directly under Contents/Resources without triggering invalid root bundle lookups.
+- Immediate First-Mouse Corner Dial Response: Corner dials now immediately process your click without requiring an initial focus click.
+
 # What's New in Version 2.8.0
 
 MacStash 2.8.0 delivers a premier macOS UX/UI overhaul, zero-footprint background mouse pass-through, shake-to-summon drag gestures, key window typing focus for Quick Scratchpad, immediate first-mouse responsive clicks, and total size metrics.

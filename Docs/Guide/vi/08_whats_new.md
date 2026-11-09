@@ -1,3 +1,13 @@
+# Có Gì Mới Trong Phiên Bản 2.8.1
+
+MacStash 2.8.1 khắc phục triệt để sự cố ứng dụng bị thoát đột ngột khi khởi chạy sau khi cập nhật do cơ chế tìm kiếm tài nguyên Bundle.module của Swift Package Manager, đồng thời tăng cường độ nhạy khi nhấp chuột lần đầu vào vòng xoay góc.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.8.1
+
+- Khắc Phục Sự Cố Thoát Đột Ngột Khi Khởi Động: Chuyển đổi toàn bộ cơ chế nạp tài nguyên giao diện từ Bundle.module của SPM sang Bundle.main chuẩn macOS, giải quyết triệt để lỗi could not load resource bundle làm ứng dụng bị thoát đột ngột sau khi cập nhật.
+- Tuân Thủ Kiến Trúc Bundle Chuẩn macOS: Tinh chỉnh cấu hình gói Swift Package để tài nguyên được đặt chuẩn xác trong Contents/Resources mà không gây lỗi chữ ký số hay tìm sai thư mục gốc.
+- Phản Hồi Nhấp Chuột Tức Thì Trên Vòng Xoay Góc: Các vành xoay góc phản hồi ngay lập tức ở lần nhấp đầu tiên mà không cần nhấp chuột kích hoạt cửa sổ trước.
+
 # Có Gì Mới Trong Phiên Bản 2.8.0
 
 MacStash 2.8.0 nâng cấp toàn diện trải nghiệm UI/UX chuẩn mực macOS, cơ chế truyền sự kiện chuột hoàn toàn không chặn ứng dụng nền, cử chỉ lắc chuột mở nhanh kệ tệp Stash Shelf, khả năng nhận diện phím gõ tức thì cho bảng ghi chú Scratchpad, phản hồi nhấp chuột tức thì ngay lần chạm đầu tiên, và nút sao chép toàn bộ tệp.

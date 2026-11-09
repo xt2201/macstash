@@ -5,27 +5,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [2.9.6] - 2026-11-09
+## [2.9.8] - 2026-11-09
+
+### Fixed
+- Fixed Right Edge Bar not opening on multi-monitor / external displays: Eliminated per-instance dwell timer cancellation in `ScreenManager` cursor tracking, allowing the extreme edge dwell detector to inspect all screens and schedule dwell without non-candidate displays immediately cancelling it.
+- Fixed boundary clipping on physical screen edges: Replaced open-interval `CGRect.contains` check with an inclusive boundary test (`x >= maxX - 2.5 && x <= maxX + 1.0`), guaranteeing that cursors pushed directly to `maxX` on external displays are reliably detected.
+- Per-display Right Edge Bar activation: Scoped edge slider expansion and hit-testing interactivity strictly to the active target display (`appState.activeDisplayID`), ensuring edge panels on other connected displays stay idle without intercepting underlying application clicks.
+- Improved multi-display outer boundary geometry: Enhanced `isOuterRightEdge` and `isOuterLeftEdge` in `CornerGeometry` to use robust interval overlap checks that reliably handle vertically offset or differently sized external displays.
+
+---
+
+## [2.9.7] - 2026-11-09
 
 ### Added
-- Apple Liquid Glass Design System: Re-architected all floating overlay panels with high-fidelity optical realism (`LiquidGlassMaterial`), featuring multi-layer frosted refraction, dual-path specular rim bevels reflecting 135° virtual light, caustic ambient color halos, and soft depth shadows.
-- Sculpted Liquid Glass Radial Corner Dials: Transformed the 4 corner hot vertex dials with 3D sculpted quarter-circle glass backdrops, luminous fluid arc gauges with droplet meniscus heads, laser-etched tick marks that illuminate as liquid sweeps across them, and floating glass jewel action badges.
 - The Liquid Docking Bay (Stash Shelf): Elevated the left-edge drop shelf with interactive liquid ripple aura on file hover, frosted glass item tiles with 3D hover lift, and circular glass micro-action pills.
-- Crystal Tube & Dynamic Now Playing Aura: Re-architected the vertical edge slider into a precision crystal tube with glowing fluid volume (`LiquidVerticalTrack`), and infused the Now Playing controller with dancing fluid visualizers and real-time album artwork aurora reflections.
-- Floating Glass Writing Slate (Scratchpad): Refined ephemeral scratchpad drawer with translucent glass surface, glowing emerald accent rim, and floating capsule word/char counter.
-- Liquid Glass Compass (Cursor Radial Palette): 4 magnetic fluid petals expanding toward cursor with surface tension on Ultrawide monitors.
-- Interactive Liquid Glass Studio Stage (Preferences): Added real-time interactive preview canvas in Settings > Appearance, allowing live testing of dial radius, glass opacity, fluid scrubbing, and tactile haptic/sound detents.
+- Drag-and-Drop Drop Target Feedback: Added animated drop indicator banner when dragging files over populated shelf items and expanded dropped type recognition to support legacy file lists and string URLs.
+- Bidirectional Shake-to-Summon Gesture: Upgraded shake detection to monitor both horizontal and vertical mouse direction reversals with a responsive 12pt threshold and 0.75s window.
 
 ### Fixed
 - Stash Shelf Performance & Lag Elimination: Replaced synchronous LaunchServices icon extraction and disk queries during SwiftUI view passes with high-performance in-memory caching (`StashIconCache`). Isolated item hover state inside dedicated `StashItemCardView` subviews to eliminate full-list view invalidations, maintaining silky-smooth 120 FPS scrolling and interaction.
 - Stash Shelf Drag Latency Fix: Replaced `NSItemProvider(contentsOf:)` with `NSItemProvider(object: url as NSURL)` in `createItemProvider`, eliminating synchronous temporary file copy operations on the main thread and making dragging files out of the shelf instantaneous. Removed conflicting double-tap recognizer delays on draggable cards.
 - Left-Edge Peek Handle & Hover Hit-Testing: Fixed narrow 4pt hit zone clipping that caused rapid hovering/collapsing jitter. Unified hit-test and hover bounds across `ScreenManager`, `StashShelfHostingView`, and `LeftEdgeContainerView` (44pt width, 84pt height), allowing single-click opening and rock-solid button interactions.
-- Bidirectional Shake-to-Summon Gesture: Upgraded shake detection to monitor both horizontal and vertical mouse direction reversals with a responsive 12pt threshold and 0.75s window.
-- Drag-and-Drop Drop Target Feedback: Added animated drop indicator banner when dragging files over populated shelf items and expanded dropped type recognition to support legacy file lists and string URLs.
-- Fixed Right Edge Bar not opening on multi-monitor / external displays: Eliminated per-instance dwell timer cancellation in `ScreenManager` cursor tracking, allowing the extreme edge dwell detector to inspect all screens and schedule dwell without non-candidate displays immediately cancelling it.
-- Fixed boundary clipping on physical screen edges: Replaced open-interval `CGRect.contains` check with an inclusive boundary test (`x >= maxX - 2.5 && x <= maxX + 1.0`), guaranteeing that cursors pushed directly to `maxX` on external displays are reliably detected.
-- Per-display Right Edge Bar activation: Scoped edge slider expansion and hit-testing interactivity strictly to the active target display (`appState.activeDisplayID`), ensuring edge panels on other connected displays stay idle without intercepting underlying application clicks.
-- Improved multi-display outer boundary geometry: Enhanced `isOuterRightEdge` and `isOuterLeftEdge` in `CornerGeometry` to use robust interval overlap checks that reliably handle vertically offset or differently sized external displays.
+
+---
+
+## [2.9.6] - 2026-11-09
+
+### Added
+- Apple Liquid Glass Design System: Re-architected all floating overlay panels with high-fidelity optical realism (`LiquidGlassMaterial`), featuring multi-layer frosted refraction, dual-path specular rim bevels reflecting 135° virtual light, caustic ambient color halos, and soft depth shadows.
+- Sculpted Liquid Glass Radial Corner Dials: Transformed the 4 corner hot vertex dials with 3D sculpted quarter-circle glass backdrops, luminous fluid arc gauges with droplet meniscus heads, laser-etched tick marks that illuminate as liquid sweeps across them, and floating glass jewel action badges.
+- Crystal Tube & Dynamic Now Playing Aura: Re-architected the vertical edge slider into a precision crystal tube with glowing fluid volume (`LiquidVerticalTrack`), and infused the Now Playing controller with dancing fluid visualizers and real-time album artwork aurora reflections.
+- Floating Glass Writing Slate (Scratchpad): Refined ephemeral scratchpad drawer with translucent glass surface, glowing emerald accent rim, and floating capsule word/char counter.
+- Liquid Glass Compass (Cursor Radial Palette): 4 magnetic fluid petals expanding toward cursor with surface tension on Ultrawide monitors.
+- Interactive Liquid Glass Studio Stage (Preferences): Added real-time interactive preview canvas in Settings > Appearance, allowing live testing of dial radius, glass opacity, fluid scrubbing, and tactile haptic/sound detents.
 
 ---
 

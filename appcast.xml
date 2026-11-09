@@ -6,6 +6,48 @@
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
         <item>
+            <title>Version 2.9.8</title>
+            <pubDate>Mon, 09 Nov 2026 14:17:12 +0700</pubDate>
+            <sparkle:version>298</sparkle:version>
+            <sparkle:shortVersionString>2.9.8</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+<h2>What's New in Stash 2.9.8</h2>
+<ul>
+    <li>Industry standard 1-click in-place background auto-updates via Sparkle 2.</li>
+    <li>Ed25519 cryptographic update signing and verification.</li>
+    <li>Screen corner responsiveness and dynamic display tracking improvements.</li>
+    <li>Menu bar icon and native macOS visual polish.</li>
+</ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/xt2201/macstash/releases/download/v2.9.8/Stash-2.9.8.zip"
+                sparkle:edSignature="v+timM8ZOLB0+tfiSizwbxks9qHtPpDG22GjUpJ/9sMJyiQ6whF4u0L6mEveOmAcKbODCaVlOjdmpnjTOCZZDA=="
+                length="6673199"
+                type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 2.9.7</title>
+            <pubDate>Mon, 09 Nov 2026 07:08:00 +0000</pubDate>
+            <sparkle:version>297</sparkle:version>
+            <sparkle:shortVersionString>2.9.7</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+<h2>What's New in Stash 2.9.7</h2>
+<ul>
+    <li>Stash Shelf performance and in-memory icon caching for locked 120 FPS interactions.</li>
+    <li>Direct URL drag providers eliminating main thread copy blocking.</li>
+    <li>Refined 44pt left edge handle hit zone with single-click opening.</li>
+    <li>Bidirectional shake-to-summon gesture recognition.</li>
+</ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/xt2201/macstash/releases/download/v2.9.7/Stash-2.9.7.zip"
+                sparkle:edSignature="pEMysakWCIytbmPZWgro54TzKZ5hoUXzgR8v+3F0OdZeLPHDdnqXRlyOTHL9+aWL+YsP5cM7bsBbleby0UmAAg=="
+                length="4977591"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 2.9.6</title>
             <pubDate>Mon, 09 Nov 2026 07:04:16 +0000</pubDate>
             <sparkle:version>296</sparkle:version>

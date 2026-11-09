@@ -1,6 +1,29 @@
+# Có Gì Mới Trong Phiên Bản 2.9.8
+
+MacStash 2.9.8 khắc phục triệt để sự cố thanh trượt cạnh phải không mở ra khi cắm màn hình ngoài, tối ưu hóa cơ chế nhận diện điểm dừng cạnh màn hình trên hệ thống đa màn hình và cô lập kích hoạt theo từng màn hình riêng biệt.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.8
+
+- Tương Tác Cạnh Phải Mượt Mà Trên Màn Hình Ngoài: Loại bỏ xung đột hủy bộ đếm dwell giữa các màn hình kết nối, cho phép thanh trượt mở ra chính xác và ổn định trên bất kỳ màn hình ngoài nào.
+- Nhận Diện Chạm Mép Viền Vật Lý Toàn Diện: Thay thế kiểm tra vùng mở của `CGRect.contains` bằng phép kiểm tra biên bao gồm (`x >= maxX - 2.5 && x <= maxX + 1.0`), nhận diện chuẩn xác ngay cả khi con trỏ chuột chạm sát mép viền ngoài cùng của màn hình.
+- Cô Lập Kích Hoạt Theo Màn Hình Mục Tiêu: Trạng thái mở rộng và nhận diện nhấp chuột của thanh trượt cạnh phải được giới hạn chặt chẽ trên màn hình đang thao tác (`activeDisplayID`), giữ cho các thanh trượt trên màn hình khác hoàn toàn thụ động và không gây cản trở thao tác ứng dụng ngầm.
+- Tính Toán Hình Học Đa Màn Hình Chuẩn Xác: Nâng cấp thuật toán kiểm tra biên ngoài `CornerGeometry` với cơ chế giao nhau khoảng chiều dọc, tương thích hoàn hảo với mọi cách bố trí màn hình ngoài lệch trục hoặc khác độ phân giải.
+
+# Có Gì Mới Trong Phiên Bản 2.9.7
+
+MacStash 2.9.7 nâng cấp toàn diện hiệu năng Stash Shelf với bộ nhớ đệm biểu tượng trong RAM, loại bỏ độ trễ kéo thả tập tin, tinh chỉnh vùng chạm tai kéo cạnh trái và hỗ trợ cử chỉ lắc chuột hai chiều.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.9.7
+
+- Bộ Nhớ Đệm Biểu Tượng In-Memory & Cuộn 120 FPS: Loại bỏ hoàn toàn các truy vấn LaunchServices đồng bộ trên luồng chính với `StashIconCache`, đảm bảo danh sách tập tin cuộn mượt mà không giật lag.
+- Kéo Thả Tập Tin Tức Thì: Tối ưu hóa việc sinh `NSItemProvider` với tham chiếu NSURL trực tiếp, triệt tiêu việc sao chép tập tin tạm thời gây trễ khi bắt đầu kéo.
+- Kích Hoạt Cạnh Trái Ổn Định: Mở rộng vùng nhận diện tai kéo lên 44pt cùng khả năng mở 1-chạm, loại bỏ hoàn toàn hiện tượng rung nhấp nháy khi rê chuột.
+- Cử Chỉ Lắc Chuột Hai Chiều: Nâng cấp tính năng lắc chuột để gọi ngăn chứa hỗ trợ cả đảo chiều ngang và dọc với ngưỡng nhạy 12pt.
+- Phản Hồi Thả Tệp & Biểu Ngữ Trực Quan: Bổ sung biểu ngữ sinh động khi thả tệp vào danh sách đã có tệp và mở rộng nhận diện các loại tệp kéo thả.
+
 # Có Gì Mới Trong Phiên Bản 2.9.6
 
-MacStash 2.9.6 mang đến cuộc cách mạng nâng cấp toàn diện giao diện UI/UX sang ngôn ngữ Liquid Glass (Thủy tinh lỏng) đẳng cấp Apple, đồng thời khắc phục triệt để sự cố thanh trượt cạnh phải không mở ra khi cắm màn hình ngoài.
+MacStash 2.9.6 ra mắt Ngôn ngữ Thiết kế Apple Liquid Glass trên toàn bộ bảng điều khiển nổi, núm xoay góc 3D điêu khắc, thanh trượt thể lỏng phát sáng và phòng thí nghiệm Liquid Glass Studio tương tác trực tiếp.
 
 ## Những Cải Tiến Nổi Bật Trong Bản 2.9.6
 
@@ -11,12 +34,6 @@ MacStash 2.9.6 mang đến cuộc cách mạng nâng cấp toàn diện giao di�
 - Bảng Ghi Chú Đá Đen Thủy Tinh: Giao diện soạn thảo văn bản trong suốt tao nhã với viền ngọc bích phát sáng và viên thuốc đếm từ lơ lửng.
 - La Bàn Thủy Tinh 4 Cánh Tại Con Trỏ: Cụm điều khiển 4 cánh quạt hút dính đàn hồi nở ra tại tâm con trỏ chuột dành cho màn hình siêu rộng.
 - Khung Trải Nghiệm Liquid Glass Studio Trong Cài Đặt: Khung xem trước thời gian thực trong Cài đặt > Giao diện cho phép tùy chỉnh và thử nghiệm độ trong suốt của kính, phản hồi xúc giác và âm thanh click cơ học trực tiếp.
-- Tối Ưu Hiệu Năng Stash Shelf & Thao Tác Kéo Thả Siêu Mượt: Tái kiến trúc Stash Shelf với bộ nhớ đệm biểu tượng tệp (`StashIconCache`) và cô lập render theo từng hàng (`StashItemCardView`), loại bỏ hoàn toàn việc đọc ổ đĩa LaunchServices trên main thread và duy trì tốc độ 120 FPS mượt mà. Loại bỏ cơ chế sao chép tệp tạm thời chặn luồng, thay bằng cơ chế cấp URL trực tiếp giúp thao tác kéo tệp ra khỏi kệ diễn ra tức thì không còn giật lag.
-- Nâng Cấp Tay Nắm Cạnh Trái & Cử Chỉ Lắc Chuột: Mở rộng vùng tương tác tay nắm cạnh trái lên 44pt loại bỏ hiện tượng rung giật nhấp nháy, hỗ trợ mở kệ tức thì chỉ với 1 cú nhấp vào tay nắm, nâng cấp cử chỉ lắc chuột gọi kệ hỗ trợ cả hướng ngang và dọc, bổ sung biểu ngữ thả tệp sinh động khi danh sách đã có tệp.
-- Tương Tác Cạnh Phải Mượt Mà Trên Màn Hình Ngoài: Loại bỏ xung đột hủy bộ đếm dwell giữa các màn hình kết nối, cho phép thanh trượt mở ra chính xác và ổn định trên bất kỳ màn hình ngoài nào.
-- Nhận Diện Chạm Mép Viền Vật Lý Toàn Diện: Thay thế kiểm tra vùng mở của `CGRect.contains` bằng phép kiểm tra biên bao gồm (`x >= maxX - 2.5 && x <= maxX + 1.0`), nhận diện chuẩn xác ngay cả khi con trỏ chuột chạm sát mép viền ngoài cùng của màn hình.
-- Cô Lập Kích Hoạt Theo Màn Hình Mục Tiêu: Trạng thái mở rộng và nhận diện nhấp chuột của thanh trượt cạnh phải được giới hạn chặt chẽ trên màn hình đang thao tác (`activeDisplayID`), giữ cho các thanh trượt trên màn hình khác hoàn toàn thụ động và không gây cản trở thao tác ứng dụng ngầm.
-- Tính Toán Hình Học Đa Màn Hình Chuẩn Xác: Nâng cấp thuật toán kiểm tra biên ngoài `CornerGeometry` với cơ chế giao nhau khoảng chiều dọc, tương thích hoàn hảo với mọi cách bố trí màn hình ngoài lệch trục hoặc khác độ phân giải.
 
 # Có Gì Mới Trong Phiên Bản 2.9.5
 

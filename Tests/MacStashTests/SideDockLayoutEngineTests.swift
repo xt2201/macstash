@@ -106,4 +106,21 @@ public enum SideDockLayoutEngineTests {
 
         TestAssertion.assertTrue(frame.width <= visible.width, "Giant content auto-fits within visible screen width")
     }
+
+    private static func testReserveSpacePolicy() {
+        let policy = ReserveSpacePolicy()
+        let screenVisible = CGRect(x: 0, y: 0, width: 1920, height: 1080)
+        let dockFrame = CGRect(x: 400, y: 70, width: 1120, height: 60)
+
+        // Window overlapping fixed bottom dock (minY=50, dock maxY=130)
+        let window1 = CGRect(x: 200, y: 50, width: 1000, height: 800)
+        let adjusted1 = policy.adjustWindowFrame(windowFrame: window1, dockFrame: dockFrame, placement: .fixedBottom, screenVisibleFrame: screenVisible)
+        TestAssertion.assertEqual(adjusted1.minY, 130.0, "Window pushed up so minY matches dock maxY")
+        TestAssertion.assertEqual(adjusted1.maxY, window1.maxY, "Window top stays at same position")
+
+        // Window completely above dock
+        let window2 = CGRect(x: 200, y: 200, width: 1000, height: 500)
+        let adjusted2 = policy.adjustWindowFrame(windowFrame: window2, dockFrame: dockFrame, placement: .fixedBottom, screenVisibleFrame: screenVisible)
+        TestAssertion.assertEqual(adjusted2, window2, "Non-overlapping window frame is preserved")
+    }
 }

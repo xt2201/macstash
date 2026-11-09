@@ -889,6 +889,27 @@ public final class ScreenManager: ObservableObject {
                   matchesConfiguredShortcut(event: event, shortcutString: s.scratchpadShortcut) {
             appState.scratchpad.isScratchpadOpen.toggle()
             HapticManager.shared.performBoundaryClick()
+        } else if matchesConfiguredShortcut(event: event, shortcutString: "ctrl+opt+d") {
+            appState.sideDock.toggleDock()
+            HapticManager.shared.performBoundaryClick()
+        }
+
+        let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        if flags == [.control] || flags == [.control, .option] {
+            let digitCodes: [UInt16: Int] = [
+                18: 0,
+                19: 1,
+                20: 2,
+                21: 3,
+                23: 4,
+                22: 5,
+                26: 6,
+                28: 7
+            ]
+            if let profileIdx = digitCodes[event.keyCode], profileIdx < appState.sideDock.config.profiles.count {
+                appState.sideDock.selectProfile(at: profileIdx)
+                HapticManager.shared.performBoundaryClick()
+            }
         }
     }
 

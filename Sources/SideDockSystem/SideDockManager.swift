@@ -61,6 +61,11 @@ public final class SideDockManager: ObservableObject {
         updateDockLayout()
     }
 
+    public func selectProfile(at index: Int) {
+        guard index >= 0 && index < config.profiles.count else { return }
+        selectProfile(config.profiles[index].id)
+    }
+
     public func removeItem(_ id: UUID) {
         configStore.updateConfig { cfg in
             if let idx = cfg.profiles.firstIndex(where: { $0.id == cfg.activeProfileId }) {
@@ -133,7 +138,9 @@ public final class SideDockManager: ObservableObject {
     }
 
     public func updateDockLayout() {
-        guard let panel = dockPanel, let screen = panel.screen ?? NSScreen.main else { return }
+        guard let panel = dockPanel else { return }
+        let targetScreen = resolveScreen()
+        guard let screen = targetScreen else { return }
 
         let hostingView = SideDockHostingView(rootView: makeDockRootView())
         panel.contentView = hostingView
@@ -148,6 +155,20 @@ public final class SideDockManager: ObservableObject {
         )
 
         panel.setFrame(targetFrame, display: true, animate: !prof.theme.reduceMotion)
+
+        // Update reserve space manager
+        if prof.layoutConfig.reserveDockSpace && prof.layoutConfig.placement != .floating {
+            ReserveSpaceManager.shared.startObserving { [weak self] in
+                guard let self = self, let panel = self.dockPanel, let screen = panel.screen else { return nil }
+                return (panel.frame, self.activeProfile.layoutConfig.placement, screen.visibleFrame)
+            }
+        } else {
+            ReserveSpaceManager.shared.stopObserving()
+        }
+    }
+
+    private func resolveScreen() -> NSScreen? {
+        return dockPanel?.screen ?? NSScreen.main ?? NSScreen.screens.first
     }
 
     private func applyVisibility() {
@@ -173,7 +194,14 @@ public final class SideDockManager: ObservableObject {
                 placement: prof.layoutConfig.placement,
                 triggerThickness: prof.layoutConfig.edgeTriggerThickness,
                 revealDelaySeconds: prof.layoutConfig.revealDelaySeconds,
-                dockFrame: panel.frame
+                dockFrame: panel.frame,
+                hideInFullscreen: prof.layoutConfig.hideInFullscreen,
+                hideOnWindowHover: prof.layoutConfig.hideOnWindowHover,
+                onHoverAlphaChanged: { [weak self] alpha in
+                    Task { @MainActor in
+                        self?.dockPanel?.animator().alphaValue = alpha
+                    }
+                }
             )
         }
     }

@@ -21,6 +21,7 @@ public enum StashFeatureTests {
         testCornerDialAlignmentGeometry()
         testLeftEdgeDrawerAutoCloseBounds()
         testLeftEdgeExtremeDwellSymmetry()
+        testRightEdgeExtremeDwellSymmetry()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -413,5 +414,22 @@ public enum StashFeatureTests {
         let insideWindowPt = CGPoint(x: frame.minX + 10.0, y: leftRect.midY)
         let notAtEdge = insideWindowPt.x <= (frame.minX + 2.5) && insideWindowPt.x >= (frame.minX - 1.0)
         TestAssertion.assertFalse(notAtEdge, "Point away from extreme left edge must not trigger dwell summon")
+    }
+
+    private static func testRightEdgeExtremeDwellSymmetry() {
+        let frame = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let panelHeight: CGFloat = Defaults.LeftEdgeDrawer.panelHeightPoints
+        let panelY = frame.minY + (frame.height - panelHeight) / 2.0
+        let panelWidth = Defaults.LeftEdgeDrawer.panelWidthPoints
+        let rightRect = CGRect(x: frame.maxX - panelWidth, y: panelY, width: panelWidth, height: panelHeight)
+
+        let atEdgePt = CGPoint(x: frame.maxX - 1.0, y: rightRect.midY)
+        let isAtEdgeX = atEdgePt.x >= (frame.maxX - 2.5) && atEdgePt.x <= (frame.maxX + 1.0)
+        let isWithinEdgeY = atEdgePt.y >= rightRect.minY && atEdgePt.y <= rightRect.maxY
+        TestAssertion.assertTrue(isAtEdgeX && isWithinEdgeY, "Point directly on right physical edge must qualify for dwell summon")
+
+        let insideWindowPt = CGPoint(x: frame.maxX - 10.0, y: rightRect.midY)
+        let notAtEdge = insideWindowPt.x >= (frame.maxX - 2.5) && insideWindowPt.x <= (frame.maxX + 1.0)
+        TestAssertion.assertFalse(notAtEdge, "Point away from extreme right edge must not trigger dwell summon")
     }
 }

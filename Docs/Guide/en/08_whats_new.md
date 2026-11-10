@@ -1,3 +1,17 @@
+# What's New in Version 2.13.0
+
+MacStash 2.13.0 delivers a comprehensive user experience and visual architecture overhaul, modularizing all core capabilities with independent user toggles, providing flexible screen edge customization for edge sliders and utility drawers, localizing Second Dock and Onboarding into Vietnamese and English, setting Stash Shelf and Scratchpad to disabled by default, and eliminating text overflow and layout jitter across all configuration panels.
+
+## Key Enhancements in Version 2.13.0
+
+- Modular Feature Architecture: Every core feature of MacStash (Corner Dials, Edge Sliders, Stash Shelf, Quick Scratchpad, Second Dock, Cursor Radial Palette, Pomodoro Focus Timer, Keep Awake) now features an independent toggle in Settings, allowing users to enable only the tools they use.
+- Configurable Edge Placements: Users can now customize the screen edge for Edge Sliders (Left Edge or Right Edge) and Drawer Utilities (Left Edge or Right Edge) with automatic collision avoidance and symmetrical spring animation curves.
+- Clean Out-of-the-Box Defaults: Stash Shelf and Quick Scratchpad now default to disabled (OFF), keeping screen edges completely free and unobtrusive until explicitly summoned.
+- Expanded 8-Tab Settings Window: Upgraded settings window dimensions to 720x600 with adaptive tab bar buttons, preventing label wrapping and eliminating scroll collisions.
+- Complete Bilingual Localization: Localized all Second Dock settings, widget gallery labels, Onboarding steps, and system badges into English and Vietnamese with zero hardcoded language checks.
+- Typography and Text Overflow Polish: Applied monospacedDigit to all numerical readouts, sliders, and timers in Settings and dial badges to eliminate horizontal text jitter during adjustments.
+- Native User Guide Markdown Rendering: UserGuideView now parses and natively renders Markdown headings, bold text, bullet points, and code spans cleanly.
+
 # What's New in Version 2.12.0
 
 MacStash 2.12.0 introduces hot corner screen target selection, restores complete mouse interactivity to the Second Dock with a dedicated dock item manager in Settings, upgrades Stash Shelf drag-and-drop file exports with true clipboard file copying, and enables standard editing keyboard shortcuts in the Quick Scratchpad.

@@ -34,7 +34,7 @@ public struct AboutTab: View {
                     Button(action: {
                         appState.updater.checkForUpdates(silent: false)
                     }) {
-                        Label(appState.updater.isChecking ? "Checking..." : "Check for Updates...", systemImage: "arrow.triangle.2.circlepath")
+                        Label(appState.updater.isChecking ? appState.localized("about.checking") : appState.localized("about.checkForUpdates"), systemImage: "arrow.triangle.2.circlepath")
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
@@ -82,7 +82,7 @@ public struct AboutTab: View {
                     }
 
                     if let err = importErrorMessage {
-                        Text("Import Error: \(err)")
+                        Text("\(appState.localized("about.importError")): \(err)")
                             .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.red)
                     }

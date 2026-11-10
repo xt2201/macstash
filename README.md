@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.12.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.13.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.12.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.13.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -97,7 +97,9 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Low-latency synchronization with macOS CoreAudio subsystem.
 
 ### 5. The Liquid Docking Bay (Stash Drop Shelf) & Quick Scratchpad
-- **The Stash Shelf**: The core namesake feature of MacStash. A sculpted liquid glass docking bay sliding smoothly from the left screen edge to hold files, images, links, and text snippets when dragging across spaces, displays, or apps.
+- **Modular Enable/Disable**: Both Stash Shelf and Quick Scratchpad feature independent toggles (default: OFF) so screen edges remain completely clean and zero-resource until you choose to enable them.
+- **Configurable Screen Edge**: Attach drawer utilities to either the Left Edge or Right Edge of your screen, matching your personal workflow and physical workspace.
+- **The Stash Shelf**: The core namesake feature of MacStash. A sculpted liquid glass docking bay sliding smoothly from the screen edge to hold files, images, links, and text snippets when dragging across spaces, displays, or apps.
 - **Silky-Smooth 120 FPS Performance**: Isolated row rendering (`StashItemCardView`) and in-memory icon caching (`StashIconCache`) eliminate LaunchServices disk I/O during mouse hover and scroll, guaranteeing locked 120 FPS fluid interaction.
 - **Instant Zero-Copy Drag Out**: Items dragged from the shelf provide standard `UTType.item` file representations for immediate drag-and-drop to Finder folders, the Desktop, or third-party apps with full-card drag interaction.
 - **True Clipboard File Copying**: The copy button writes real file objects (`NSURL`, `NSFilenamesPboardType`) to the pasteboard, enabling instant file pasting into Finder, Desktop, Mail, and Slack without dropping plain text paths.
@@ -122,6 +124,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Adjust Volume, Display Brightness, Keep Awake, and Focus Timer anywhere on screen without flinging the pointer across 34"–49" Ultrawide setups.
 
 ### 8. Hidden Edge Slider &amp; Now Playing Media Controls
+- **Configurable Screen Edge**: Place edge sliders on the Right Edge or Left Edge of your display with automatic collision separation against drawer panels.
 - Rides flush against your screen border with configurable actions in Settings (Volume, Brightness, Keyboard, Timer, Keep Awake, Stash Shelf, Scratchpad) and 120Hz ProMotion vertical drag/scroll smoothness.
 - **Extreme Edge &amp; Dwell Triggering**: Requires moving cursor to the physical edge boundary (`x >= maxX - 3.0`) with an intentional 180ms dwell delay, completely eliminating accidental expansions when using window scrollbars or controls in background apps.
 - **Universal Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, a 5-bar rhythm audio visualizer dynamically tinted to match the track's artwork color, and vertical transport controls (Previous on top, Play/Pause in middle, Next at bottom) across all browsers (Crest, Safari, Chrome, Arc) and native players (Spotify, Apple Music, VLC).

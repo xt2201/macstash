@@ -24,59 +24,66 @@ public struct HotCornersTab: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             GroupBox(label: Label(appState.localized("corners.cornerAssignment"), systemImage: "hand.tap.fill")) {
-                VStack(spacing: 12) {
-                    // Profile Switcher Header
-                    HStack {
-                        Text(appState.localized("corners.profile"))
-                            .font(.system(size: 12, weight: .semibold))
+                VStack(alignment: .leading, spacing: 12) {
+                    Toggle(appState.localized("corners.enableCornerDials"), isOn: $appState.isCornerDialsEnabled)
+                        .font(.system(size: 13, weight: .semibold))
 
-                        Picker("", selection: Binding(
-                            get: { currentProfile.id },
-                            set: { selectedProfileID = $0 }
-                        )) {
-                            ForEach(appState.appProfiles) { prof in
-                                Text(prof.name + (prof.bundleIdentifier == nil ? " (\(appState.localized("corners.default")))" : ""))
-                                    .tag(prof.id)
+                    if appState.isCornerDialsEnabled {
+                        Divider()
+
+                        // Profile Switcher Header
+                        HStack {
+                            Text(appState.localized("corners.profile"))
+                                .font(.system(size: 12, weight: .semibold))
+
+                            Picker("", selection: Binding(
+                                get: { currentProfile.id },
+                                set: { selectedProfileID = $0 }
+                            )) {
+                                ForEach(appState.appProfiles) { prof in
+                                    Text(prof.name + (prof.bundleIdentifier == nil ? " (\(appState.localized("corners.default")))" : ""))
+                                        .tag(prof.id)
+                                }
                             }
-                        }
-                        .pickerStyle(.menu)
-                        .frame(width: 190)
+                            .pickerStyle(.menu)
+                            .frame(width: 190)
 
-                        Spacer()
+                            Spacer()
 
-                        Button(action: {
-                            newProfileName = ""
-                            newProfileBundleID = ""
-                            showAddProfileSheet = true
-                        }) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 11))
-                        }
-                        .buttonStyle(.bordered)
-                        .help(appState.localized("corners.addProfile"))
-
-                        if currentProfile.bundleIdentifier != nil {
                             Button(action: {
-                                deleteProfile(currentProfile)
+                                newProfileName = ""
+                                newProfileBundleID = ""
+                                showAddProfileSheet = true
                             }) {
-                                Image(systemName: "trash")
+                                Image(systemName: "plus")
                                     .font(.system(size: 11))
-                                    .foregroundColor(.red)
                             }
                             .buttonStyle(.bordered)
-                            .help(appState.localized("corners.deleteProfile"))
+                            .help(appState.localized("corners.addProfile"))
+
+                            if currentProfile.bundleIdentifier != nil {
+                                Button(action: {
+                                    deleteProfile(currentProfile)
+                                }) {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.red)
+                                }
+                                .buttonStyle(.bordered)
+                                .help(appState.localized("corners.deleteProfile"))
+                            }
                         }
+
+                        Divider()
+
+                        cornerRow(profile: currentProfile, corner: .topLeft, title: appState.localized("corners.topLeft"))
+                        Divider()
+                        cornerRow(profile: currentProfile, corner: .topRight, title: appState.localized("corners.topRight"))
+                        Divider()
+                        cornerRow(profile: currentProfile, corner: .bottomLeft, title: appState.localized("corners.bottomLeft"))
+                        Divider()
+                        cornerRow(profile: currentProfile, corner: .bottomRight, title: appState.localized("corners.bottomRight"))
                     }
-
-                    Divider()
-
-                    cornerRow(profile: currentProfile, corner: .topLeft, title: appState.localized("corners.topLeft"))
-                    Divider()
-                    cornerRow(profile: currentProfile, corner: .topRight, title: appState.localized("corners.topRight"))
-                    Divider()
-                    cornerRow(profile: currentProfile, corner: .bottomLeft, title: appState.localized("corners.bottomLeft"))
-                    Divider()
-                    cornerRow(profile: currentProfile, corner: .bottomRight, title: appState.localized("corners.bottomRight"))
                 }
                 .padding(8)
             }
@@ -86,6 +93,18 @@ public struct HotCornersTab: View {
                     Toggle(appState.localized("corners.enableEdgeSliders"), isOn: $appState.isEdgeSlidersEnabled)
 
                     if appState.isEdgeSlidersEnabled {
+                        HStack {
+                            Text(appState.localized("corners.edgePosition"))
+                                .font(.system(size: 12, weight: .medium))
+                            Spacer()
+                            Picker("", selection: $appState.edgeSliderPosition) {
+                                Text(appState.localized("corners.edgeLeft")).tag(EdgePosition.left)
+                                Text(appState.localized("corners.edgeRight")).tag(EdgePosition.right)
+                            }
+                            .pickerStyle(.segmented)
+                            .frame(width: 190)
+                        }
+
                         HStack {
                             Text(appState.localized("corners.rightEdgeAction"))
                                 .font(.system(size: 12, weight: .medium))
@@ -132,15 +151,30 @@ public struct HotCornersTab: View {
                 .padding(8)
             }
 
-            GroupBox(label: Label(appState.effectiveLanguage == "vi" ? "Tiện ích mép trái và con trỏ" : "Left Edge Utilities & Cursor Palette", systemImage: "tray.2")) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Toggle(appState.effectiveLanguage == "vi" ? "Kệ thả tệp Stash Shelf" : "Stash Drop Shelf", isOn: $appState.settings.isStashShelfEnabled)
-                    Toggle(appState.effectiveLanguage == "vi" ? "Ghi chú nhanh Scratchpad" : "Quick Scratchpad", isOn: $appState.settings.isScratchpadEnabled)
-                    Toggle(appState.effectiveLanguage == "vi" ? "Vòng xoay tại con trỏ chuột" : "Cursor Radial Palette", isOn: $appState.settings.isCursorPaletteEnabled)
+            GroupBox(label: Label(appState.localized("corners.drawerSection"), systemImage: "tray.2")) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Toggle(appState.localized("corners.stashShelfToggle"), isOn: $appState.settings.isStashShelfEnabled)
+                    Toggle(appState.localized("corners.scratchpadToggle"), isOn: $appState.settings.isScratchpadEnabled)
 
-                    Text(appState.effectiveLanguage == "vi"
-                         ? "Mẹo: Lắc nhẹ chuột qua lại khi đang kéo tệp để mở nhanh Stash Shelf. Phím Esc để đóng nhanh."
-                         : "Tip: Wiggle or shake the cursor while dragging a file to instantly summon Stash Shelf. Press Esc to close.")
+                    if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
+                        HStack {
+                            Text(appState.localized("corners.drawerPosition"))
+                                .font(.system(size: 12, weight: .medium))
+                            Spacer()
+                            Picker("", selection: $appState.drawerEdgePosition) {
+                                Text(appState.localized("corners.edgeLeft")).tag(EdgePosition.left)
+                                Text(appState.localized("corners.edgeRight")).tag(EdgePosition.right)
+                            }
+                            .pickerStyle(.segmented)
+                            .frame(width: 190)
+                        }
+                    }
+
+                    Divider()
+
+                    Toggle(appState.localized("corners.cursorPaletteToggle"), isOn: $appState.settings.isCursorPaletteEnabled)
+
+                    Text(appState.localized("corners.drawerTip"))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }
@@ -156,6 +190,7 @@ public struct HotCornersTab: View {
                             Spacer()
                             Text("\(Int(appState.settings.cornerSensitivityPoints)) pt")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .monospacedDigit()
                         }
                         Slider(
                             value: $appState.settings.cornerSensitivityPoints,
@@ -176,6 +211,7 @@ public struct HotCornersTab: View {
                             Spacer()
                             Text("\(Int(appState.settings.cornerDwellDelaySeconds * 1000)) ms")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .monospacedDigit()
                         }
                         Slider(
                             value: $appState.settings.cornerDwellDelaySeconds,
@@ -196,6 +232,7 @@ public struct HotCornersTab: View {
                             Spacer()
                             Text("\(Int(appState.settings.cornerHideDelaySeconds * 1000)) ms")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .monospacedDigit()
                         }
                         Slider(
                             value: $appState.settings.cornerHideDelaySeconds,

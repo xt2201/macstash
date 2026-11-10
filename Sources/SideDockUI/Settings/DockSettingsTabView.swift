@@ -3,6 +3,7 @@ import AppKit
 import UniformTypeIdentifiers
 import SideDockCore
 import SideDockWidgets
+import MacStashCore
 
 public struct DockSettingsTabView: View {
     @Binding public var config: SideDockFileConfig
@@ -12,6 +13,10 @@ public struct DockSettingsTabView: View {
     @State private var showWidgetGallery: Bool = false
     @State private var newProfileName: String = ""
     @State private var isCreatingProfile: Bool = false
+
+    private func localized(_ key: String) -> String {
+        LocalizationService.shared.localized(key)
+    }
 
     public init(
         config: Binding<SideDockFileConfig>,
@@ -34,48 +39,51 @@ public struct DockSettingsTabView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 // Section 1: Core Toggle & Placement
-                GroupBox(label: Text("Second Dock Configuration").font(.headline)) {
+                GroupBox(label: Text(localized("dock.configTitle")).font(.headline)) {
                     VStack(alignment: .leading, spacing: 12) {
-                        Toggle("Enable Second Dock", isOn: $config.isDockVisible)
+                        Toggle(localized("dock.enableSecondDock"), isOn: $config.isDockVisible)
                             .onChange(of: config.isDockVisible) { _, _ in onSave(true) }
 
                         Divider()
 
-                        Picker("Placement", selection: bindingForPlacement) {
-                            Text("Fixed Bottom (Above macOS Dock)").tag(DockPlacement.fixedBottom)
-                            Text("Floating Window").tag(DockPlacement.floating)
-                            Text("Fixed Top").tag(DockPlacement.fixedTop)
-                            Text("Fixed Left").tag(DockPlacement.fixedLeft)
-                            Text("Fixed Right").tag(DockPlacement.fixedRight)
+                        Picker(localized("dock.placement"), selection: bindingForPlacement) {
+                            Text(localized("dock.placementFixedBottom")).tag(DockPlacement.fixedBottom)
+                            Text(localized("dock.placementFloating")).tag(DockPlacement.floating)
+                            Text(localized("dock.placementFixedTop")).tag(DockPlacement.fixedTop)
+                            Text(localized("dock.placementFixedLeft")).tag(DockPlacement.fixedLeft)
+                            Text(localized("dock.placementFixedRight")).tag(DockPlacement.fixedRight)
                         }
                         .pickerStyle(.menu)
 
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                Text("Scale:")
+                                Text(localized("dock.scale"))
                                 Spacer()
                                 Text("\(String(format: "%.1f", config.profiles[activeProfileIndex].layoutConfig.scale))x")
                                     .foregroundColor(.secondary)
+                                    .monospacedDigit()
                             }
                             Slider(value: bindingForScale, in: 0.7...1.5, step: 0.05)
                         }
 
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                Text("Tile Spacing:")
+                                Text(localized("dock.tileSpacing"))
                                 Spacer()
                                 Text("\(Int(config.profiles[activeProfileIndex].layoutConfig.tileSpacing)) px")
                                     .foregroundColor(.secondary)
+                                    .monospacedDigit()
                             }
                             Slider(value: bindingForSpacing, in: 4.0...24.0, step: 1.0)
                         }
 
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                Text("Offset from Screen Edge:")
+                                Text(localized("dock.edgeOffset"))
                                 Spacer()
                                 Text("\(Int(config.profiles[activeProfileIndex].layoutConfig.bottomOffset)) px")
                                     .foregroundColor(.secondary)
+                                    .monospacedDigit()
                             }
                             Slider(value: bindingForBottomOffset, in: 0.0...60.0, step: 2.0)
                         }
@@ -84,62 +92,64 @@ public struct DockSettingsTabView: View {
                 }
 
                 // Section 2: Auto-Hide & Edge Triggers
-                GroupBox(label: Text("Behavior & Triggers").font(.headline)) {
+                GroupBox(label: Text(localized("dock.behaviorTitle")).font(.headline)) {
                     VStack(alignment: .leading, spacing: 12) {
-                        Toggle("Auto-Hide Dock", isOn: bindingForAutoHide)
+                        Toggle(localized("dock.autoHide"), isOn: bindingForAutoHide)
 
                         if config.profiles[activeProfileIndex].layoutConfig.autoHide {
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
-                                    Text("Reveal Delay:")
+                                    Text(localized("dock.revealDelay"))
                                     Spacer()
                                     Text("\(String(format: "%.1f", config.profiles[activeProfileIndex].layoutConfig.revealDelaySeconds)) s")
                                         .foregroundColor(.secondary)
+                                        .monospacedDigit()
                                 }
                                 Slider(value: bindingForRevealDelay, in: 0.0...3.0, step: 0.1)
                             }
 
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
-                                    Text("Activation Edge Zone:")
+                                    Text(localized("dock.edgeZone"))
                                     Spacer()
                                     Text("\(Int(config.profiles[activeProfileIndex].layoutConfig.edgeTriggerThickness)) px")
                                         .foregroundColor(.secondary)
+                                        .monospacedDigit()
                                 }
                                 Slider(value: bindingForTriggerThickness, in: 2.0...20.0, step: 1.0)
                             }
                         }
 
-                        Toggle("Hide when application is in Fullscreen", isOn: bindingForFullscreen)
-                        Toggle("Hide on Window Hover (fade out when window covers dock)", isOn: bindingForHover)
-                        Toggle("Reserve Dock Space (push active windows away from dock)", isOn: bindingForReserve)
-                        Toggle("Show Running Applications Bar", isOn: bindingForRunningApps)
+                        Toggle(localized("dock.hideInFullscreen"), isOn: bindingForFullscreen)
+                        Toggle(localized("dock.hideOnHover"), isOn: bindingForHover)
+                        Toggle(localized("dock.reserveSpace"), isOn: bindingForReserve)
+                        Toggle(localized("dock.showRunningApps"), isOn: bindingForRunningApps)
                     }
                     .padding(8)
                 }
 
                 // Section 3: Appearance & Glass Style
-                GroupBox(label: Text("Appearance & Glass Materials").font(.headline)) {
+                GroupBox(label: Text(localized("dock.appearanceTitle")).font(.headline)) {
                     VStack(alignment: .leading, spacing: 12) {
-                        Picker("Backdrop Style", selection: bindingForBackdrop) {
-                            Text("Auto System").tag(DockBackdropStyle.autoSystem)
-                            Text("Light Glass").tag(DockBackdropStyle.lightGlass)
-                            Text("Dark Glass").tag(DockBackdropStyle.darkGlass)
-                            Text("Liquid Glass").tag(DockBackdropStyle.liquidGlass)
-                            Text("Clear (Frameless)").tag(DockBackdropStyle.clear)
+                        Picker(localized("dock.backdropStyle"), selection: bindingForBackdrop) {
+                            Text(localized("dock.backdropAuto")).tag(DockBackdropStyle.autoSystem)
+                            Text(localized("dock.backdropLight")).tag(DockBackdropStyle.lightGlass)
+                            Text(localized("dock.backdropDark")).tag(DockBackdropStyle.darkGlass)
+                            Text(localized("dock.backdropLiquid")).tag(DockBackdropStyle.liquidGlass)
+                            Text(localized("dock.backdropClear")).tag(DockBackdropStyle.clear)
                         }
                         .pickerStyle(.segmented)
 
-                        Toggle("Reduce Motion (Disable hover bounce & animations)", isOn: bindingForReduceMotion)
+                        Toggle(localized("dock.reduceMotion"), isOn: bindingForReduceMotion)
                     }
                     .padding(8)
                 }
 
                 // Section 4: Profiles & Widgets
-                GroupBox(label: Text("Profiles & Widget Gallery").font(.headline)) {
+                GroupBox(label: Text(localized("dock.profilesTitle")).font(.headline)) {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Picker("Active Profile:", selection: $config.activeProfileId) {
+                            Picker(localized("dock.activeProfile"), selection: $config.activeProfileId) {
                                 ForEach(config.profiles) { prof in
                                     Text(prof.name).tag(prof.id)
                                 }
@@ -152,39 +162,39 @@ public struct DockSettingsTabView: View {
                             Button {
                                 exportCurrentProfile()
                             } label: {
-                                Label("Export...", systemImage: "square.and.arrow.up")
+                                Label(localized("dock.export"), systemImage: "square.and.arrow.up")
                             }
 
                             Button {
                                 importProfileFromFile()
                             } label: {
-                                Label("Import...", systemImage: "square.and.arrow.down")
+                                Label(localized("dock.import"), systemImage: "square.and.arrow.down")
                             }
 
                             Button {
                                 isCreatingProfile = true
                             } label: {
-                                Label("New Profile", systemImage: "plus")
+                                Label(localized("dock.newProfile"), systemImage: "plus")
                             }
 
                             if config.profiles.count > 1 {
                                 Button(role: .destructive) {
                                     deleteCurrentProfile()
                                 } label: {
-                                    Label("Delete", systemImage: "trash")
+                                    Label(localized("dock.delete"), systemImage: "trash")
                                 }
                             }
                         }
 
                         if isCreatingProfile {
                             HStack {
-                                TextField("Profile Name...", text: $newProfileName)
+                                TextField(localized("dock.profileNamePlaceholder"), text: $newProfileName)
                                     .textFieldStyle(.roundedBorder)
-                                Button("Create") {
+                                Button(localized("dock.create")) {
                                     createNewProfile()
                                 }
                                 .disabled(newProfileName.trimmingCharacters(in: .whitespaces).isEmpty)
-                                Button("Cancel") {
+                                Button(localized("dock.cancel")) {
                                     isCreatingProfile = false
                                     newProfileName = ""
                                 }
@@ -197,7 +207,7 @@ public struct DockSettingsTabView: View {
                             Button {
                                 showWidgetGallery = true
                             } label: {
-                                Label("Browse Widget Gallery...", systemImage: "plus.rectangle.on.rectangle")
+                                Label(localized("dock.browseWidgets"), systemImage: "plus.rectangle.on.rectangle")
                             }
                             .buttonStyle(.borderedProminent)
 
@@ -206,23 +216,23 @@ public struct DockSettingsTabView: View {
                             Button(role: .destructive) {
                                 onResetLayout()
                             } label: {
-                                Label("Reset Layout", systemImage: "arrow.counterclockwise")
+                                Label(localized("dock.resetLayout"), systemImage: "arrow.counterclockwise")
                             }
-                            .help("Restores dock position and dimensions without losing widgets")
+                            .help(localized("dock.resetLayoutHelp"))
                         }
                     }
                     .padding(8)
                 }
 
                 // Section 5: Dock Items & Applications
-                GroupBox(label: Text("Dock Items & Applications").font(.headline)) {
+                GroupBox(label: Text(localized("dock.itemsTitle")).font(.headline)) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Manage apps, widgets, and separators in this profile. Default apps like Safari and Terminal can be deleted or reordered here.")
+                        Text(localized("dock.itemsDesc"))
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
 
                         if config.profiles[activeProfileIndex].items.isEmpty {
-                            Text("No items in this profile.")
+                            Text(localized("dock.noItems"))
                                 .font(.system(size: 12))
                                 .foregroundColor(.secondary)
                                 .padding(.vertical, 8)
@@ -247,7 +257,7 @@ public struct DockSettingsTabView: View {
                                                     .font(.system(size: 10, weight: .bold))
                                             }
                                             .buttonStyle(.plain)
-                                            .help("Move Up")
+                                            .help(localized("dock.moveUp"))
                                         }
 
                                         if idx < config.profiles[activeProfileIndex].items.count - 1 {
@@ -258,7 +268,7 @@ public struct DockSettingsTabView: View {
                                                     .font(.system(size: 10, weight: .bold))
                                             }
                                             .buttonStyle(.plain)
-                                            .help("Move Down")
+                                            .help(localized("dock.moveDown"))
                                         }
 
                                         Button(role: .destructive) {
@@ -269,7 +279,7 @@ public struct DockSettingsTabView: View {
                                                 .foregroundColor(.red)
                                         }
                                         .buttonStyle(.plain)
-                                        .help("Remove from Dock")
+                                        .help(localized("dock.remove"))
                                     }
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 5)
@@ -284,20 +294,20 @@ public struct DockSettingsTabView: View {
                             Button {
                                 addApplication()
                             } label: {
-                                Label("Add Application...", systemImage: "plus.app")
+                                Label(localized("dock.addApp"), systemImage: "plus.app")
                             }
 
                             Button {
                                 config.profiles[activeProfileIndex].items.append(.separator(UUID()))
                                 onSave(true)
                             } label: {
-                                Label("Add Separator", systemImage: "line.diagonal")
+                                Label(localized("dock.addSeparator"), systemImage: "line.diagonal")
                             }
 
                             Button {
                                 showWidgetGallery = true
                             } label: {
-                                Label("Add Widget...", systemImage: "plus.rectangle.on.rectangle")
+                                Label(localized("dock.addWidget"), systemImage: "plus.rectangle.on.rectangle")
                             }
                             .buttonStyle(.borderedProminent)
                         }

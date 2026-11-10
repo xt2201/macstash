@@ -68,16 +68,23 @@ public enum Defaults {
     }
 
     public enum StashShelf {
+        public static let defaultEnabled: Bool = false
         public static let maxItems: Int = 50
         public static let defaultWidthPoints: CGFloat = 310.0
     }
 
     public enum Scratchpad {
+        public static let defaultEnabled: Bool = false
         public static let defaultWidthPoints: CGFloat = 340.0
         public static let defaultHeightPoints: CGFloat = 400.0
     }
 
+    public enum EdgeSliders {
+        public static let defaultPosition: EdgePosition = .right
+    }
+
     public enum LeftEdgeDrawer {
+        public static let defaultPosition: EdgePosition = .left
         public static let tabBarWidthPoints: CGFloat = 36.0
         public static let spacingPoints: CGFloat = 6.0
         public static let panelWidthPoints: CGFloat = 410.0

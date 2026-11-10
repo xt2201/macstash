@@ -90,6 +90,18 @@ public final class AppState: ObservableObject {
     @Published public var cornerDwellDelay: TimeInterval = Defaults.HotCorner.defaultDwellDelaySeconds {
         didSet { settings.cornerDwellDelaySeconds = cornerDwellDelay }
     }
+    @Published public var edgeSliderPosition: EdgePosition = Defaults.EdgeSliders.defaultPosition {
+        didSet {
+            settings.edgeSliderPosition = edgeSliderPosition
+            ScreenManager.shared.reconfigureOverlays()
+        }
+    }
+    @Published public var drawerEdgePosition: EdgePosition = Defaults.LeftEdgeDrawer.defaultPosition {
+        didSet {
+            settings.drawerEdgePosition = drawerEdgePosition
+            ScreenManager.shared.reconfigureOverlays()
+        }
+    }
     @Published public var isSoundEnabled: Bool = true {
         didSet { settings.isSoundEnabled = isSoundEnabled }
     }
@@ -148,6 +160,8 @@ public final class AppState: ObservableObject {
         self.cornerDwellDelay = loaded.cornerDwellDelaySeconds
         self.isSoundEnabled = loaded.isSoundEnabled
         self.soundVolume = loaded.soundVolume
+        self.edgeSliderPosition = loaded.edgeSliderPosition
+        self.drawerEdgePosition = loaded.drawerEdgePosition
         self.hapticIntensity = HapticIntensity(rawValue: loaded.hapticIntensity.capitalized) ?? .medium
 
         let defaults = UserDefaults.standard
@@ -535,6 +549,8 @@ public final class AppState: ObservableObject {
         self.cornerDwellDelay = fresh.cornerDwellDelaySeconds
         self.isSoundEnabled = fresh.isSoundEnabled
         self.soundVolume = fresh.soundVolume
+        self.edgeSliderPosition = fresh.edgeSliderPosition
+        self.drawerEdgePosition = fresh.drawerEdgePosition
         self.hapticIntensity = HapticIntensity(rawValue: fresh.hapticIntensity.capitalized) ?? .medium
     }
 }

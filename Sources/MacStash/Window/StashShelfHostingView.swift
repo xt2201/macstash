@@ -65,7 +65,9 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
                 ? Defaults.LeftEdgeDrawer.scratchpadTotalHeightPoints
                 : Defaults.LeftEdgeDrawer.shelfTotalHeightPoints
             let activeY = (bounds.height - activeHeight) / 2.0
-            let activeRect = NSRect(x: bounds.minX, y: activeY, width: activeDrawerWidth, height: activeHeight)
+            let isRight = appState.settings.drawerEdgePosition == .right
+            let activeX = isRight ? (bounds.maxX - activeDrawerWidth) : bounds.minX
+            let activeRect = NSRect(x: activeX, y: activeY, width: activeDrawerWidth, height: activeHeight)
             if activeRect.contains(point) {
                 return super.hitTest(point)
             }

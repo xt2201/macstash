@@ -58,6 +58,10 @@ public struct AppSettings: Codable, Equatable, Sendable {
     // Scratchpad
     public var isScratchpadEnabled: Bool
 
+    // Edge & Drawer Placements
+    public var edgeSliderPosition: EdgePosition
+    public var drawerEdgePosition: EdgePosition
+
     // Cursor Palette
     public var isCursorPaletteEnabled: Bool
 
@@ -124,8 +128,10 @@ public struct AppSettings: Codable, Equatable, Sendable {
         pomodoroSoundEnabled: Bool = true,
         isKeepAwakeEnabled: Bool = true,
         keepAwakeDefaultMinutes: Int = Defaults.KeepAwake.defaultDurationMinutes,
-        isStashShelfEnabled: Bool = true,
-        isScratchpadEnabled: Bool = true,
+        isStashShelfEnabled: Bool = Defaults.StashShelf.defaultEnabled,
+        isScratchpadEnabled: Bool = Defaults.Scratchpad.defaultEnabled,
+        edgeSliderPosition: EdgePosition = Defaults.EdgeSliders.defaultPosition,
+        drawerEdgePosition: EdgePosition = Defaults.LeftEdgeDrawer.defaultPosition,
         isCursorPaletteEnabled: Bool = true,
         isSoundEnabled: Bool = true,
         soundVolume: Float = Defaults.Audio.defaultSoundVolume,
@@ -176,6 +182,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.keepAwakeDefaultMinutes = keepAwakeDefaultMinutes
         self.isStashShelfEnabled = isStashShelfEnabled
         self.isScratchpadEnabled = isScratchpadEnabled
+        self.edgeSliderPosition = edgeSliderPosition
+        self.drawerEdgePosition = drawerEdgePosition
         self.isCursorPaletteEnabled = isCursorPaletteEnabled
         self.isSoundEnabled = isSoundEnabled
         self.soundVolume = max(0.0, min(1.0, soundVolume))
@@ -231,6 +239,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
         let keepAwakeDefaultMinutes = try container.decodeIfPresent(Int.self, forKey: .keepAwakeDefaultMinutes) ?? def.keepAwakeDefaultMinutes
         let isStashShelfEnabled = try container.decodeIfPresent(Bool.self, forKey: .isStashShelfEnabled) ?? def.isStashShelfEnabled
         let isScratchpadEnabled = try container.decodeIfPresent(Bool.self, forKey: .isScratchpadEnabled) ?? def.isScratchpadEnabled
+        let edgeSliderPosition = try container.decodeIfPresent(EdgePosition.self, forKey: .edgeSliderPosition) ?? def.edgeSliderPosition
+        let drawerEdgePosition = try container.decodeIfPresent(EdgePosition.self, forKey: .drawerEdgePosition) ?? def.drawerEdgePosition
         let isCursorPaletteEnabled = try container.decodeIfPresent(Bool.self, forKey: .isCursorPaletteEnabled) ?? def.isCursorPaletteEnabled
         let isSoundEnabled = try container.decodeIfPresent(Bool.self, forKey: .isSoundEnabled) ?? def.isSoundEnabled
         let soundVolume = try container.decodeIfPresent(Float.self, forKey: .soundVolume) ?? def.soundVolume
@@ -282,6 +292,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
             keepAwakeDefaultMinutes: keepAwakeDefaultMinutes,
             isStashShelfEnabled: isStashShelfEnabled,
             isScratchpadEnabled: isScratchpadEnabled,
+            edgeSliderPosition: edgeSliderPosition,
+            drawerEdgePosition: drawerEdgePosition,
             isCursorPaletteEnabled: isCursorPaletteEnabled,
             isSoundEnabled: isSoundEnabled,
             soundVolume: soundVolume,

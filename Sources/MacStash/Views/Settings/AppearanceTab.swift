@@ -23,6 +23,7 @@ public struct AppearanceTab: View {
                             Spacer()
                             Text("\(Int(appState.settings.dialRadiusPoints)) pt")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .monospacedDigit()
                         }
                         Slider(value: $appState.settings.dialRadiusPoints, in: 110...200, step: 5)
                     }
@@ -36,6 +37,7 @@ public struct AppearanceTab: View {
                             Spacer()
                             Text("\(Int(appState.settings.dialOpacity * 100))%")
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .monospacedDigit()
                         }
                         Slider(value: $appState.settings.dialOpacity, in: 0.3...1.0, step: 0.05)
                     }
@@ -67,6 +69,7 @@ public struct AppearanceTab: View {
                             Spacer()
                             Text(String(format: "%.1fx", appState.settings.animationSpeedMultiplier))
                                 .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .monospacedDigit()
                         }
                         Slider(value: $appState.settings.animationSpeedMultiplier, in: 0.5...2.0, step: 0.1)
                     }
@@ -93,6 +96,7 @@ public struct AppearanceTab: View {
                                 Spacer()
                                 Text("\(Int(appState.settings.soundVolume * 100))%")
                                     .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                    .monospacedDigit()
                             }
                             Slider(value: $appState.settings.soundVolume, in: 0.1...1.0, step: 0.05)
                         }
@@ -105,7 +109,7 @@ public struct AppearanceTab: View {
                             .font(.system(size: 12, weight: .medium))
                         Spacer()
                         Picker("", selection: $appState.settings.hapticIntensity) {
-                            Text(appState.effectiveLanguage == "vi" ? "Tắt" : "Off").tag("off")
+                            Text(appState.localized("appearance.hapticOff")).tag("off")
                             Text(appState.localized("appearance.hapticLight")).tag("subtle")
                             Text(appState.localized("appearance.hapticMedium")).tag("medium")
                             Text(appState.localized("appearance.hapticStrong")).tag("strong")
@@ -128,7 +132,7 @@ private struct LiquidGlassPreviewStage: View {
     @State private var previewAction: ControlAction = .volume
 
     var body: some View {
-        GroupBox(label: Label(appState.effectiveLanguage == "vi" ? "Thử nghiệm Liquid Glass tương tác" : "Interactive Liquid Glass Studio", systemImage: "sparkles")) {
+        GroupBox(label: Label(appState.localized("appearance.studioTitle"), systemImage: "sparkles")) {
             VStack(spacing: 12) {
                 // Interactive stage canvas with dark backdrop and simulated screen corner
                 ZStack(alignment: .bottomTrailing) {

@@ -103,17 +103,27 @@ public final class ScreenOverlayInstance {
             passThroughViews[corner] = hostingView
         }
 
-        createRightEdgePanelIfNeeded()
-        createLeftEdgePanelIfNeeded()
+        createSliderPanelIfNeeded()
+        createDrawerPanelIfNeeded()
     }
 
-    private func createLeftEdgePanelIfNeeded() {
-        if appState.settings.onlyOuterCorners {
-            let allFrames = NSScreen.screens.map { $0.frame }
-            guard CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames) else { return }
+    private func createDrawerPanelIfNeeded() {
+        guard appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled else {
+            leftEdgePanel?.orderOut(nil)
+            return
         }
 
-        let panel = makeEdgePanel(contentRect: leftEdgeRect(in: screen.frame))
+        let isRight = appState.settings.drawerEdgePosition == .right
+        if appState.settings.onlyOuterCorners {
+            let allFrames = NSScreen.screens.map { $0.frame }
+            if isRight {
+                guard CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames) else { return }
+            } else {
+                guard CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames) else { return }
+            }
+        }
+
+        let panel = makeEdgePanel(contentRect: drawerRect(in: screen.frame))
         let hostingView = StashShelfHostingView(rootView: LeftEdgeContainerView(appState: appState), appState: appState)
         panel.contentView = hostingView
         panel.orderFrontRegardless()
@@ -122,25 +132,42 @@ public final class ScreenOverlayInstance {
         stashHostingView = hostingView
     }
 
-    public func leftEdgeRect(in frame: NSRect) -> NSRect {
+    public func drawerRect(in frame: NSRect) -> NSRect {
+        let isRight = appState.settings.drawerEdgePosition == .right
+        let sameEdge = isRight == (appState.settings.edgeSliderPosition == .right) && appState.settings.isEdgeSlidersEnabled
         let panelWidth: CGFloat = Defaults.LeftEdgeDrawer.panelWidthPoints
         let panelHeight: CGFloat = Defaults.LeftEdgeDrawer.panelHeightPoints
-        let panelY = frame.minY + (frame.height - panelHeight) / 2
-        return NSRect(x: frame.minX, y: panelY, width: panelWidth, height: panelHeight)
+        let panelY = sameEdge
+            ? max(frame.minY + 10, frame.midY - panelHeight + 40)
+            : frame.minY + (frame.height - panelHeight) / 2
+        let panelX = isRight ? (frame.maxX - panelWidth) : frame.minX
+        return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
     }
 
-    private func createRightEdgePanelIfNeeded() {
+    public func leftEdgeRect(in frame: NSRect) -> NSRect {
+        drawerRect(in: frame)
+    }
+
+    private func createSliderPanelIfNeeded() {
+        guard appState.settings.isEdgeSlidersEnabled else {
+            rightEdgePanel?.orderOut(nil)
+            return
+        }
+
+        let isLeft = appState.settings.edgeSliderPosition == .left
         if appState.settings.onlyOuterCorners {
             let allFrames = NSScreen.screens.map { $0.frame }
-            guard CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames) else {
-                return
+            if isLeft {
+                guard CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames) else { return }
+            } else {
+                guard CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames) else { return }
             }
         }
 
-        let edgeFrame = rightEdgeRect(in: screen.frame)
+        let edgeFrame = sliderRect(in: screen.frame)
         let panel = makeEdgePanel(contentRect: edgeFrame)
-        let sliderView = EdgeSliderView(appState: appState, displayID: displayID, edge: .right)
-        let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID, edge: .right)
+        let sliderView = EdgeSliderView(appState: appState, displayID: displayID, edge: isLeft ? .left : .right)
+        let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID, edge: isLeft ? .left : .right)
 
         panel.contentView = hostingView
         panel.orderFrontRegardless()
@@ -149,12 +176,20 @@ public final class ScreenOverlayInstance {
         self.edgeHostingView = hostingView
     }
 
-    public func rightEdgeRect(in frame: NSRect) -> NSRect {
+    public func sliderRect(in frame: NSRect) -> NSRect {
+        let isLeft = appState.settings.edgeSliderPosition == .left
+        let sameEdge = (appState.settings.drawerEdgePosition == .left) == isLeft && (appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled)
         let panelWidth: CGFloat = 80
         let panelHeight: CGFloat = 460
-        let panelY = frame.minY + (frame.height - panelHeight) / 2
-        let panelX = frame.maxX - panelWidth
+        let panelY = sameEdge
+            ? min(frame.maxY - panelHeight - 10, frame.midY - 40)
+            : frame.minY + (frame.height - panelHeight) / 2
+        let panelX = isLeft ? frame.minX : (frame.maxX - panelWidth)
         return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
+    }
+
+    public func rightEdgeRect(in frame: NSRect) -> NSRect {
+        sliderRect(in: frame)
     }
 
     public func repositionPanels() {
@@ -165,41 +200,56 @@ public final class ScreenOverlayInstance {
             panel.setFrame(rect, display: true)
         }
 
-        if let edgePanel = rightEdgePanel {
-            let shouldShow: Bool
-            if appState.settings.onlyOuterCorners {
-                let allFrames = NSScreen.screens.map { $0.frame }
-                shouldShow = CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames)
-            } else {
-                shouldShow = true
-            }
+        if appState.settings.isEdgeSlidersEnabled {
+            if let edgePanel = rightEdgePanel {
+                let isLeft = appState.settings.edgeSliderPosition == .left
+                let shouldShow: Bool
+                if appState.settings.onlyOuterCorners {
+                    let allFrames = NSScreen.screens.map { $0.frame }
+                    shouldShow = isLeft
+                        ? CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames)
+                        : CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames)
+                } else {
+                    shouldShow = true
+                }
 
-            if shouldShow {
-                let rect = rightEdgeRect(in: frame)
-                edgePanel.setFrame(rect, display: true)
-                edgePanel.orderFrontRegardless()
+                if shouldShow {
+                    let rect = sliderRect(in: frame)
+                    edgePanel.setFrame(rect, display: true)
+                    edgePanel.orderFrontRegardless()
+                } else {
+                    edgePanel.orderOut(nil)
+                }
             } else {
-                edgePanel.orderOut(nil)
+                createSliderPanelIfNeeded()
             }
         } else {
-            createRightEdgePanelIfNeeded()
+            rightEdgePanel?.orderOut(nil)
         }
 
-        if let leftPanel = leftEdgePanel {
-            let shouldShow: Bool
-            if appState.settings.onlyOuterCorners {
-                shouldShow = CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: NSScreen.screens.map { $0.frame })
+        if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
+            if let leftPanel = leftEdgePanel {
+                let isRight = appState.settings.drawerEdgePosition == .right
+                let shouldShow: Bool
+                if appState.settings.onlyOuterCorners {
+                    let allFrames = NSScreen.screens.map { $0.frame }
+                    shouldShow = isRight
+                        ? CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames)
+                        : CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames)
+                } else {
+                    shouldShow = true
+                }
+                if shouldShow {
+                    leftPanel.setFrame(drawerRect(in: frame), display: true)
+                    leftPanel.orderFrontRegardless()
+                } else {
+                    leftPanel.orderOut(nil)
+                }
             } else {
-                shouldShow = true
-            }
-            if shouldShow {
-                leftPanel.setFrame(leftEdgeRect(in: frame), display: true)
-                leftPanel.orderFrontRegardless()
-            } else {
-                leftPanel.orderOut(nil)
+                createDrawerPanelIfNeeded()
             }
         } else {
-            createLeftEdgePanelIfNeeded()
+            leftEdgePanel?.orderOut(nil)
         }
     }
 

@@ -549,20 +549,20 @@ public struct CenterActionBadge: View {
                     .font(.system(size: 13, weight: .heavy, design: .rounded))
                     .monospacedDigit()
                     .foregroundColor(.primary)
-                Text("items")
+                Text(LocalizationService.shared.localized("dial.items"))
                     .font(.system(size: 8, weight: .semibold, design: .rounded))
                     .foregroundColor(.secondary)
             }
         } else if action == .scratchpad {
-            Text("NOTES")
+            Text(LocalizationService.shared.localized("dial.notes"))
                 .font(.system(size: 9.5, weight: .heavy, design: .rounded))
                 .foregroundColor(.primary)
         } else if action == .volume && isMuted {
-            Text("MUTE")
+            Text(LocalizationService.shared.localized("dial.mute"))
                 .font(.system(size: 9.5, weight: .heavy, design: .rounded))
                 .foregroundColor(.red)
         } else if action == .keyboardBrightness && !isKeyboardSupported {
-            Text("N/A")
+            Text(LocalizationService.shared.localized("dial.na"))
                 .font(.system(size: 10, weight: .heavy, design: .rounded))
                 .foregroundColor(.secondary)
         } else {

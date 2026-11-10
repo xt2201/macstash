@@ -18,29 +18,23 @@ public struct LeftEdgeContainerView: View {
     }
 
     public var body: some View {
+        let isRight = appState.settings.drawerEdgePosition == .right
+        let transitionEdge: Edge = isRight ? .trailing : .leading
+
         HStack(alignment: .center, spacing: 6) {
             if isOpen {
-                // When open: Show active drawer with integrated mini tab bar
                 HStack(spacing: 6) {
-                    drawerTabBar
-
-                    if shelf.isShelfOpen || shelf.isDropTargetActive {
-                        StashShelfView(appState: appState)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .leading).combined(with: .opacity),
-                                removal: .move(edge: .leading).combined(with: .opacity)
-                            ))
-                    } else if scratchpad.isScratchpadOpen {
-                        ScratchpadView(appState: appState)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .leading).combined(with: .opacity),
-                                removal: .move(edge: .leading).combined(with: .opacity)
-                            ))
+                    if isRight {
+                        drawerView(transitionEdge: transitionEdge)
+                        drawerTabBar
+                    } else {
+                        drawerTabBar
+                        drawerView(transitionEdge: transitionEdge)
                     }
                 }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: isRight ? .trailing : .leading)
         .animation(.spring(response: 0.28, dampingFraction: 0.82), value: isOpen)
         .onHover { isHovered in
             if isHovered {
@@ -51,6 +45,23 @@ public struct LeftEdgeContainerView: View {
                     ScreenManager.shared.scheduleLeftEdgeHideTimer()
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func drawerView(transitionEdge: Edge) -> some View {
+        if shelf.isShelfOpen || shelf.isDropTargetActive {
+            StashShelfView(appState: appState)
+                .transition(.asymmetric(
+                    insertion: .move(edge: transitionEdge).combined(with: .opacity),
+                    removal: .move(edge: transitionEdge).combined(with: .opacity)
+                ))
+        } else if scratchpad.isScratchpadOpen {
+            ScratchpadView(appState: appState)
+                .transition(.asymmetric(
+                    insertion: .move(edge: transitionEdge).combined(with: .opacity),
+                    removal: .move(edge: transitionEdge).combined(with: .opacity)
+                ))
         }
     }
 

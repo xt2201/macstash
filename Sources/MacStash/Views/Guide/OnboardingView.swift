@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import MacStashCore
 
 public struct OnboardingView: View {
     @State private var currentStep: Int = 1
@@ -8,6 +9,10 @@ public struct OnboardingView: View {
 
     public init(onFinish: @escaping () -> Void) {
         self.onFinish = onFinish
+    }
+
+    private func localized(_ key: String) -> String {
+        LocalizationService.shared.localized(key)
     }
 
     public var body: some View {
@@ -42,7 +47,7 @@ public struct OnboardingView: View {
             // Navigation Buttons
             HStack {
                 if currentStep > 1 {
-                    Button("Previous") {
+                    Button(localized("onboarding.previous")) {
                         currentStep -= 1
                     }
                     .buttonStyle(.bordered)
@@ -51,12 +56,12 @@ public struct OnboardingView: View {
                 Spacer()
 
                 if currentStep < 4 {
-                    Button("Next Step") {
+                    Button(localized("onboarding.next")) {
                         currentStep += 1
                     }
                     .buttonStyle(.borderedProminent)
                 } else {
-                    Button("Get Started") {
+                    Button(localized("onboarding.getStarted")) {
                         onFinish()
                     }
                     .buttonStyle(.borderedProminent)
@@ -72,10 +77,10 @@ public struct OnboardingView: View {
         VStack(spacing: 14) {
             StashBrandLogoView(size: 64, showWordmark: true)
 
-            Text("Welcome to MacStash")
+            Text(localized("onboarding.welcome"))
                 .font(.system(size: 22, weight: .bold))
 
-            Text("MacStash brings tactile corner dials and hidden productivity controls directly to your macOS workspace. Controls remain completely hidden and zero-resource until you summon them.")
+            Text(localized("onboarding.welcomeDesc"))
                 .font(.system(size: 13))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -91,10 +96,10 @@ public struct OnboardingView: View {
                 .frame(width: 54, height: 54)
                 .foregroundColor(.accentColor)
 
-            Text("Outer Corner Triggering")
+            Text(localized("onboarding.cornersTitle"))
                 .font(.system(size: 20, weight: .bold))
 
-            Text("To reveal a dial, move your mouse into the extreme corner of your display and pause for a fraction of a second. On multi-display setups, inner junctions are automatically filtered out to ensure smooth cursor transitions.")
+            Text(localized("onboarding.cornersDesc"))
                 .font(.system(size: 13))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -110,10 +115,10 @@ public struct OnboardingView: View {
                 .frame(width: 54, height: 54)
                 .foregroundColor(.accentColor)
 
-            Text("Tactile Hardware & Focus Controls")
+            Text(localized("onboarding.controlsTitle"))
                 .font(.system(size: 20, weight: .bold))
 
-            Text("Easily adjust per-monitor brightness (via DDC/CI hardware control or software dimming), master audio output, keyboard backlight, and the monotonic Pomodoro focus timer.")
+            Text(localized("onboarding.controlsDesc"))
                 .font(.system(size: 13))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -129,22 +134,22 @@ public struct OnboardingView: View {
                 .frame(width: 48, height: 48)
                 .foregroundColor(.green)
 
-            Text("Permissions Setup")
+            Text(localized("onboarding.permissionsTitle"))
                 .font(.system(size: 20, weight: .bold))
 
-            Text("MacStash operates locally on your machine with zero telemetry. Grant Accessibility permission to enable cursor tracking across your displays.")
+            Text(localized("onboarding.permissionsDesc"))
                 .font(.system(size: 12))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 16)
 
             HStack(spacing: 12) {
-                Button("Configure Accessibility") {
+                Button(localized("onboarding.configAccessibility")) {
                     permissions.openAccessibilitySettings()
                 }
                 .buttonStyle(.bordered)
 
-                Button("Configure Notifications") {
+                Button(localized("onboarding.configNotifications")) {
                     permissions.openNotificationSettings()
                 }
                 .buttonStyle(.bordered)

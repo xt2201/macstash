@@ -73,7 +73,7 @@ public struct UserGuideView: View {
 
                         Divider()
 
-                        Text(active.content)
+                        Text(LocalizedStringKey(active.content))
                             .font(.system(size: 13))
                             .lineSpacing(4)
                             .textSelection(.enabled)
@@ -89,7 +89,7 @@ public struct UserGuideView: View {
         .onAppear {
             articles = Self.loadArticles(language: appState.effectiveLanguage)
         }
-        .onChange(of: appState.effectiveLanguage) { newLang in
+        .onChange(of: appState.effectiveLanguage) { _, newLang in
             articles = Self.loadArticles(language: newLang)
         }
     }

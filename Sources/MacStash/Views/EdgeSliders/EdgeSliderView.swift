@@ -54,7 +54,7 @@ public struct EdgeSliderView: View {
             if isVisible {
                 // Smoothly slides into view when activated and glides off-screen when dismissed
                 sliderContent(isExpanded: isExpanded)
-                    .offset(x: isExpanded ? -8 : (edge == .right ? 85 : -85))
+                    .offset(x: isExpanded ? (edge == .right ? -8 : 8) : (edge == .right ? 85 : -85))
                     .opacity(isExpanded ? 1.0 : 0.0)
                     .animation(.spring(response: 0.28, dampingFraction: 0.82), value: isExpanded)
             }

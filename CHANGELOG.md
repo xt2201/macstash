@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.13.0] - 2026-11-10
+
+### Added
+- Modular Feature Architecture: Every major MacStash capability (Corner Dials, Edge Sliders, Stash Shelf, Quick Scratchpad, Second Dock, Cursor Radial Palette, Pomodoro Timer, Keep Awake) now features independent user-controllable toggles.
+- Configurable Screen Edge Placements: Users can now customize the screen edge for Edge Sliders (Left Edge or Right Edge) and Drawer Utilities (Left Edge or Right Edge) with automatic collision avoidance and symmetrical spring animations.
+- Second Dock Complete Localization: Added full bilingual localization (English and Vietnamese) for Second Dock settings tab, widget gallery, profile manager, and backdrop selector.
+- Onboarding Redesign: Upgraded the first-launch onboarding experience with complete English and Vietnamese localization and interactive permission check indicators.
+
+### Changed
+- Default Feature States: Left Edge Bar Shelf (Stash Drop Shelf) and Quick Scratchpad are now disabled by default to keep the desktop completely clean and unobstructed out of the box.
+- Expanded Settings Window: Increased settings window dimensions to 720x600 with adaptive tab bar to prevent label clipping and eliminate scroll collisions across languages.
+
+### Fixed
+- Text Jitter and Typography Polish: Applied monospacedDigit across numeric readouts, sliders, and timers in Settings and Corner Dials to eliminate horizontal text jitter during adjustments.
+- Eliminated Hardcoded Strings: Removed hardcoded language ternaries and raw strings across HotCornersTab, AppearanceTab, ShortcutsTab, AboutTab, CornerDialView, and MenuBarExtraView into String Catalog.
+- User Guide Markdown Formatting: Upgraded UserGuideView to natively parse and render Markdown headings, bold text, bullet points, and code spans cleanly.
+
+---
+
 ## [2.12.0] - 2026-11-10
 
 ### Added

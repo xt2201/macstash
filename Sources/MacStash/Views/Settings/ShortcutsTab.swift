@@ -44,20 +44,20 @@ public struct ShortcutsTab: View {
                     )
 
                     shortcutRow(
-                        title: appState.effectiveLanguage == "vi" ? "Vòng xoay tại con trỏ chuột" : "Cursor Radial Palette",
-                        description: appState.effectiveLanguage == "vi" ? "Mở núm xoay ngay tại vị trí con trỏ chuột" : "Bloom the radial dials directly under the cursor",
+                        title: appState.localized("shortcuts.cursorPalette"),
+                        description: appState.localized("shortcuts.cursorPaletteDesc"),
                         shortcut: $appState.settings.cursorPaletteShortcut
                     )
 
                     shortcutRow(
-                        title: appState.effectiveLanguage == "vi" ? "Kệ thả tệp Stash" : "Stash Drop Shelf",
-                        description: appState.effectiveLanguage == "vi" ? "Mở kệ giữ tệp ở cạnh trái" : "Slide out the left-edge drop shelf",
+                        title: appState.localized("shortcuts.stashShelf"),
+                        description: appState.localized("shortcuts.stashShelfDesc"),
                         shortcut: $appState.settings.stashShelfShortcut
                     )
 
                     shortcutRow(
-                        title: appState.effectiveLanguage == "vi" ? "Ghi chú nhanh Scratchpad" : "Quick Scratchpad",
-                        description: appState.effectiveLanguage == "vi" ? "Mở bảng ghi chú ở cạnh trái" : "Slide out the left-edge notes drawer",
+                        title: appState.localized("shortcuts.scratchpad"),
+                        description: appState.localized("shortcuts.scratchpadDesc"),
                         shortcut: $appState.settings.scratchpadShortcut
                     )
                 }

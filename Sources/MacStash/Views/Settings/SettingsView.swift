@@ -57,7 +57,7 @@ public struct SettingsView: View {
     public var body: some View {
         VStack(spacing: 0) {
             // macOS HIG Toolbar Tabs Bar
-            HStack(spacing: 6) {
+            HStack(spacing: 4) {
                 ForEach(SettingsTab.allCases) { tab in
                     Button(action: { selectedTab = tab }) {
                         VStack(spacing: 4) {
@@ -65,10 +65,12 @@ public struct SettingsView: View {
                                 .font(.system(size: 15))
                             Text(tab.localizedTitle(using: appState))
                                 .font(.system(size: 11, weight: .medium))
+                                .lineLimit(1)
                         }
                         .foregroundColor(selectedTab == tab ? .accentColor : .primary)
                         .padding(.vertical, 8)
-                        .padding(.horizontal, 10)
+                        .padding(.horizontal, 8)
+                        .frame(maxWidth: .infinity)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
                                 .fill(selectedTab == tab ? Color.accentColor.opacity(0.14) : Color.clear)
@@ -123,9 +125,9 @@ public struct SettingsView: View {
                         AboutTab(appState: appState)
                     }
                 }
-                .padding(20)
+                .padding(22)
             }
         }
-        .frame(width: 660, height: 560)
+        .frame(width: 720, height: 600)
     }
 }

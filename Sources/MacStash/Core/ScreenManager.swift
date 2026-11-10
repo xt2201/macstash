@@ -485,10 +485,11 @@ public final class ScreenManager: ObservableObject {
             cancelPendingLeftEdgeHide()
         }
 
-        // 1. Left Edge Interactivity & Extreme Edge Dwell
+        // 1. Drawer Interactivity & Extreme Edge Dwell (Shelf & Scratchpad)
         if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
             let allFrames = NSScreen.screens.map { $0.frame }
             let isOpen = shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen
+            let isDrawerRight = appState.settings.drawerEdgePosition == .right
 
             if isOpen {
                 for instance in instances.values {
@@ -498,9 +499,11 @@ public final class ScreenManager: ObservableObject {
                 cancelPendingLeftEdgeDwell()
                 for instance in instances.values {
                     let frame = instance.screen.frame
-                    let leftRect = instance.leftEdgeRect(in: frame)
-                    if mouseLoc.x >= frame.minX && mouseLoc.x <= frame.minX + 60 &&
-                       mouseLoc.y >= leftRect.minY && mouseLoc.y <= leftRect.maxY {
+                    let dRect = instance.drawerRect(in: frame)
+                    let isDragInRangeX = isDrawerRight
+                        ? (mouseLoc.x >= frame.maxX - 60 && mouseLoc.x <= frame.maxX)
+                        : (mouseLoc.x >= frame.minX && mouseLoc.x <= frame.minX + 60)
+                    if isDragInRangeX && mouseLoc.y >= dRect.minY && mouseLoc.y <= dRect.maxY {
                         instance.setLeftEdgeInteractive(true, allowsKey: false)
                         if !shelf.isShelfOpen {
                             shelf.openShelf(transient: true)
@@ -513,30 +516,34 @@ public final class ScreenManager: ObservableObject {
                 // Extreme edge (<= 2.5pt) requirement with intentional dwell delay across candidate displays
                 var candidateInstance: ScreenOverlayInstance?
                 var candidateFrame: NSRect = .zero
-                var candidateLeftRect: NSRect = .zero
+                var candidateDrawerRect: NSRect = .zero
 
                 for instance in instances.values {
                     let frame = instance.screen.frame
-                    let isOuterLeft: Bool
+                    let isOuterEdge: Bool
                     if appState.settings.onlyOuterCorners {
-                        isOuterLeft = CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames)
+                        isOuterEdge = isDrawerRight
+                            ? CornerGeometry.isOuterRightEdge(screen: frame, in: allFrames)
+                            : CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames)
                     } else {
-                        isOuterLeft = true
+                        isOuterEdge = true
                     }
 
-                    guard isOuterLeft else {
+                    guard isOuterEdge else {
                         instance.setLeftEdgeInteractive(false, allowsKey: false)
                         continue
                     }
 
-                    let leftRect = instance.leftEdgeRect(in: frame)
-                    let isAtEdgeX = mouseLoc.x <= (frame.minX + 2.5) && mouseLoc.x >= (frame.minX - 1.0)
-                    let isWithinEdgeY = mouseLoc.y >= leftRect.minY && mouseLoc.y <= leftRect.maxY
+                    let dRect = instance.drawerRect(in: frame)
+                    let isAtEdgeX = isDrawerRight
+                        ? (mouseLoc.x >= (frame.maxX - 2.5) && mouseLoc.x <= (frame.maxX + 1.0))
+                        : (mouseLoc.x <= (frame.minX + 2.5) && mouseLoc.x >= (frame.minX - 1.0))
+                    let isWithinEdgeY = mouseLoc.y >= dRect.minY && mouseLoc.y <= dRect.maxY
 
                     if isAtEdgeX && isWithinEdgeY {
                         candidateInstance = instance
                         candidateFrame = frame
-                        candidateLeftRect = leftRect
+                        candidateDrawerRect = dRect
                         break
                     } else {
                         instance.setLeftEdgeInteractive(false, allowsKey: false)
@@ -544,7 +551,7 @@ public final class ScreenManager: ObservableObject {
                 }
 
                 if let candidate = candidateInstance {
-                    scheduleLeftEdgeDwellTimer(displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateLeftRect)
+                    scheduleLeftEdgeDwellTimer(displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateDrawerRect)
                 } else {
                     cancelPendingLeftEdgeDwell()
                 }
@@ -556,12 +563,12 @@ public final class ScreenManager: ObservableObject {
             }
         }
 
-        // 2. Right Edge Slider Interactivity
+        // 2. Edge Slider Interactivity
         if appState.isEdgeSlidersEnabled && appState.activeProfile.rightEdgeAction != .none {
             let allFrames = NSScreen.screens.map { $0.frame }
+            let isSliderLeft = appState.settings.edgeSliderPosition == .left
 
             if appState.isRightSliderActive {
-                // The visual slider is docked within the rightmost 80pt of the active display
                 var isInsideActiveSlider = false
                 for (id, instance) in instances {
                     guard appState.activeDisplayID == 0 || appState.activeDisplayID == id else {
@@ -569,8 +576,9 @@ public final class ScreenManager: ObservableObject {
                         continue
                     }
                     let frame = instance.screen.frame
-                    let rightRect = instance.rightEdgeRect(in: frame)
-                    let expandedHitRect = NSRect(x: frame.maxX - 80, y: rightRect.minY, width: 80, height: rightRect.height)
+                    let sRect = instance.sliderRect(in: frame)
+                    let hitX = isSliderLeft ? frame.minX : (frame.maxX - 80)
+                    let expandedHitRect = NSRect(x: hitX, y: sRect.minY, width: 80, height: sRect.height)
                     if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
                         isInsideActiveSlider = true
                         rightEdgeHideWorkItem?.cancel()
@@ -583,33 +591,36 @@ public final class ScreenManager: ObservableObject {
                     scheduleRightEdgeHideTimer()
                 }
             } else {
-                // Extreme edge (<= 2.5pt) requirement with intentional dwell delay across candidate displays
                 var candidateInstance: ScreenOverlayInstance?
                 var candidateFrame: NSRect = .zero
-                var candidateRightRect: NSRect = .zero
+                var candidateSliderRect: NSRect = .zero
 
                 for instance in instances.values {
                     let frame = instance.screen.frame
-                    let isOuterRight: Bool
+                    let isOuterEdge: Bool
                     if appState.settings.onlyOuterCorners {
-                        isOuterRight = CornerGeometry.isOuterRightEdge(screen: frame, in: allFrames)
+                        isOuterEdge = isSliderLeft
+                            ? CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames)
+                            : CornerGeometry.isOuterRightEdge(screen: frame, in: allFrames)
                     } else {
-                        isOuterRight = true
+                        isOuterEdge = true
                     }
 
-                    guard isOuterRight else {
+                    guard isOuterEdge else {
                         instance.setRightEdgeInteractive(false)
                         continue
                     }
 
-                    let rightRect = instance.rightEdgeRect(in: frame)
-                    let isAtEdgeX = mouseLoc.x >= (frame.maxX - 2.5) && mouseLoc.x <= (frame.maxX + 1.0)
-                    let isWithinEdgeY = mouseLoc.y >= rightRect.minY && mouseLoc.y <= rightRect.maxY
+                    let sRect = instance.sliderRect(in: frame)
+                    let isAtEdgeX = isSliderLeft
+                        ? (mouseLoc.x <= (frame.minX + 2.5) && mouseLoc.x >= (frame.minX - 1.0))
+                        : (mouseLoc.x >= (frame.maxX - 2.5) && mouseLoc.x <= (frame.maxX + 1.0))
+                    let isWithinEdgeY = mouseLoc.y >= sRect.minY && mouseLoc.y <= sRect.maxY
 
                     if isAtEdgeX && isWithinEdgeY {
                         candidateInstance = instance
                         candidateFrame = frame
-                        candidateRightRect = rightRect
+                        candidateSliderRect = sRect
                         break
                     } else {
                         instance.setRightEdgeInteractive(false)
@@ -617,7 +628,7 @@ public final class ScreenManager: ObservableObject {
                 }
 
                 if let candidate = candidateInstance {
-                    scheduleRightEdgeDwellTimer(displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateRightRect)
+                    scheduleRightEdgeDwellTimer(displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateSliderRect)
                 } else {
                     cancelPendingRightEdgeDwell()
                 }
@@ -708,18 +719,26 @@ public final class ScreenManager: ObservableObject {
         }
     }
 
+    public func reconfigureOverlays() {
+        for instance in instances.values {
+            instance.repositionPanels()
+        }
+    }
+
     public func isMouseInsideLeftDrawer(_ point: NSPoint) -> Bool {
+        let isDrawerRight = appState.settings.drawerEdgePosition == .right
         for instance in instances.values {
             let frame = instance.screen.frame
-            let leftRect = instance.leftEdgeRect(in: frame)
+            let drawerPanelRect = instance.drawerRect(in: frame)
             let activeWidth: CGFloat = (appState.scratchpad.isScratchpadOpen
                 ? Defaults.LeftEdgeDrawer.scratchpadTotalWidthPoints
                 : Defaults.LeftEdgeDrawer.shelfTotalWidthPoints) + 25.0
             let activeHeight: CGFloat = (appState.scratchpad.isScratchpadOpen
                 ? Defaults.LeftEdgeDrawer.scratchpadTotalHeightPoints
                 : Defaults.LeftEdgeDrawer.shelfTotalHeightPoints) + 25.0
-            let activeY = leftRect.minY + (leftRect.height - activeHeight) / 2.0
-            let drawerRect = NSRect(x: frame.minX, y: activeY, width: activeWidth, height: activeHeight)
+            let activeY = drawerPanelRect.minY + (drawerPanelRect.height - activeHeight) / 2.0
+            let activeX = isDrawerRight ? (frame.maxX - activeWidth) : frame.minX
+            let drawerRect = NSRect(x: activeX, y: activeY, width: activeWidth, height: activeHeight)
             if drawerRect.contains(point) {
                 return true
             }

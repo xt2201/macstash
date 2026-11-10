@@ -253,41 +253,47 @@ public struct MenuBarExtraView: View {
                 }
 
                 // Keep Awake (Caffeine)
-                KeepAwakeRow(keepAwake: appState.keepAwake, isVietnamese: appState.effectiveLanguage == "vi")
+                KeepAwakeRow(keepAwake: appState.keepAwake)
 
-                // Stash Shelf & Scratchpad quick access
-                HStack(spacing: 6) {
-                    Button(action: {
-                        if appState.stashShelf.isShelfOpen {
-                            appState.stashShelf.closeShelf()
-                        } else {
-                            appState.scratchpad.isScratchpadOpen = false
-                            appState.stashShelf.openShelf()
+                // Stash Shelf & Scratchpad quick access (only if enabled)
+                if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
+                    HStack(spacing: 6) {
+                        if appState.settings.isStashShelfEnabled {
+                            Button(action: {
+                                if appState.stashShelf.isShelfOpen {
+                                    appState.stashShelf.closeShelf()
+                                } else {
+                                    appState.scratchpad.isScratchpadOpen = false
+                                    appState.stashShelf.openShelf()
+                                }
+                            }) {
+                                Label("\(appState.localized("menubar.stash")) (\(appState.stashShelf.items.count))", systemImage: "tray.2.fill")
+                                    .font(.system(size: 10, weight: .medium))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 4)
+                                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.cyan.opacity(0.12)))
+                            }
+                            .buttonStyle(.plain)
                         }
-                    }) {
-                        Label("Stash (\(appState.stashShelf.items.count))", systemImage: "tray.2.fill")
-                            .font(.system(size: 10, weight: .medium))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 4)
-                            .background(RoundedRectangle(cornerRadius: 6).fill(Color.cyan.opacity(0.12)))
-                    }
-                    .buttonStyle(.plain)
 
-                    Button(action: {
-                        if appState.scratchpad.isScratchpadOpen {
-                            appState.scratchpad.isScratchpadOpen = false
-                        } else {
-                            appState.stashShelf.closeShelf()
-                            appState.scratchpad.isScratchpadOpen = true
+                        if appState.settings.isScratchpadEnabled {
+                            Button(action: {
+                                if appState.scratchpad.isScratchpadOpen {
+                                    appState.scratchpad.isScratchpadOpen = false
+                                } else {
+                                    appState.stashShelf.closeShelf()
+                                    appState.scratchpad.isScratchpadOpen = true
+                                }
+                            }) {
+                                Label(appState.localized("menubar.notes"), systemImage: "note.text")
+                                    .font(.system(size: 10, weight: .medium))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 4)
+                                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.green.opacity(0.12)))
+                            }
+                            .buttonStyle(.plain)
                         }
-                    }) {
-                        Label("Notes", systemImage: "note.text")
-                            .font(.system(size: 10, weight: .medium))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 4)
-                            .background(RoundedRectangle(cornerRadius: 6).fill(Color.green.opacity(0.12)))
                     }
-                    .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, 12)
@@ -301,7 +307,7 @@ public struct MenuBarExtraView: View {
                 }) {
                     HStack {
                         Image(systemName: "dock.rectangle")
-                        Text(appState.sideDock.config.isDockVisible ? "Hide Second Dock" : "Show Second Dock")
+                        Text(appState.sideDock.config.isDockVisible ? appState.localized("menubar.hideDock") : appState.localized("menubar.showDock"))
                         Spacer()
                     }
                     .padding(.horizontal, 10)
@@ -314,7 +320,7 @@ public struct MenuBarExtraView: View {
                 }) {
                     HStack {
                         Image(systemName: "arrow.triangle.2.circlepath")
-                        Text("Check for Updates...")
+                        Text(appState.localized("menubar.checkForUpdates"))
                         Spacer()
                     }
                     .padding(.horizontal, 10)
@@ -406,9 +412,10 @@ private struct VolumeSliderRow: View {
 
 private struct KeepAwakeRow: View {
     @ObservedObject var keepAwake: KeepAwakeManager
-    let isVietnamese: Bool
 
-    private func label(_ vi: String, _ en: String) -> String { isVietnamese ? vi : en }
+    private func localized(_ key: String) -> String {
+        LocalizationService.shared.localized(key)
+    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -416,19 +423,19 @@ private struct KeepAwakeRow: View {
                 .foregroundColor(keepAwake.isActive ? .orange : .secondary)
                 .frame(width: 16)
 
-            Text(label("Giữ máy luôn thức", "Keep Awake"))
+            Text(localized("menubar.keepAwake"))
                 .font(.system(size: 11, weight: .medium))
 
             Spacer()
 
             Menu {
-                Button(label("Tắt", "Off")) { keepAwake.deactivate() }
+                Button(localized("menubar.keepAwakeOff")) { keepAwake.deactivate() }
                 Divider()
-                Button(label("15 phút", "15 Minutes")) { keepAwake.activate(minutes: 15) }
-                Button(label("30 phút", "30 Minutes")) { keepAwake.activate(minutes: 30) }
-                Button(label("1 giờ", "1 Hour")) { keepAwake.activate(minutes: 60) }
-                Button(label("2 giờ", "2 Hours")) { keepAwake.activate(minutes: 120) }
-                Button(label("Vô hạn", "Indefinitely")) { keepAwake.activate(minutes: -1) }
+                Button(localized("menubar.keepAwake15m")) { keepAwake.activate(minutes: 15) }
+                Button(localized("menubar.keepAwake30m")) { keepAwake.activate(minutes: 30) }
+                Button(localized("menubar.keepAwake1h")) { keepAwake.activate(minutes: 60) }
+                Button(localized("menubar.keepAwake2h")) { keepAwake.activate(minutes: 120) }
+                Button(localized("menubar.keepAwakeIndefinite")) { keepAwake.activate(minutes: -1) }
             } label: {
                 Text(keepAwake.formattedRemaining)
                     .font(.system(size: 10, weight: .bold, design: .monospaced))

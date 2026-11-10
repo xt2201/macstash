@@ -543,7 +543,7 @@ public final class NowPlayingManager: ObservableObject {
     public func activateCurrentApp() {
         guard !appBundleID.isEmpty else { return }
         if let app = NSRunningApplication.runningApplications(withBundleIdentifier: appBundleID).first {
-            app.activate(options: [.activateIgnoringOtherApps])
+            app.activate()
         } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: appBundleID) {
             NSWorkspace.shared.openApplication(at: appURL, configuration: NSWorkspace.OpenConfiguration())
         }

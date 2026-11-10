@@ -16,6 +16,10 @@ public enum SettingsPersistenceTests {
         TestAssertion.assertEqual(settings.edgeBarShowMediaControls, true)
         TestAssertion.assertEqual(settings.edgeBarVisualizerEnabled, true)
         TestAssertion.assertEqual(settings.cornerDisplayTarget, .builtIn)
+        TestAssertion.assertEqual(settings.isStashShelfEnabled, false)
+        TestAssertion.assertEqual(settings.isScratchpadEnabled, false)
+        TestAssertion.assertEqual(settings.edgeSliderPosition, .right)
+        TestAssertion.assertEqual(settings.drawerEdgePosition, .left)
         settings.cornerSensitivityPoints = 12.0
         settings.cornerDwellDelaySeconds = 0.35
         settings.isSoundEnabled = false
@@ -24,6 +28,10 @@ public enum SettingsPersistenceTests {
         settings.edgeBarShowMediaControls = false
         settings.edgeBarVisualizerEnabled = false
         settings.cornerDisplayTarget = .external
+        settings.isStashShelfEnabled = true
+        settings.isScratchpadEnabled = true
+        settings.edgeSliderPosition = .left
+        settings.drawerEdgePosition = .right
 
         let suiteName = "com.macstash.test.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
@@ -44,6 +52,10 @@ public enum SettingsPersistenceTests {
         TestAssertion.assertEqual(loaded.edgeBarShowMediaControls, false)
         TestAssertion.assertEqual(loaded.edgeBarVisualizerEnabled, false)
         TestAssertion.assertEqual(loaded.cornerDisplayTarget, .external)
+        TestAssertion.assertEqual(loaded.isStashShelfEnabled, true)
+        TestAssertion.assertEqual(loaded.isScratchpadEnabled, true)
+        TestAssertion.assertEqual(loaded.edgeSliderPosition, .left)
+        TestAssertion.assertEqual(loaded.drawerEdgePosition, .right)
     }
 
     private static func testExportAndImportJSON() {

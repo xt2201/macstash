@@ -73,6 +73,7 @@ let package = Package(
         .target(
             name: "SideDockUI",
             dependencies: [
+                "MacStashCore",
                 "SideDockCore",
                 "SideDockWidgets"
             ],

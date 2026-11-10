@@ -1,3 +1,17 @@
+# Có Gì Mới Trong Phiên Bản 2.13.0
+
+MacStash 2.13.0 mang đến một đợt nâng cấp toàn diện về trải nghiệm người dùng và kiến trúc giao diện, biến toàn bộ tính năng cốt lõi thành các module có công tắc bật tắt độc lập, cho phép tùy chọn cạnh màn hình linh hoạt cho thanh trượt và ngăn kéo tiện ích, bản địa hóa 100% Thanh Dock Thứ Hai và màn hình Giới thiệu sang Tiếng Việt và Tiếng Anh, chuyển Stash Shelf và Scratchpad về mặc định tắt, đồng thời xử lý triệt để hiện tượng giật chữ và tràn chữ trên toàn bộ giao diện.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.13.0
+
+- Kiến Trúc Tính Năng Module Hóa: Từng tính năng của MacStash (Núm xoay góc, Thanh trượt cạnh, Kệ thả tệp Stash, Ghi chú nhanh Scratchpad, Thanh Dock Thứ Hai, Vòng xoay con trỏ, Đồng hồ Pomodoro, Giữ máy thức) nay đều có công tắc Bật/Tắt độc lập trong Cài đặt, giúp người dùng tùy biến đúng nhu cầu sử dụng.
+- Tùy Chọn Cạnh Màn Hình Linh Hoạt: Người dùng có thể tùy chọn đặt Thanh trượt cạnh (Cạnh Trái hoặc Cạnh Phải) và Ngăn kéo tiện ích (Cạnh Trái hoặc Cạnh Phải) kèm cơ chế tự động tránh xung đột hit-zone và hiệu ứng trượt lò xo đối xứng mượt mà.
+- Mặc Định Gọn Gàng Sạch Sẽ: Kệ thả tệp Stash Shelf và Ghi chú nhanh Scratchpad nay chuyển sang trạng thái mặc định Tắt, giữ các cạnh màn hình hoàn toàn thông thoáng cho công việc hàng ngày.
+- Mở Rộng Cửa Sổ Cài Đặt 8 Tab: Nâng kích thước cửa sổ Cài đặt lên 720x600 cùng thanh tab thích ứng, loại bỏ tình trạng tràn chữ và xung đột thanh cuộn trên mọi ngôn ngữ.
+- Bản Địa Hóa Song Ngữ Hoàn Chỉnh: Đưa toàn bộ chuỗi giao diện của Thanh Dock Thứ Hai, bộ sưu tập widget, màn hình Hướng dẫn ban đầu và các nhãn trạng thái vào String Catalog, loại bỏ hoàn toàn các chuỗi hardcode.
+- Chống Giật Số Và Tối Ưu Kiểu Chữ: Áp dụng monospacedDigit cho toàn bộ nhãn số, thanh trượt và đồng hồ đếm giờ trong Cài đặt và Núm xoay góc, loại bỏ hiện tượng giật chữ khi trượt.
+- Hiển Thị Markdown Chuẩn Trong Sách Hướng Dẫn: Nâng cấp UserGuideView giúp tự động phân tích và hiển thị đẹp mắt các tiêu đề, chữ in đậm, danh sách và khối mã nguồn trong tài liệu hướng dẫn.
+
 # Có Gì Mới Trong Phiên Bản 2.12.0
 
 MacStash 2.12.0 cho phép người dùng chủ động chọn màn hình áp dụng góc nóng, khôi phục toàn diện khả năng nhấp chuột trên Thanh Dock Thứ Hai cùng mục quản lý ứng dụng dock trong Cài đặt, nâng cấp kéo thả tệp từ Stash Shelf ra ngoài và sao chép tệp chuẩn vào clipboard, đồng thời hỗ trợ đầy đủ các phím tắt soạn thảo cơ bản cho Quick Scratchpad.

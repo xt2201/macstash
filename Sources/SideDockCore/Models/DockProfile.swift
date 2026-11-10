@@ -31,7 +31,7 @@ public struct DockProfile: Codable, Identifiable, Equatable, Sendable {
                 .widget(WidgetItem(widgetKind: "clock", size: .small)),
                 .widget(WidgetItem(widgetKind: "date", size: .small)),
                 .separator(UUID()),
-                .app(AppItem(bundleIdentifier: "com.apple.Safari", displayName: "Safari", appPath: "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app")),
+                .app(AppItem(bundleIdentifier: "com.apple.Safari", displayName: "Safari", appPath: "/Applications/Safari.app")),
                 .app(AppItem(bundleIdentifier: "com.apple.Terminal", displayName: "Terminal", appPath: "/System/Applications/Utilities/Terminal.app")),
                 .separator(UUID()),
                 .widget(WidgetItem(widgetKind: "weather", size: .medium)),

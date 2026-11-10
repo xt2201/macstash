@@ -213,6 +213,97 @@ public struct DockSettingsTabView: View {
                     }
                     .padding(8)
                 }
+
+                // Section 5: Dock Items & Applications
+                GroupBox(label: Text("Dock Items & Applications").font(.headline)) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Manage apps, widgets, and separators in this profile. Default apps like Safari and Terminal can be deleted or reordered here.")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+
+                        if config.profiles[activeProfileIndex].items.isEmpty {
+                            Text("No items in this profile.")
+                                .font(.system(size: 12))
+                                .foregroundColor(.secondary)
+                                .padding(.vertical, 8)
+                        } else {
+                            VStack(spacing: 4) {
+                                ForEach(Array(config.profiles[activeProfileIndex].items.enumerated()), id: \.element.id) { idx, item in
+                                    HStack(spacing: 8) {
+                                        Image(systemName: item.systemIconName)
+                                            .foregroundColor(.accentColor)
+                                            .frame(width: 20)
+
+                                        Text(item.displayName)
+                                            .font(.system(size: 12, weight: .medium))
+
+                                        Spacer()
+
+                                        if idx > 0 {
+                                            Button {
+                                                moveItem(from: idx, to: idx - 1)
+                                            } label: {
+                                                Image(systemName: "chevron.up")
+                                                    .font(.system(size: 10, weight: .bold))
+                                            }
+                                            .buttonStyle(.plain)
+                                            .help("Move Up")
+                                        }
+
+                                        if idx < config.profiles[activeProfileIndex].items.count - 1 {
+                                            Button {
+                                                moveItem(from: idx, to: idx + 1)
+                                            } label: {
+                                                Image(systemName: "chevron.down")
+                                                    .font(.system(size: 10, weight: .bold))
+                                            }
+                                            .buttonStyle(.plain)
+                                            .help("Move Down")
+                                        }
+
+                                        Button(role: .destructive) {
+                                            removeItem(at: idx)
+                                        } label: {
+                                            Image(systemName: "trash")
+                                                .font(.system(size: 11))
+                                                .foregroundColor(.red)
+                                        }
+                                        .buttonStyle(.plain)
+                                        .help("Remove from Dock")
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 5)
+                                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.04)))
+                                }
+                            }
+                        }
+
+                        Divider()
+
+                        HStack(spacing: 10) {
+                            Button {
+                                addApplication()
+                            } label: {
+                                Label("Add Application...", systemImage: "plus.app")
+                            }
+
+                            Button {
+                                config.profiles[activeProfileIndex].items.append(.separator(UUID()))
+                                onSave(true)
+                            } label: {
+                                Label("Add Separator", systemImage: "line.diagonal")
+                            }
+
+                            Button {
+                                showWidgetGallery = true
+                            } label: {
+                                Label("Add Widget...", systemImage: "plus.rectangle.on.rectangle")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                    .padding(8)
+                }
             }
             .padding(16)
         }
@@ -366,6 +457,39 @@ public struct DockSettingsTabView: View {
                 config.activeProfileId = imported.id
                 onSave(true)
             }
+        }
+    }
+
+    private func removeItem(at index: Int) {
+        guard index >= 0 && index < config.profiles[activeProfileIndex].items.count else { return }
+        config.profiles[activeProfileIndex].items.remove(at: index)
+        onSave(true)
+    }
+
+    private func moveItem(from: Int, to: Int) {
+        guard from >= 0 && from < config.profiles[activeProfileIndex].items.count,
+              to >= 0 && to < config.profiles[activeProfileIndex].items.count else { return }
+        let item = config.profiles[activeProfileIndex].items.remove(at: from)
+        config.profiles[activeProfileIndex].items.insert(item, at: to)
+        onSave(true)
+    }
+
+    private func addApplication() {
+        let openPanel = NSOpenPanel()
+        openPanel.allowedContentTypes = [UTType.application]
+        openPanel.directoryURL = URL(fileURLWithPath: "/Applications")
+        openPanel.allowsMultipleSelection = true
+        openPanel.canChooseDirectories = false
+        openPanel.prompt = "Add to Dock"
+        if openPanel.runModal() == .OK {
+            for url in openPanel.urls {
+                let bundle = Bundle(url: url)
+                let bundleID = bundle?.bundleIdentifier ?? url.deletingPathExtension().lastPathComponent
+                let name = FileManager.default.displayName(atPath: url.path)
+                let appItem = AppItem(bundleIdentifier: bundleID, displayName: name, appPath: url.path)
+                config.profiles[activeProfileIndex].items.append(.app(appItem))
+            }
+            onSave(true)
         }
     }
 }

@@ -20,6 +20,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var excludedBundleIDs: [String]
     public var cornerEnabled: [CornerPosition: Bool]
     public var cornerActions: [CornerPosition: ControlAction]
+    public var cornerDisplayTarget: HotCornerDisplayTarget
 
     // General & MenuBar
     public var launchAtLogin: Bool
@@ -102,6 +103,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
             .bottomLeft: .timer,
             .topLeft: .keyboardBrightness
         ],
+        cornerDisplayTarget: HotCornerDisplayTarget = Defaults.HotCorner.defaultCornerDisplayTarget,
         launchAtLogin: Bool = false,
         showMenuBarIcon: Bool = true,
         language: String = "system",
@@ -151,6 +153,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.excludedBundleIDs = excludedBundleIDs
         self.cornerEnabled = cornerEnabled
         self.cornerActions = cornerActions
+        self.cornerDisplayTarget = cornerDisplayTarget
         self.launchAtLogin = launchAtLogin
         self.showMenuBarIcon = showMenuBarIcon
         self.language = language
@@ -205,6 +208,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         let excludedBundleIDs = try container.decodeIfPresent([String].self, forKey: .excludedBundleIDs) ?? def.excludedBundleIDs
         let cornerEnabled = try container.decodeIfPresent([CornerPosition: Bool].self, forKey: .cornerEnabled) ?? def.cornerEnabled
         let cornerActions = try container.decodeIfPresent([CornerPosition: ControlAction].self, forKey: .cornerActions) ?? def.cornerActions
+        let cornerDisplayTarget = try container.decodeIfPresent(HotCornerDisplayTarget.self, forKey: .cornerDisplayTarget) ?? def.cornerDisplayTarget
         let launchAtLogin = try container.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? def.launchAtLogin
         let showMenuBarIcon = try container.decodeIfPresent(Bool.self, forKey: .showMenuBarIcon) ?? def.showMenuBarIcon
         let language = try container.decodeIfPresent(String.self, forKey: .language) ?? def.language
@@ -255,6 +259,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
             excludedBundleIDs: excludedBundleIDs,
             cornerEnabled: cornerEnabled,
             cornerActions: cornerActions,
+            cornerDisplayTarget: cornerDisplayTarget,
             launchAtLogin: launchAtLogin,
             showMenuBarIcon: showMenuBarIcon,
             language: language,

@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.12.0] - 2026-11-10
+
+### Added
+- Hot Corner Screen Target Selection: Users can now choose whether hot corners activate on the built-in Mac screen only, external displays only, or across all displays (defaults to built-in Mac screen).
+- Second Dock Applications & Items Management: Added an item manager section in Settings to add custom apps from `/Applications`, reorder apps and widgets, and add separators.
+
+### Fixed
+- Shelf and Scratchpad Auto-Dismiss on Mouse Exit: Restored continuous cursor tracking timer, fixed false active drop target state, and integrated native AppKit mouse tracking areas so Stash Shelf and Quick Scratchpad automatically and smoothly dismiss when the mouse leaves the drawer zone (unless explicitly pinned).
+- Second Dock Interactivity: Resolved mouse click hit-testing in `SideDockHostingView` and enabled `acceptsFirstMouse` on the non-activating floating panel, making all dock buttons, app icons, widgets, and menus instantly responsive.
+- Second Dock Default Apps: Fixed ability to delete and edit default apps (Safari, Terminal) via on-dock context menu and via the Settings item manager, and corrected the default application bundle path.
+- Stash Shelf Drag-Out & File Copy: Fixed dragging files out from Stash Shelf to Finder/Desktop by registering native `UTType.item` file representations, made the entire card row draggable, and updated the copy button to copy actual file objects (`NSURL`, `NSFilenamesPboardType`) to the clipboard ready for pasting in Finder.
+- Quick Scratchpad Keyboard Shortcuts: Added native macOS Edit menu in `AppDelegate` and key equivalent dispatch in `MacStashInteractivePanel`, restoring standard shortcuts (Command+A, Command+C, Command+V, Command+X, Command+Z, Shift+Command+Z) in Scratchpad text editor.
+
+---
+
 ## [2.11.1] - 2026-11-09
 
 ### Added

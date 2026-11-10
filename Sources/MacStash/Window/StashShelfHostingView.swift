@@ -85,6 +85,43 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
         super.keyDown(with: event)
     }
 
+    // MARK: - Mouse Tracking for Auto-Dismiss
+
+    private var trackingArea: NSTrackingArea?
+
+    public override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        if let existing = trackingArea {
+            removeTrackingArea(existing)
+        }
+        let area = NSTrackingArea(
+            rect: bounds,
+            options: [.mouseEnteredAndExited, .mouseMoved, .activeAlways],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(area)
+        trackingArea = area
+    }
+
+    public override func mouseExited(with event: NSEvent) {
+        super.mouseExited(with: event)
+        let isAnyPinned = (shelf.isShelfOpen && shelf.isPinned) || (scratchpad.isScratchpadOpen && scratchpad.isPinned)
+        if !isAnyPinned && !shelf.isDropTargetActive {
+            ScreenManager.shared.scheduleLeftEdgeHideTimer()
+        }
+    }
+
+    public override func mouseEntered(with event: NSEvent) {
+        super.mouseEntered(with: event)
+        ScreenManager.shared.cancelPendingLeftEdgeHide()
+    }
+
+    public override func mouseMoved(with event: NSEvent) {
+        super.mouseMoved(with: event)
+        ScreenManager.shared.cancelPendingLeftEdgeHide()
+    }
+
     // MARK: - Native Drag Destination
 
     public override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {

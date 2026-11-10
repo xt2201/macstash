@@ -37,6 +37,7 @@ public enum Defaults {
         public static let defaultOuterPaddingPoints: CGFloat = 30.0
         public static let cornerWindowPaddingPoints: CGFloat = 20.0
         public static let defaultAnimationDurationSeconds: TimeInterval = 0.18
+        public static let defaultCornerDisplayTarget: HotCornerDisplayTarget = .builtIn
     }
 
     public enum Brightness {

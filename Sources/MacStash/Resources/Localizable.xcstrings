@@ -609,6 +609,54 @@
         }
       }
     },
+    "corners.displaySelection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display Target"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Màn Hình Hiển Thị Góc"
+          }
+        }
+      }
+    },
+    "corners.displayTarget": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active Screens for Corners:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Màn hình áp dụng góc nóng:"
+          }
+        }
+      }
+    },
+    "corners.displayTargetHint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose whether hot corners trigger on your built-in Mac display, external monitors, or both."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chủ động chọn hiển thị góc nóng trên màn hình máy Mac, màn hình ngoài, hoặc cả hai màn hình."
+          }
+        }
+      }
+    },
     "corners.add": {
       "localizations": {
         "en": {

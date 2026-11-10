@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.11.1-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.12.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.11.1.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.12.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -71,6 +71,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 
 ### 1. Sculpted Liquid Glass Radial Corner Dials
 - Invisibly docked at the screen corners with zero desktop clutter.
+- **Screen Target Selection**: Actively choose which monitors display hot corners - Built-in Mac Screen only (default), External Displays only, or Both/All screens, with automatic desktop Mac fallback.
 - **Apple Liquid Glass Optical Realism**: Multi-layer frosted refraction, dual-path specular bevel highlights (135° virtual light source), and dynamic caustic ambient color halos.
 - **Tactical HUD Precision Instrument Hub**: Center action hubs engineered with studio-grade optical glass bezels, multi-color hierarchical SF Symbols, and precision micro-typography with tabular figures (`.monospacedDigit()`).
 - **Mathematical Symmetry & 4-Quadrant Balance**: Perfectly aligned along the 45° diagonal axis of symmetry with uniform 19pt clearance to both adjacent screen borders, inner concentric guide arcs, and 21 symmetrical ticks with major indicators placed at 0%, 25%, 50%, 75%, and 100%.
@@ -98,7 +99,8 @@ MacStash assigns high-frequency system controls to the four physical display ver
 ### 5. The Liquid Docking Bay (Stash Drop Shelf) & Quick Scratchpad
 - **The Stash Shelf**: The core namesake feature of MacStash. A sculpted liquid glass docking bay sliding smoothly from the left screen edge to hold files, images, links, and text snippets when dragging across spaces, displays, or apps.
 - **Silky-Smooth 120 FPS Performance**: Isolated row rendering (`StashItemCardView`) and in-memory icon caching (`StashIconCache`) eliminate LaunchServices disk I/O during mouse hover and scroll, guaranteeing locked 120 FPS fluid interaction.
-- **Instant Zero-Copy Drag Out**: Items dragged from the shelf provide direct file URL references without main-thread temporary file duplications, starting drag gestures instantaneously with zero freeze or stutter.
+- **Instant Zero-Copy Drag Out**: Items dragged from the shelf provide standard `UTType.item` file representations for immediate drag-and-drop to Finder folders, the Desktop, or third-party apps with full-card drag interaction.
+- **True Clipboard File Copying**: The copy button writes real file objects (`NSURL`, `NSFilenamesPboardType`) to the pasteboard, enabling instant file pasting into Finder, Desktop, Mail, and Slack without dropping plain text paths.
 - **Liquid Ripple Drop Aura**: Hovering a dragged file over the drop zone summons an animated pulsating liquid ripple wave that magnetically expands to receive items. A top drop banner guides drag-and-drop even over populated lists.
 - **Elevated Glass File Tiles**: Stashed items rest on translucent frosted glass tiles with continuous squircle corners, 3D hover elevation, and crystal micro-action buttons.
 - **Bidirectional Shake-to-Summon Gesture**: Wiggle or shake the mouse cursor horizontally or vertically while dragging any file, photo, or snippet to immediately summon the Stash Shelf at your cursor with tactile mechanical detents.
@@ -108,7 +110,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - **Outside-Click & Mouse-Exit Auto-Dismiss**: Moving the mouse out of the drawer area into the workspace automatically schedules a smooth auto-dismiss timer, while clicking outside collapses the shelf immediately and returns window focus cleanly to your active application. Drop operations stay safely active during drag sessions.
 - **Immediate First-Mouse Interaction**: Every button (Clear All, Copy Path, Reveal in Finder, Remove, Close) triggers on the very first mouse-up with zero swallowed clicks.
 - **Quick Drag Export & Copy All**: Drag stashed items back out to any application, email, or Finder folder anytime, or click "Copy All" to copy all file references to the clipboard at once.
-- **Quick Scratchpad Drawer**: Ephemeral liquid glass writing slate with dynamic key window keyboard focus for immediate typing, glowing emerald rim, live word and character counters, automatic local persistence, and standard macOS keyboard shortcuts (`Cmd+A`, `Cmd+C`, `Cmd+V`, `Cmd+Z`, `Esc`).
+- **Quick Scratchpad Drawer**: Ephemeral liquid glass writing slate with dynamic key window keyboard focus for immediate typing, glowing emerald rim, live word and character counters, automatic local persistence, and standard macOS keyboard shortcuts (`Cmd+A`, `Cmd+C`, `Cmd+V`, `Cmd+X`, `Cmd+Z`, `Esc`).
 
 ### 6. Keep Awake (Caffeine) Radial Dial
 - Hardware-level macOS I/O Kit power assertions (`IOPMAssertionCreateWithName`) prevent display and system sleep during video exports, large downloads, or presentations.
@@ -154,7 +156,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - **7 Layout Placements & Auto-Fit**: Fixed Bottom (perfectly positioned above the native macOS Dock with distance >= 0 px), Floating Window with drag handle, Fixed Top, Fixed Left, Fixed Right, and auto-fit screen width.
 - **Smart Edge Triggers & Auto-Hide**: Customizable slide reveal delay (0.0s to 3.0s) and edge trigger activation thickness (2px to 20px).
 - **Zero-Interference Pass-Through**: Mouse clicks on empty/transparent regions pass straight through to background windows.
-- **Profile Switcher & Widget Gallery**: Supports multiple independent dock profiles (Work, Focus, Default) with instant switching and a searchable widget catalog.
+- **Profile Switcher, App Manager & Widget Gallery**: Supports multiple independent dock profiles (Work, Focus, Default) with instant switching, an integrated Dock Items manager to add custom applications or remove default apps (Safari, Terminal), and a searchable 16-widget catalog.
 - **Glass Styling**: Light Glass, Dark Glass, Liquid Glass, and Clear frameless themes.
 
 ---

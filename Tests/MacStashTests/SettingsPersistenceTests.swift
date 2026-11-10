@@ -15,6 +15,7 @@ public enum SettingsPersistenceTests {
         TestAssertion.assertEqual(settings.scrollAdjustmentEnabled, true)
         TestAssertion.assertEqual(settings.edgeBarShowMediaControls, true)
         TestAssertion.assertEqual(settings.edgeBarVisualizerEnabled, true)
+        TestAssertion.assertEqual(settings.cornerDisplayTarget, .builtIn)
         settings.cornerSensitivityPoints = 12.0
         settings.cornerDwellDelaySeconds = 0.35
         settings.isSoundEnabled = false
@@ -22,6 +23,7 @@ public enum SettingsPersistenceTests {
         settings.scrollAdjustmentEnabled = false
         settings.edgeBarShowMediaControls = false
         settings.edgeBarVisualizerEnabled = false
+        settings.cornerDisplayTarget = .external
 
         let suiteName = "com.macstash.test.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
@@ -41,6 +43,7 @@ public enum SettingsPersistenceTests {
         TestAssertion.assertEqual(loaded.scrollAdjustmentEnabled, false)
         TestAssertion.assertEqual(loaded.edgeBarShowMediaControls, false)
         TestAssertion.assertEqual(loaded.edgeBarVisualizerEnabled, false)
+        TestAssertion.assertEqual(loaded.cornerDisplayTarget, .external)
     }
 
     private static func testExportAndImportJSON() {

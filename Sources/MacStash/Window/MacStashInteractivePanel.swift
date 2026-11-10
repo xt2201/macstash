@@ -15,7 +15,32 @@ public final class MacStashInteractivePanel: NSPanel {
     }
 
     public override var canBecomeMain: Bool {
-        return false
+        return allowsKeyWindow
+    }
+
+    public override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if allowsKeyWindow && event.modifierFlags.contains(.command) {
+            let key = event.charactersIgnoringModifiers?.lowercased()
+            switch key {
+            case "a":
+                if NSApp.sendAction(#selector(NSText.selectAll(_:)), to: nil, from: self) { return true }
+            case "c":
+                if NSApp.sendAction(#selector(NSText.copy(_:)), to: nil, from: self) { return true }
+            case "v":
+                if NSApp.sendAction(#selector(NSText.paste(_:)), to: nil, from: self) { return true }
+            case "x":
+                if NSApp.sendAction(#selector(NSText.cut(_:)), to: nil, from: self) { return true }
+            case "z":
+                if event.modifierFlags.contains(.shift) {
+                    if NSApp.sendAction(Selector(("redo:")), to: nil, from: self) { return true }
+                } else {
+                    if NSApp.sendAction(Selector(("undo:")), to: nil, from: self) { return true }
+                }
+            default:
+                break
+            }
+        }
+        return super.performKeyEquivalent(with: event)
     }
 
     public override init(

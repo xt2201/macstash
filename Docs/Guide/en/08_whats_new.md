@@ -1,3 +1,16 @@
+# What's New in Version 2.12.0
+
+MacStash 2.12.0 introduces hot corner screen target selection, restores complete mouse interactivity to the Second Dock with a dedicated dock item manager in Settings, upgrades Stash Shelf drag-and-drop file exports with true clipboard file copying, and enables standard editing keyboard shortcuts in the Quick Scratchpad.
+
+## Key Enhancements in Version 2.12.0
+
+- Hot Corner Screen Target Selection: Users can now actively configure which screen hot corners activate on - Built-in Mac Screen only (default), External Displays only, or Both/All screens - with smart fallbacks for desktop Macs without built-in screens.
+- Shelf and Scratchpad Auto-Dismiss on Mouse Exit: Fixed false active drop target state and restored continuous cursor tracking, ensuring both Stash Shelf and Quick Scratchpad automatically and smoothly close when moving the cursor away from the left drawer (unless pinned).
+- Second Dock Full Interactivity: Resolved panel hit-testing and first-mouse handling, ensuring every tile, button, widget, and context menu on the Second Dock registers clicks immediately.
+- Second Dock App Management: Added a dedicated Items & Applications management section in Settings to add custom apps from /Applications, remove default apps (Safari, Terminal), and reorder dock items.
+- Stash Shelf Drag-Out and True File Copy: Upgraded file drag-out to Finder and Desktop using native UTType.item file representations, made the entire item card draggable, and updated the copy button to copy actual file objects (NSURL and NSFilenamesPboardType) ready for pasting in Finder.
+- Scratchpad Standard Shortcuts: Added native macOS Edit menu and responder forwarding for Command+A (Select All), Command+C (Copy), Command+V (Paste), Command+X (Cut), and Command+Z (Undo) in the Quick Scratchpad.
+
 # What's New in Version 2.11.1
 
 MacStash 2.11.1 expands the Second Dock ecosystem with 6 new live utility widgets (bringing the total to 16), adds comprehensive profile export and import packages (.sidedock-profile JSON), introduces Reserve Dock Space window management, multi-monitor display binding, vertical dock layouts, and fullscreen reveal auto-hide.

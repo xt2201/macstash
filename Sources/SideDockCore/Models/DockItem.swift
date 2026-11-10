@@ -118,4 +118,24 @@ public enum DockItem: Codable, Identifiable, Equatable, Sendable {
         case .separator, .spacer: return false
         }
     }
+
+    public var displayName: String {
+        switch self {
+        case .app(let item): return item.displayName
+        case .folder(let item): return item.displayName
+        case .widget(let item): return item.customTitle ?? item.widgetKind.capitalized
+        case .separator: return "Separator"
+        case .spacer: return "Spacer"
+        }
+    }
+
+    public var systemIconName: String {
+        switch self {
+        case .app: return "app.fill"
+        case .folder: return "folder.fill"
+        case .widget: return "square.grid.2x2.fill"
+        case .separator: return "line.diagonal"
+        case .spacer: return "space"
+        }
+    }
 }

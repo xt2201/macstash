@@ -56,7 +56,7 @@ public final class ScreenManager: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] shelfOpen, padOpen in
                 guard let self = self else { return }
-                if !shelfOpen {
+                if !shelfOpen && !padOpen {
                     self.cancelPendingLeftEdgeHide()
                 }
                 let isOpen = shelfOpen || padOpen || self.appState.stashShelf.isDropTargetActive
@@ -87,6 +87,13 @@ public final class ScreenManager: ObservableObject {
                     let shouldBeInteractive = sliderActive && (self.appState.activeDisplayID == 0 || self.appState.activeDisplayID == id)
                     instance.setRightEdgeInteractive(shouldBeInteractive)
                 }
+            }
+            .store(in: &cancellables)
+
+        appState.$cornerDisplayTarget
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.resetAllInstances(reason: .displayConfigurationChange)
             }
             .store(in: &cancellables)
     }
@@ -215,7 +222,14 @@ public final class ScreenManager: ObservableObject {
 
     private func startCursorTracking() {
         cursorTrackingTimer?.invalidate()
-        cursorTrackingTimer = nil
+        cursorTrackingTimer = Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { [weak self] _ in
+            DispatchQueue.main.async { [weak self] in
+                self?.evaluateMousePosition(NSEvent.mouseLocation)
+            }
+        }
+        if let t = cursorTrackingTimer {
+            RunLoop.main.add(t, forMode: .common)
+        }
 
         globalMouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .leftMouseDown]) { [weak self] event in
             DispatchQueue.main.async { [weak self] in
@@ -355,6 +369,9 @@ public final class ScreenManager: ObservableObject {
                 guard let sDisplayID = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else {
                     continue
                 }
+                guard shouldEnableCorners(on: screen, displayID: sDisplayID) else {
+                    continue
+                }
                 for corner in CornerPosition.allCases {
                     guard appState.settings.cornerEnabled[corner] == true && appState.action(for: corner) != .none else {
                         continue
@@ -427,6 +444,26 @@ public final class ScreenManager: ObservableObject {
             appState.stashShelf.openShelf(transient: true)
             AppLogger.lifecycle.info("Shake-to-summon gesture activated Stash Shelf")
             dragHistory.removeAll()
+        }
+    }
+
+    public func shouldEnableCorners(on screen: NSScreen, displayID: CGDirectDisplayID) -> Bool {
+        let isBuiltIn = CGDisplayIsBuiltin(displayID) != 0
+        switch appState.settings.cornerDisplayTarget {
+        case .builtIn:
+            let hasBuiltIn = NSScreen.screens.contains { s in
+                guard let id = s.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else { return false }
+                return CGDisplayIsBuiltin(id) != 0
+            }
+            if hasBuiltIn {
+                return isBuiltIn
+            } else {
+                return screen == NSScreen.main || screen == NSScreen.screens.first
+            }
+        case .external:
+            return !isBuiltIn
+        case .all:
+            return true
         }
     }
 

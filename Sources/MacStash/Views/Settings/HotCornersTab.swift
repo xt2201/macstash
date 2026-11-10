@@ -232,6 +232,29 @@ public struct HotCornersTab: View {
                 .padding(8)
             }
 
+            GroupBox(label: Label(appState.localized("corners.displaySelection"), systemImage: "display.2")) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(appState.localized("corners.displayTarget"))
+                            .font(.system(size: 12, weight: .medium))
+                        Spacer()
+                        Picker("", selection: $appState.cornerDisplayTarget) {
+                            ForEach(HotCornerDisplayTarget.allCases) { target in
+                                Text(target.localizedDisplayName(using: appState.effectiveLanguage))
+                                    .tag(target)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: 230)
+                    }
+
+                    Text(appState.localized("corners.displayTargetHint"))
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+                .padding(8)
+            }
+
             GroupBox(label: Label(appState.localized("corners.excludedApps"), systemImage: "xmark.circle")) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(appState.localized("corners.excludedAppsDesc"))

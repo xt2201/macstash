@@ -78,6 +78,9 @@ public final class AppState: ObservableObject {
     @Published public var onlyOuterCorners: Bool = false {
         didSet { settings.onlyOuterCorners = onlyOuterCorners }
     }
+    @Published public var cornerDisplayTarget: HotCornerDisplayTarget = .builtIn {
+        didSet { settings.cornerDisplayTarget = cornerDisplayTarget }
+    }
     @Published public var scrollAdjustmentEnabled: Bool = true {
         didSet { settings.scrollAdjustmentEnabled = scrollAdjustmentEnabled }
     }
@@ -139,6 +142,7 @@ public final class AppState: ObservableObject {
         self.edgeBarShowMediaControls = loaded.edgeBarShowMediaControls
         self.edgeBarVisualizerEnabled = loaded.edgeBarVisualizerEnabled
         self.onlyOuterCorners = loaded.onlyOuterCorners
+        self.cornerDisplayTarget = loaded.cornerDisplayTarget
         self.scrollAdjustmentEnabled = loaded.scrollAdjustmentEnabled
         self.cornerSensitivityRadius = loaded.cornerSensitivityPoints
         self.cornerDwellDelay = loaded.cornerDwellDelaySeconds
@@ -525,6 +529,7 @@ public final class AppState: ObservableObject {
         self.edgeBarShowMediaControls = fresh.edgeBarShowMediaControls
         self.edgeBarVisualizerEnabled = fresh.edgeBarVisualizerEnabled
         self.onlyOuterCorners = fresh.onlyOuterCorners
+        self.cornerDisplayTarget = fresh.cornerDisplayTarget
         self.scrollAdjustmentEnabled = fresh.scrollAdjustmentEnabled
         self.cornerSensitivityRadius = fresh.cornerSensitivityPoints
         self.cornerDwellDelay = fresh.cornerDwellDelaySeconds

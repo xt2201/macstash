@@ -42,6 +42,16 @@ public struct LeftEdgeContainerView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .animation(.spring(response: 0.28, dampingFraction: 0.82), value: isOpen)
+        .onHover { isHovered in
+            if isHovered {
+                ScreenManager.shared.cancelPendingLeftEdgeHide()
+            } else {
+                let isAnyPinned = (shelf.isShelfOpen && shelf.isPinned) || (scratchpad.isScratchpadOpen && scratchpad.isPinned)
+                if isOpen && !isAnyPinned && !shelf.isDropTargetActive {
+                    ScreenManager.shared.scheduleLeftEdgeHideTimer()
+                }
+            }
+        }
     }
 
     // MARK: - Drawer Tab Bar (Mode Switcher when Open)

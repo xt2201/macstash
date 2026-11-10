@@ -22,6 +22,8 @@ public final class SideDockPanel: NSPanel {
         self.isMovableByWindowBackground = false
         self.isReleasedWhenClosed = false
         self.hidesOnDeactivate = false
+        self.acceptsMouseMovedEvents = true
+        self.ignoresMouseEvents = false
     }
 
     public override var canBecomeKey: Bool {

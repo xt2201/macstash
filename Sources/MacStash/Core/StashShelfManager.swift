@@ -2,6 +2,7 @@ import Foundation
 import AppKit
 import SwiftUI
 import Combine
+import UniformTypeIdentifiers
 import MacStashCore
 
 /// Holds files, images, links and snippets temporarily on the Stash Shelf with persistent local disk storage.
@@ -91,7 +92,7 @@ public final class StashShelfManager: ObservableObject {
     public func openShelf(transient: Bool = false) {
         isTransientOpen = transient
         isShelfOpen = true
-        isDropTargetActive = true
+        isDropTargetActive = false
         HapticManager.shared.performDetentTick()
     }
 
@@ -107,9 +108,8 @@ public final class StashShelfManager: ObservableObject {
     }
 
     public func copyAllFilesToClipboard() {
-        let urls = items.compactMap { $0.sourceURL }
-        guard !urls.isEmpty else {
-            // Fallback to text snippets if only snippets exist
+        let existingFileURLs = items.compactMap { $0.sourceURL }.filter { FileManager.default.fileExists(atPath: $0.path) }
+        guard !existingFileURLs.isEmpty else {
             let texts = items.compactMap { $0.stringContent ?? $0.title }
             if !texts.isEmpty {
                 NSPasteboard.general.clearContents()
@@ -120,7 +120,9 @@ public final class StashShelfManager: ObservableObject {
         }
 
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.writeObjects(urls as [NSURL])
+        NSPasteboard.general.writeObjects(existingFileURLs as [NSURL])
+        NSPasteboard.general.setPropertyList(existingFileURLs.map { $0.path }, forType: NSPasteboard.PasteboardType("NSFilenamesPboardType"))
+        NSPasteboard.general.setString(existingFileURLs.map { $0.path }.joined(separator: "\n"), forType: .string)
         HapticManager.shared.performDetentTick()
     }
 
@@ -153,6 +155,22 @@ public final class StashShelfManager: ObservableObject {
         HapticManager.shared.performBoundaryClick()
     }
 
+    public func copyItemToClipboard(id: UUID) {
+        guard let item = items.first(where: { $0.id == id }) else { return }
+        NSPasteboard.general.clearContents()
+        if let url = item.sourceURL, item.isExistingFile {
+            NSPasteboard.general.writeObjects([url as NSURL])
+            NSPasteboard.general.setPropertyList([url.path], forType: NSPasteboard.PasteboardType("NSFilenamesPboardType"))
+            NSPasteboard.general.setString(url.path, forType: .string)
+        } else if let text = item.stringContent {
+            NSPasteboard.general.setString(text, forType: .string)
+        } else if let url = item.sourceURL {
+            NSPasteboard.general.writeObjects([url as NSURL])
+            NSPasteboard.general.setString(url.absoluteString, forType: .string)
+        }
+        HapticManager.shared.performDetentTick()
+    }
+
     public func copyPathToClipboard(id: UUID) {
         guard let url = items.first(where: { $0.id == id })?.sourceURL else { return }
         NSPasteboard.general.clearContents()
@@ -181,13 +199,25 @@ public final class StashShelfManager: ObservableObject {
     }
 
     public func createItemProvider(for item: StashItem) -> NSItemProvider {
-        if let url = item.sourceURL, (item.itemType == .file || item.itemType == .image) {
-            let provider = NSItemProvider(object: url as NSURL)
+        if let url = item.sourceURL, (item.itemType == .file || item.itemType == .image), FileManager.default.fileExists(atPath: url.path) {
+            let provider = NSItemProvider()
             provider.suggestedName = item.title
+            let uti = (try? url.resourceValues(forKeys: [.contentTypeKey]).contentType) ?? .item
+            provider.registerFileRepresentation(forTypeIdentifier: uti.identifier, fileOptions: [], visibility: .all) { completion in
+                completion(url, false, nil)
+                return nil
+            }
+            provider.registerObject(url as NSURL, visibility: .all)
             return provider
         }
         if let text = item.stringContent {
             return NSItemProvider(object: text as NSString)
+        }
+        if let url = item.sourceURL {
+            let provider = NSItemProvider()
+            provider.suggestedName = item.title
+            provider.registerObject(url as NSURL, visibility: .all)
+            return provider
         }
         return NSItemProvider(object: item.title as NSString)
     }

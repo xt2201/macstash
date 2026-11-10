@@ -1,3 +1,16 @@
+# Có Gì Mới Trong Phiên Bản 2.12.0
+
+MacStash 2.12.0 cho phép người dùng chủ động chọn màn hình áp dụng góc nóng, khôi phục toàn diện khả năng nhấp chuột trên Thanh Dock Thứ Hai cùng mục quản lý ứng dụng dock trong Cài đặt, nâng cấp kéo thả tệp từ Stash Shelf ra ngoài và sao chép tệp chuẩn vào clipboard, đồng thời hỗ trợ đầy đủ các phím tắt soạn thảo cơ bản cho Quick Scratchpad.
+
+## Những Cải Tiến Nổi Bật Trong Bản 2.12.0
+
+- Tùy Chọn Màn Hình Hiển Thị Góc Nóng: Người dùng có thể chủ động chọn kích hoạt góc nóng trên màn hình máy Mac (mặc định), màn hình ngoài, hoặc cả hai màn hình, kèm cơ chế tự động chuyển sang màn hình chính nếu dùng máy Mac để bàn không có màn hình tích hợp.
+- Tự Động Ẩn Stash Shelf và Scratchpad Khi Rê Chuột Ra Ngoài: Sửa lỗi cờ drop target kích hoạt nhầm và khôi phục bộ theo dõi con trỏ liên tục, giúp cả Stash Shelf và Quick Scratchpad tự động đóng êm ái khi di chuột ra khỏi khu vực ngăn kéo (trừ khi đã bấm Ghim).
+- Khôi Phục Tương Tác Nhấp Chuột Trên Dock: Sửa lỗi hit-testing và hỗ trợ acceptsFirstMouse cho thanh dock nổi, giúp mọi biểu tượng ứng dụng, nút bấm tiện ích và menu ngữ cảnh phản hồi nhấp chuột ngay tức thì.
+- Quản Lý Ứng Dụng Trên Dock Thứ Hai: Bổ sung mục quản lý ứng dụng và tiện ích trong Cài đặt cho phép thêm ứng dụng bất kỳ từ thư mục /Applications, xóa ứng dụng mặc định (Safari, Terminal) và thay đổi thứ tự hiển thị.
+- Kéo Thả Tệp Từ Shelf Và Sao Chép Tệp Chuẩn: Hỗ trợ kéo thả trực tiếp tệp từ Stash Shelf ra Finder và Màn hình chính nhờ đăng ký định dạng tệp chuẩn UTType.item, mở rộng vùng kéo thả trên toàn bộ thẻ tệp, và nút sao chép đưa trực tiếp đối tượng tệp vào clipboard để dán trong Finder.
+- Phím Tắt Cơ Bản Trong Scratchpad: Bổ sung menu Edit chuẩn hệ thống và cơ chế chuyển tiếp phím tắt, giúp các tổ hợp Command+A (Chọn tất cả), Command+C (Sao chép), Command+V (Dán), Command+X (Cắt) và Command+Z (Hoàn tác) hoạt động mượt mà trong trình soạn thảo Scratchpad.
+
 # Có Gì Mới Trong Phiên Bản 2.11.1
 
 MacStash 2.11.1 mở rộng hệ sinh thái Thanh Dock Thứ Hai với 6 widget sống tiện ích mới (nâng tổng số lên 16 widget), hỗ trợ xuất nhập hồ sơ (.sidedock-profile JSON) chia sẻ cấu hình, tính năng Dành Riêng Không Gian Dock (Reserve Dock Space) điều phối kích thước cửa sổ ứng dụng, chọn màn hình đích đa màn hình, bố cục dock dọc cuộn mượt mà và tự động ẩn khi toàn màn hình.

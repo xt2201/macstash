@@ -334,11 +334,12 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if settingsWindow == nil {
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 660, height: 560),
-                styleMask: [.titled, .closable, .miniaturizable],
+                contentRect: NSRect(x: 0, y: 0, width: 760, height: 620),
+                styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
             )
+            window.minSize = NSSize(width: 760, height: 620)
             window.title = appState.localized("settings.windowTitle")
             window.center()
             window.isReleasedWhenClosed = false
@@ -352,7 +353,11 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
         settingsWindow?.center()
         settingsWindow?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        if #available(macOS 14.0, *) {
+            NSApp.activate()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 
     @objc public func openHelp() {

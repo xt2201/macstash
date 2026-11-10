@@ -1,3 +1,14 @@
+# What's New in Version 2.13.1
+
+MacStash 2.13.1 fixes layout clipping, content jumping, and missing translations across the Settings window and Menu Bar Extra dropdown.
+
+## Key Fixes in Version 2.13.1
+
+- Settings Window Layout Alignment: Expanded NSWindow content rect to 760x620 and enabled window resizing, perfectly matching the SwiftUI layout and eliminating edge clipping on leading text, trailing buttons, and the About tab.
+- Second Dock Settings Content Restoration: Removed redundant nested ScrollView inside the Second Dock settings tab, completely fixing top content clipping, jumping viewports, and blank void areas.
+- Runtime Localization Catalog Synchronization: Added all 98 extended localization keys into the in-memory LocalizationService catalog, eliminating raw key fallbacks in Menu Bar Extra (keepAwake, stash, notes, hideDock, checkForUpdates) and Second Dock settings.
+- Tab Bar Label Truncation Polish: Streamlined tab bar labels and applied adaptive font scaling with minimum scale factor, ensuring all 8 settings tabs fit cleanly without truncation in English and Vietnamese.
+
 # What's New in Version 2.13.0
 
 MacStash 2.13.0 delivers a comprehensive user experience and visual architecture overhaul, modularizing all core capabilities with independent user toggles, providing flexible screen edge customization for edge sliders and utility drawers, localizing Second Dock and Onboarding into Vietnamese and English, setting Stash Shelf and Scratchpad to disabled by default, and eliminating text overflow and layout jitter across all configuration panels.

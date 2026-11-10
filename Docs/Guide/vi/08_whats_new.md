@@ -1,3 +1,14 @@
+# Có Gì Mới Trong Phiên Bản 2.13.1
+
+MacStash 2.13.1 khắc phục triệt để hiện tượng mất nội dung, tràn viền hiển thị và thiếu chuỗi dịch trên cửa sổ Cài đặt và trình đơn Menu Bar.
+
+## Những Điểm Khắc Phục Nổi Bật Trong Bản 2.13.1
+
+- Canh Lề Chuẩn Cho Cửa Sổ Cài Đặt: Nâng kích thước NSWindow lên 760x620 và hỗ trợ co giãn cửa sổ, đồng bộ tuyệt đối với layout SwiftUI và loại bỏ hoàn toàn hiện tượng tràn viền mép trái, nút mép phải và tab Giới thiệu.
+- Khôi Phục Toàn Diện Nội Dung Thanh Dock: Loại bỏ ScrollView lồng nhau bên trong tab Thanh Dock, xử lý dứt điểm hiện tượng nhảy viewport, mất nội dung phần trên và khoảng trống rỗng bất thường.
+- Đồng Bộ Từ Điển Dịch Runtime Toàn Diện: Bổ sung 98 khóa ngôn ngữ vào từ điển LocalizationService, giải quyết triệt để lỗi hiển thị khóa thô trên Menu Bar Extra (keepAwake, stash, notes, hideDock, checkForUpdates) và bảng tùy chỉnh Thanh Dock.
+- Tối Ưu Hiển Thị Nhãn Thanh Tab: Tinh chỉnh nhãn tab ngắn gọn và áp dụng cơ chế tự động co giãn tỷ lệ font chữ, đảm bảo toàn bộ 8 tab hiển thị trọn vẹn, không bị cắt bớt bằng dấu ba chấm.
+
 # Có Gì Mới Trong Phiên Bản 2.13.0
 
 MacStash 2.13.0 mang đến một đợt nâng cấp toàn diện về trải nghiệm người dùng và kiến trúc giao diện, biến toàn bộ tính năng cốt lõi thành các module có công tắc bật tắt độc lập, cho phép tùy chọn cạnh màn hình linh hoạt cho thanh trượt và ngăn kéo tiện ích, bản địa hóa 100% Thanh Dock Thứ Hai và màn hình Giới thiệu sang Tiếng Việt và Tiếng Anh, chuyển Stash Shelf và Scratchpad về mặc định tắt, đồng thời xử lý triệt để hiện tượng giật chữ và tràn chữ trên toàn bộ giao diện.

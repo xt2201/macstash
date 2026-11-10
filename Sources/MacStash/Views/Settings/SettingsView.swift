@@ -66,10 +66,11 @@ public struct SettingsView: View {
                             Text(tab.localizedTitle(using: appState))
                                 .font(.system(size: 11, weight: .medium))
                                 .lineLimit(1)
+                                .minimumScaleFactor(0.75)
                         }
                         .foregroundColor(selectedTab == tab ? .accentColor : .primary)
                         .padding(.vertical, 8)
-                        .padding(.horizontal, 8)
+                        .padding(.horizontal, 4)
                         .frame(maxWidth: .infinity)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -128,6 +129,6 @@ public struct SettingsView: View {
                 .padding(22)
             }
         }
-        .frame(width: 720, height: 600)
+        .frame(minWidth: 760, idealWidth: 760, maxWidth: .infinity, minHeight: 620, idealHeight: 620, maxHeight: .infinity)
     }
 }

@@ -36,8 +36,7 @@ public struct DockSettingsTabView: View {
     }
 
     public var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 18) {
                 // Section 1: Core Toggle & Placement
                 GroupBox(label: Text(localized("dock.configTitle")).font(.headline)) {
                     VStack(alignment: .leading, spacing: 12) {
@@ -315,16 +314,15 @@ public struct DockSettingsTabView: View {
                     .padding(8)
                 }
             }
-            .padding(16)
-        }
-        .sheet(isPresented: $showWidgetGallery) {
-            WidgetGalleryView { newItem in
-                config.profiles[activeProfileIndex].items.append(.widget(newItem))
-                onSave(true)
-                showWidgetGallery = false
+            .padding(.bottom, 20)
+            .sheet(isPresented: $showWidgetGallery) {
+                WidgetGalleryView { newItem in
+                    config.profiles[activeProfileIndex].items.append(.widget(newItem))
+                    onSave(true)
+                    showWidgetGallery = false
+                }
             }
         }
-    }
 
     // MARK: - Bindings
 

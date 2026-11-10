@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.13.1] - 2026-11-10
+
+### Fixed
+- Settings Window Layout Clipping: Expanded NSWindow content rect to 760x620 with resizable style mask matching SwiftUI content frame, eliminating edge-clipping of leading characters, buttons, and the About tab.
+- Second Dock Settings Lost Content: Removed redundant nested ScrollView inside DockSettingsTabView, resolving content jump, viewport clipping, and blank void areas.
+- Localization Key Fallbacks: Synchronized all 98 runtime localization keys into LocalizationService catalog, resolving raw key strings across Menu Bar Extra (keepAwake, stash, notes, hideDock, checkForUpdates) and Second Dock settings.
+- Tab Bar Label Truncation: Streamlined tab bar labels and applied adaptive scaling with minimum scale factor, ensuring all 8 settings tabs fit cleanly without truncation in English and Vietnamese.
+
+---
+
 ## [2.13.0] - 2026-11-10
 
 ### Added

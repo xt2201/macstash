@@ -145,7 +145,7 @@ if [[ ! -d "$SPARKLE_FW_SRC" ]]; then
 fi
 
 if [[ -d "$SPARKLE_FW_SRC" ]]; then
-    cp -R "$SPARKLE_FW_SRC" "$APP_BUNDLE/Contents/Frameworks/Sparkle.framework"
+    ditto "$SPARKLE_FW_SRC" "$APP_BUNDLE/Contents/Frameworks/Sparkle.framework"
 else
     echo "Error: Sparkle.framework source not found in .build artifacts!" >&2
     exit 1
@@ -220,7 +220,7 @@ rm -rf "$DMG_SRC" "$DMG_PATH"
 mkdir -p "$DMG_SRC/.background"
 
 # 1. Place Stash.app
-cp -R "$APP_BUNDLE" "$DMG_SRC/"
+ditto "$APP_BUNDLE" "$DMG_SRC/$APP_NAME"
 
 # 2. Add /Applications symlink
 ln -s /Applications "$DMG_SRC/Applications"

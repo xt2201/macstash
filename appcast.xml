@@ -7,7 +7,7 @@
         <language>en</language>
         <item>
             <title>Version 2.12.0</title>
-            <pubDate>Tue, 10 Nov 2026 08:52:08 +0700</pubDate>
+            <pubDate>Tue, 10 Nov 2026 01:56:49 +0000</pubDate>
             <sparkle:version>2120</sparkle:version>
             <sparkle:shortVersionString>2.12.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
@@ -22,8 +22,8 @@
             ]]></description>
             <enclosure
                 url="https://github.com/xt2201/macstash/releases/download/v2.12.0/Stash-2.12.0.zip"
-                sparkle:edSignature="Jn5qF67fO+hKNz66xikmscK8ykFVrI4pEFnUOQUqQAL9lG2NHb8GhExUphO+hL/Eg/jjS7tEPe6Kq8f91Q6cAQ=="
-                length="8137199"
+                sparkle:edSignature="w99AB95eHrUTJc/MxotPn/obdyCCSKY7DkfUP1g9ts7l5TYTCdRm3eibRZN4mMl6ayaTaIgcVIZu3k+Z2VF9Ag=="
+                length="6451956"
                 type="application/octet-stream" />
         </item>
         <item>

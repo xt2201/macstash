@@ -44,21 +44,20 @@ public final class CompositeBrightnessService: ObservableObject, @unchecked Send
     /// Returns the live clamped brightness value.
     @discardableResult
     public func syncHardwareBrightness(for display: DisplayInfo) -> Float {
+        var profile = profiles[display.uuid] ?? DisplayBrightnessProfile(
+            displayUUID: display.uuid,
+            displayName: display.name,
+            isBuiltIn: display.isBuiltIn
+        )
         if let live = currentHardwareBrightness(for: display) {
-            var profile = profiles[display.uuid] ?? DisplayBrightnessProfile(
-                displayUUID: display.uuid,
-                displayName: display.name,
-                isBuiltIn: display.isBuiltIn
-            )
-            if abs(profile.brightnessLevel - live) > 0.005 {
-                profile.brightnessLevel = live
-                profile.actualMethod = .builtIn
-                let updated = profile
-                profiles[display.uuid] = updated
-            }
+            profile.brightnessLevel = live
+            profile.actualMethod = .builtIn
+            profiles[display.uuid] = profile
             return live
+        } else {
+            profiles[display.uuid] = profile
+            return profile.brightnessLevel
         }
-        return profiles[display.uuid]?.brightnessLevel ?? Defaults.Brightness.defaultLevel
     }
 
     /// Synchronizes all connected displays with physical hardware values.

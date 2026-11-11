@@ -34,11 +34,11 @@ public final class KeepAwakeManager: ObservableObject {
         AppLogger.lifecycle.info("KeepAwake deactivated")
     }
 
-    public func toggle() {
+    public func toggle(defaultMinutes: Int = Defaults.KeepAwake.defaultDurationMinutes) {
         if isActive {
             deactivate()
         } else {
-            activate(minutes: Defaults.KeepAwake.defaultDurationMinutes)
+            activate(minutes: defaultMinutes)
         }
     }
 

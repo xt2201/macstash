@@ -31,6 +31,8 @@ public final class AppState: ObservableObject {
 
     // MARK: - Persisted Settings
 
+    private var isSyncingSettings: Bool = false
+
     @Published public var settings: AppSettings {
         didSet {
             scheduleSaveSettings()
@@ -41,7 +43,55 @@ public final class AppState: ObservableObject {
                 effectiveLanguage = newEffective
             }
             applyPomodoroSettings()
+            syncMirroredProperties(from: oldValue)
         }
+    }
+
+    private func syncMirroredProperties(from old: AppSettings) {
+        guard !isSyncingSettings else { return }
+        isSyncingSettings = true
+        defer { isSyncingSettings = false }
+
+        if isEnabled != settings.isEnabled { isEnabled = settings.isEnabled }
+        if isCornerDialsEnabled != settings.isCornerDialsEnabled { isCornerDialsEnabled = settings.isCornerDialsEnabled }
+        if isEdgeSlidersEnabled != settings.isEdgeSlidersEnabled { isEdgeSlidersEnabled = settings.isEdgeSlidersEnabled }
+        if edgeBarShowMediaControls != settings.edgeBarShowMediaControls { edgeBarShowMediaControls = settings.edgeBarShowMediaControls }
+        if edgeBarVisualizerEnabled != settings.edgeBarVisualizerEnabled { edgeBarVisualizerEnabled = settings.edgeBarVisualizerEnabled }
+        if onlyOuterCorners != settings.onlyOuterCorners { onlyOuterCorners = settings.onlyOuterCorners }
+        if cornerDisplayTarget != settings.cornerDisplayTarget { cornerDisplayTarget = settings.cornerDisplayTarget }
+        if scrollAdjustmentEnabled != settings.scrollAdjustmentEnabled { scrollAdjustmentEnabled = settings.scrollAdjustmentEnabled }
+        if cornerSensitivityRadius != settings.cornerSensitivityPoints { cornerSensitivityRadius = settings.cornerSensitivityPoints }
+        if cornerDwellDelay != settings.cornerDwellDelaySeconds { cornerDwellDelay = settings.cornerDwellDelaySeconds }
+        if edgeSliderPosition != settings.edgeSliderPosition { edgeSliderPosition = settings.edgeSliderPosition }
+        if drawerEdgePosition != settings.drawerEdgePosition { drawerEdgePosition = settings.drawerEdgePosition }
+        if isSoundEnabled != settings.isSoundEnabled { isSoundEnabled = settings.isSoundEnabled }
+        if soundVolume != settings.soundVolume { soundVolume = settings.soundVolume }
+        let parsedHaptic = HapticIntensity(rawValue: settings.hapticIntensity.capitalized) ?? .medium
+        if hapticIntensity != parsedHaptic { hapticIntensity = parsedHaptic }
+
+        let overlayLayoutChanged = old.dialRadiusPoints != settings.dialRadiusPoints
+            || old.isEdgeSlidersEnabled != settings.isEdgeSlidersEnabled
+            || old.isStashShelfEnabled != settings.isStashShelfEnabled
+            || old.isScratchpadEnabled != settings.isScratchpadEnabled
+            || old.onlyOuterCorners != settings.onlyOuterCorners
+            || old.edgeSliderPosition != settings.edgeSliderPosition
+            || old.drawerEdgePosition != settings.drawerEdgePosition
+
+        if overlayLayoutChanged {
+            ScreenManager.shared.reconfigureOverlays()
+        }
+    }
+
+    public var resolvedColorScheme: ColorScheme? {
+        switch settings.appearanceTheme {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil
+        }
+    }
+
+    public var effectiveHapticIntensity: HapticIntensity {
+        settings.hapticFeedbackEnabled ? hapticIntensity : .off
     }
 
     private func scheduleSaveSettings() {
@@ -61,55 +111,57 @@ public final class AppState: ObservableObject {
     }
 
     @Published public var isEnabled: Bool = true {
-        didSet { settings.isEnabled = isEnabled }
+        didSet { if !isSyncingSettings { settings.isEnabled = isEnabled } }
     }
     @Published public var isCornerDialsEnabled: Bool = true {
-        didSet { settings.isCornerDialsEnabled = isCornerDialsEnabled }
+        didSet { if !isSyncingSettings { settings.isCornerDialsEnabled = isCornerDialsEnabled } }
     }
     @Published public var isEdgeSlidersEnabled: Bool = true {
-        didSet { settings.isEdgeSlidersEnabled = isEdgeSlidersEnabled }
+        didSet { if !isSyncingSettings { settings.isEdgeSlidersEnabled = isEdgeSlidersEnabled } }
     }
     @Published public var edgeBarShowMediaControls: Bool = true {
-        didSet { settings.edgeBarShowMediaControls = edgeBarShowMediaControls }
+        didSet { if !isSyncingSettings { settings.edgeBarShowMediaControls = edgeBarShowMediaControls } }
     }
     @Published public var edgeBarVisualizerEnabled: Bool = true {
-        didSet { settings.edgeBarVisualizerEnabled = edgeBarVisualizerEnabled }
+        didSet { if !isSyncingSettings { settings.edgeBarVisualizerEnabled = edgeBarVisualizerEnabled } }
     }
     @Published public var onlyOuterCorners: Bool = false {
-        didSet { settings.onlyOuterCorners = onlyOuterCorners }
+        didSet { if !isSyncingSettings { settings.onlyOuterCorners = onlyOuterCorners } }
     }
     @Published public var cornerDisplayTarget: HotCornerDisplayTarget = .builtIn {
-        didSet { settings.cornerDisplayTarget = cornerDisplayTarget }
+        didSet { if !isSyncingSettings { settings.cornerDisplayTarget = cornerDisplayTarget } }
     }
     @Published public var scrollAdjustmentEnabled: Bool = true {
-        didSet { settings.scrollAdjustmentEnabled = scrollAdjustmentEnabled }
+        didSet { if !isSyncingSettings { settings.scrollAdjustmentEnabled = scrollAdjustmentEnabled } }
     }
     @Published public var cornerSensitivityRadius: CGFloat = Defaults.HotCorner.defaultHitZoneSizePoints {
-        didSet { settings.cornerSensitivityPoints = cornerSensitivityRadius }
+        didSet { if !isSyncingSettings { settings.cornerSensitivityPoints = cornerSensitivityRadius } }
     }
     @Published public var cornerDwellDelay: TimeInterval = Defaults.HotCorner.defaultDwellDelaySeconds {
-        didSet { settings.cornerDwellDelaySeconds = cornerDwellDelay }
+        didSet { if !isSyncingSettings { settings.cornerDwellDelaySeconds = cornerDwellDelay } }
     }
     @Published public var edgeSliderPosition: EdgePosition = Defaults.EdgeSliders.defaultPosition {
         didSet {
-            settings.edgeSliderPosition = edgeSliderPosition
-            ScreenManager.shared.reconfigureOverlays()
+            if !isSyncingSettings {
+                settings.edgeSliderPosition = edgeSliderPosition
+            }
         }
     }
     @Published public var drawerEdgePosition: EdgePosition = Defaults.LeftEdgeDrawer.defaultPosition {
         didSet {
-            settings.drawerEdgePosition = drawerEdgePosition
-            ScreenManager.shared.reconfigureOverlays()
+            if !isSyncingSettings {
+                settings.drawerEdgePosition = drawerEdgePosition
+            }
         }
     }
     @Published public var isSoundEnabled: Bool = true {
-        didSet { settings.isSoundEnabled = isSoundEnabled }
+        didSet { if !isSyncingSettings { settings.isSoundEnabled = isSoundEnabled } }
     }
     @Published public var soundVolume: Float = Defaults.Audio.defaultSoundVolume {
-        didSet { settings.soundVolume = soundVolume }
+        didSet { if !isSyncingSettings { settings.soundVolume = soundVolume } }
     }
     @Published public var hapticIntensity: HapticIntensity = .medium {
-        didSet { settings.hapticIntensity = hapticIntensity.rawValue.lowercased() }
+        didSet { if !isSyncingSettings { settings.hapticIntensity = hapticIntensity.rawValue.lowercased() } }
     }
 
     @Published public var appProfiles: [AppProfile]
@@ -123,6 +175,7 @@ public final class AppState: ObservableObject {
     @Published public var liveEdgeSliderValue: Float? = nil
     @Published public var isAudioDevicePickerPresented: Bool = false
     @Published public var isCursorPalettePresented: Bool = false
+    @Published public var requestedSettingsTab: String? = nil
 
     private var cachedDisplays: [DisplayInfo] = []
     private var settingsSaveWorkItem: DispatchWorkItem?
@@ -188,6 +241,10 @@ public final class AppState: ObservableObject {
         setupSubscribers()
         setupPomodoroTimer()
         setupSystemWakeObserver()
+
+        sideDock.onOpenSettings = { [weak self] in
+            self?.requestedSettingsTab = "Second Dock"
+        }
     }
 
     private func setupSubscribers() {
@@ -211,7 +268,8 @@ public final class AppState: ObservableObject {
     }
 
     private func evaluateActiveProfile(bundleId: String) {
-        if let matching = appProfiles.first(where: { $0.bundleIdentifier == bundleId && $0.isEnabled }) {
+        let target = bundleId.lowercased()
+        if let matching = appProfiles.first(where: { ($0.bundleIdentifier?.lowercased() == target) && $0.isEnabled }) {
             self.activeProfile = matching
         } else if let def = appProfiles.first(where: { $0.bundleIdentifier == nil }) {
             self.activeProfile = def
@@ -251,8 +309,8 @@ public final class AppState: ObservableObject {
         }
     }
 
-    private func connectedDisplays() -> [DisplayInfo] {
-        if cachedDisplays.isEmpty {
+    public func connectedDisplays(forceRefresh: Bool = false) -> [DisplayInfo] {
+        if forceRefresh || cachedDisplays.isEmpty {
             cachedDisplays = brightnessService.queryConnectedDisplays()
         }
         return cachedDisplays
@@ -304,7 +362,7 @@ public final class AppState: ObservableObject {
         }
         syncPomodoroProperties()
         savePomodoroSnapshot()
-        haptics.performBoundaryClick()
+        haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
         sound.playAccent(enabled: isSoundEnabled)
     }
 
@@ -312,15 +370,21 @@ public final class AppState: ObservableObject {
         pomodoroEngine.reset(toDurationSeconds: duration)
         syncPomodoroProperties()
         savePomodoroSnapshot()
-        haptics.performBoundaryClick()
+        haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
         sound.playAccent(enabled: isSoundEnabled)
+    }
+
+    public func resetPomodoroRounds() {
+        pomodoroEngine.resetRounds()
+        syncPomodoroProperties()
+        savePomodoroSnapshot()
     }
 
     public func skipPomodoroMode() {
         pomodoroEngine.skipToNextMode()
         syncPomodoroProperties()
         savePomodoroSnapshot()
-        haptics.performBoundaryClick()
+        haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
         sound.playAccent(enabled: isSoundEnabled)
     }
 
@@ -346,7 +410,7 @@ public final class AppState: ObservableObject {
         if tickResult.didJustComplete {
             if settings.pomodoroSoundEnabled {
                 sound.playChime(enabled: isSoundEnabled)
-                haptics.performBoundaryClick()
+                haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             }
             NSApp.requestUserAttention(.criticalRequest)
             savePomodoroSnapshot()
@@ -435,19 +499,20 @@ public final class AppState: ObservableObject {
         case .volume:
             audio.setVolume(clamped)
         case .brightness:
+            let bounded = BrightnessPolicy.clamp(clamped, min: settings.minBrightnessClamp, max: settings.maxBrightnessClamp)
             let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
             let displays = connectedDisplays()
             if let display = displays.first(where: { $0.id == targetID }) {
                 var profile = brightnessService.profile(for: display.uuid) ?? DisplayBrightnessProfile(
                     displayUUID: display.uuid,
                     displayName: display.name,
-                    brightnessLevel: clamped,
+                    brightnessLevel: bounded,
                     isBuiltIn: display.isBuiltIn
                 )
-                profile.brightnessLevel = clamped
+                profile.brightnessLevel = bounded
                 updateDisplayProfile(profile)
                 Task {
-                    _ = await brightnessService.setBrightness(clamped, for: display)
+                    _ = await brightnessService.setBrightness(bounded, for: display)
                 }
             }
         case .keyboardBrightness:
@@ -478,7 +543,7 @@ public final class AppState: ObservableObject {
         let notch = Int(clamped * 33.3)
         if notch != lastValueNotch {
             lastValueNotch = notch
-            haptics.performDetentTick()
+            haptics.performDetentTick(intensity: effectiveHapticIntensity)
             sound.playTick(enabled: isSoundEnabled, volume: soundVolume)
         }
     }
@@ -487,32 +552,32 @@ public final class AppState: ObservableObject {
         switch action {
         case .volume:
             audio.toggleMute()
-            haptics.performBoundaryClick()
+            haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .timer:
             togglePomodoro()
         case .brightness:
             let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
             let cur = getValue(for: .brightness, displayID: targetID)
-            setValue(for: .brightness, value: cur > 0.5 ? 0.2 : 0.8, displayID: targetID)
-            haptics.performBoundaryClick()
+            setValue(for: .brightness, value: cur > 0.5 ? max(0.2, Double(settings.minBrightnessClamp)) : min(0.8, Double(settings.maxBrightnessClamp)), displayID: targetID)
+            haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .keyboardBrightness:
             let next = KeyboardBrightnessPolicy.toggle(current: keyboard.brightness)
             setValue(for: .keyboardBrightness, value: Double(next))
-            haptics.performBoundaryClick()
+            haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .keepAwake:
-            keepAwake.toggle()
-            haptics.performBoundaryClick()
+            keepAwake.toggle(defaultMinutes: settings.keepAwakeDefaultMinutes)
+            haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .stashShelf:
             stashShelf.isShelfOpen.toggle()
-            haptics.performBoundaryClick()
+            haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .scratchpad:
             scratchpad.isScratchpadOpen.toggle()
-            haptics.performBoundaryClick()
+            haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .none:
             break
@@ -536,21 +601,11 @@ public final class AppState: ObservableObject {
 
     public func resetToDefaults() {
         let fresh = persistence.resetToDefaults()
+        let defaultProf = AppProfile.defaultProfile
+        self.appProfiles = [defaultProf]
+        self.activeProfile = defaultProf
+        UserDefaults.standard.removeObject(forKey: "stash_appProfiles")
         self.settings = fresh
-        self.isEnabled = fresh.isEnabled
-        self.isCornerDialsEnabled = fresh.isCornerDialsEnabled
-        self.isEdgeSlidersEnabled = fresh.isEdgeSlidersEnabled
-        self.edgeBarShowMediaControls = fresh.edgeBarShowMediaControls
-        self.edgeBarVisualizerEnabled = fresh.edgeBarVisualizerEnabled
-        self.onlyOuterCorners = fresh.onlyOuterCorners
-        self.cornerDisplayTarget = fresh.cornerDisplayTarget
-        self.scrollAdjustmentEnabled = fresh.scrollAdjustmentEnabled
-        self.cornerSensitivityRadius = fresh.cornerSensitivityPoints
-        self.cornerDwellDelay = fresh.cornerDwellDelaySeconds
-        self.isSoundEnabled = fresh.isSoundEnabled
-        self.soundVolume = fresh.soundVolume
-        self.edgeSliderPosition = fresh.edgeSliderPosition
-        self.drawerEdgePosition = fresh.drawerEdgePosition
-        self.hapticIntensity = HapticIntensity(rawValue: fresh.hapticIntensity.capitalized) ?? .medium
+        ScreenManager.shared.reconfigureOverlays()
     }
 }

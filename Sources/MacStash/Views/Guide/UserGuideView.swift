@@ -2,332 +2,702 @@ import SwiftUI
 import AppKit
 import MacStashCore
 
-public struct GuideArticle: Identifiable {
+public struct GuideArticle: Identifiable, Equatable {
     public let id: String
     public let title: String
-    public let filename: String
+    public let iconName: String
     public let content: String
-
-    public init(id: String, title: String, filename: String, content: String) {
-        self.id = id
-        self.title = title
-        self.filename = filename
-        self.content = content
-    }
 }
 
 public struct UserGuideView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var appState: AppState
-    @State private var selectedArticleID: String = "01_getting_started"
-    @State private var searchQuery: String = ""
     @State private var articles: [GuideArticle] = []
+    @State private var selectedArticleID: String?
+    @State private var searchText: String = ""
 
     public init(appState: AppState = .shared) {
         self.appState = appState
-        _articles = State(initialValue: Self.loadArticles(language: appState.effectiveLanguage))
+    }
+
+    private var filteredArticles: [GuideArticle] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if query.isEmpty {
+            return articles
+        }
+        return articles.filter {
+            $0.title.localizedCaseInsensitiveContains(query) ||
+            $0.content.localizedCaseInsensitiveContains(query)
+        }
+    }
+
+    private var selectedArticle: GuideArticle? {
+        filteredArticles.first(where: { $0.id == selectedArticleID }) ?? filteredArticles.first
     }
 
     public var body: some View {
-        NavigationSplitView {
-            VStack(spacing: 8) {
-                HStack {
-                    StashBrandLogoView(size: 26, showWordmark: true)
-                    Spacer()
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, 10)
+        HStack(spacing: 0) {
+            sidebarView
+                .frame(width: 245)
+                .background(GuideSidebarEffectBackground())
 
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
-                    TextField(appState.localized("guide.searchPlaceholder"), text: $searchQuery)
-                        .textFieldStyle(.plain)
-                    if !searchQuery.isEmpty {
-                        Button(action: { searchQuery = "" }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.secondary)
+            Divider()
+
+            detailView
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(NSColor.windowBackgroundColor))
+        }
+        .frame(minWidth: 680, minHeight: 480)
+        .macStashTheme(appState.resolvedColorScheme)
+        .onAppear {
+            reloadArticles()
+        }
+        .onChange(of: appState.effectiveLanguage) { _, _ in
+            reloadArticles()
+        }
+        .onChange(of: searchText) { _, _ in
+            ensureValidSelection()
+        }
+    }
+
+    // MARK: - Sidebar
+
+    private var sidebarView: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                StashBrandLogoView(size: 26, showWordmark: false)
+                Text(appState.localized("guide.windowTitle"))
+                    .font(.system(size: 13.5, weight: .bold))
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 14)
+            .padding(.bottom, 10)
+
+            HStack(spacing: 6) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+
+                TextField(appState.localized("guide.searchPlaceholder"), text: $searchText)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 12))
+
+                if !searchText.isEmpty {
+                    Button {
+                        searchText = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color.primary.opacity(0.06))
+            )
+            .padding(.horizontal, 12)
+            .padding(.bottom, 10)
+
+            Divider()
+                .padding(.horizontal, 12)
+
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(filteredArticles) { article in
+                        let isSelected = selectedArticle?.id == article.id
+                        Button {
+                            selectedArticleID = article.id
+                        } label: {
+                            HStack(spacing: 9) {
+                                Image(systemName: article.iconName)
+                                    .font(.system(size: 11.5, weight: .semibold))
+                                    .foregroundColor(isSelected ? .white : .accentColor)
+                                    .frame(width: 22, height: 22)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                            .fill(isSelected ? AnyShapeStyle(Color.accentColor.gradient) : AnyShapeStyle(Color.accentColor.opacity(0.12)))
+                                    )
+
+                                Text(article.title)
+                                    .font(.system(size: 12.5, weight: isSelected ? .semibold : .medium))
+                                    .foregroundColor(.primary)
+                                    .lineLimit(2)
+                                    .multilineTextAlignment(.leading)
+
+                                Spacer(minLength: 0)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .background(
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(isSelected ? Color.accentColor.opacity(0.15) : Color.clear)
+                            )
                         }
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(6)
-                .background(RoundedRectangle(cornerRadius: 6).fill(Color.secondary.opacity(0.1)))
-                .padding(.horizontal, 10)
-                .padding(.top, 10)
-
-                List(filteredArticles, id: \.id, selection: $selectedArticleID) { article in
-                    NavigationLink(value: article.id) {
-                        Label(article.title, systemImage: "doc.text")
-                            .font(.system(size: 13, weight: .medium))
-                    }
-                }
-                .listStyle(.sidebar)
+                .padding(10)
             }
-            .frame(minWidth: 220, maxWidth: 280)
-        } detail: {
-            if let active = articles.first(where: { $0.id == selectedArticleID }) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text(active.title)
-                            .font(.system(size: 20, weight: .bold))
-
-                        Divider()
-
-                        Text(LocalizedStringKey(active.content))
-                            .font(.system(size: 13))
-                            .lineSpacing(4)
-                            .textSelection(.enabled)
-                    }
-                    .padding(24)
-                }
-            } else {
-                Text(appState.localized("guide.emptySelection"))
-                    .foregroundColor(.secondary)
-            }
-        }
-        .frame(minWidth: 680, minHeight: 480)
-        .onAppear {
-            articles = Self.loadArticles(language: appState.effectiveLanguage)
-        }
-        .onChange(of: appState.effectiveLanguage) { _, newLang in
-            articles = Self.loadArticles(language: newLang)
         }
     }
 
-    private var filteredArticles: [GuideArticle] {
-        if searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return articles
+    // MARK: - Detail Reader
+
+    private var detailView: some View {
+        Group {
+            if let article = selectedArticle {
+                ScrollView(.vertical, showsIndicators: true) {
+                    VStack(alignment: .leading, spacing: 14) {
+                        MarkdownArticleView(markdown: article.content)
+                    }
+                    .padding(28)
+                    .frame(maxWidth: 740, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                }
+                .id(article.id)
+            } else {
+                VStack(spacing: 12) {
+                    Image(systemName: "book.closed")
+                        .font(.system(size: 36))
+                        .foregroundColor(.secondary.opacity(0.6))
+                    Text(appState.localized("guide.emptySelection"))
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
-        let q = searchQuery.lowercased()
-        return articles.filter {
-            $0.title.lowercased().contains(q) || $0.content.lowercased().contains(q)
+    }
+
+    // MARK: - Loading
+
+    private func reloadArticles() {
+        let lang = appState.effectiveLanguage
+        articles = Self.loadArticles(language: lang)
+        ensureValidSelection()
+    }
+
+    private func ensureValidSelection() {
+        if let current = selectedArticleID,
+           filteredArticles.contains(where: { $0.id == current }) {
+            return
         }
+        selectedArticleID = filteredArticles.first?.id
     }
 
     public static func loadArticles(language: String = "en") -> [GuideArticle] {
-        let isVi = language == "vi"
-        let folder = isVi ? "vi" : "en"
+        let folder = language == "vi" ? "vi" : "en"
+        let specs: [(file: String, icon: String)] = [
+            ("01_getting_started.md", "play.circle.fill"),
+            ("02_display_brightness.md", "sun.max.fill"),
+            ("03_pomodoro_timer.md", "timer"),
+            ("04_troubleshooting.md", "wrench.and.screwdriver.fill"),
+            ("05_settings.md", "gearshape.fill"),
+            ("06_shortcuts.md", "keyboard.fill"),
+            ("07_faq.md", "questionmark.circle.fill"),
+            ("08_whats_new.md", "sparkles")
+        ]
 
-        func contentFor(filename: String, fallback: String) -> String {
-            let paths = [
-                "Docs/Guide/\(folder)/\(filename)",
-                "../Docs/Guide/\(folder)/\(filename)",
-                "../../Docs/Guide/\(folder)/\(filename)"
+        var result: [GuideArticle] = []
+        for spec in specs {
+            let candidates = [
+                "Docs/Guide/\(folder)/\(spec.file)",
+                "../Docs/Guide/\(folder)/\(spec.file)",
+                "../../Docs/Guide/\(folder)/\(spec.file)"
             ]
-            for p in paths {
-                if let s = try? String(contentsOfFile: p, encoding: .utf8), !s.isEmpty {
-                    return s
+
+            var loadedContent: String?
+            for path in candidates where FileManager.default.fileExists(atPath: path) {
+                loadedContent = try? String(contentsOfFile: path, encoding: .utf8)
+                if loadedContent != nil { break }
+            }
+
+            if loadedContent == nil {
+                if let bundleURL = Bundle.main.url(forResource: spec.file, withExtension: nil, subdirectory: "Docs/Guide/\(folder)") ??
+                    Bundle.main.url(forResource: spec.file, withExtension: nil, subdirectory: "Guide/\(folder)") {
+                    loadedContent = try? String(contentsOf: bundleURL, encoding: .utf8)
                 }
             }
-            if let bundleUrl = Bundle.main.url(forResource: filename, withExtension: nil, subdirectory: "Docs/Guide/\(folder)") ??
-                               Bundle.main.url(forResource: filename, withExtension: nil) {
-                if let s = try? String(contentsOf: bundleUrl, encoding: .utf8), !s.isEmpty {
-                    return s
-                }
+
+            if let text = loadedContent {
+                let firstHeading = text.components(separatedBy: .newlines).first(where: { $0.hasPrefix("# ") })
+                let title = firstHeading?.replacingOccurrences(of: "# ", with: "").trimmingCharacters(in: .whitespaces)
+                    ?? spec.file.replacingOccurrences(of: ".md", with: "")
+                result.append(GuideArticle(id: spec.file, title: title, iconName: spec.icon, content: text))
             }
-            return fallback
         }
+
+        if !result.isEmpty {
+            return result
+        }
+        return fallbackArticles(language: folder)
+    }
+
+    private static func fallbackArticles(language: String) -> [GuideArticle] {
+        let isVi = language == "vi"
+        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? Defaults.appVersion
 
         return [
             GuideArticle(
-                id: "01_getting_started",
-                title: isVi ? "1. Hướng Dẫn Bắt Đầu" : "1. Getting Started",
-                filename: "01_getting_started.md",
-                content: contentFor(
-                    filename: "01_getting_started.md",
-                    fallback: isVi ? """
-                    MacStash cung cấp các vòng xoay điều khiển hình góc phần tư xuất hiện tinh tế tại bốn góc vật lý của màn hình macOS.
+                id: "01_getting_started.md",
+                title: isVi ? "Bắt đầu nhanh với MacStash" : "Getting Started with MacStash",
+                iconName: "play.circle.fill",
+                content: isVi ? """
+                # Bắt đầu nhanh với MacStash
 
-                    Khái Niệm Cốt Lõi:
-                    MacStash được thiết kế để duy trì trạng thái ẩn hoàn toàn và không tiêu tốn tài nguyên cho đến khi người dùng cần thao tác. Khi di chuột vào góc kích hoạt và dừng lại trong giây lát, vòng xoay tương ứng sẽ xuất hiện mượt mà.
+                MacStash bổ sung **Vòng xoay góc màn hình (Corner Dials)**, **Thanh trượt cạnh màn hình**, **Bảng chọn tại con trỏ (Cursor Palette)**, **Kệ thả tệp (Stash Shelf)**, **Ghi chú nhanh (Scratchpad)** và **Thanh Dock thứ hai (Second Dock)** ngay trên màn hình macOS.
 
-                    Bốn Góc Vật Lý:
-                    - Góc Trên - Trái: Mặc định điều chỉnh đèn bàn phím (Keyboard Backlight).
-                    - Góc Trên - Phải: Mặc định điều chỉnh độ sáng màn hình (Display Brightness).
-                    - Góc Dưới - Trái: Mặc định đồng hồ tập trung Pomodoro.
-                    - Góc Dưới - Phải: Mặc định âm lượng loa tổng (Master Volume).
-                    """ : """
-                    MacStash provides tactile, quarter-circle radial dial controls that appear seamlessly at the extreme corners of your macOS displays.
+                ## 3 bước sử dụng nhanh
+                1. **Cấp quyền Trợ năng (Accessibility)** để MacStash theo dõi con trỏ chuột tại góc và mép màn hình.
+                2. **Đưa con trỏ chuột vào 1 trong 4 góc ngoài màn hình** và dừng lại 0.2 giây để núm xoay Liquid Glass mở ra.
+                3. **Kéo theo cung tròn** hoặc dùng **cuộn hai ngón** để tinh chỉnh độ sáng, âm lượng, đèn bàn phím, hoặc Pomodoro.
+                """ : """
+                # Getting Started with MacStash
 
-                    Core Concepts:
-                    MacStash is designed to remain completely invisible and zero-resource until you need it. By resting your mouse cursor at an active corner, the corresponding dial emerges smoothly.
+                MacStash brings **Hot Corner Dials**, **Edge Sliders**, a **Cursor Radial Palette**, a **Stash Drop Shelf**, **Quick Scratchpad**, and a widget-powered **Second Dock** to macOS.
 
-                    The Four Physical Corners:
-                    - Top-Left: Configured by default for Keyboard Backlight adjustment.
-                    - Top-Right: Configured by default for Display Brightness control.
-                    - Bottom-Left: Configured by default for Pomodoro and Focus Timer.
-                    - Bottom-Right: Configured by default for Master Audio Volume.
-                    """
-                )
+                ## Quick Start
+                1. **Grant Accessibility Permission** so MacStash can detect outer corners and vertical edges cleanly.
+                2. **Hover into any outer screen corner** for 0.2s to bloom a Liquid Glass radial dial.
+                3. **Drag along the arc** or **scroll with two fingers** to adjust brightness, volume, backlight, or focus timers.
+                """
             ),
             GuideArticle(
-                id: "02_display_brightness",
-                title: isVi ? "2. Độ Sáng Đa Màn Hình" : "2. Display Brightness",
-                filename: "02_display_brightness.md",
-                content: contentFor(
-                    filename: "02_display_brightness.md",
-                    fallback: isVi ? """
-                    MacStash hỗ trợ điều chỉnh độ sáng độc lập cho từng màn hình, bao gồm màn hình tích hợp trên MacBook và tất cả các màn hình ngoài.
+                id: "05_settings.md",
+                title: isVi ? "Hướng dẫn 8 mục Cài đặt" : "Settings Reference Guide",
+                iconName: "gearshape.fill",
+                content: isVi ? """
+                # Cửa sổ Cài đặt MacStash (8 mục)
 
-                    Các Phương Thức Điều Khiển:
-                    - Dịch Vụ Mặc Định (DisplayServices): Áp dụng cho màn hình Retina tích hợp của Apple.
-                    - Điều Khiển Phần Cứng DDC/CI: Dành cho các màn hình ngoài tương thích kết nối qua DisplayPort, HDMI hoặc USB-C.
-                    - Giảm Sáng Bằng Phần Mềm (Software Dimming): Tự động sử dụng khi màn hình ngoài không phản hồi DDC/CI.
-                    """ : """
-                    MacStash provides individual brightness regulation across both MacBook built-in displays and external monitors.
+                Mở Cài đặt bất kỳ lúc nào qua menu bar hoặc phím tắt `Command+,`:
 
-                    Control Methods:
-                    - Native Display Services: Used for built-in Apple Retina displays. Communicates directly with macOS DisplayServices.
-                    - DDC/CI Hardware Control: For compatible external monitors connected via DisplayPort, HDMI, or USB-C.
-                    - Software Dimming: Used as an automatic fallback when external hardware does not support DDC/CI.
-                    """
-                )
+                - **Tổng quan (General)**: Công tắc tổng, bảng trạng thái 6 module, thời lượng Keep Awake mặc định, ngôn ngữ, quyền hệ thống và đặt lại mặc định.
+                - **Góc nóng (Hot Corners)**: Sơ đồ màn hình tương tác, cấu hình 4 góc, hồ sơ theo ứng dụng (App Profiles), thanh trượt cạnh Trái/Phải và loại trừ ứng dụng.
+                - **Thanh Dock thứ hai (Second Dock)**: Quản lý hồ sơ, chọn 16 tiện ích trực tiếp từ Widget Gallery, vị trí neo hoặc thả nổi.
+                - **Giao diện (Appearance)**: Thử nghiệm Liquid Glass trực tiếp trên nền sáng/tối, bán kính, độ mờ kính và phản hồi rung/âm thanh.
+                - **Màn hình (Displays)**: Chọn DDC/CI phần cứng hay giảm sáng phần mềm, các mức đặt nhanh (25–100%) và ngưỡng tối thiểu/tối đa.
+                - **Pomodoro**: Vòng đếm ngược trực tiếp, chuyển chế độ tập trung/nghỉ và cấu hình thời lượng.
+                - **Phím tắt (Shortcuts)**: Bộ ghi phím trực quan và phát hiện xung đột phím tắt macOS.
+                - **Thông tin & Sao lưu (About / Advanced)**: Kiểm tra cập nhật tự động Sparkle 2, xuất/nhập cấu hình JSON và nhật ký gỡ lỗi.
+                """ : """
+                # MacStash Settings (8 Categories)
+
+                Open Settings anytime from the Menu Bar or press `Command+,`:
+
+                - **General**: Master switch, 6-module status matrix, default Keep Awake duration, language, system permissions, and factory reset.
+                - **Hot Corners**: Interactive screen overview map, per-corner assignments, per-app profiles, configurable Left/Right edge slider and drawers, and excluded apps.
+                - **Second Dock**: Multi-profile dock management, 16 live widgets from the Widget Gallery, fixed or floating placement.
+                - **Appearance**: Live Interactive Liquid Glass Studio with light/dark backdrop testing, radius, translucency, motion, and haptics.
+                - **Displays**: DDC/CI hardware vs software dimming, quick brightness presets, and safe hardware min/max clamps.
+                - **Pomodoro**: Live circular countdown hero, manual mode switching, intervals, and chimes.
+                - **Shortcuts**: Keycap shortcut recorders with automatic macOS reserved conflict detection.
+                - **About / Advanced**: Sparkle 2 updates, Console diagnostics, JSON backup & restore, and factory reset.
+                """
             ),
             GuideArticle(
-                id: "03_pomodoro_timer",
-                title: isVi ? "3. Đồng Hồ Pomodoro" : "3. Pomodoro Timer",
-                filename: "03_pomodoro_timer.md",
-                content: contentFor(
-                    filename: "03_pomodoro_timer.md",
-                    fallback: isVi ? """
-                    Bộ máy Pomodoro được tích hợp trực tiếp vào vòng xoay góc màn hình và biểu tượng trên thanh menu bar.
+                id: "06_shortcuts.md",
+                title: isVi ? "Bảng tra cứu phím tắt" : "Keyboard Shortcuts",
+                iconName: "keyboard.fill",
+                content: isVi ? """
+                # Phím tắt chuẩn
 
-                    Tính Năng Nổi Bật:
-                    - Không Bị Đóng Băng Khi Kéo Chuột: Hệ thống tính toán thời gian còn lại dựa trên mốc thời gian kết thúc và đồng hồ đơn điệu.
-                    - Duy Trì Trạng Thái Khi Máy Ngủ: Khi máy tính ngủ, thời gian trôi qua vẫn được tính toán chính xác ngay khi màn hình bật trở lại.
-                    """ : """
-                    The built-in Pomodoro engine integrates into corner dials and the menu bar status item.
+                | Phím tắt | Chức năng |
+                | --- | --- |
+                | `Option+S` | Bật / Tắt toàn bộ vòng xoay góc |
+                | `Option+Space` | Mở Vòng xoay tại con trỏ chuột (Cursor Palette) |
+                | `Control+Option+S` | Mở / Đóng Kệ thả tệp (Stash Shelf) |
+                | `Control+Option+N` | Mở / Đóng Ghi chú nhanh (Scratchpad) |
+                | `Control+Option+D` | Ẩn / Hiện Thanh Dock thứ hai |
+                | `Command+1..8` | Chuyển nhanh hồ sơ Thanh Dock thứ hai |
+                | `Command+,` | Mở cửa sổ Cài đặt |
+                | `Command+?` | Mở Hướng dẫn sử dụng |
+                | `Command+W` | Đóng cửa sổ hiện tại |
+                | `Command+Q` | Thoát MacStash |
+                | `Esc` | Đóng lớp phủ đang mở |
+                """ : """
+                # Standard Shortcuts
 
-                    Key Features:
-                    - Monotonic Timing Invariant: Unlike timers that rely on simple countdown increments, MacStash computes remaining duration against target timestamps using system monotonic clocks.
-                    - System Sleep and Wake Handling: When your Mac sleeps, elapsed duration is accurately recalculated upon waking.
-                    """
-                )
+                | Shortcut | Action |
+                | --- | --- |
+                | `Option+S` | Toggle Corner Dials on/off |
+                | `Option+Space` | Summon Cursor Radial Palette |
+                | `Control+Option+S` | Toggle Stash Drop Shelf |
+                | `Control+Option+N` | Toggle Quick Scratchpad |
+                | `Control+Option+D` | Toggle Second Dock |
+                | `Command+1..8` | Switch Second Dock profile |
+                | `Command+,` | Open Settings Window |
+                | `Command+?` | Open User Guide |
+                | `Command+W` | Close active window |
+                | `Command+Q` | Quit MacStash |
+                | `Esc` | Dismiss active overlay |
+                """
             ),
             GuideArticle(
-                id: "04_troubleshooting",
-                title: isVi ? "4. Xử Lý Sự Cố & Phân Quyền" : "4. Troubleshooting",
-                filename: "04_troubleshooting.md",
-                content: contentFor(
-                    filename: "04_troubleshooting.md",
-                    fallback: isVi ? """
-                    Thiết Lập Quyền Hệ Thống:
-                    - Accessibility (Trợ Năng): Bắt buộc để theo dõi vị trí con trỏ chuột toàn cục và quản lý lớp overlay không kích hoạt cửa sổ.
-                    - Input Monitoring (Theo Dõi Đầu Vào): Bắt buộc để nhận diện phím bổ trợ và thao tác cuộn khi tinh chỉnh thông số.
-                    - Notifications (Thông Báo): Dùng để gửi thông báo khi đồng hồ Pomodoro hoàn thành.
-                    """ : """
-                    Permissions Setup:
-                    - Accessibility: Required for global cursor position tracking and non-activating overlay management.
-                    - Input Monitoring: Required to monitor modifier keys and scroll events while adjusting values.
-                    - Notifications: Required to post completion banners for Pomodoro focus intervals.
-                    """
-                )
-            ),
-            GuideArticle(
-                id: "05_settings",
-                title: isVi ? "5. Chi Tiết 7 Tab Settings" : "5. Settings Reference",
-                filename: "05_settings.md",
-                content: contentFor(
-                    filename: "05_settings.md",
-                    fallback: isVi ? """
-                    MacStash cung cấp cửa sổ thiết lập gồm 7 tab chuẩn theo Apple Human Interface Guidelines:
-                    1. General: Công tắc tổng, ngôn ngữ giao diện, quyền hệ thống.
-                    2. Hot Corners: Gán hành động 4 góc, độ nhạy, độ trễ và ứng dụng loại trừ.
-                    3. Appearance: Bán kính, độ trong suốt, chủ đề và phản hồi xúc giác.
-                    4. Displays: Quản lý độ sáng màn hình theo UUID.
-                    5. Pomodoro: Thiết lập thời gian tập trung và nghỉ.
-                    6. Shortcuts: Phím tắt toàn cục và kiểm tra xung đột.
-                    7. About / Advanced: Chẩn đoán, sao lưu cấu hình JSON và đặt lại gốc.
-                    """ : """
-                    MacStash provides a comprehensive 7-tab configuration window compliant with macOS Human Interface Guidelines.
+                id: "08_whats_new.md",
+                title: isVi ? "Có gì mới (\(currentVersion))" : "What's New (\(currentVersion))",
+                iconName: "sparkles",
+                content: isVi ? """
+                # Phiên bản \(currentVersion)
 
-                    Tab Directory:
-                    1. General: Master switch, menu bar icon toggle, language switcher, launch at login, and system permissions dashboard.
-                    2. Hot Corners: Per-corner assignments, sensitivity (1-20pt), dwell activation delay, and suppression rules.
-                    3. Appearance: Dial radius (110-200pt), glass opacity, theme selection, motion reduction, and haptic feedback.
-                    4. Displays: Connected display inventory with UUIDs, method selector (Auto/DDC/Software), and live testing sliders.
-                    5. Pomodoro: Interval duration steppers, rounds before long break, auto-start breaks, and completion chime alerts.
-                    6. Shortcuts: Global hotkeys for toggling dials with conflict analysis.
-                    7. About / Advanced: Diagnostics, console log shortcuts, JSON settings backup, and factory reset.
-                    """
-                )
-            ),
-            GuideArticle(
-                id: "06_shortcuts",
-                title: isVi ? "6. Bảng Tra Nhanh Phím Tắt" : "6. Shortcuts Quick Reference",
-                filename: "06_shortcuts.md",
-                content: contentFor(
-                    filename: "06_shortcuts.md",
-                    fallback: isVi ? """
-                    Các Tổ Hợp Phím Mặc Định:
-                    - Command+, : Mở cửa sổ Settings
-                    - Command+W : Đóng cửa sổ MacStash hiện tại
-                    - Command+? : Mở cửa sổ hướng dẫn sử dụng
-                    - Option+S  : Bật/Tắt hiển thị vòng quay góc
-                    - Command+H : Ẩn ứng dụng
-                    - Command+Q : Thoát ứng dụng
-                    """ : """
-                    Default Key Combinations:
-                    - Command+, : Open Settings window
-                    - Command+W : Close frontmost window
-                    - Command+? : Open User Guide
-                    - Option+S  : Toggle corner dials
-                    - Command+H : Hide MacStash application
-                    - Command+Q : Quit MacStash and restore display gamma
-                    """
-                )
-            ),
-            GuideArticle(
-                id: "07_faq",
-                title: isVi ? "7. Câu Hỏi Thường Gặp (FAQ)" : "7. Frequently Asked Questions",
-                filename: "07_faq.md",
-                content: contentFor(
-                    filename: "07_faq.md",
-                    fallback: isVi ? """
-                    Câu Hỏi Thường Gặp:
+                - Thiết kế lại toàn diện giao diện Cài đặt dạng sidebar hiện đại, bảng Menu Bar Control Center, Onboarding và trình đọc tài liệu Markdown.
+                - Bổ sung Sơ đồ màn hình tương tác, bộ ghi phím tắt Keycap và Studio thử nghiệm Liquid Glass trực tiếp.
+                - Khắc phục hoàn toàn lỗi phát hiện cạnh Trái/Phải cho Edge Slider và Drawer, lỗi trạng thái Widget khi mở Second Dock, cùng nhiều cải tiến hiệu năng.
+                """ : """
+                # Version \(currentVersion)
 
-                    Hỏi: MacStash có gây tốn CPU khi chạy ngầm không?
-                    Đáp: Không. Khi các vòng xoay ở trạng thái ẩn, MacStash không tiêu thụ CPU.
-
-                    Hỏi: Tôi có thể bấm các nút nằm ở góc của app khác không?
-                    Đáp: Có. Khi vòng xoay đang ẩn, hit-testing luôn trả về nil, cho phép click xuyên qua.
-                    """ : """
-                    Frequently Asked Questions:
-
-                    Q: Does MacStash consume CPU when idle?
-                    A: No. When dials are hidden, MacStash uses zero CPU cycles. It operates without polling timers.
-
-                    Q: Can I click buttons located behind corner dials?
-                    A: Yes. When dials are hidden, hit testing returns nil, allowing clicks to pass through to underlying apps.
-                    """
-                )
-            ),
-            GuideArticle(
-                id: "08_whats_new",
-                title: isVi ? "8. Có Gì Mới Trong Phiên Bản 2.0.0" : "8. What's New in Version 2.0.0",
-                filename: "08_whats_new.md",
-                content: contentFor(
-                    filename: "08_whats_new.md",
-                    fallback: isVi ? """
-                    Những Cải Tiến Nổi Bật:
-                    - Nhận diện hình học góc ngoài biên cho hệ thống đa màn hình.
-                    - Máy trạng thái formal state machine quản lý hiện/ẩn với bộ đếm generation.
-                    - Hỗ trợ Universal Binary cho cả Apple Silicon (arm64) và Intel (x86_64).
-                    - Điều khiển độ sáng đa màn hình tích hợp DisplayServices, DDC/CI và giảm sáng bằng phần mềm.
-                    - Đồng hồ tập trung Pomodoro theo thời gian đơn điệu.
-                    - Cửa sổ Settings chuẩn 7 tab và cẩm nang hướng dẫn sử dụng song ngữ.
-                    """ : """
-                    What's New in Version 2.0.0:
-                    - Multi-monitor outer corner detection avoiding inner display seam conflicts.
-                    - Formal state machine overlay lifecycle with generational delay cancellation.
-                    - Universal binary distribution supporting both Apple Silicon (arm64) and Intel (x86_64).
-                    - Multi-display brightness controller supporting Apple DisplayServices, DDC/CI, and Software Dimming.
-                    - Monotonic Pomodoro focus timer surviving window drags and macOS system sleep.
-                    - Standard 7-tab Settings preferences window with permissions deep-links and JSON backup.
-                    - In-app offline user guide with search filter and first-launch onboarding walkthrough.
-                    """
-                )
+                - Complete UI/UX overhaul across sidebar Settings, Menu Bar Control Center, Onboarding graphics, and rich Markdown User Guide.
+                - Added Interactive Screen Map, Keycap Shortcut Recorders, and Live Interactive Liquid Glass Studio.
+                - Fixed symmetric Left/Right edge slider and drawer triggers, Second Dock persistent widget hosting, and background CPU/polling efficiency.
+                """
             )
         ]
     }
+}
+
+// MARK: - Rich Native SwiftUI Markdown Renderer
+
+private struct MarkdownArticleView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let markdown: String
+
+    private enum Block: Identifiable {
+        case heading(id: Int, level: Int, text: String)
+        case paragraph(id: Int, text: String)
+        case bullet(id: Int, text: String)
+        case numbered(id: Int, prefix: String, text: String)
+        case blockquote(id: Int, text: String)
+        case codeBlock(id: Int, lines: [String])
+        case table(id: Int, headers: [String], rows: [[String]])
+        case divider(id: Int)
+
+        var id: Int {
+            switch self {
+            case .heading(let id, _, _),
+                 .paragraph(let id, _),
+                 .bullet(let id, _),
+                 .numbered(let id, _, _),
+                 .blockquote(let id, _),
+                 .codeBlock(let id, _),
+                 .table(let id, _, _),
+                 .divider(let id):
+                return id
+            }
+        }
+    }
+
+    var body: some View {
+        let blocks = parseBlocks(from: markdown)
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(blocks) { block in
+                renderBlock(block)
+            }
+        }
+        .textSelection(.enabled)
+    }
+
+    @ViewBuilder
+    private func renderBlock(_ block: Block) -> some View {
+        switch block {
+        case .heading(_, let level, let text):
+            VStack(alignment: .leading, spacing: 6) {
+                inlineText(text)
+                    .font(.system(
+                        size: level == 1 ? 22 : (level == 2 ? 16 : 13.5),
+                        weight: level <= 2 ? .bold : .semibold
+                    ))
+                    .foregroundColor(.primary)
+                    .padding(.top, level == 1 ? 0 : 8)
+
+                if level == 1 {
+                    Divider()
+                        .padding(.bottom, 4)
+                }
+            }
+
+        case .paragraph(_, let text):
+            inlineText(text)
+                .font(.system(size: 13))
+                .foregroundColor(.primary.opacity(0.9))
+                .lineSpacing(4)
+                .fixedSize(horizontal: false, vertical: true)
+
+        case .bullet(_, let text):
+            HStack(alignment: .top, spacing: 8) {
+                Circle()
+                    .fill(Color.accentColor)
+                    .frame(width: 5, height: 5)
+                    .padding(.top, 6)
+
+                inlineText(text)
+                    .font(.system(size: 13))
+                    .foregroundColor(.primary.opacity(0.9))
+                    .lineSpacing(3.5)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.leading, 6)
+
+        case .numbered(_, let prefix, let text):
+            HStack(alignment: .top, spacing: 8) {
+                Text(prefix)
+                    .font(.system(size: 12.5, weight: .bold, design: .rounded))
+                    .foregroundColor(.accentColor)
+                    .frame(minWidth: 18, alignment: .trailing)
+
+                inlineText(text)
+                    .font(.system(size: 13))
+                    .foregroundColor(.primary.opacity(0.9))
+                    .lineSpacing(3.5)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.leading, 4)
+
+        case .blockquote(_, let text):
+            HStack(alignment: .top, spacing: 10) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.accentColor)
+                    .frame(width: 3)
+
+                inlineText(text)
+                    .font(.system(size: 12.5))
+                    .foregroundColor(.secondary)
+                    .lineSpacing(3.5)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color.accentColor.opacity(0.08))
+            )
+
+        case .codeBlock(_, let lines):
+            Text(lines.joined(separator: "\n"))
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundColor(.primary)
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.05))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.7)
+                )
+
+        case .table(_, let headers, let rows):
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    ForEach(Array(headers.enumerated()), id: \.offset) { colIdx, header in
+                        inlineText(header)
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.primary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        if colIdx < headers.count - 1 {
+                            Divider()
+                        }
+                    }
+                }
+                .background(Color.primary.opacity(0.06))
+
+                ForEach(Array(rows.enumerated()), id: \.offset) { rowIdx, row in
+                    Divider()
+                    HStack(spacing: 0) {
+                        ForEach(0..<headers.count, id: \.self) { colIdx in
+                            let cell = colIdx < row.count ? row[colIdx] : ""
+                            inlineText(cell)
+                                .font(.system(size: 12))
+                                .foregroundColor(.primary.opacity(0.9))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            if colIdx < headers.count - 1 {
+                                Divider()
+                            }
+                        }
+                    }
+                    .background(rowIdx % 2 == 1 ? Color.primary.opacity(0.025) : Color.clear)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .strokeBorder(Color.primary.opacity(0.12), lineWidth: 0.8)
+            )
+
+        case .divider:
+            Divider()
+                .padding(.vertical, 4)
+        }
+    }
+
+    private func inlineText(_ raw: String) -> Text {
+        if let attr = try? AttributedString(
+            markdown: raw,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        ) {
+            return Text(attr)
+        }
+        return Text(raw)
+    }
+
+    private func parseBlocks(from raw: String) -> [Block] {
+        let lines = raw.components(separatedBy: .newlines)
+        var blocks: [Block] = []
+        var idx = 0
+        var nextID = 0
+
+        func makeID() -> Int {
+            defer { nextID += 1 }
+            return nextID
+        }
+
+        while idx < lines.count {
+            let line = lines[idx]
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+
+            if trimmed.isEmpty {
+                idx += 1
+                continue
+            }
+
+            if trimmed.hasPrefix("```") {
+                idx += 1
+                var codeLines: [String] = []
+                while idx < lines.count && !lines[idx].trimmingCharacters(in: .whitespaces).hasPrefix("```") {
+                    codeLines.append(lines[idx])
+                    idx += 1
+                }
+                if idx < lines.count { idx += 1 }
+                blocks.append(.codeBlock(id: makeID(), lines: codeLines))
+                continue
+            }
+
+            if trimmed == "---" || trimmed == "***" {
+                blocks.append(.divider(id: makeID()))
+                idx += 1
+                continue
+            }
+
+            if trimmed.hasPrefix("# ") {
+                blocks.append(.heading(id: makeID(), level: 1, text: String(trimmed.dropFirst(2))))
+                idx += 1
+                continue
+            }
+
+            if trimmed.hasPrefix("## ") {
+                blocks.append(.heading(id: makeID(), level: 2, text: String(trimmed.dropFirst(3))))
+                idx += 1
+                continue
+            }
+
+            if trimmed.hasPrefix("### ") {
+                blocks.append(.heading(id: makeID(), level: 3, text: String(trimmed.dropFirst(4))))
+                idx += 1
+                continue
+            }
+
+            if trimmed.hasPrefix("> ") {
+                var quoteLines = [String(trimmed.dropFirst(2))]
+                idx += 1
+                while idx < lines.count {
+                    let nextTrimmed = lines[idx].trimmingCharacters(in: .whitespaces)
+                    if nextTrimmed.hasPrefix("> ") {
+                        quoteLines.append(String(nextTrimmed.dropFirst(2)))
+                        idx += 1
+                    } else {
+                        break
+                    }
+                }
+                blocks.append(.blockquote(id: makeID(), text: quoteLines.joined(separator: "\n")))
+                continue
+            }
+
+            // Markdown table detection: | col1 | col2 |
+            if trimmed.hasPrefix("|") && idx + 1 < lines.count {
+                let separatorCandidate = lines[idx + 1].trimmingCharacters(in: .whitespaces)
+                if separatorCandidate.hasPrefix("|") && separatorCandidate.contains("---") {
+                    let headers = parseTableRow(trimmed)
+                    idx += 2
+                    var rows: [[String]] = []
+                    while idx < lines.count {
+                        let rowTrimmed = lines[idx].trimmingCharacters(in: .whitespaces)
+                        if rowTrimmed.hasPrefix("|") {
+                            rows.append(parseTableRow(rowTrimmed))
+                            idx += 1
+                        } else {
+                            break
+                        }
+                    }
+                    blocks.append(.table(id: makeID(), headers: headers, rows: rows))
+                    continue
+                }
+            }
+
+            if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") {
+                blocks.append(.bullet(id: makeID(), text: String(trimmed.dropFirst(2))))
+                idx += 1
+                continue
+            }
+
+            if let dotRange = trimmed.range(of: ". "),
+               dotRange.lowerBound > trimmed.startIndex,
+               let _ = Int(trimmed[..<dotRange.lowerBound]) {
+                let prefix = String(trimmed[...dotRange.lowerBound])
+                let rest = String(trimmed[dotRange.upperBound...])
+                blocks.append(.numbered(id: makeID(), prefix: prefix, text: rest))
+                idx += 1
+                continue
+            }
+
+            // Merge consecutive plain lines into one paragraph
+            var paraLines = [trimmed]
+            idx += 1
+            while idx < lines.count {
+                let peek = lines[idx].trimmingCharacters(in: .whitespaces)
+                if peek.isEmpty || peek.hasPrefix("#") || peek.hasPrefix("- ") || peek.hasPrefix("* ") ||
+                    peek.hasPrefix("> ") || peek.hasPrefix("```") || peek.hasPrefix("|") || peek == "---" {
+                    break
+                }
+                if let dotRange = peek.range(of: ". "),
+                   dotRange.lowerBound > peek.startIndex,
+                   let _ = Int(peek[..<dotRange.lowerBound]) {
+                    break
+                }
+                paraLines.append(peek)
+                idx += 1
+            }
+            blocks.append(.paragraph(id: makeID(), text: paraLines.joined(separator: " ")))
+        }
+
+        return blocks
+    }
+
+    private func parseTableRow(_ line: String) -> [String] {
+        var trimmed = line.trimmingCharacters(in: .whitespaces)
+        if trimmed.hasPrefix("|") { trimmed.removeFirst() }
+        if trimmed.hasSuffix("|") { trimmed.removeLast() }
+        return trimmed.split(separator: "|", omittingEmptySubsequences: false)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+    }
+}
+
+private struct GuideSidebarEffectBackground: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = .sidebar
+        view.blendingMode = .behindWindow
+        view.state = .active
+        return view
+    }
+
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
 }

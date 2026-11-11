@@ -56,10 +56,12 @@ public struct CornerDialView: View {
                     corner: corner,
                     size: CGSize(width: dialSize, height: dialSize),
                     outerRadius: dialSize - 15,
-                    innerRadius: 55
+                    innerRadius: max(42, dialSize * 0.38)
                 )
 
                 let isExpanded = isDragging || (appState.activeCorner == corner && appState.activeDisplayID == displayID)
+                let satelliteRadius = max(72, (dialSize - 35) * 0.87)
+                let shouldReduceMotion = appState.settings.respectReduceMotion && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
                 ZStack {
                     // 1. Sculpted Liquid Glass Quarter-Circle Backdrop Disc
@@ -68,6 +70,7 @@ public struct CornerDialView: View {
                         dialSize: dialSize,
                         tint: actionColors.first ?? .clear
                     )
+                    .opacity(appState.settings.dialOpacity)
 
                     // 2. Laser-etched tick marks with liquid glow illumination
                     DialTicksView(
@@ -85,7 +88,7 @@ public struct CornerDialView: View {
 
                     // 4. Satellite micro-controls for Pomodoro (Floating liquid mercury droplets)
                     if action == .timer && isExpanded {
-                        let resetPt = geom.point(radius: 96, angleDegrees: geom.angle(for: 0.14))
+                        let resetPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
                         Button(action: {
                             appState.resetPomodoro()
                         }) {
@@ -107,7 +110,7 @@ public struct CornerDialView: View {
                         .onHover { isResetHovered = $0 }
                         .position(x: resetPt.x, y: resetPt.y)
 
-                        let skipPt = geom.point(radius: 96, angleDegrees: geom.angle(for: 0.86))
+                        let skipPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
                         Button(action: {
                             appState.skipPomodoroMode()
                         }) {
@@ -157,13 +160,14 @@ public struct CornerDialView: View {
                 }
                 .frame(width: dialSize, height: dialSize)
                 .scaleEffect(isExpanded ? 1.0 : 0.05, anchor: unitPoint(for: corner))
-                .opacity(isExpanded ? appState.settings.dialOpacity : 0.0)
+                .opacity(isExpanded ? 1.0 : 0.0)
                 .animation(
-                    NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+                    shouldReduceMotion
                         ? .easeInOut(duration: 0.1)
                         : .spring(response: 0.30 * appState.settings.animationSpeedMultiplier, dampingFraction: 0.76),
                     value: isExpanded
                 )
+                .macStashTheme(appState.resolvedColorScheme)
                 .gesture(
                     DragGesture(minimumDistance: 4)
                         .onChanged { gesture in
@@ -171,8 +175,9 @@ public struct CornerDialView: View {
                             let loc = gesture.location
                             let dist = hypot(loc.x - center.x, loc.y - center.y)
 
-                            // Ignore touches on center badge (dist < 58) or outside dial perimeter
-                            guard dist >= 58 && dist <= dialSize + 30 else {
+                            // Ignore touches on center badge or outside dial perimeter
+                            let centerDeadRadius = max(44, dialSize * 0.38)
+                            guard dist >= centerDeadRadius && dist <= dialSize + 30 else {
                                 return
                             }
 
@@ -259,6 +264,7 @@ public struct CornerDialView: View {
 // MARK: - Sculpted Liquid Glass Quarter-Circle Backdrop
 
 public struct QuarterCircleGlassBackdrop: View {
+    @Environment(\.colorScheme) private var colorScheme
     public let corner: CornerPosition
     public let dialSize: CGFloat
     public let tint: Color
@@ -270,17 +276,21 @@ public struct QuarterCircleGlassBackdrop: View {
     }
 
     public var body: some View {
+        let isDark = colorScheme == .dark
         ZStack {
             // Layer 1: Frosted refractive glass substrate
             QuarterCircleBackdrop(corner: corner)
                 .fill(.ultraThinMaterial)
+
+            QuarterCircleBackdrop(corner: corner)
+                .fill(isDark ? Color.black.opacity(0.16) : Color.white.opacity(0.28))
 
             // Layer 2: Caustic ambient reflection originating from screen vertex
             QuarterCircleBackdrop(corner: corner)
                 .fill(
                     RadialGradient(
                         colors: [
-                            tint.opacity(0.20),
+                            tint.opacity(0.22),
                             tint.opacity(0.06),
                             Color.clear
                         ],
@@ -295,7 +305,7 @@ public struct QuarterCircleGlassBackdrop: View {
                 .fill(
                     LinearGradient(
                         stops: [
-                            .init(color: Color.white.opacity(0.12), location: 0.0),
+                            .init(color: Color.white.opacity(isDark ? 0.12 : 0.35), location: 0.0),
                             .init(color: Color.white.opacity(0.02), location: 0.4),
                             .init(color: Color.clear, location: 0.7)
                         ],
@@ -309,10 +319,10 @@ public struct QuarterCircleGlassBackdrop: View {
                 .stroke(
                     LinearGradient(
                         stops: [
-                            .init(color: Color.white.opacity(0.55), location: 0.0),
-                            .init(color: Color.white.opacity(0.15), location: 0.45),
-                            .init(color: Color.white.opacity(0.04), location: 0.8),
-                            .init(color: tint.opacity(0.3), location: 1.0)
+                            .init(color: Color.white.opacity(isDark ? 0.55 : 0.85), location: 0.0),
+                            .init(color: Color.primary.opacity(0.14), location: 0.45),
+                            .init(color: Color.primary.opacity(0.05), location: 0.8),
+                            .init(color: tint.opacity(0.32), location: 1.0)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -321,7 +331,7 @@ public struct QuarterCircleGlassBackdrop: View {
                 )
         }
         .frame(width: dialSize, height: dialSize)
-        .shadow(color: Color.black.opacity(0.32), radius: 14, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(isDark ? 0.32 : 0.16), radius: 14, x: 0, y: 5)
         .shadow(color: tint == .clear ? Color.clear : tint.opacity(0.15), radius: 10, x: 0, y: 0)
     }
 
@@ -340,6 +350,7 @@ public struct QuarterCircleGlassBackdrop: View {
 // MARK: - Tactical Pro HUD Center Action Hub
 
 public struct CenterActionBadge: View {
+    @Environment(\.colorScheme) private var colorScheme
     public let action: ControlAction
     public let corner: CornerPosition
     public let value: Double
@@ -395,17 +406,19 @@ public struct CenterActionBadge: View {
 
     public var body: some View {
         let offset = badgeOffset(for: corner, in: dialSize)
+        let badgeSide = max(54.0, min(72.0, dialSize * (64.0 / 145.0)))
+        let isDark = colorScheme == .dark
 
         VStack(spacing: 2) {
             actionIconView
 
             actionReadoutView
         }
-        .frame(width: 64, height: 64)
+        .frame(width: badgeSide, height: badgeSide)
         .background(
             ZStack {
                 Circle().fill(.ultraThinMaterial)
-                Circle().fill(Color.black.opacity(0.38))
+                Circle().fill(isDark ? Color.black.opacity(0.38) : Color.white.opacity(0.62))
                 if tint != .clear {
                     Circle()
                         .fill(
@@ -413,7 +426,7 @@ public struct CenterActionBadge: View {
                                 colors: [tint.opacity(isExpanded ? 0.32 : 0.18), Color.clear],
                                 center: .center,
                                 startRadius: 2,
-                                endRadius: 32
+                                endRadius: badgeSide * 0.5
                             )
                         )
                 }
@@ -424,9 +437,9 @@ public struct CenterActionBadge: View {
                 .strokeBorder(
                     LinearGradient(
                         stops: [
-                            .init(color: Color.white.opacity(isExpanded ? 0.85 : 0.65), location: 0.0),
-                            .init(color: Color.white.opacity(0.20), location: 0.5),
-                            .init(color: (tint == .clear ? Color.white : tint).opacity(0.40), location: 1.0)
+                            .init(color: Color.white.opacity(isExpanded ? (isDark ? 0.85 : 0.95) : 0.65), location: 0.0),
+                            .init(color: Color.primary.opacity(0.16), location: 0.5),
+                            .init(color: (tint == .clear ? Color.primary : tint).opacity(0.40), location: 1.0)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -434,7 +447,7 @@ public struct CenterActionBadge: View {
                     lineWidth: isExpanded ? 1.4 : 1.15
                 )
         )
-        .shadow(color: Color.black.opacity(0.35), radius: 7, x: 0, y: 3)
+        .shadow(color: Color.black.opacity(isDark ? 0.35 : 0.15), radius: 7, x: 0, y: 3)
         .offset(x: offset.x, y: offset.y)
     }
 
@@ -580,8 +593,8 @@ public struct CenterActionBadge: View {
     }
 
     private func badgeOffset(for corner: CornerPosition, in size: CGFloat) -> CGPoint {
-        // Mathematically centered along the 45° line of symmetry (x = y = 51 from corner vertex)
-        let offsetDist: CGFloat = 39.0
+        // Mathematically centered along the 45° line of symmetry (39pt at 145pt dial size => 19pt edge clearance)
+        let offsetDist: CGFloat = size * (39.0 / 145.0)
         switch corner {
         case .topLeft:
             return CGPoint(x: -offsetDist, y: -offsetDist)
@@ -598,6 +611,7 @@ public struct CenterActionBadge: View {
 // MARK: - Luminous Fluid Arc Shape with Meniscus Droplet
 
 public struct DialArcShape: View {
+    @Environment(\.colorScheme) private var colorScheme
     public let geometry: RadialDialGeometry
     public let value: Double
     public let gradientColors: [Color]
@@ -609,8 +623,10 @@ public struct DialArcShape: View {
     }
 
     public var body: some View {
+        let isDark = colorScheme == .dark
         Canvas { context, _ in
             let trackRadius = geometry.outerRadius - 20
+            let guideRadius = max(56, geometry.size.width * (106.0 / 145.0))
             let startDeg = geometry.angle(for: 0.0)
             let fullDeg = geometry.angle(for: 1.0)
             let isClockwise = geometry.corner == .bottomLeft || geometry.corner == .topLeft
@@ -619,14 +635,14 @@ public struct DialArcShape: View {
             var guidePath = Path()
             guidePath.addArc(
                 center: geometry.center,
-                radius: 106,
+                radius: guideRadius,
                 startAngle: .degrees(startDeg),
                 endAngle: .degrees(fullDeg),
                 clockwise: isClockwise
             )
             context.stroke(
                 guidePath,
-                with: .color(Color.white.opacity(0.06)),
+                with: .color(isDark ? Color.white.opacity(0.08) : Color.black.opacity(0.08)),
                 style: StrokeStyle(lineWidth: 1.0)
             )
 
@@ -641,7 +657,7 @@ public struct DialArcShape: View {
             )
             context.stroke(
                 trenchPath,
-                with: .color(Color.white.opacity(0.08)),
+                with: .color(isDark ? Color.white.opacity(0.10) : Color.black.opacity(0.10)),
                 style: StrokeStyle(lineWidth: 9, lineCap: .round)
             )
 

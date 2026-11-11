@@ -18,6 +18,8 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.regular)
         setupMainMenu()
         setupStatusItem()
+        applyWindowAppearance(appState.settings.appearanceTheme)
+        statusItem?.isVisible = appState.settings.showMenuBarIcon
         ScreenManager.shared.start(appState: appState)
         SystemPermissionService.shared.requestNotificationPermission()
         if !SystemPermissionService.shared.isAccessibilityGranted {
@@ -33,6 +35,34 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
                 guard let self = self else { return }
                 self.settingsWindow?.title = self.appState.localized("settings.windowTitle")
                 self.helpWindow?.title = self.appState.localized("guide.windowTitle")
+                self.onboardingWindow?.title = self.appState.localized("onboarding.windowTitle")
+            }
+            .store(in: &cancellables)
+
+        appState.$settings
+            .map(\.showMenuBarIcon)
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] visible in
+                self?.statusItem?.isVisible = visible
+            }
+            .store(in: &cancellables)
+
+        appState.$settings
+            .map(\.appearanceTheme)
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] theme in
+                self?.applyWindowAppearance(theme)
+            }
+            .store(in: &cancellables)
+
+        appState.$requestedSettingsTab
+            .compactMap { $0 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] tabID in
+                self?.openSettings(tabID: tabID)
+                self?.appState.requestedSettingsTab = nil
             }
             .store(in: &cancellables)
 
@@ -115,9 +145,17 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.behavior = .transient
         popover.delegate = self
 
-        let menuBarView = MenuBarExtraView(appState: appState) { [weak self] in
-            self?.openSettings()
-        }
+        let menuBarView = MenuBarExtraView(
+            appState: appState,
+            onOpenSettings: { [weak self] in
+                self?.openSettings()
+            },
+            onOpenGuide: { [weak self] in
+                self?.popover.performClose(nil)
+                self?.cleanupAnchorWindow()
+                self?.openHelp()
+            }
+        )
         popover.contentViewController = NSHostingController(rootView: menuBarView)
         updatePopoverContentSize()
 
@@ -231,7 +269,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         let currentScreen = screen ?? statusItem?.button?.window?.screen ?? NSScreen.main
         let maxHeight = max(200, (currentScreen?.visibleFrame.height ?? 800) - 40)
         let target = NSSize(
-            width: max(260, fitting.width),
+            width: max(296, fitting.width),
             height: min(max(100, fitting.height), maxHeight)
         )
         contentVC.preferredContentSize = target
@@ -328,19 +366,41 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         anchorWindow = nil
     }
 
+    private func applyWindowAppearance(_ theme: String) {
+        let appearance: NSAppearance?
+        switch theme {
+        case "light":
+            appearance = NSAppearance(named: .aqua)
+        case "dark":
+            appearance = NSAppearance(named: .darkAqua)
+        default:
+            appearance = nil
+        }
+        NSApp.appearance = appearance
+    }
+
     @objc public func openSettings() {
+        openSettings(tabID: nil)
+    }
+
+    public func openSettings(tabID: String? = nil) {
         popover.performClose(nil)
         cleanupAnchorWindow()
 
+        if let tabID = tabID {
+            appState.requestedSettingsTab = tabID
+        }
+
         if settingsWindow == nil {
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 760, height: 620),
+                contentRect: NSRect(x: 0, y: 0, width: 880, height: 640),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
             )
-            window.minSize = NSSize(width: 760, height: 620)
+            window.minSize = NSSize(width: 820, height: 600)
             window.title = appState.localized("settings.windowTitle")
+            window.titlebarAppearsTransparent = false
             window.center()
             window.isReleasedWhenClosed = false
 
@@ -363,11 +423,12 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc public func openHelp() {
         if helpWindow == nil {
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 720, height: 520),
+                contentRect: NSRect(x: 0, y: 0, width: 820, height: 580),
                 styleMask: [.titled, .closable, .resizable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
+            window.minSize = NSSize(width: 680, height: 480)
             window.title = appState.localized("guide.windowTitle")
             window.center()
             window.isReleasedWhenClosed = false
@@ -387,16 +448,16 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     public func openOnboarding() {
         if onboardingWindow == nil {
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 520, height: 400),
+                contentRect: NSRect(x: 0, y: 0, width: 620, height: 470),
                 styleMask: [.titled, .closable],
                 backing: .buffered,
                 defer: false
             )
-            window.title = "Welcome to MacStash"
+            window.title = appState.localized("onboarding.windowTitle")
             window.center()
             window.isReleasedWhenClosed = false
 
-            let onboardingView = OnboardingView { [weak self] in
+            let onboardingView = OnboardingView(appState: appState) { [weak self] in
                 self?.onboardingWindow?.close()
                 self?.onboardingWindow = nil
             }

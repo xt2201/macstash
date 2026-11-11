@@ -3,6 +3,7 @@ import SwiftUI
 /// Renders precision liquid fluid level tracks and gauges with optical glass realism.
 /// Simulates glowing luminous fluid contained within a crystal glass tube or curved trench.
 public struct LiquidVerticalTrack: View {
+    @Environment(\.colorScheme) private var colorScheme
     public let progress: Double // 0.0 ... 1.0
     public let primaryTint: Color
     public let secondaryTint: Color
@@ -24,6 +25,7 @@ public struct LiquidVerticalTrack: View {
     }
 
     public var body: some View {
+        let isDark = colorScheme == .dark
         GeometryReader { geo in
             let totalHeight = geo.size.height
             let fillHeight = totalHeight * CGFloat(progress)
@@ -31,16 +33,16 @@ public struct LiquidVerticalTrack: View {
             ZStack(alignment: .bottom) {
                 // 1. Crystal Glass Tube Chamber (Concave trench with subtle inner shadow)
                 Capsule(style: .continuous)
-                    .fill(Color.white.opacity(0.09))
+                    .fill(isDark ? Color.white.opacity(0.09) : Color.black.opacity(0.08))
                     .frame(width: trackWidth, height: totalHeight)
                     .overlay(
                         Capsule(style: .continuous)
                             .strokeBorder(
                                 LinearGradient(
                                     stops: [
-                                        .init(color: Color.white.opacity(0.35), location: 0.0),
-                                        .init(color: Color.white.opacity(0.08), location: 0.4),
-                                        .init(color: Color.white.opacity(0.02), location: 1.0)
+                                        .init(color: Color.white.opacity(isDark ? 0.35 : 0.70), location: 0.0),
+                                        .init(color: Color.primary.opacity(0.08), location: 0.45),
+                                        .init(color: Color.primary.opacity(0.03), location: 1.0)
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing

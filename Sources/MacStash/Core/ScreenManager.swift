@@ -87,6 +87,11 @@ public final class ScreenManager: ObservableObject {
                     let shouldBeInteractive = sliderActive && (self.appState.activeDisplayID == 0 || self.appState.activeDisplayID == id)
                     instance.setRightEdgeInteractive(shouldBeInteractive)
                 }
+                let visualizerOn = sliderActive
+                    && self.appState.settings.edgeBarShowMediaControls
+                    && self.appState.settings.edgeBarVisualizerEnabled
+                    && self.appState.activeProfile.rightEdgeAction == .volume
+                NowPlayingManager.shared.setVisualizerActive(visualizerOn)
             }
             .store(in: &cancellables)
 
@@ -315,14 +320,25 @@ public final class ScreenManager: ObservableObject {
             return
         }
 
-        // Outside Click Handling for Transient Panels (Right Slider, Stash Shelf, Scratchpad)
+        // Outside Click Handling for Transient Panels (Edge Slider, Stash Shelf, Scratchpad, Cursor Palette)
         if isClick {
+            if appState.isCursorPalettePresented, let paletteFrame = cursorPalettePanel?.frame {
+                if !CornerGeometry.rectContains(paletteFrame, mouseLoc) {
+                    dismissCursorPalette()
+                }
+            }
+
             if appState.isRightSliderActive {
                 var clickedInsideSlider = false
+                let sliderEdge = appState.settings.edgeSliderPosition
                 for instance in instances.values {
                     let frame = instance.screen.frame
-                    let rightRect = instance.rightEdgeRect(in: frame)
-                    let expandedHitRect = NSRect(x: frame.maxX - 80, y: rightRect.minY, width: 80, height: rightRect.height)
+                    let sliderRect = instance.sliderRect(in: frame)
+                    let expandedHitRect = CornerGeometry.edgeSliderHitRect(
+                        screenFrame: frame,
+                        sliderPanelRect: sliderRect,
+                        edge: sliderEdge
+                    )
                     if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
                         clickedInsideSlider = true
                         break
@@ -335,18 +351,24 @@ public final class ScreenManager: ObservableObject {
 
             if appState.stashShelf.isShelfOpen || appState.scratchpad.isScratchpadOpen {
                 var clickedInsideDrawer = false
+                let drawerEdge = appState.settings.drawerEdgePosition
                 for instance in instances.values {
                     let frame = instance.screen.frame
-                    let leftRect = instance.leftEdgeRect(in: frame)
+                    let drawerPanelRect = instance.drawerRect(in: frame)
                     let activeWidth: CGFloat = appState.scratchpad.isScratchpadOpen
                         ? Defaults.LeftEdgeDrawer.scratchpadTotalWidthPoints
                         : Defaults.LeftEdgeDrawer.shelfTotalWidthPoints
                     let activeHeight: CGFloat = appState.scratchpad.isScratchpadOpen
                         ? Defaults.LeftEdgeDrawer.scratchpadTotalHeightPoints
                         : Defaults.LeftEdgeDrawer.shelfTotalHeightPoints
-                    let activeY = leftRect.minY + (leftRect.height - activeHeight) / 2.0
-                    let drawerRect = NSRect(x: frame.minX, y: activeY, width: activeWidth, height: activeHeight)
-                    if drawerRect.contains(mouseLoc) {
+                    let drawerRect = CornerGeometry.edgeDrawerHitRect(
+                        screenFrame: frame,
+                        drawerPanelRect: drawerPanelRect,
+                        edge: drawerEdge,
+                        drawerWidth: activeWidth,
+                        drawerHeight: activeHeight
+                    )
+                    if CornerGeometry.rectContains(drawerRect, mouseLoc) {
                         clickedInsideDrawer = true
                         break
                     }
@@ -647,20 +669,25 @@ public final class ScreenManager: ObservableObject {
         pendingRightEdgeDisplayID = displayID
 
         let delay = max(0.15, appState.cornerDwellDelay)
+        let targetEdge = appState.settings.edgeSliderPosition
         let item = DispatchWorkItem { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 guard self.pendingRightEdgeDisplayID == displayID else { return }
                 let cur = NSEvent.mouseLocation
-                let isAtEdgeX = cur.x >= (screenFrame.maxX - 2.5) && cur.x <= (screenFrame.maxX + 1.0)
-                let isWithinEdgeY = cur.y >= verticalRange.minY && cur.y <= verticalRange.maxY
-                if isAtEdgeX && isWithinEdgeY {
+                let matchesEdge = CornerGeometry.isCursorAtVerticalEdge(
+                    point: cur,
+                    screenFrame: screenFrame,
+                    verticalRange: verticalRange,
+                    edge: targetEdge
+                )
+                if matchesEdge {
                     self.appState.activeDisplayID = displayID
                     self.appState.isRightSliderActive = true
                     for (id, inst) in self.instances {
                         inst.setRightEdgeInteractive(id == displayID)
                     }
-                    HapticManager.shared.performDetentTick()
+                    HapticManager.shared.performDetentTick(intensity: self.appState.effectiveHapticIntensity)
                 }
                 self.pendingRightEdgeDisplayID = nil
             }
@@ -677,6 +704,7 @@ public final class ScreenManager: ObservableObject {
 
     public func scheduleRightEdgeHideTimer() {
         guard rightEdgeHideWorkItem == nil else { return }
+        let sliderEdge = appState.settings.edgeSliderPosition
         let item = DispatchWorkItem { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
@@ -687,8 +715,12 @@ public final class ScreenManager: ObservableObject {
                         continue
                     }
                     let frame = instance.screen.frame
-                    let rightRect = instance.rightEdgeRect(in: frame)
-                    let expandedHitRect = NSRect(x: frame.maxX - 80, y: rightRect.minY, width: 80, height: rightRect.height)
+                    let sliderRect = instance.sliderRect(in: frame)
+                    let expandedHitRect = CornerGeometry.edgeSliderHitRect(
+                        screenFrame: frame,
+                        sliderPanelRect: sliderRect,
+                        edge: sliderEdge
+                    )
                     if CornerGeometry.rectContains(expandedHitRect, cur) {
                         stillInside = true
                         break
@@ -726,20 +758,25 @@ public final class ScreenManager: ObservableObject {
     }
 
     public func isMouseInsideLeftDrawer(_ point: NSPoint) -> Bool {
-        let isDrawerRight = appState.settings.drawerEdgePosition == .right
+        let drawerEdge = appState.settings.drawerEdgePosition
         for instance in instances.values {
             let frame = instance.screen.frame
             let drawerPanelRect = instance.drawerRect(in: frame)
-            let activeWidth: CGFloat = (appState.scratchpad.isScratchpadOpen
+            let activeWidth: CGFloat = appState.scratchpad.isScratchpadOpen
                 ? Defaults.LeftEdgeDrawer.scratchpadTotalWidthPoints
-                : Defaults.LeftEdgeDrawer.shelfTotalWidthPoints) + 25.0
-            let activeHeight: CGFloat = (appState.scratchpad.isScratchpadOpen
+                : Defaults.LeftEdgeDrawer.shelfTotalWidthPoints
+            let activeHeight: CGFloat = appState.scratchpad.isScratchpadOpen
                 ? Defaults.LeftEdgeDrawer.scratchpadTotalHeightPoints
-                : Defaults.LeftEdgeDrawer.shelfTotalHeightPoints) + 25.0
-            let activeY = drawerPanelRect.minY + (drawerPanelRect.height - activeHeight) / 2.0
-            let activeX = isDrawerRight ? (frame.maxX - activeWidth) : frame.minX
-            let drawerRect = NSRect(x: activeX, y: activeY, width: activeWidth, height: activeHeight)
-            if drawerRect.contains(point) {
+                : Defaults.LeftEdgeDrawer.shelfTotalHeightPoints
+            let drawerRect = CornerGeometry.edgeDrawerHitRect(
+                screenFrame: frame,
+                drawerPanelRect: drawerPanelRect,
+                edge: drawerEdge,
+                drawerWidth: activeWidth,
+                drawerHeight: activeHeight,
+                margin: 25.0
+            )
+            if CornerGeometry.rectContains(drawerRect, point) {
                 return true
             }
         }
@@ -781,21 +818,30 @@ public final class ScreenManager: ObservableObject {
         pendingLeftEdgeDisplayID = displayID
 
         let delay = max(0.15, appState.cornerDwellDelay)
+        let targetEdge = appState.settings.drawerEdgePosition
         let item = DispatchWorkItem { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 guard self.pendingLeftEdgeDisplayID == displayID else { return }
                 let cur = NSEvent.mouseLocation
-                let isAtEdgeX = cur.x <= (screenFrame.minX + 2.5) && cur.x >= (screenFrame.minX - 1.0)
-                let isWithinEdgeY = cur.y >= verticalRange.minY && cur.y <= verticalRange.maxY
-                if isAtEdgeX && isWithinEdgeY {
+                let matchesEdge = CornerGeometry.isCursorAtVerticalEdge(
+                    point: cur,
+                    screenFrame: screenFrame,
+                    verticalRange: verticalRange,
+                    edge: targetEdge
+                )
+                if matchesEdge {
                     withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
-                        self.appState.stashShelf.openShelf(transient: true)
+                        if self.appState.settings.isStashShelfEnabled {
+                            self.appState.stashShelf.openShelf(transient: true)
+                        } else if self.appState.settings.isScratchpadEnabled {
+                            self.appState.scratchpad.isScratchpadOpen = true
+                        }
                     }
                     for (id, inst) in self.instances {
                         inst.setLeftEdgeInteractive(id == displayID, allowsKey: true)
                     }
-                    HapticManager.shared.performDetentTick()
+                    HapticManager.shared.performDetentTick(intensity: self.appState.effectiveHapticIntensity)
                 }
                 self.pendingLeftEdgeDisplayID = nil
             }
@@ -868,7 +914,7 @@ public final class ScreenManager: ObservableObject {
         appState.activeCorner = corner
         appState.activeDisplayID = displayID
         instances[displayID]?.setMouseInteractive(true, for: corner)
-        appState.haptics.performDetentTick()
+        appState.haptics.performDetentTick(intensity: appState.effectiveHapticIntensity)
         appState.sound.playTick(enabled: appState.isSoundEnabled, volume: appState.soundVolume)
     }
 
@@ -970,10 +1016,10 @@ public final class ScreenManager: ObservableObject {
     }
 
     private func matchesConfiguredShortcut(event: NSEvent, shortcutString: String) -> Bool {
-        let parts = shortcutString
-            .replacingOccurrences(of: "-", with: "+")
+        let canonical = ShortcutValidator.canonicalize(shortcutString)
+        let parts = canonical
             .split(separator: "+")
-            .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+            .map(String.init)
 
         guard !parts.isEmpty else { return false }
 
@@ -982,13 +1028,13 @@ public final class ScreenManager: ObservableObject {
 
         for part in parts {
             switch part {
-            case "option", "opt", "alt":
+            case "option":
                 expectedFlags.insert(.option)
-            case "command", "cmd":
+            case "command":
                 expectedFlags.insert(.command)
             case "shift":
                 expectedFlags.insert(.shift)
-            case "control", "ctrl":
+            case "control":
                 expectedFlags.insert(.control)
             default:
                 expectedKey = part
@@ -1080,8 +1126,12 @@ public final class ScreenManager: ObservableObject {
 
     public func showCursorPalette() {
         let mouse = NSEvent.mouseLocation
-        let side: CGFloat = 260
-        let rect = NSRect(x: mouse.x - side / 2, y: mouse.y - side / 2, width: side, height: side)
+        let side: CGFloat = 284
+        let targetScreen = NSScreen.screens.first(where: { $0.frame.contains(mouse) }) ?? NSScreen.main ?? NSScreen.screens.first
+        let vis = targetScreen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        let clampedX = min(max(mouse.x - side / 2, vis.minX + 12), max(vis.minX + 12, vis.maxX - side - 12))
+        let clampedY = min(max(mouse.y - side / 2, vis.minY + 12), max(vis.minY + 12, vis.maxY - side - 12))
+        let rect = NSRect(x: clampedX, y: clampedY, width: side, height: side)
 
         if cursorPalettePanel == nil {
             let panel = MacStashInteractivePanel(
@@ -1107,7 +1157,7 @@ public final class ScreenManager: ObservableObject {
         cursorPalettePanel?.setFrame(rect, display: true)
         cursorPalettePanel?.orderFrontRegardless()
         appState.isCursorPalettePresented = true
-        HapticManager.shared.performDetentTick()
+        HapticManager.shared.performDetentTick(intensity: appState.effectiveHapticIntensity)
     }
 
     public func dismissCursorPalette() {

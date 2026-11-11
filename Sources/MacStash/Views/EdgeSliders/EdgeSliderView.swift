@@ -2,23 +2,25 @@ import SwiftUI
 import MacStashCore
 
 /// EdgeBar vertical slider view that slides out from the physical screen edge.
-/// When configured for Volume action, seamlessly hosts the vertical Now Playing
-/// media controller directly below the slider with artwork, dancing visualizer,
-/// and vertical playback controls, styled with Apple Liquid Glass aesthetics.
+/// Dynamically supports both Left and Right screen edges, adapts to Light/Dark themes,
+/// and hosts the vertical Now Playing controller when configured for Volume.
 public struct EdgeSliderView: View {
     @ObservedObject var appState: AppState
     public let displayID: CGDirectDisplayID
-    public let edge: EdgePosition
 
     @State private var isDragging: Bool = false
     @State private var dragValue: Float = 0.5
+    @State private var isTopHovered: Bool = false
 
-    private let sliderWidth: CGFloat = 50
+    private let sliderWidth: CGFloat = 56
 
-    public init(appState: AppState, displayID: CGDirectDisplayID = 0, edge: EdgePosition = .right) {
+    public init(appState: AppState, displayID: CGDirectDisplayID = 0) {
         self.appState = appState
         self.displayID = displayID
-        self.edge = edge
+    }
+
+    private var edge: EdgePosition {
+        appState.settings.edgeSliderPosition
     }
 
     private var action: ControlAction {
@@ -30,7 +32,7 @@ public struct EdgeSliderView: View {
     }
 
     private var containerHeight: CGFloat {
-        shouldShowMediaControls ? 418 : 250
+        shouldShowMediaControls ? 426 : 254
     }
 
     private var currentValue: Float {
@@ -49,14 +51,19 @@ public struct EdgeSliderView: View {
     public var body: some View {
         let isVisible = appState.isEnabled && appState.isEdgeSlidersEnabled && action != .none
         let isExpanded = isDragging || (appState.isRightSliderActive && (appState.activeDisplayID == displayID || appState.activeDisplayID == 0))
+        let shouldReduceMotion = appState.settings.respectReduceMotion && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
         ZStack(alignment: edge == .right ? .trailing : .leading) {
             if isVisible {
-                // Smoothly slides into view when activated and glides off-screen when dismissed
                 sliderContent(isExpanded: isExpanded)
-                    .offset(x: isExpanded ? (edge == .right ? -8 : 8) : (edge == .right ? 85 : -85))
+                    .offset(x: isExpanded ? (edge == .right ? -8 : 8) : (edge == .right ? 88 : -88))
                     .opacity(isExpanded ? 1.0 : 0.0)
-                    .animation(.spring(response: 0.28, dampingFraction: 0.82), value: isExpanded)
+                    .animation(
+                        shouldReduceMotion
+                            ? .easeInOut(duration: 0.12)
+                            : .spring(response: 0.28 * appState.settings.animationSpeedMultiplier, dampingFraction: 0.82),
+                        value: isExpanded
+                    )
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .trailing : .leading)
@@ -65,55 +72,56 @@ public struct EdgeSliderView: View {
                 ScreenManager.shared.scheduleRightEdgeHideTimer()
             }
         }
+        .macStashTheme(appState.resolvedColorScheme)
     }
 
     @ViewBuilder
     private func sliderContent(isExpanded: Bool) -> some View {
+        let isMuted = action == .volume && appState.audio.isMuted
+        let accentTint = isMuted ? Color.red : (action.accentColors.first ?? .clear)
+
         VStack(spacing: 0) {
-            // 1. Primary Slider Section (Volume / Brightness / Keyboard / Timer)
+            // 1. Primary Slider Section
             VStack(spacing: 10) {
-                // Action Icon (Tap to toggle mute / silent for volume)
+                // Action Toggle Button
                 Button(action: {
-                    if action == .volume {
-                        appState.audio.toggleMute()
-                        HapticManager.shared.performDetentTick()
-                        SoundEffectManager.shared.playAccent()
-                    }
+                    appState.toggleAction(action, displayID: displayID)
                 }) {
-                    Image(systemName: (action == .volume && appState.audio.isMuted) ? "speaker.slash.fill" : action.systemImage)
+                    Image(systemName: iconName(isMuted: isMuted))
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(
-                            (action == .volume && appState.audio.isMuted)
+                            isMuted
                                 ? AnyShapeStyle(Color.red)
                                 : AnyShapeStyle(LinearGradient(colors: action.accentColors, startPoint: .top, endPoint: .bottom))
                         )
-                        .frame(width: 32, height: 32)
+                        .frame(width: 34, height: 34)
                         .circularLiquidGlass(
-                            tint: (action == .volume && appState.audio.isMuted) ? .red : (action.accentColors.first ?? .clear),
-                            specularIntensity: 0.8,
-                            causticOpacity: 0.15
+                            tint: accentTint,
+                            specularIntensity: 0.9,
+                            causticOpacity: 0.18,
+                            isHighlighted: isTopHovered
                         )
-                        .contentShape(Rectangle())
+                        .scaleEffect(isTopHovered ? 1.06 : 1.0)
+                        .animation(.spring(response: 0.18, dampingFraction: 0.72), value: isTopHovered)
                 }
                 .buttonStyle(.plain)
-                .help((action == .volume && appState.audio.isMuted) ? appState.localized("menubar.unmute") : appState.localized("menubar.mute"))
-                .padding(.top, 8)
+                .onHover { isTopHovered = $0 }
+                .help(topHelpText(isMuted: isMuted))
+                .padding(.top, 10)
 
                 // Precision Crystal Tube Liquid Track
                 GeometryReader { geo in
                     let trackH = max(1, geo.size.height)
 
                     ZStack {
-                        // High-fidelity liquid track
                         LiquidVerticalTrack(
                             progress: Double(currentValue),
                             primaryTint: action.accentColors.first ?? .cyan,
                             secondaryTint: action.accentColors.last ?? .blue,
-                            trackWidth: 15,
-                            isMuted: action == .volume && appState.audio.isMuted
+                            trackWidth: 16,
+                            isMuted: isMuted
                         )
 
-                        // Full-width hit zone so gesture never slips off
                         Color.clear
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
@@ -135,35 +143,24 @@ public struct EdgeSliderView: View {
                             }
                     )
                 }
-                .frame(width: 44, height: shouldShowMediaControls ? 110 : 140)
-                .padding(.horizontal, 3)
+                .frame(width: 48, height: shouldShowMediaControls ? 112 : 144)
+                .padding(.horizontal, 4)
 
-                // Percentage / MUTE label with monospaced tabular figures
-                if action == .volume && appState.audio.isMuted {
-                    Text("MUTE")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundColor(.red)
-                        .padding(.bottom, shouldShowMediaControls ? 6 : 12)
-                } else {
-                    Text("\(Int(currentValue * 100))%")
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundColor(.primary)
-                        .padding(.bottom, shouldShowMediaControls ? 6 : 12)
-                }
+                readoutLabel(isMuted: isMuted)
+                    .padding(.bottom, shouldShowMediaControls ? 6 : 12)
             }
 
-            // 2. Vertical Media Controller (Shown directly beneath the volume slider)
+            // 2. Vertical Media Controller (Shown beneath Volume slider)
             if shouldShowMediaControls {
-                // Subtle glass divider
                 Rectangle()
                     .fill(
                         LinearGradient(
-                            colors: [Color.white.opacity(0.2), Color.white.opacity(0.02)],
+                            colors: [Color.primary.opacity(0.18), Color.primary.opacity(0.03)],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
-                    .frame(width: 32, height: 1)
+                    .frame(width: 34, height: 1)
                     .padding(.vertical, 4)
 
                 EdgeMediaControlView(appState: appState)
@@ -172,11 +169,62 @@ public struct EdgeSliderView: View {
         }
         .frame(width: sliderWidth, height: containerHeight)
         .liquidGlass(
-            cornerRadius: 18,
+            cornerRadius: 20,
             tint: action.accentColors.first ?? .clear,
             specularIntensity: 1.1,
             causticOpacity: 0.18,
-            shadowRadius: 16
+            shadowRadius: 16,
+            backdropOpacity: appState.settings.dialOpacity
         )
+    }
+
+    @ViewBuilder
+    private func readoutLabel(isMuted: Bool) -> some View {
+        if isMuted {
+            Text(appState.localized("dial.mute"))
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .foregroundColor(.red)
+        } else if action == .timer {
+            Text(appState.formattedTimerTime)
+                .font(.system(size: 10.5, weight: .bold, design: .monospaced))
+                .monospacedDigit()
+                .foregroundColor(.primary)
+        } else if action == .keepAwake {
+            Text(appState.keepAwake.formattedRemaining)
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .foregroundColor(appState.keepAwake.isActive ? .orange : .secondary)
+        } else if action == .stashShelf {
+            Text("\(appState.stashShelf.items.count)")
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .monospacedDigit()
+                .foregroundColor(.primary)
+        } else if action == .scratchpad {
+            Text(appState.localized("dial.notes"))
+                .font(.system(size: 9.5, weight: .bold, design: .rounded))
+                .foregroundColor(.primary)
+        } else {
+            Text("\(Int(round(currentValue * 100)))%")
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .monospacedDigit()
+                .foregroundColor(.primary)
+        }
+    }
+
+    private func iconName(isMuted: Bool) -> String {
+        if isMuted { return "speaker.slash.fill" }
+        if action == .timer {
+            return appState.isPomodoroRunning ? "pause.fill" : "play.fill"
+        }
+        return action.systemImage
+    }
+
+    private func topHelpText(isMuted: Bool) -> String {
+        if action == .volume {
+            return isMuted ? appState.localized("menubar.unmute") : appState.localized("menubar.mute")
+        }
+        if action == .timer {
+            return appState.isPomodoroRunning ? appState.localized("menubar.pause") : appState.localized("menubar.start")
+        }
+        return "\(action.localizedDisplayName(using: appState.effectiveLanguage)) — \(appState.localized("edge.toggleAction"))"
     }
 }

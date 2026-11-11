@@ -97,8 +97,8 @@ public struct EdgeMediaControlView: View {
             }
         }
         .padding(.vertical, 6)
-        .padding(.horizontal, 2)
-        .frame(width: 50)
+        .padding(.horizontal, 3)
+        .frame(width: 56)
         .onAppear {
             nowPlaying.refreshNowPlaying()
         }
@@ -153,6 +153,6 @@ public struct EdgeMediaControlView: View {
                     )
             }
         }
-        .help(nowPlaying.hasMedia ? "\(nowPlaying.title) • \(nowPlaying.artist)" : "Now Playing")
+        .help(nowPlaying.hasMedia ? "\(nowPlaying.title) • \(nowPlaying.artist)" : appState.localized("edge.noMedia"))
     }
 }

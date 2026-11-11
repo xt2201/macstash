@@ -3,13 +3,13 @@ import AppKit
 import MacStashCore
 
 /// An instant floating scratchpad drawer for capturing ephemeral thoughts,
-/// verification codes, terminal commands, or text snippets with automatic local persistence,
-/// styled with Apple Liquid Glass optical shading.
+/// verification codes, terminal commands, or text snippets with automatic local persistence.
 public struct ScratchpadView: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var manager = ScratchpadManager.shared
 
     @State private var copyFeedback: Bool = false
+    @State private var sentToStashFeedback: Bool = false
     @FocusState private var isEditorFocused: Bool
 
     private let drawerWidth: CGFloat = Defaults.Scratchpad.defaultWidthPoints
@@ -27,7 +27,7 @@ public struct ScratchpadView: View {
             Divider()
                 .background(
                     LinearGradient(
-                        colors: [Color.green.opacity(0.4), Color.white.opacity(0.06)],
+                        colors: [Color.green.opacity(0.4), Color.primary.opacity(0.06)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
@@ -35,142 +35,110 @@ public struct ScratchpadView: View {
 
             // 2. Text Editor Area
             editorArea
+
+            // 3. Subtle Footer Hint & Live Metrics
+            footerBar
         }
         .frame(width: drawerWidth, height: drawerHeight)
         .liquidGlass(
             cornerRadius: 20,
             tint: .green,
             specularIntensity: 1.15,
-            causticOpacity: 0.18,
-            shadowRadius: 22
+            causticOpacity: 0.16,
+            shadowRadius: 22,
+            backdropOpacity: appState.settings.dialOpacity
         )
     }
 
     // MARK: - Header Bar
 
     private var headerBar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Image(systemName: "note.text")
                 .font(.system(size: 13, weight: .bold))
                 .foregroundColor(.green)
-                .shadow(color: Color.green.opacity(0.45), radius: 3, x: 0, y: 0)
+                .shadow(color: Color.green.opacity(0.35), radius: 3, x: 0, y: 0)
 
-            Text("SCRATCHPAD")
+            Text(appState.localized("scratchpad.title"))
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
+                .lineLimit(1)
 
             Spacer()
 
-            Text("\(manager.wordCount)w · \(manager.characterCount)c")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
-                .foregroundColor(.secondary)
-                .padding(.horizontal, 7)
-                .padding(.vertical, 2.5)
-                .background(Capsule().fill(Color.white.opacity(0.08)))
-                .overlay(
-                    Capsule()
-                        .stroke(Color.white.opacity(0.15), lineWidth: 0.8)
-                )
+            if !manager.text.isEmpty {
+                HoverActionButton(
+                    systemImage: sentToStashFeedback ? "checkmark" : "tray.and.arrow.down",
+                    tint: sentToStashFeedback ? .cyan : .secondary,
+                    size: 24,
+                    helpText: appState.localized("scratchpad.moveToStash")
+                ) {
+                    appState.stashShelf.addTextSnippet(manager.text)
+                    withAnimation(.easeInOut(duration: 0.15)) { sentToStashFeedback = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        withAnimation(.easeInOut(duration: 0.15)) { sentToStashFeedback = false }
+                    }
+                }
+            }
 
-            // Copy All Button
-            Button(action: {
+            HoverActionButton(
+                systemImage: copyFeedback ? "checkmark" : "doc.on.doc",
+                tint: copyFeedback ? .green : .secondary,
+                size: 24,
+                helpText: appState.localized("scratchpad.copyAll")
+            ) {
                 manager.copyAll()
                 withAnimation(.easeInOut(duration: 0.15)) { copyFeedback = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                     withAnimation(.easeInOut(duration: 0.15)) { copyFeedback = false }
                 }
-            }) {
-                Image(systemName: copyFeedback ? "checkmark" : "doc.on.doc")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(copyFeedback ? .green : .secondary)
-                    .frame(width: 26, height: 26)
-                    .circularLiquidGlass(
-                        tint: copyFeedback ? .green : .clear,
-                        specularIntensity: 0.8,
-                        causticOpacity: 0.2,
-                        isHighlighted: copyFeedback
-                    )
             }
-            .buttonStyle(.plain)
-            .help("Copy All to Clipboard")
 
-            // Undo Clear Button (if available)
             if manager.canUndoClear {
-                Button(action: {
+                HoverActionButton(
+                    systemImage: "arrow.uturn.backward",
+                    tint: .green,
+                    size: 24,
+                    helpText: appState.localized("scratchpad.restore")
+                ) {
                     manager.undoClear()
-                }) {
-                    Image(systemName: "arrow.uturn.backward")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.green)
-                        .frame(width: 26, height: 26)
-                        .circularLiquidGlass(
-                            tint: .green,
-                            specularIntensity: 0.8,
-                            causticOpacity: 0.2,
-                            isHighlighted: true
-                        )
                 }
-                .buttonStyle(.plain)
-                .help("Restore Cleared Notes")
             }
 
-            // Clear Button
-            Button(action: {
-                withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
-                    manager.clear()
+            if !manager.text.isEmpty {
+                HoverActionButton(
+                    systemImage: "trash",
+                    tint: .red,
+                    size: 24,
+                    helpText: appState.localized("scratchpad.clear")
+                ) {
+                    withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                        manager.clear()
+                    }
                 }
-            }) {
-                Image(systemName: "trash")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.secondary)
-                    .frame(width: 26, height: 26)
-                    .circularLiquidGlass(
-                        tint: .clear,
-                        specularIntensity: 0.8,
-                        causticOpacity: 0.15
-                    )
             }
-            .buttonStyle(.plain)
-            .help("Clear All")
 
-            // Pin / Keep Open Button
-            Button(action: {
+            HoverActionButton(
+                systemImage: manager.isPinned ? "pin.fill" : "pin",
+                tint: manager.isPinned ? .green : .secondary,
+                size: 24,
+                helpText: manager.isPinned ? appState.localized("scratchpad.unpin") : appState.localized("scratchpad.pin")
+            ) {
                 manager.togglePin()
-            }) {
-                Image(systemName: manager.isPinned ? "pin.fill" : "pin")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(manager.isPinned ? .green : .secondary)
-                    .frame(width: 26, height: 26)
-                    .circularLiquidGlass(
-                        tint: manager.isPinned ? .green : .clear,
-                        specularIntensity: 0.8,
-                        causticOpacity: manager.isPinned ? 0.25 : 0.15,
-                        isHighlighted: manager.isPinned
-                    )
             }
-            .buttonStyle(.plain)
-            .help(manager.isPinned ? "Unpin Scratchpad" : "Pin Scratchpad (Keep Open)")
 
-            // Close Button
-            Button(action: {
+            HoverActionButton(
+                systemImage: "xmark",
+                tint: .secondary,
+                size: 24,
+                helpText: appState.localized("scratchpad.close")
+            ) {
                 withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
                     manager.isScratchpadOpen = false
                 }
-            }) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.secondary)
-                    .frame(width: 26, height: 26)
-                    .circularLiquidGlass(
-                        tint: .clear,
-                        specularIntensity: 0.8,
-                        causticOpacity: 0.15
-                    )
             }
-            .buttonStyle(.plain)
-            .help("Close (Esc)")
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 12)
         .padding(.vertical, 10)
     }
 
@@ -179,9 +147,9 @@ public struct ScratchpadView: View {
     private var editorArea: some View {
         ZStack(alignment: .topLeading) {
             if manager.text.isEmpty {
-                Text("Type or paste quick notes, snippets, OTP codes, or prompts here...\nAutomatically saved.")
+                Text(appState.localized("scratchpad.placeholder"))
                     .font(.system(size: 12))
-                    .foregroundColor(.secondary.opacity(0.6))
+                    .foregroundColor(.secondary.opacity(0.65))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 12)
                     .allowsHitTesting(false)
@@ -200,5 +168,28 @@ public struct ScratchpadView: View {
                     }
                 }
         }
+    }
+
+    // MARK: - Footer Bar
+
+    private var footerBar: some View {
+        HStack {
+            Text(appState.localized("scratchpad.shortcutHint"))
+                .font(.system(size: 9.5))
+                .foregroundColor(.secondary.opacity(0.8))
+
+            Spacer()
+
+            Text(String(format: appState.localized("scratchpad.wordsChars"), manager.wordCount, manager.characterCount))
+                .font(.system(size: 9.5, weight: .medium, design: .monospaced))
+                .monospacedDigit()
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(Capsule().fill(Color.primary.opacity(0.06)))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(Color.primary.opacity(0.025))
     }
 }

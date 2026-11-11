@@ -8,18 +8,15 @@ import MacStashCore
 public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
     private let appState: AppState
     public let displayID: CGDirectDisplayID
-    private let edge: EdgePosition
     private var scrollEndWorkItem: DispatchWorkItem?
 
     public init(
         rootView: EdgeSliderView,
         appState: AppState,
-        displayID: CGDirectDisplayID = 0,
-        edge: EdgePosition = .right
+        displayID: CGDirectDisplayID = 0
     ) {
         self.appState = appState
         self.displayID = displayID
-        self.edge = edge
         super.init(rootView: rootView)
     }
 

@@ -40,7 +40,7 @@ public final class AudioManager: ObservableObject {
 
     private func setupPeriodicSync() {
         syncTimer?.invalidate()
-        syncTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+        syncTimer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 self?.updateVolumeFromHardware(force: false)
             }

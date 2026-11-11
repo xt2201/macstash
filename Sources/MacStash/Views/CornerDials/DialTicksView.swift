@@ -3,6 +3,7 @@ import SwiftUI
 /// Draws delicate laser-etched radial tick marks around the dial arc that illuminate
 /// as luminous liquid fills the gauge. Formatted with strict mathematical symmetry across 4 quadrants.
 public struct DialTicksView: View {
+    @Environment(\.colorScheme) private var colorScheme
     public let geometry: RadialDialGeometry
     public let value: Double
     public let accentColor: Color
@@ -15,6 +16,7 @@ public struct DialTicksView: View {
     }
 
     public var body: some View {
+        let isDark = colorScheme == .dark
         Canvas { context, _ in
             for i in 0..<tickCount {
                 let frac = Double(i) / Double(tickCount - 1)
@@ -47,10 +49,13 @@ public struct DialTicksView: View {
                         lineWidth: isMajor ? 1.6 : 1.0
                     )
                 } else {
-                    // Laser-etched frosted groove on inactive glass surface
+                    // Laser-etched frosted groove adaptive to dark & light glass
+                    let inactiveColor = isDark
+                        ? Color.white.opacity(isMajor ? 0.30 : 0.12)
+                        : Color.black.opacity(isMajor ? 0.28 : 0.10)
                     context.stroke(
                         path,
-                        with: .color(Color.white.opacity(isMajor ? 0.28 : 0.10)),
+                        with: .color(inactiveColor),
                         lineWidth: isMajor ? 1.4 : 0.9
                     )
                 }

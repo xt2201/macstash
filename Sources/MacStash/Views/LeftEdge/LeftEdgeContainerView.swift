@@ -2,8 +2,8 @@ import SwiftUI
 import AppKit
 import MacStashCore
 
-/// Outer Left-Edge Container View that hosts the tactile Stash Shelf
-/// and the Quick Scratchpad Drawer with a sleek, non-intrusive edge peek affordance.
+/// Outer edge container view that hosts the tactile Stash Shelf
+/// and Quick Scratchpad Drawer with symmetrical Left/Right edge attachment.
 public struct LeftEdgeContainerView: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var shelf = StashShelfManager.shared
@@ -26,9 +26,9 @@ public struct LeftEdgeContainerView: View {
                 HStack(spacing: 6) {
                     if isRight {
                         drawerView(transitionEdge: transitionEdge)
-                        drawerTabBar
+                        drawerTabBar(isRight: true)
                     } else {
-                        drawerTabBar
+                        drawerTabBar(isRight: false)
                         drawerView(transitionEdge: transitionEdge)
                     }
                 }
@@ -46,6 +46,7 @@ public struct LeftEdgeContainerView: View {
                 }
             }
         }
+        .macStashTheme(appState.resolvedColorScheme)
     }
 
     @ViewBuilder
@@ -67,51 +68,55 @@ public struct LeftEdgeContainerView: View {
 
     // MARK: - Drawer Tab Bar (Mode Switcher when Open)
 
-    private var drawerTabBar: some View {
-        VStack(spacing: 8) {
-            // Stash Shelf Mode
-            Button(action: {
-                withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
-                    scratchpad.isScratchpadOpen = false
-                    shelf.openShelf()
-                }
-            }) {
-                ZStack {
-                    Circle()
-                        .fill((shelf.isShelfOpen || shelf.isDropTargetActive) ? Color.cyan : Color.white.opacity(0.12))
-                        .frame(width: 28, height: 28)
+    private func drawerTabBar(isRight: Bool) -> some View {
+        let isShelfActive = shelf.isShelfOpen || shelf.isDropTargetActive
+        let isPadActive = scratchpad.isScratchpadOpen && !isShelfActive
 
-                    Image(systemName: "tray.2.fill")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor((shelf.isShelfOpen || shelf.isDropTargetActive) ? .black : .white)
+        return VStack(spacing: 8) {
+            if appState.settings.isStashShelfEnabled || isShelfActive {
+                Button(action: {
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+                        scratchpad.isScratchpadOpen = false
+                        shelf.openShelf()
+                    }
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(isShelfActive ? Color.cyan : Color.primary.opacity(0.10))
+                            .frame(width: 28, height: 28)
+
+                        Image(systemName: "tray.2.fill")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(isShelfActive ? .black : .primary)
+                    }
                 }
+                .buttonStyle(.plain)
+                .help(appState.localized("general.stashShelf"))
             }
-            .buttonStyle(.plain)
-            .help("Stash Shelf")
 
-            // Scratchpad Mode
-            Button(action: {
-                withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
-                    shelf.closeShelf()
-                    scratchpad.isScratchpadOpen = true
-                }
-            }) {
-                ZStack {
-                    Circle()
-                        .fill(scratchpad.isScratchpadOpen ? Color.green : Color.white.opacity(0.12))
-                        .frame(width: 28, height: 28)
+            if appState.settings.isScratchpadEnabled || isPadActive {
+                Button(action: {
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+                        shelf.closeShelf()
+                        scratchpad.isScratchpadOpen = true
+                    }
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(isPadActive ? Color.green : Color.primary.opacity(0.10))
+                            .frame(width: 28, height: 28)
 
-                    Image(systemName: "note.text")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(scratchpad.isScratchpadOpen ? .black : .white)
+                        Image(systemName: "note.text")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(isPadActive ? .black : .primary)
+                    }
                 }
+                .buttonStyle(.plain)
+                .help(appState.localized("general.scratchpad"))
             }
-            .buttonStyle(.plain)
-            .help("Quick Scratchpad")
 
             Spacer()
 
-            // Close Drawer Button
             Button(action: {
                 withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
                     shelf.closeShelf()
@@ -120,7 +125,7 @@ public struct LeftEdgeContainerView: View {
             }) {
                 ZStack {
                     Circle()
-                        .fill(Color.white.opacity(0.08))
+                        .fill(Color.primary.opacity(0.08))
                         .frame(width: 24, height: 24)
 
                     Image(systemName: "xmark")
@@ -129,12 +134,12 @@ public struct LeftEdgeContainerView: View {
                 }
             }
             .buttonStyle(.plain)
-            .help("Close (Esc)")
+            .help(appState.localized("scratchpad.close"))
         }
-        .frame(width: 32, height: 160)
+        .frame(width: 32, height: 156)
         .padding(.vertical, 8)
         .padding(.horizontal, 2)
-        .liquidGlass(cornerRadius: 16, tint: .cyan, specularIntensity: 0.9, causticOpacity: 0.12, shadowRadius: 10)
-        .padding(.leading, 4)
+        .liquidGlass(cornerRadius: 16, tint: isPadActive ? .green : .cyan, specularIntensity: 0.9, causticOpacity: 0.14, shadowRadius: 10)
+        .padding(isRight ? .trailing : .leading, 4)
     }
 }

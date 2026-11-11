@@ -39,6 +39,7 @@ public final class NowPlayingManager: ObservableObject {
 
     // Beat / rhythm envelope generator state
     private var rhythmTimer: Timer?
+    private var isVisualizerActive: Bool = false
     private var smoothedBands: [Double] = [0.18, 0.18, 0.18, 0.18, 0.18]
     private var beatPhase: Double = 0.0
     private var trackSeed: Double = 1.0
@@ -57,7 +58,6 @@ public final class NowPlayingManager: ObservableObject {
     private init() {
         loadFallbackMediaRemoteFramework()
         startHelperProcessIfPossible()
-        startRhythmEngine()
     }
 
     // MARK: - Platform-Binary Perl Bridge (`now-playing.pl` + `libMacStashNowPlaying.dylib`)
@@ -205,6 +205,7 @@ public final class NowPlayingManager: ObservableObject {
         self.elapsedTime = newElapsed
         self.isPlaying = newPlaying
         self.hasMedia = !newTitle.isEmpty || newPlaying
+        updateRhythmEngineState()
 
         if let b64 = dict["artworkBase64"] as? String,
            !b64.isEmpty,
@@ -378,6 +379,24 @@ public final class NowPlayingManager: ObservableObject {
 
     // MARK: - Real-Time Rhythm & Beat Envelope Engine
 
+    public func setVisualizerActive(_ active: Bool) {
+        isVisualizerActive = active
+        updateRhythmEngineState()
+    }
+
+    private func updateRhythmEngineState() {
+        if isPlaying && isVisualizerActive {
+            if rhythmTimer == nil {
+                startRhythmEngine()
+            }
+        } else {
+            rhythmTimer?.invalidate()
+            rhythmTimer = nil
+            smoothedBands = [0.18, 0.18, 0.18, 0.18, 0.18]
+            audioLevels = [0.18, 0.18, 0.18, 0.18, 0.18]
+        }
+    }
+
     private func startRhythmEngine() {
         rhythmTimer?.invalidate()
         let timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
@@ -498,6 +517,7 @@ public final class NowPlayingManager: ObservableObject {
 
         let nextState = !isPlaying
         isPlaying = nextState
+        updateRhythmEngineState()
 
         if sendHelperCommand("toggle") {
             return

@@ -4,18 +4,29 @@ import MacStashCore
 
 /// Tactile Drop Shelf view elevated with Apple Liquid Glass optical shading.
 /// Slides out from the screen edge to temporarily hold files, images, URLs, and text snippets
-/// with dynamic refraction, liquid drop ripples, and glass tile elevation.
+/// with bilingual localization, inline filter, clipboard paste, and drag-and-drop export.
 public struct StashShelfView: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var shelf = StashShelfManager.shared
 
     @State private var selectedItemID: UUID? = nil
     @State private var copyFeedback: Bool = false
+    @State private var searchQuery: String = ""
 
     private let shelfWidth: CGFloat = Defaults.StashShelf.defaultWidthPoints
 
     public init(appState: AppState) {
         self.appState = appState
+    }
+
+    private var filteredItems: [StashItem] {
+        let q = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !q.isEmpty else { return shelf.items }
+        return shelf.items.filter {
+            $0.title.lowercased().contains(q)
+                || $0.detailText.lowercased().contains(q)
+                || ($0.stringContent?.lowercased().contains(q) ?? false)
+        }
     }
 
     public var body: some View {
@@ -28,18 +39,43 @@ public struct StashShelfView: View {
             Divider()
                 .background(
                     LinearGradient(
-                        colors: [Color.cyan.opacity(0.35), Color.white.opacity(0.06)],
+                        colors: [Color.cyan.opacity(0.35), Color.primary.opacity(0.06)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
 
-            // 2. Drop banner when dragging over existing items
+            // 2. Search bar when shelf has >= 4 items
+            if shelf.items.count >= 4 {
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                    TextField(appState.localized("shelf.searchPlaceholder"), text: $searchQuery)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 11))
+                    if !searchQuery.isEmpty {
+                        Button(action: { searchQuery = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.06)))
+                .padding(.horizontal, 10)
+                .padding(.top, 8)
+            }
+
+            // 3. Drop banner when dragging over existing items
             if isDropActive && !shelf.items.isEmpty {
                 dropBanner
             }
 
-            // 3. Body List / Drop Zone
+            // 4. Body List / Drop Zone
             if shelf.items.isEmpty {
                 emptyDropZone
             } else {
@@ -51,9 +87,10 @@ public struct StashShelfView: View {
             cornerRadius: 20,
             tint: isDropActive ? .cyan : .clear,
             specularIntensity: 1.15,
-            causticOpacity: isDropActive ? 0.28 : 0.12,
+            causticOpacity: isDropActive ? 0.28 : 0.14,
             shadowRadius: 22,
-            isHighlighted: isDropActive
+            isHighlighted: isDropActive,
+            backdropOpacity: appState.settings.dialOpacity
         )
         .animation(.spring(response: 0.28, dampingFraction: 0.78), value: isDropActive)
     }
@@ -61,25 +98,26 @@ public struct StashShelfView: View {
     // MARK: - Header Bar
 
     private var headerBar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Image(systemName: "tray.2.fill")
                 .font(.system(size: 13, weight: .bold))
                 .foregroundColor(.cyan)
-                .shadow(color: Color.cyan.opacity(0.4), radius: 3, x: 0, y: 0)
+                .shadow(color: Color.cyan.opacity(0.35), radius: 3, x: 0, y: 0)
 
-            Text("STASH SHELF")
+            Text(appState.localized("shelf.title"))
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
+                .lineLimit(1)
 
             if !shelf.items.isEmpty {
                 HStack(spacing: 4) {
                     Text("\(shelf.items.count)")
                         .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .monospacedDigit()
                         .foregroundColor(.black)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 1.5)
                         .background(Capsule().fill(Color.cyan))
-                        .shadow(color: Color.cyan.opacity(0.4), radius: 4, x: 0, y: 1)
 
                     if !shelf.totalFormattedSize.isEmpty {
                         Text(shelf.totalFormattedSize)
@@ -91,109 +129,77 @@ public struct StashShelfView: View {
 
             Spacer()
 
+            // Paste from clipboard quick button
+            HoverActionButton(
+                systemImage: "doc.on.clipboard",
+                tint: .cyan,
+                size: 24,
+                helpText: appState.localized("shelf.pasteClipboard")
+            ) {
+                pasteFromClipboard()
+            }
+
             if !shelf.items.isEmpty {
-                // Copy All Button
-                Button(action: {
+                HoverActionButton(
+                    systemImage: copyFeedback ? "checkmark" : "doc.on.doc",
+                    tint: copyFeedback ? .green : .secondary,
+                    size: 24,
+                    helpText: appState.localized("shelf.copyAll")
+                ) {
                     shelf.copyAllFilesToClipboard()
                     withAnimation(.easeInOut(duration: 0.15)) { copyFeedback = true }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                         withAnimation(.easeInOut(duration: 0.15)) { copyFeedback = false }
                     }
-                }) {
-                    Image(systemName: copyFeedback ? "checkmark" : "doc.on.doc")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(copyFeedback ? .green : .secondary)
-                        .frame(width: 26, height: 26)
-                        .circularLiquidGlass(
-                            tint: copyFeedback ? .green : .clear,
-                            specularIntensity: 0.8,
-                            causticOpacity: 0.2,
-                            isHighlighted: copyFeedback
-                        )
                 }
-                .buttonStyle(.plain)
-                .help("Copy All to Clipboard")
 
-                // Clear All Button
-                Button(action: {
+                HoverActionButton(
+                    systemImage: "trash",
+                    tint: .red,
+                    size: 24,
+                    helpText: appState.localized("shelf.clearAll")
+                ) {
                     withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
                         shelf.clearAll()
+                        searchQuery = ""
                     }
-                }) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.secondary)
-                        .frame(width: 26, height: 26)
-                        .circularLiquidGlass(
-                            tint: .clear,
-                            specularIntensity: 0.8,
-                            causticOpacity: 0.15
-                        )
                 }
-                .buttonStyle(.plain)
-                .help("Clear Shelf")
             } else if shelf.canUndoClear {
-                // Undo Clear Button
-                Button(action: {
+                HoverActionButton(
+                    systemImage: "arrow.uturn.backward",
+                    tint: .cyan,
+                    size: 24,
+                    helpText: appState.localized("shelf.undoClear")
+                ) {
                     shelf.undoClear()
-                }) {
-                    Image(systemName: "arrow.uturn.backward")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.cyan)
-                        .frame(width: 26, height: 26)
-                        .circularLiquidGlass(
-                            tint: .cyan,
-                            specularIntensity: 0.8,
-                            causticOpacity: 0.2,
-                            isHighlighted: true
-                        )
                 }
-                .buttonStyle(.plain)
-                .help("Restore Cleared Items")
             }
 
-            // Pin / Keep Open Toggle Button
-            Button(action: {
+            HoverActionButton(
+                systemImage: shelf.isPinned ? "pin.fill" : "pin",
+                tint: shelf.isPinned ? .cyan : .secondary,
+                size: 24,
+                helpText: shelf.isPinned ? appState.localized("shelf.unpin") : appState.localized("shelf.pin")
+            ) {
                 shelf.togglePin()
-            }) {
-                Image(systemName: shelf.isPinned ? "pin.fill" : "pin")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(shelf.isPinned ? .cyan : .secondary)
-                    .frame(width: 26, height: 26)
-                    .circularLiquidGlass(
-                        tint: shelf.isPinned ? .cyan : .clear,
-                        specularIntensity: 0.8,
-                        causticOpacity: shelf.isPinned ? 0.25 : 0.15,
-                        isHighlighted: shelf.isPinned
-                    )
             }
-            .buttonStyle(.plain)
-            .help(shelf.isPinned ? "Unpin Shelf" : "Pin Shelf (Keep Open)")
 
-            // Close Shelf Button
-            Button(action: {
+            HoverActionButton(
+                systemImage: "xmark",
+                tint: .secondary,
+                size: 24,
+                helpText: appState.localized("shelf.close")
+            ) {
                 withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
                     shelf.closeShelf()
                 }
-            }) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.secondary)
-                    .frame(width: 26, height: 26)
-                    .circularLiquidGlass(
-                        tint: .clear,
-                        specularIntensity: 0.8,
-                        causticOpacity: 0.15
-                    )
             }
-            .buttonStyle(.plain)
-            .help("Close Shelf (Esc)")
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 12)
         .padding(.vertical, 10)
     }
 
-    // MARK: - Drop Target Banner (Visible when dragging over populated list)
+    // MARK: - Drop Target Banner
 
     private var dropBanner: some View {
         HStack(spacing: 6) {
@@ -201,7 +207,7 @@ public struct StashShelfView: View {
                 .font(.system(size: 12, weight: .bold))
                 .foregroundColor(.cyan)
 
-            Text("Drop here to stash")
+            Text(appState.localized("shelf.dropToStash"))
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(.cyan)
         }
@@ -220,21 +226,20 @@ public struct StashShelfView: View {
         .transition(.move(edge: .top).combined(with: .opacity))
     }
 
-    // MARK: - Empty Drop Zone (Liquid Ripple Aura)
+    // MARK: - Empty Drop Zone
 
     private var emptyDropZone: some View {
         let isDropActive = shelf.isDropTargetActive
 
-        return VStack(spacing: 12) {
+        return VStack(spacing: 14) {
             Spacer()
 
             ZStack {
-                // Expanding liquid ripple rings when drop is active
                 if isDropActive {
                     Circle()
                         .stroke(Color.cyan.opacity(0.35), lineWidth: 2)
-                        .frame(width: 84, height: 84)
-                        .scaleEffect(1.1)
+                        .frame(width: 86, height: 86)
+                        .scaleEffect(1.08)
                 }
 
                 Circle()
@@ -242,37 +247,49 @@ public struct StashShelfView: View {
                         LinearGradient(
                             colors: isDropActive
                                 ? [Color.cyan, Color.blue]
-                                : [Color.white.opacity(0.3), Color.white.opacity(0.08)],
+                                : [Color.primary.opacity(0.25), Color.primary.opacity(0.06)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
                         style: StrokeStyle(lineWidth: isDropActive ? 2.0 : 1.5, dash: isDropActive ? [] : [4, 4])
                     )
-                    .frame(width: 66, height: 66)
+                    .frame(width: 68, height: 68)
                     .background(
                         Circle()
-                            .fill(isDropActive ? Color.cyan.opacity(0.15) : Color.white.opacity(0.03))
+                            .fill(isDropActive ? Color.cyan.opacity(0.15) : Color.primary.opacity(0.04))
                     )
-                    .shadow(color: isDropActive ? Color.cyan.opacity(0.5) : Color.clear, radius: 10, x: 0, y: 0)
+                    .shadow(color: isDropActive ? Color.cyan.opacity(0.45) : Color.clear, radius: 10, x: 0, y: 0)
 
                 Image(systemName: isDropActive ? "arrow.down.circle.fill" : "arrow.down.doc")
                     .font(.system(size: 26, weight: .light))
-                    .foregroundColor(isDropActive ? .cyan : .secondary.opacity(0.7))
+                    .foregroundColor(isDropActive ? .cyan : .secondary.opacity(0.75))
                     .scaleEffect(isDropActive ? 1.15 : 1.0)
                     .animation(.spring(response: 0.25, dampingFraction: 0.65), value: isDropActive)
             }
 
-            VStack(spacing: 4) {
-                Text(isDropActive ? "Release to Stash" : "Drop Files or Text Here")
+            VStack(spacing: 5) {
+                Text(isDropActive ? appState.localized("shelf.dropToStash") : appState.localized("shelf.dropEmptyTitle"))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(.primary)
-
-                Text("Wiggle mouse while dragging to summon\nPress Esc to dismiss")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary.opacity(0.7))
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 16)
+
+                Text(appState.localized("shelf.dropEmptyHint"))
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 14)
             }
+
+            Button(action: pasteFromClipboard) {
+                Label(appState.localized("shelf.pasteClipboard"), systemImage: "doc.on.clipboard")
+                    .font(.system(size: 11, weight: .semibold))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Capsule().fill(Color.cyan.opacity(0.16)))
+                    .overlay(Capsule().strokeBorder(Color.cyan.opacity(0.35), lineWidth: 0.8))
+                    .foregroundColor(.cyan)
+            }
+            .buttonStyle(.plain)
 
             Spacer()
         }
@@ -285,8 +302,9 @@ public struct StashShelfView: View {
     private var itemsListView: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 6) {
-                ForEach(shelf.items) { item in
+                ForEach(filteredItems) { item in
                     StashItemCardView(
+                        appState: appState,
                         item: item,
                         isSelected: selectedItemID == item.id,
                         onSelect: { selectedItemID = item.id },
@@ -310,11 +328,31 @@ public struct StashShelfView: View {
             .padding(10)
         }
     }
+
+    private func pasteFromClipboard() {
+        let pb = NSPasteboard.general
+        if let urls = pb.readObjects(forClasses: [NSURL.self], options: nil) as? [URL], !urls.isEmpty {
+            let fileURLs = urls.filter { $0.isFileURL }
+            let webURLs = urls.filter { !$0.isFileURL }
+            if !fileURLs.isEmpty { shelf.addFileURLs(fileURLs) }
+            for u in webURLs { shelf.addTextSnippet(u.absoluteString) }
+            return
+        }
+        if let str = pb.string(forType: .string) {
+            let trimmed = str.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.hasPrefix("/") && FileManager.default.fileExists(atPath: trimmed) {
+                shelf.addFileURLs([URL(fileURLWithPath: trimmed)])
+            } else if !trimmed.isEmpty {
+                shelf.addTextSnippet(trimmed)
+            }
+        }
+    }
 }
 
-// MARK: - Isolated Stash Item Card View (High Performance, Zero Cross-Row Re-render)
+// MARK: - Isolated Stash Item Card View
 
 private struct StashItemCardView: View {
+    @ObservedObject var appState: AppState
     let item: StashItem
     let isSelected: Bool
     let onSelect: () -> Void
@@ -326,23 +364,18 @@ private struct StashItemCardView: View {
     let itemProvider: () -> NSItemProvider
 
     @State private var isHovered: Bool = false
+    @State private var copiedRow: Bool = false
 
     var body: some View {
         HStack(spacing: 8) {
-            // Main Content Area (Handles drag-and-drop & selection)
+            // Main Content Area (Drag, Select, Double-Click to Open)
             HStack(spacing: 8) {
-                Image(systemName: "line.3.horizontal")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(isHovered ? .secondary : .secondary.opacity(0.4))
-                    .frame(width: 12)
-
                 itemIconView
                     .frame(width: 28, height: 28)
 
-                // Text Metadata
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.title)
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 11.5, weight: .semibold))
                         .foregroundColor(item.sourceURL != nil && !item.isExistingFile ? .secondary : .primary)
                         .strikethrough(item.sourceURL != nil && !item.isExistingFile, color: .orange)
                         .lineLimit(1)
@@ -350,10 +383,10 @@ private struct StashItemCardView: View {
 
                     HStack(spacing: 4) {
                         if item.sourceURL != nil && !item.isExistingFile {
-                            Text("Missing")
-                                .font(.system(size: 8, weight: .bold))
+                            Text(appState.localized("shelf.missing"))
+                                .font(.system(size: 8.5, weight: .bold))
                                 .foregroundColor(.orange)
-                                .padding(.horizontal, 3)
+                                .padding(.horizontal, 4)
                                 .padding(.vertical, 0.5)
                                 .background(RoundedRectangle(cornerRadius: 3).fill(Color.orange.opacity(0.15)))
                         } else if !item.formattedSize.isEmpty {
@@ -362,16 +395,20 @@ private struct StashItemCardView: View {
                                 .foregroundColor(.secondary)
                         }
                         if item.itemType == .url {
-                            Text("Link")
+                            Text(appState.localized("shelf.link"))
                                 .font(.system(size: 9, weight: .semibold))
                                 .foregroundColor(.cyan)
+                        } else if item.itemType == .text {
+                            Text(appState.localized("shelf.snippet"))
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundColor(.green)
                         } else if let ext = item.sourceURL?.pathExtension.uppercased(), !ext.isEmpty {
                             Text(ext)
                                 .font(.system(size: 8, weight: .bold, design: .monospaced))
-                                .foregroundColor(.secondary.opacity(0.8))
-                                .padding(.horizontal, 3)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 4)
                                 .padding(.vertical, 0.5)
-                                .background(RoundedRectangle(cornerRadius: 3).fill(Color.white.opacity(0.1)))
+                                .background(RoundedRectangle(cornerRadius: 3).fill(Color.primary.opacity(0.08)))
                         }
                     }
                 }
@@ -382,7 +419,7 @@ private struct StashItemCardView: View {
             }, preview: {
                 HStack(spacing: 8) {
                     itemIconView
-                        .frame(width: 24, height: 24)
+                        .frame(width: 22, height: 22)
                     Text(item.title)
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.primary)
@@ -400,127 +437,98 @@ private struct StashItemCardView: View {
                         .stroke(Color.cyan.opacity(0.4), lineWidth: 1)
                 )
             })
+            .onTapGesture(count: 2) {
+                onOpen()
+            }
             .onTapGesture {
                 onSelect()
             }
 
-            Spacer()
+            Spacer(minLength: 4)
 
-            // Isolated Trailing Action Buttons
+            // Compact Action Micro-Buttons (revealed cleanly on hover / selection)
             HStack(spacing: 4) {
-                Button(action: onOpen) {
-                    Image(systemName: "arrow.up.forward.app")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(isSelected ? .cyan : .secondary)
-                        .frame(width: 22, height: 22)
-                        .background(
-                            RoundedRectangle(cornerRadius: 5, style: .continuous)
-                                .fill(Color.white.opacity(0.08))
-                        )
-                }
-                .buttonStyle(.plain)
-                .help("Open File")
-
-                if item.isExistingFile {
-                    Button(action: onReveal) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.secondary)
-                            .frame(width: 22, height: 22)
-                            .background(
-                                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                                    .fill(Color.white.opacity(0.08))
-                            )
+                if isHovered || isSelected {
+                    rowActionButton(
+                        icon: copiedRow ? "checkmark" : "doc.on.doc",
+                        tint: copiedRow ? .green : .secondary,
+                        help: appState.localized("shelf.copyFile")
+                    ) {
+                        onCopyFile()
+                        copiedRow = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { copiedRow = false }
                     }
-                    .buttonStyle(.plain)
-                    .help("Reveal in Finder")
 
-                    Button(action: onCopyFile) {
-                        Image(systemName: "doc.on.doc")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.secondary)
-                            .frame(width: 22, height: 22)
-                            .background(
-                                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                                    .fill(Color.white.opacity(0.08))
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .help("Copy File to Clipboard (Ready to Paste)")
-                }
-
-                Button(action: onRemove) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundColor(.secondary)
-                        .frame(width: 22, height: 22)
-                        .background(
-                            RoundedRectangle(cornerRadius: 5, style: .continuous)
-                                .fill(Color.white.opacity(0.08))
+                    if item.isExistingFile {
+                        rowActionButton(
+                            icon: "magnifyingglass",
+                            tint: .secondary,
+                            help: appState.localized("shelf.revealFinder"),
+                            action: onReveal
                         )
+                    }
+
+                    rowActionButton(
+                        icon: "arrow.up.forward.app",
+                        tint: .cyan,
+                        help: appState.localized("shelf.open"),
+                        action: onOpen
+                    )
                 }
-                .buttonStyle(.plain)
-                .help("Remove")
+
+                rowActionButton(
+                    icon: "xmark",
+                    tint: .secondary,
+                    help: appState.localized("shelf.remove"),
+                    action: onRemove
+                )
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
         .contextMenu {
-            Button("Copy File") {
-                onCopyFile()
-            }
+            Button(appState.localized("shelf.copyFile")) { onCopyFile() }
             if item.sourceURL != nil {
-                Button("Copy Path") {
-                    onCopyPath()
-                }
+                Button(appState.localized("shelf.copyPath")) { onCopyPath() }
             }
             Divider()
-            Button("Open") {
-                onOpen()
-            }
+            Button(appState.localized("shelf.open")) { onOpen() }
             if item.isExistingFile {
-                Button("Reveal in Finder") {
-                    onReveal()
-                }
+                Button(appState.localized("shelf.revealFinder")) { onReveal() }
             }
             Divider()
-            Button("Remove from Shelf") {
-                onRemove()
-            }
+            Button(appState.localized("shelf.remove")) { onRemove() }
         }
-        .padding(.vertical, 6)
         .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(isSelected ? Color.cyan.opacity(0.18) : (isHovered ? Color.white.opacity(0.12) : Color.white.opacity(0.05)))
-
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(
-                            RadialGradient(
-                                colors: [Color.cyan.opacity(0.15), Color.clear],
-                                center: .topLeading,
-                                startRadius: 5,
-                                endRadius: 100
-                            )
-                        )
-                }
-            }
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(isSelected ? Color.cyan.opacity(0.18) : (isHovered ? Color.primary.opacity(0.09) : Color.primary.opacity(0.04)))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(
                     isSelected
-                        ? LinearGradient(colors: [Color.cyan, Color.blue.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                        : (isHovered ? LinearGradient(colors: [Color.white.opacity(0.3), Color.white.opacity(0.05)], startPoint: .topLeading, endPoint: .bottomTrailing) : LinearGradient(colors: [Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing)),
+                        ? Color.cyan.opacity(0.7)
+                        : (isHovered ? Color.primary.opacity(0.16) : Color.clear),
                     lineWidth: 1.0
                 )
         )
-        .scaleEffect(isHovered ? 1.015 : 1.0)
-        .animation(.spring(response: 0.2, dampingFraction: 0.75), value: isHovered)
-        .onHover { hovering in
-            isHovered = hovering
+        .animation(.easeOut(duration: 0.14), value: isHovered)
+        .onHover { isHovered = $0 }
+    }
+
+    private func rowActionButton(icon: String, tint: Color, help: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 9.5, weight: .bold))
+                .foregroundColor(tint)
+                .frame(width: 22, height: 22)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(Color.primary.opacity(0.07))
+                )
         }
+        .buttonStyle(.plain)
+        .help(help)
     }
 
     @ViewBuilder
@@ -534,7 +542,6 @@ private struct StashItemCardView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
                     .fill(Color.orange.opacity(0.18))
-
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 12))
                     .foregroundColor(.orange)
@@ -543,7 +550,6 @@ private struct StashItemCardView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
                     .fill(Color.cyan.opacity(0.18))
-
                 Image(systemName: item.itemType == .url ? "link" : (item.itemType == .image ? "photo" : "doc.text"))
                     .font(.system(size: 13))
                     .foregroundColor(.cyan)

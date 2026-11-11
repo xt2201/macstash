@@ -4,241 +4,329 @@ import MacStashCore
 
 public struct AppearanceTab: View {
     @ObservedObject var appState: AppState
+    @State private var previewCorner: CornerPosition = .bottomRight
+    @State private var previewAction: ControlAction = .volume
+    @State private var previewValue: Double = 0.68
+    @State private var isLightBackdrop: Bool = false
+    @State private var lastDetentStep: Int = 13
 
     public init(appState: AppState) {
         self.appState = appState
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Interactive Liquid Glass Studio Stage (Real-time Live Preview)
-            LiquidGlassPreviewStage(appState: appState)
+        VStack(alignment: .leading, spacing: 18) {
+            // Section 1: Interactive Liquid Glass Studio
+            SettingsCard(
+                title: appState.localized("appearance.studioTitle"),
+                systemImage: "sparkles",
+                accentColor: .purple,
+                trailingText: "\(Int(round(previewValue * 100)))%"
+            ) {
+                HStack(spacing: 10) {
+                    Text(appState.localized("appearance.previewCorner"))
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(.secondary)
 
-            GroupBox(label: Label(appState.localized("appearance.geometryStyling"), systemImage: "circle.circle")) {
-                VStack(alignment: .leading, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(appState.localized("appearance.dialRadius"))
-                                .font(.system(size: 12, weight: .medium))
-                            Spacer()
-                            Text("\(Int(appState.settings.dialRadiusPoints)) pt")
-                                .font(.system(size: 12, weight: .bold, design: .monospaced))
-                                .monospacedDigit()
-                        }
-                        Slider(value: $appState.settings.dialRadiusPoints, in: 110...200, step: 5)
+                    Picker("", selection: $previewCorner) {
+                        Text("TL").tag(CornerPosition.topLeft)
+                        Text("TR").tag(CornerPosition.topRight)
+                        Text("BL").tag(CornerPosition.bottomLeft)
+                        Text("BR").tag(CornerPosition.bottomRight)
                     }
+                    .labelsHidden()
+                    .pickerStyle(.segmented)
+                    .frame(width: 150)
 
-                    Divider()
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(appState.localized("appearance.glassOpacity"))
-                                .font(.system(size: 12, weight: .medium))
-                            Spacer()
-                            Text("\(Int(appState.settings.dialOpacity * 100))%")
-                                .font(.system(size: 12, weight: .bold, design: .monospaced))
-                                .monospacedDigit()
-                        }
-                        Slider(value: $appState.settings.dialOpacity, in: 0.3...1.0, step: 0.05)
+                    Picker("", selection: $previewAction) {
+                        Text(appState.localized("palette.volume")).tag(ControlAction.volume)
+                        Text(appState.localized("palette.brightness")).tag(ControlAction.brightness)
+                        Text(appState.localized("corners.action.backlight")).tag(ControlAction.keyboardBrightness)
+                        Text(appState.localized("palette.timer")).tag(ControlAction.timer)
+                        Text(appState.localized("corners.action.keepAwake")).tag(ControlAction.keepAwake)
                     }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .frame(width: 135)
 
-                    Divider()
+                    Spacer()
 
-                    HStack {
-                        Text(appState.localized("appearance.theme"))
-                            .font(.system(size: 12, weight: .medium))
-                        Spacer()
-                        Picker("", selection: $appState.settings.appearanceTheme) {
-                            Text(appState.localized("appearance.themeMatchSystem")).tag("system")
-                            Text(appState.localized("appearance.themeLight")).tag("light")
-                            Text(appState.localized("appearance.themeDark")).tag("dark")
-                        }
-                        .pickerStyle(.segmented)
-                        .frame(width: 240)
+                    Picker("", selection: $isLightBackdrop) {
+                        Text(appState.localized("appearance.wallpaperDark")).tag(false)
+                        Text(appState.localized("appearance.wallpaperLight")).tag(true)
                     }
+                    .labelsHidden()
+                    .pickerStyle(.segmented)
+                    .frame(width: 145)
                 }
-                .padding(8)
+
+                previewStageView
             }
 
-            GroupBox(label: Label(appState.localized("appearance.animationMotion"), systemImage: "sparkles")) {
-                VStack(alignment: .leading, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(appState.localized("appearance.animationSpeed"))
-                                .font(.system(size: 12, weight: .medium))
-                            Spacer()
-                            Text(String(format: "%.1fx", appState.settings.animationSpeedMultiplier))
-                                .font(.system(size: 12, weight: .bold, design: .monospaced))
-                                .monospacedDigit()
-                        }
-                        Slider(value: $appState.settings.animationSpeedMultiplier, in: 0.5...2.0, step: 0.1)
+            // Section 2: Dial Geometry & Styling
+            SettingsCard(
+                title: appState.localized("appearance.geometryStyling"),
+                systemImage: "circle.dashed.inset.filled",
+                accentColor: .blue
+            ) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(appState.localized("appearance.dialRadius"))
+                            .font(.system(size: 12.5, weight: .medium))
+                        Spacer()
+                        Text("\(Int(appState.settings.dialRadiusPoints)) pt")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .monospacedDigit()
+                            .foregroundColor(.secondary)
                     }
+                    Slider(value: $appState.settings.dialRadiusPoints, in: 100...250, step: 5)
+                }
 
-                    Divider()
+                Divider()
 
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(appState.localized("appearance.glassOpacity"))
+                            .font(.system(size: 12.5, weight: .medium))
+                        Spacer()
+                        Text("\(Int(round(appState.settings.dialOpacity * 100)))%")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .monospacedDigit()
+                            .foregroundColor(.secondary)
+                    }
+                    Slider(value: $appState.settings.dialOpacity, in: 0.2...1.0, step: 0.05)
+                    Text(appState.localized("appearance.dialScaleHint"))
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+
+                Divider()
+
+                HStack {
+                    Text(appState.localized("appearance.theme"))
+                        .font(.system(size: 12.5, weight: .medium))
+                    Spacer()
+                    Picker("", selection: $appState.settings.appearanceTheme) {
+                        Text(appState.localized("appearance.themeMatchSystem")).tag("system")
+                        Text(appState.localized("appearance.themeLight")).tag("light")
+                        Text(appState.localized("appearance.themeDark")).tag("dark")
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 260)
+                }
+            }
+
+            // Section 3: Animation & Motion
+            SettingsCard(
+                title: appState.localized("appearance.animationMotion"),
+                systemImage: "wind",
+                accentColor: .cyan
+            ) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(appState.localized("appearance.animationSpeed"))
+                            .font(.system(size: 12.5, weight: .medium))
+                        Spacer()
+                        Text(String(format: "%.1fx", appState.settings.animationSpeedMultiplier))
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .monospacedDigit()
+                            .foregroundColor(.secondary)
+                    }
+                    Slider(value: $appState.settings.animationSpeedMultiplier, in: 0.5...2.0, step: 0.1)
+                }
+
+                Divider()
+
+                VStack(alignment: .leading, spacing: 4) {
                     Toggle(appState.localized("appearance.reduceMotion"), isOn: $appState.settings.respectReduceMotion)
+                        .font(.system(size: 12.5, weight: .medium))
                     Text(appState.localized("appearance.reduceMotionHint"))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }
-                .padding(8)
             }
 
-            GroupBox(label: Label(appState.localized("appearance.tactileAudio"), systemImage: "speaker.wave.2")) {
-                VStack(alignment: .leading, spacing: 14) {
-                    Toggle(appState.localized("appearance.soundFx"), isOn: $appState.settings.isSoundEnabled)
+            // Section 4: Tactile & Audio Feedback
+            SettingsCard(
+                title: appState.localized("appearance.tactileAudio"),
+                systemImage: "waveform",
+                accentColor: .orange
+            ) {
+                Toggle(appState.localized("appearance.soundFx"), isOn: $appState.isSoundEnabled)
+                    .font(.system(size: 12.5, weight: .medium))
 
-                    if appState.settings.isSoundEnabled {
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(appState.localized("appearance.soundVolume"))
-                                    .font(.system(size: 12, weight: .medium))
-                                Spacer()
-                                Text("\(Int(appState.settings.soundVolume * 100))%")
-                                    .font(.system(size: 12, weight: .bold, design: .monospaced))
-                                    .monospacedDigit()
-                            }
-                            Slider(value: $appState.settings.soundVolume, in: 0.1...1.0, step: 0.05)
+                if appState.isSoundEnabled {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(appState.localized("appearance.soundVolume"))
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("\(Int(round(appState.soundVolume * 100)))%")
+                                .font(.system(size: 11.5, weight: .bold, design: .monospaced))
+                                .monospacedDigit()
+                                .foregroundColor(.secondary)
                         }
+                        Slider(value: Binding(
+                            get: { Double(appState.soundVolume) },
+                            set: { appState.soundVolume = Float($0) }
+                        ), in: 0.0...1.0, step: 0.05)
                     }
+                    .padding(.leading, 18)
+                }
 
-                    Divider()
+                Divider()
 
+                Toggle(appState.localized("appearance.trackpadHaptics"), isOn: $appState.settings.hapticFeedbackEnabled)
+                    .font(.system(size: 12.5, weight: .medium))
+
+                if appState.settings.hapticFeedbackEnabled {
                     HStack {
                         Text(appState.localized("appearance.hapticIntensity"))
                             .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
                         Spacer()
                         Picker("", selection: $appState.settings.hapticIntensity) {
-                            Text(appState.localized("appearance.hapticOff")).tag("off")
-                            Text(appState.localized("appearance.hapticLight")).tag("subtle")
+                            Text(appState.localized("appearance.hapticLight")).tag("light")
                             Text(appState.localized("appearance.hapticMedium")).tag("medium")
                             Text(appState.localized("appearance.hapticStrong")).tag("strong")
                         }
-                        .pickerStyle(.menu)
-                        .frame(width: 140)
+                        .pickerStyle(.segmented)
+                        .frame(width: 220)
                     }
+                    .padding(.leading, 18)
                 }
-                .padding(8)
+
+                Divider()
+
+                HStack {
+                    Spacer()
+                    Button {
+                        appState.sound.playAccent(enabled: appState.isSoundEnabled)
+                        appState.haptics.performBoundaryClick(intensity: appState.effectiveHapticIntensity)
+                    } label: {
+                        Label(appState.localized("appearance.testFeedback"), systemImage: "hand.tap.fill")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
             }
         }
     }
-}
 
-// MARK: - Interactive Liquid Glass Preview Stage
+    // MARK: - Live Interactive Preview Stage
 
-private struct LiquidGlassPreviewStage: View {
-    @ObservedObject var appState: AppState
-    @State private var previewValue: Double = 0.65
-    @State private var previewAction: ControlAction = .volume
+    private var previewStageView: some View {
+        let previewDialSize = min(210.0, appState.settings.dialRadiusPoints)
+        let tint = previewAction.accentColors.first ?? .accentColor
+        let stageHeight = max(210.0, previewDialSize + 44.0)
+        let geom = RadialDialGeometry(
+            corner: previewCorner,
+            size: CGSize(width: previewDialSize, height: previewDialSize),
+            outerRadius: previewDialSize - 15,
+            innerRadius: max(42, previewDialSize * 0.38)
+        )
 
-    var body: some View {
-        GroupBox(label: Label(appState.localized("appearance.studioTitle"), systemImage: "sparkles")) {
-            VStack(spacing: 12) {
-                // Interactive stage canvas with dark backdrop and simulated screen corner
-                ZStack(alignment: .bottomTrailing) {
-                    // Simulated desktop wallpaper preview
+        return ZStack(alignment: stageAlignment(for: previewCorner)) {
+            // Wallpaper simulation backdrop
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(
                     LinearGradient(
-                        colors: [
-                            Color(red: 0.10, green: 0.14, blue: 0.22),
-                            Color(red: 0.04, green: 0.06, blue: 0.12)
-                        ],
+                        colors: isLightBackdrop
+                            ? [Color(red: 0.87, green: 0.92, blue: 0.98), Color(red: 0.72, green: 0.83, blue: 0.96), Color(red: 0.89, green: 0.84, blue: 0.96)]
+                            : [Color(red: 0.06, green: 0.08, blue: 0.14), Color(red: 0.11, green: 0.15, blue: 0.25), Color(red: 0.16, green: 0.11, blue: 0.24)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
-                    .frame(height: 190)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [Color.white.opacity(0.25), Color.white.opacity(0.05)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1
-                            )
-                    )
+                )
 
-                    // Interactive mini dial positioned at the bottom right corner of the stage
-                    let stageDialSize: CGFloat = min(155, appState.settings.dialRadiusPoints)
-                    let geom = RadialDialGeometry(
-                        corner: .bottomRight,
-                        size: CGSize(width: stageDialSize, height: stageDialSize),
-                        outerRadius: stageDialSize - 15,
-                        innerRadius: 50
-                    )
+            // Decorative desktop ambient mesh orbs for glass refraction test
+            GeometryReader { geo in
+                ZStack {
+                    Circle()
+                        .fill(tint.opacity(isLightBackdrop ? 0.25 : 0.30))
+                        .frame(width: 140, height: 140)
+                        .blur(radius: 30)
+                        .position(x: geo.size.width * 0.32, y: geo.size.height * 0.45)
 
-                    ZStack {
-                        QuarterCircleGlassBackdrop(
-                            corner: .bottomRight,
-                            dialSize: stageDialSize,
-                            tint: previewAction.accentColors.first ?? .clear
-                        )
-                        .opacity(appState.settings.dialOpacity)
-
-                        DialTicksView(
-                            geometry: geom,
-                            value: previewValue,
-                            accentColor: previewAction.accentColors.first ?? .accentColor
-                        )
-
-                        DialArcShape(
-                            geometry: geom,
-                            value: previewValue,
-                            gradientColors: previewAction.accentColors
-                        )
-
-                        // Center badge (tap to toggle mute/play)
-                        Button(action: {
-                            SoundEffectManager.shared.playAccent()
-                            HapticManager.shared.performDetentTick()
-                            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
-                                previewValue = previewValue > 0.05 ? 0.0 : 0.75
-                            }
-                        }) {
-                            CenterActionBadge(
-                                action: previewAction,
-                                corner: .bottomRight,
-                                value: previewValue,
-                                dialSize: stageDialSize,
-                                isExpanded: true,
-                                formattedTimer: "25:00",
-                                isPomodoroRunning: false,
-                                isPomodoroPaused: false,
-                                pomodoroMode: .focus,
-                                completedRounds: 1,
-                                totalRounds: 4,
-                                isMuted: previewValue <= 0.01,
-                                isKeyboardSupported: true,
-                                formattedKeepAwake: "30m",
-                                stashItemCount: 3,
-                                tint: previewAction.accentColors.first ?? .clear
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .frame(width: stageDialSize, height: stageDialSize)
-                    .padding([.bottom, .trailing], 8)
+                    Circle()
+                        .fill(Color.indigo.opacity(isLightBackdrop ? 0.18 : 0.28))
+                        .frame(width: 130, height: 130)
+                        .blur(radius: 28)
+                        .position(x: geo.size.width * 0.72, y: geo.size.height * 0.55)
                 }
-
-                // Controls beneath the stage to test actions & scrub value
-                HStack(spacing: 12) {
-                    Picker("", selection: $previewAction) {
-                        Text(ControlAction.volume.displayName).tag(ControlAction.volume)
-                        Text(ControlAction.brightness.displayName).tag(ControlAction.brightness)
-                        Text(ControlAction.timer.displayName).tag(ControlAction.timer)
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 240)
-
-                    Spacer()
-
-                    Slider(value: $previewValue, in: 0...1)
-                        .frame(width: 120)
-                }
-                .padding(.horizontal, 4)
             }
-            .padding(8)
+
+            // Interactive Dial Under Test
+            ZStack {
+                QuarterCircleGlassBackdrop(
+                    corner: previewCorner,
+                    dialSize: previewDialSize,
+                    tint: tint
+                )
+                .opacity(appState.settings.dialOpacity)
+
+                DialTicksView(
+                    geometry: geom,
+                    value: previewValue,
+                    accentColor: tint
+                )
+
+                DialArcShape(
+                    geometry: geom,
+                    value: previewValue,
+                    gradientColors: previewAction.accentColors
+                )
+
+                CenterActionBadge(
+                    action: previewAction,
+                    corner: previewCorner,
+                    value: previewValue,
+                    dialSize: previewDialSize,
+                    isExpanded: true,
+                    formattedTimer: String(format: "%02d:00", max(1, Int(round(previewValue * 60)))),
+                    isPomodoroRunning: false,
+                    isPomodoroPaused: false,
+                    pomodoroMode: .focus,
+                    completedRounds: 1,
+                    totalRounds: 4,
+                    isMuted: previewAction == .volume && previewValue <= 0.01,
+                    isKeyboardSupported: true,
+                    formattedKeepAwake: "30m",
+                    stashItemCount: 3,
+                    tint: tint
+                )
+            }
+            .frame(width: previewDialSize, height: previewDialSize)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        let newVal = geom.value(for: value.location)
+                        previewValue = max(0.0, min(1.0, newVal))
+                        let step = Int(round(previewValue * 20))
+                        if step != lastDetentStep {
+                            lastDetentStep = step
+                            appState.haptics.performDetentTick(intensity: appState.effectiveHapticIntensity)
+                        }
+                    }
+            )
+            .macStashTheme(isLightBackdrop ? .light : .dark)
+        }
+        .frame(height: stageHeight)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.14), lineWidth: 1.0)
+        )
+    }
+
+    private func stageAlignment(for corner: CornerPosition) -> Alignment {
+        switch corner {
+        case .topLeft: return .topLeading
+        case .topRight: return .topTrailing
+        case .bottomLeft: return .bottomLeading
+        case .bottomRight: return .bottomTrailing
         }
     }
 }

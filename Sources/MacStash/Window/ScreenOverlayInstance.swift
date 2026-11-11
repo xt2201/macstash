@@ -166,8 +166,8 @@ public final class ScreenOverlayInstance {
 
         let edgeFrame = sliderRect(in: screen.frame)
         let panel = makeEdgePanel(contentRect: edgeFrame)
-        let sliderView = EdgeSliderView(appState: appState, displayID: displayID, edge: isLeft ? .left : .right)
-        let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID, edge: isLeft ? .left : .right)
+        let sliderView = EdgeSliderView(appState: appState, displayID: displayID)
+        let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID)
 
         panel.contentView = hostingView
         panel.orderFrontRegardless()
@@ -198,6 +198,17 @@ public final class ScreenOverlayInstance {
         for (corner, panel) in cornerPanels {
             let rect = cornerRect(for: corner, in: frame)
             panel.setFrame(rect, display: true)
+            if let existingView = passThroughViews[corner], existingView.screenFrame != frame {
+                let updatedView = PassThroughHostingView(
+                    rootView: CornerDialView(appState: appState, corner: corner, displayID: displayID),
+                    corner: corner,
+                    displayID: displayID,
+                    screenFrame: frame,
+                    appState: appState
+                )
+                panel.contentView = updatedView
+                passThroughViews[corner] = updatedView
+            }
         }
 
         if appState.settings.isEdgeSlidersEnabled {

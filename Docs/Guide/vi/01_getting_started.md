@@ -1,10 +1,10 @@
 # Hướng Dẫn Bắt Đầu MacStash
 
-MacStash cung cấp các vòng xoay điều khiển hình góc phần tư xuất hiện tinh tế tại bốn góc vật lý của màn hình macOS.
+MacStash mang đến hệ thống vòng xoay xúc giác tại góc màn hình, thanh trượt cạnh màn hình tùy biến Trái/Phải, kệ lưu tệp/ghi chú nhanh và Thanh Dock thứ hai (Second Dock) ngay trên macOS.
 
 ## Khái Niệm Cốt Lõi
 
-MacStash được thiết kế để duy trì trạng thái ẩn hoàn toàn và không tiêu tốn tài nguyên cho đến khi người dùng cần thao tác. Khi di chuột vào góc kích hoạt và dừng lại trong giây lát, vòng xoay tương ứng sẽ xuất hiện mượt mà.
+MacStash luôn ẩn gọn và tiết kiệm tài nguyên cho tới khi bạn gọi ra, sử dụng các bảng kính Liquid Glass không làm mất tiêu điểm cửa sổ đang làm việc.
 
 ### Bốn Góc Vật Lý
 1. **Góc Trên - Trái**: Mặc định điều chỉnh đèn bàn phím (Keyboard Backlight).
@@ -13,21 +13,22 @@ MacStash được thiết kế để duy trì trạng thái ẩn hoàn toàn và
 4. **Góc Dưới - Phải**: Mặc định âm lượng loa tổng (Master Volume).
 
 ### Phân Biệt Góc Ngoài Biên và Điểm Tiếp Giáp Màn Hình
-Trên cấu hình nhiều màn hình, MacStash sử dụng thuật toán hình học để chỉ nhận diện góc ngoài biên thực sự của toàn bộ không gian desktop. Khi con trỏ chuột di chuyển qua lại giữa các màn hình tại các đường biên tiếp giáp bên trong, MacStash sẽ không chặn chuột và không kích hoạt nhầm.
+Trên hệ thống nhiều màn hình, bạn có thể bật tùy chọn **Chỉ kích hoạt góc biên ngoài** để giữ chuyển động chuột mượt mà khi đi qua ranh giới giữa hai màn hình nối liền.
 
-### Thanh Trượt Cạnh Màn Hình (Edge Sliders)
-Bên cạnh bốn góc xoay, MacStash cung cấp thanh trượt tiện ích tại mép ngoài cùng bên phải của màn hình. Khi rê chuột vào mép phải, một thanh trượt thanh lịch sẽ trượt ra nhẹ nhàng, cho phép tinh chỉnh nhanh âm lượng hoặc độ sáng mà không cần di chuyển chuột xuống góc.
+### Thanh Trượt Cạnh Trái/Phải & Trình Phát Nhạc
+Đưa con trỏ chuột chạm mép màn hình đã chọn (**Cạnh trái** hoặc **Cạnh phải**, cấu hình trong Cài đặt > Góc nóng) để trượt ra bảng điều khiển dọc kèm nút bật/tắt nhanh, ảnh bìa album, dải sóng nhạc nhấp nhô và nút điều khiển Trước / Phát-Tạm dừng / Kế tiếp.
 
-## Biểu Tượng Nhận Diện và Menu Bar
+### Kệ Thả Tệp (Stash Shelf), Ghi Chú Nhanh (Scratchpad) & Vòng Xoay Con Trỏ
+- **Kệ Thả Tệp (Stash Shelf)**: Lắc nhẹ chuột khi đang kéo tệp, nhấn `Control+Option+S` hoặc chạm mép ngăn kéo để lưu tạm tệp, hình ảnh, liên kết, lọc tìm kiếm hoặc dán nhanh từ clipboard.
+- **Ghi Chú Nhanh (Scratchpad)**: Nhấn `Control+Option+N` hoặc chuyển tab trong ngăn kéo để ghi chú nhanh, tự động lưu cục bộ và gửi ghi chú sang Kệ thả tệp chỉ với một nhấp.
+- **Vòng Xoay Tại Con Trỏ (Cursor Palette)**: Nhấn `Option+Space` để mở vòng xoay 4 phần ngay tại vị trí con trỏ (Độ sáng, Âm lượng, Hẹn giờ, Giữ máy thức); rê chuột và cuộn hai ngón để tinh chỉnh hoặc nhấp để bật/tắt.
 
-MacStash sử dụng bộ nhận diện thương hiệu **Radial Corner Bloom (Góc Nở Vành Cung)**: gồm một hạt nhân tọa độ neo tại góc màn hình vật lý kết hợp cùng vành quay quang học 1/4 hình tròn.
+### Thanh Dock Thứ Hai & 16 Tiện Ích Trực Tiếp
+**Thanh Dock thứ hai** (`Control+Option+D`) hỗ trợ ghim ứng dụng, chấm báo ứng dụng đang chạy, xem thư mục nhanh, chuyển đa hồ sơ (`Command+1..8`) và 16 tiện ích trực tiếp có thể cấu hình riêng (Đồng hồ, Lịch, Thời tiết, Hiệu năng Hệ thống, Lời nhắc, Pomodoro, Nhạc đang phát, Tìm kiếm, Clipboard, Ghi chú, Kệ tệp, Chụp màn hình, Lấy mã màu, Chuyển đổi đơn vị, Dấu trang).
 
-### Tiện Ích Nhanh Trên Menu Bar
-- **Điều khiển âm thanh**: Nhấp vào biểu tượng loa để bật hoặc tắt tiếng tức thì (Mute/Unmute), hoặc chọn thiết bị đầu ra từ danh sách thả xuống.
-- **Độ sáng đa màn hình**: Hiển thị thanh trượt độ sáng độc lập cho từng màn hình kèm tên và biểu tượng thiết bị khi kết nối nhiều màn hình.
-- **Đồng hồ Pomodoro**: Huy hiệu đếm ngược thời gian thực trên thanh trạng thái kèm các nút Bắt đầu, Tạm dừng, Bỏ qua và Đặt lại trong menu popover.
+## Trung Tâm Điều Khiển Menu Bar
 
-### Các Trạng Thái Trên Menu Bar
-- **Trạng thái Nghỉ (Idle)**: Vành cung 1/4 hình tròn đơn sắc thanh lịch với chấm neo góc, ăn khớp hoàn hảo với độ dày của các biểu tượng hệ thống Apple.
-- **Trạng thái Hoạt động (Active / Pomodoro)**: Vành cung tự động chuyển sang dạng hình quạt đặc, giúp người dùng nhận biết ngay lập tức phiên tập trung đang chạy mà không cần mở popover.
-- **Tự động Thích ứng Giao diện**: Biểu tượng sử dụng cơ chế template image, tự động chuyển đổi giữa màu trắng và đen theo chế độ Light Mode, Dark Mode hoặc màn hình hình nền trong suốt.
+Biểu tượng MacStash trên Menu Bar thích ứng tự động theo giao diện Sáng/Tối và mở ra bảng Control Center gọn gàng:
+- **Thẻ Ngữ Cảnh & Pomodoro**: Hiển thị ứng dụng hiện hành, hồ sơ áp dụng và bộ đếm thời gian Pomodoro trực tiếp.
+- **Thanh Trượt Phần Cứng Tức Thì**: Điều chỉnh âm lượng, chọn thiết bị phát âm thanh, độ sáng từng màn hình và đèn nền bàn phím.
+- **Bảng Bật/Tắt 6 Module Nhanh**: Bật hoặc tắt nhanh Vòng xoay góc, Thanh trượt cạnh, Thanh Dock thứ hai, Giữ máy thức, Kệ thả tệp hoặc Ghi chú nhanh, cùng nút mở Cài đặt (`Command+,`) và Hướng dẫn (`Command+?`).

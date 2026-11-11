@@ -1,37 +1,41 @@
-# Hướng Dẫn Cài Đặt Settings
+# Cẩm Nang 8 Mục Cài Đặt (Settings)
 
-MacStash cung cấp cửa sổ thiết lập gồm 8 tab chuẩn theo Apple Human Interface Guidelines. Mở nhanh bằng tổ hợp phím Command+, hoặc qua menu bar icon.
+Cửa sổ Cài đặt MacStash (`Command+,`) sử dụng bố cục thanh bên 8 mục rõ ràng theo chuẩn macOS:
 
-## Danh Sách 8 Tab
+## 1. General (Tổng Quan)
+- **Điều khiển tổng**: Bật/tắt toàn cục, ẩn/hiện biểu tượng Menu Bar, Khởi động cùng macOS (`SMAppService`) và chọn Thời lượng Giữ máy thức mặc định (15 phút, 30 phút, 1 giờ, 2 giờ, Vô hạn).
+- **Tổng quan Module hoạt động**: Bảng 6 ô trạng thái trực tiếp cho phép bật/tắt nhanh và nhảy thẳng tới phần cấu hình của Vòng xoay góc, Thanh trượt cạnh, Thanh Dock thứ hai, Kệ thả tệp, Ghi chú nhanh và Vòng xoay con trỏ.
+- **Ngôn ngữ**: Chuyển đổi tức thì giữa Mặc định hệ thống, Tiếng Việt và English.
+- **Quyền hệ thống & Đặt lại**: Kiểm tra và cấp quyền Trợ năng, Theo dõi đầu vào, Thông báo và khôi phục cài đặt gốc.
 
-1. **General (Tổng quan)**:
-   Công tắc tổng, ẩn hiện biểu tượng trên menu bar, lựa chọn ngôn ngữ (Tiếng Việt, English), khởi động cùng macOS, và dashboard cấp quyền Accessibility, Input Monitoring, Notifications.
+## 2. Hot Corners (Góc Nóng & Cạnh Màn Hình)
+- **Sơ đồ màn hình tương tác & Hồ sơ ứng dụng**: Nhấp trực tiếp lên góc hoặc cạnh màn hình thu nhỏ để định vị thiết lập; thêm hồ sơ theo từng ứng dụng dễ dàng bằng danh sách ứng dụng đang chạy hoặc duyệt `/Applications`.
+- **Gán tác vụ 4 góc**: Bật/tắt từng góc và gán Âm lượng, Độ sáng, Đèn bàn phím, Pomodoro, Giữ máy thức, Kệ thả tệp, Ghi chú nhanh hoặc Tắt.
+- **Thanh trượt cạnh & Trình phát nhạc**: Bật/tắt thanh trượt dọc, chọn **Cạnh trái** hoặc **Cạnh phải**, chọn tác vụ điều khiển và bật ảnh bìa cùng sóng nhạc Now Playing.
+- **Ngăn kéo tiện ích & Vòng xoay con trỏ**: Bật/tắt Kệ thả tệp, Ghi chú nhanh, chọn cạnh neo Trái/Phải và Vòng xoay tại con trỏ.
+- **Độ nhạy, Cử chỉ, Quy tắc tạm ẩn & Loại trừ ứng dụng**: Tinh chỉnh vùng kích hoạt, độ trễ xuất hiện/ẩn, cuộn hai ngón, ẩn khi kéo chuột hoặc chạy toàn màn hình, chỉ góc ngoài biên, chọn màn hình áp dụng và danh sách loại trừ ứng dụng.
 
-2. **Hot Corners (Góc nóng)**:
-   Quản lý Hồ sơ ứng dụng (hồ sơ Mặc định và hồ sơ riêng theo từng phần mềm tự nhận diện qua Bundle Identifier), công tắc tổng cho núm xoay góc, bật/tắt từng góc, gán hành động (Volume, Brightness, Backlight, Pomodoro, Keep Awake, Stash Shelf, Scratchpad, None), tùy chọn Màn hình hiển thị góc (chỉ Màn hình máy Mac, chỉ Màn hình ngoài, hoặc Cả hai màn hình), bật/tắt thanh trượt cạnh (Edge Sliders), chọn vị trí cạnh (Cạnh trái hoặc Cạnh phải) và gán tác vụ cạnh, kèm tùy chọn bộ điều khiển nhạc Now Playing dưới thanh âm lượng (hiển thị ảnh bìa album thực tế, thanh sóng nhảy theo điệu nhạc và phím điều khiển dọc: Lùi bài ở trên, Phát/Dừng ở giữa, Chuyển bài ở dưới), độ nhạy hit-zone (1-20pt), độ trễ dừng chuột (0-1000ms), độ trễ tự động ẩn (50-1000ms), cử chỉ tương tác (cuộn 2 ngón tay trên trackpad để điều chỉnh vòng xoay và thanh trượt mà không cần nhấn giữ chuột), chặn khi kéo chuột / full screen / góc biên ngoài giữa các màn hình, và danh sách ứng dụng loại trừ.
+## 3. Second Dock (Thanh Dock Thứ Hai)
+- **Hồ sơ & Vị trí**: Tạo, chuyển đổi, xuất/nhập hoặc xóa hồ sơ; chọn vị trí Cố định đáy, Cửa sổ nổi tự do, Cố định trên, Cạnh trái hoặc Cạnh phải; chỉnh Tỷ lệ kích thước, Khoảng cách ô và Khoảng cách mép.
+- **Hành vi & Chất liệu Kính**: Cấu hình Tự động ẩn, Độ trễ hiện thanh, Vùng mép kích hoạt, ẩn khi toàn màn hình/đè cửa sổ, Dành riêng không gian, Hiện ứng dụng đang chạy, phong cách Liquid/Light/Dark/Clear Glass và Giảm chuyển động.
+- **Danh sách mục & Thư viện Tiện ích**: Sắp xếp ứng dụng, thư mục, thanh phân cách và 16 tiện ích trực tiếp; mở bảng cấu hình riêng cho từng tiện ích (Thời tiết, Đồng hồ, Hiệu năng hệ thống, Pomodoro, Dấu trang).
 
-3. **Second Dock (Thanh Dock thứ hai)**:
-   Công tắc tổng kích hoạt thanh Dock phụ trợ chứa live widget và ứng dụng yêu thích chạy song song bên cạnh Dock gốc macOS. Tùy biến vị trí (Fixed Bottom nằm phía trên Dock macOS với khoảng cách lớn hơn hoặc bằng 0 px không chồng lấn, Floating trôi nổi tự do, Fixed Top, Fixed Left, Fixed Right), điều chỉnh tỷ lệ scale (0.7x đến 1.5x), khoảng cách ô, khoảng cách tới đáy màn hình, tự động ẩn kèm độ trễ hiện (0.0s đến 3.0s) và vùng kích hoạt cạnh viền (2px đến 20px), ẩn khi toàn màn hình, ẩn khi cửa sổ đè lên, dự trữ không gian dock, các kiểu nền kính (Auto System, Light Glass, Dark Glass, Liquid Glass, Clear không khung), chuyển đổi hồ sơ dock, mục quản lý ứng dụng dock (thêm ứng dụng từ /Applications, xóa ứng dụng mặc định như Safari và Terminal, đổi thứ tự hiển thị, thêm vạch ngăn), thư viện 16 live widget cục bộ và nút khôi phục bố cục Reset Layout an toàn.
+## 4. Appearance (Giao Diện)
+- **Studio Liquid Glass Tương Tác**: Thử nghiệm kéo trực tiếp trên vòng xoay mẫu với 4 góc (`TL`/`TR`/`BL`/`BR`), chuyển nền Sáng/Tối mô phỏng, tùy chỉnh Bán kính, Độ mờ nền kính và Chủ đề Giao diện (`Theo hệ thống`, `Sáng`, `Tối`).
+- **Hoạt ảnh & Phản hồi**: Tinh chỉnh tốc độ hoạt ảnh, Giảm chuyển động, âm lượng hiệu ứng cơ học, mức rung xúc giác Force Touch (`Nhẹ`, `Trung bình`, `Mạnh`) và nút Thử rung & âm thanh.
 
-4. **Appearance (Giao diện)**:
-   Bán kính vòng quay (110-200pt), độ trong suốt nền kính, chọn chủ đề (Hệ thống, Sáng, Tối), tốc độ hiệu ứng, hỗ trợ Reduce Motion, âm thanh click cơ học và cường độ rung haptic trackpad (Tắt, Nhẹ, Vừa, Mạnh).
+## 5. Displays (Màn Hình)
+- **Màn hình đang kết nối**: Xem trạng thái từng màn hình tích hợp và màn hình ngoài, chọn chế độ Tự động, Phần cứng DDC/CI hoặc Giảm sáng phần mềm, thử kéo độ sáng hoặc bấm Mức nhanh (25%, 50%, 75%, 100%).
+- **Độ chính xác & Ngưỡng an toàn**: Chọn bước chỉnh (1%, 5%, 10%) cùng Ngưỡng sáng tối thiểu và tối đa an toàn phần cứng.
 
-5. **Displays (Màn hình)**:
-   Danh sách màn hình kết nối kèm UUID, chọn phương thức điều khiển (Tự động, DDC/CI, Giảm sáng phần mềm, Mặc định), lý do fallback thực tế, thanh trượt thử nghiệm độ sáng, ngưỡng giới hạn tối thiểu, và tự động lưu cấu hình theo từng màn hình.
+## 6. Pomodoro (Đồng Hồ Tập Trung)
+- **Vòng Đếm Ngược Trực Tiếp**: Điều khiển Bắt đầu/Tạm dừng, Bỏ qua, Đặt lại, chuyển chế độ (`Tập trung`, `Nghỉ ngắn`, `Nghỉ dài`), theo dõi các chấm tiến độ hiệp và Đặt lại số hiệp.
+- **Thời lượng & Cảnh báo**: Thiết lập số phút từng phiên, số hiệp trước nghỉ dài, tự động bắt đầu giờ nghỉ và âm báo chuông.
 
-6. **Pomodoro (Đồng hồ tập trung)**:
-   Thời gian tập trung, thời gian nghỉ ngắn, thời gian nghỉ dài, số round trước khi nghỉ dài, tự động chạy break, và chuông báo khi hoàn thành.
+## 7. Shortcuts (Phím Tắt)
+- **Bộ Ghi Phím Tắt Keycap**: Nhấn để ghi tổ hợp phím cho Bật/tắt vòng xoay góc, Vòng xoay con trỏ, Kệ thả tệp và Ghi chú nhanh kèm nút Khôi phục mặc định.
+- **Kiểm tra Xung Đột & Bảng Tra Cứu**: Tự động cảnh báo trùng phím tắt hệ thống macOS (`Command+Space`, `Command+Tab`, `Control+Option+D`) hoặc trùng nội bộ, cùng bảng tra cứu phím tắt Second Dock (`Control+Option+D`, `Command+1..8`) và ứng dụng.
 
-7. **Shortcuts (Phím tắt)**:
-   Tùy chỉnh phím tắt toàn cục động để bật tắt vòng quay, vòng xoay tại con trỏ chuột, kệ thả tệp Stash và bảng ghi chú nhanh Scratchpad, kèm tính năng tự động phân tích và cảnh báo xung đột với phím tắt hệ thống macOS.
-
-8. **About / Advanced (Thông tin & Nâng cao)**:
-   Thông tin phiên bản, kiểm tra cập nhật tự động 1 chạm (Sparkle 2) với chữ ký mã hóa Ed25519, mở Console Log hệ thống, xem hướng dẫn, sao lưu và phục hồi toàn diện (cài đặt và hồ sơ ứng dụng) bằng tệp JSON, và khôi phục cài đặt gốc.
-
-## Ngăn Kéo Tiện Ích và Vòng Xoay Tại Con Trỏ (tab Hot Corners)
-
-- Kệ thả tệp Stash Shelf: công tắc bật/tắt độc lập (mặc định: TẮT) để giữ tệp, hình ảnh, liên kết và văn bản đang kéo thả.
-- Ghi chú nhanh Scratchpad: công tắc bật/tắt độc lập (mặc định: TẮT) để ghi lại suy nghĩ và mã xác thực, tự động lưu cục bộ.
-- Gắn vào cạnh màn hình: tùy chọn gắn ngăn kéo tiện ích vào Cạnh trái hoặc Cạnh phải màn hình.
-- Vòng xoay tại con trỏ chuột: bật hoặc tắt các núm xoay hiện ngay tại vị trí con trỏ.
-- Tác vụ của góc và cạnh màn hình nhận đủ Âm lượng, Độ sáng, Đèn bàn phím, Pomodoro, Giữ máy thức, Kệ Stash và Scratchpad.
+## 8. About / Advanced (Thông Tin & Nâng Cao)
+- **Thông tin Phiên Bản & Sparkle 2**: Xem phiên bản hiện tại, trạng thái cập nhật, thời điểm kiểm tra gần nhất và nút Kiểm tra cập nhật.
+- **Chẩn đoán & Sao lưu JSON**: Bật ghi log chi tiết (`com.macstash.app`), mở Console, mở Hướng dẫn sử dụng, xuất/nhập toàn bộ cài đặt JSON có thông báo kết quả và khôi phục mặc định.

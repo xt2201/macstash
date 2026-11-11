@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.13.1-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.14.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.13.1.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.14.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -63,7 +63,8 @@ MacStash assigns high-frequency system controls to the four physical display ver
 | **Top-Right (TR)** | **Display Brightness** | Multi-monitor hardware DDC/CI (I2C) for third-party external monitors + Apple Silicon native display brightness. |
 | **Bottom-Left (BL)** | **Pomodoro Focus Timer** | Radial arc countdown (0–60 min) with round progression pips and satellite reset/skip micro-controls. |
 | **Bottom-Right (BR)** | **Master Volume &amp; Route** | Real-time audio gain adjustment and immediate audio output device switching. |
-| **Screen Edge** | **Hidden Dock Shelf** | Smooth slide-out shelf with macOS dock magnification effect and instant Quick App Launcher. |
+| **Screen Edges** | **Edge Slider &amp; Drawers** | Symmetric Left/Right edge vertical slider (with Now Playing art &amp; visualizer) and Stash Shelf / Scratchpad drawers. |
+| **Cursor / Floating Dock** | **Cursor Palette &amp; Second Dock** | `Option+Space` four-sector radial dial under cursor + multi-profile **Second Dock** (`Control+Option+D`) with 16 live widgets. |
 
 ---
 
@@ -120,47 +121,41 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Quick status badge and one-click toggle in the macOS menu bar companion.
 
 ### 7. Cursor Radial Palette (for Ultrawide Displays)
-- Press `Option + Space` to summon the 4-quadrant radial dials directly centered at your mouse cursor.
-- Adjust Volume, Display Brightness, Keep Awake, and Focus Timer anywhere on screen without flinging the pointer across 34"–49" Ultrawide setups.
+- Press `Option + Space` to summon the 4-quadrant radial dials with per-sector progress rings directly centered at your mouse cursor.
+- Hover any sector (Display Brightness, Master Volume, Focus Timer, Keep Awake) and **scroll two fingers** to adjust smoothly, click to toggle, or click outside / press `Esc` to dismiss.
 
-### 8. Hidden Edge Slider &amp; Now Playing Media Controls
-- **Configurable Screen Edge**: Place edge sliders on the Right Edge or Left Edge of your display with automatic collision separation against drawer panels.
-- Rides flush against your screen border with configurable actions in Settings (Volume, Brightness, Keyboard, Timer, Keep Awake, Stash Shelf, Scratchpad) and 120Hz ProMotion vertical drag/scroll smoothness.
-- **Extreme Edge &amp; Dwell Triggering**: Requires moving cursor to the physical edge boundary (`x >= maxX - 3.0`) with an intentional 180ms dwell delay, completely eliminating accidental expansions when using window scrollbars or controls in background apps.
-- **Universal Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, a 5-bar rhythm audio visualizer dynamically tinted to match the track's artwork color, and vertical transport controls (Previous on top, Play/Pause in middle, Next at bottom) across all browsers (Crest, Safari, Chrome, Arc) and native players (Spotify, Apple Music, VLC).
-- **Hover Track Tooltip**: Floating glassmorphic card previews full track title, artist, album, and source app on hover.
+### 8. Configurable Left / Right Edge Slider &amp; Now Playing Media Controls
+- **Symmetric Left or Right Screen Edge**: Place the edge slider cleanly on either the Right Edge or Left Edge of your display (with automatic separation from Stash/Scratchpad drawers) and configure its top quick-toggle button for any assigned action.
+- Rides flush against your screen border with configurable actions in Settings (`Volume`, `Brightness`, `Keyboard Backlight`, `Pomodoro Timer`, `Keep Awake`, `Stash Shelf`, `Scratchpad`) and 120Hz ProMotion vertical drag/scroll smoothness.
+- **Extreme Edge &amp; Dwell Triggering**: Requires moving cursor cleanly to the physical edge (`minX` or `maxX`) with an intentional dwell delay, preventing accidental triggers near app scrollbars.
+- **Universal Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, a 5-bar rhythm audio visualizer (automatically idle-gated when overlays are hidden), and vertical transport controls across browsers and native players.
 - **Two-Finger Edge Scrubbing**: Seamlessly tune volume, brightness, or your chosen action on the edge slider using natural two-finger vertical scrolling.
 
 ### 9. Tactile Detents &amp; Mechanical Acoustics
-- **Trackpad Detents**: Emits crisp physical ticks via `NSHapticFeedbackManager` as the rotary dial steps through values.
+- **Trackpad Detents**: Emits crisp physical ticks via `NSHapticFeedbackManager` with configurable Light / Medium / Strong intensity as the rotary dial steps through values.
 - **Acoustic Feedback**: Low-latency mechanical click sound effects mimicking high-end rotary hardware dials.
 
 ### 10. Context-Aware Application Profiles
-- Detects the frontmost active application and dynamically reconfigures corner dials (e.g., volume in Final Cut Pro, brightness in Xcode, timer in Safari).
+- Detects the frontmost active application and dynamically reconfigures corner dials and edge actions (add profiles effortlessly via Running Applications or `/Applications` picker in Settings &gt; Hot Corners).
 
-### 11. Native Menu Bar Companion
-- Operates as a lightweight agent (`LSUIElement = true`) with a ~15MB RAM footprint.
-- Monochrome template status bar icon that illuminates during active Pomodoro intervals.
-- Full-featured Preferences window (`Command + ,`).
+### 11. Menu Bar Control Center &amp; Split-Sidebar Settings Studio
+- **296pt Menu Bar Control Center**: Features structured cards for Active Context &amp; Profile, Pomodoro countdown &amp; controls, cached multi-monitor brightness sliders, master audio + keyboard backlight, 6 one-click module toggles, and direct links to Settings (`Command+,`) and User Guide (`Command+?`).
+- **8-Category Split-Sidebar Settings**: Interactive Desktop Screen Map, Interactive Liquid Glass Studio (test corner dials live on Midnight/Daylight backdrops with synchronized Light/Dark window themes), Keycap Shortcut Recorders with `ShortcutValidator` conflict checks, Max/Min display clamps + quick presets, and Markdown User Guide viewer.
 
-### 12. Second Dock with Live Interactive Widgets
-- **Auxiliary Second Dock**: An elegant live widget dock running alongside your native macOS Dock with zero conflict or overlap.
-- **10 Native Local Widgets**:
-  1. *Clock*: Digital, analog face, or flip clock with full multi-timezone world clock support.
-  2. *Date*: Clear calendar date with weekday and untruncated full month name.
-  3. *Weather*: Current conditions and multi-day forecast powered by Open-Meteo with zero API keys required and manual city search (no location permission needed).
-  4. *Now Playing*: Interactive playback controls, track title, artist, progress bar, and freshness validation for Apple Music and Spotify.
-  5. *Calendar*: Upcoming events, countdown timer, and 1-click video meeting Join buttons for Zoom, Google Meet, Teams, and Webex.
-  6. *Reminders*: Due tasks checklist, quick-add input, and 1-tap task completion synced with Apple Reminders.
-  7. *System Stats*: Real-time CPU usage, RAM utilization, battery percentage, charging state, and disk space without external tools.
-  8. *Pomodoro*: Focus sprints, short/long breaks, and desktop notifications.
-  9. *Search*: Spotlight application and file search bar with instant keyboard execution.
-  10. *File Shelf*: Drop temporary files, links, and snippets onto the dock to hold and reuse across apps.
-- **7 Layout Placements & Auto-Fit**: Fixed Bottom (perfectly positioned above the native macOS Dock with distance >= 0 px), Floating Window with drag handle, Fixed Top, Fixed Left, Fixed Right, and auto-fit screen width.
-- **Smart Edge Triggers & Auto-Hide**: Customizable slide reveal delay (0.0s to 3.0s) and edge trigger activation thickness (2px to 20px).
-- **Zero-Interference Pass-Through**: Mouse clicks on empty/transparent regions pass straight through to background windows.
-- **Profile Switcher, App Manager & Widget Gallery**: Supports multiple independent dock profiles (Work, Focus, Default) with instant switching, an integrated Dock Items manager to add custom applications or remove default apps (Safari, Terminal), and a searchable 16-widget catalog.
-- **Glass Styling**: Light Glass, Dark Glass, Liquid Glass, and Clear frameless themes.
+### 12. Second Dock with 16 Live Interactive &amp; Configurable Widgets
+- **Auxiliary Second Dock**: An independent live widget and app launcher dock (`Control+Option+D`) running alongside your native macOS Dock with running application dot indicators and persistent widget state.
+- **16 Native Local Widgets with Per-Widget Customizer**:
+  1. *Clock*: Digital, analog dial face, or flip clock with seconds, 24h mode, and multi-timezone world clock configuration.
+  2. *Date*: Calendar badge with configurable weekday and full month name display.
+  3. *Weather*: Open-Meteo conditions &amp; forecast with zero API keys, live city search geocoding, and °C/°F unit toggle.
+  4. *Now Playing*: Background-parsed playback controls, track info, and freshness validation for Apple Music and Spotify.
+  5. *Calendar*: Upcoming events auto-refreshing via `EKEventStoreChanged`, countdown, and 1-click Join buttons for Zoom, Google Meet, Teams, and Webex.
+  6. *Reminders*: Due tasks checklist with instant EventKit sync, quick-add, and 1-tap completion.
+  7. *System Stats*: Accurate real-time delta CPU (`CPUTickSample`), RAM utilization, battery state, and configurable sensor toggles.
+  8. *Pomodoro*: Monotonic focus timer sprints, custom focus/break durations, and alerts.
+  9. *Search, Clipboard, Quick Note, File Shelf, Screenshot, Color Picker, Unit Converter &amp; Bookmarks*: Complete suite of productivity dock utilities with customizer sheets (`WidgetConfigSheet`).
+- **5 Layout Placements &amp; Smooth 1:1 Floating Drag**: Fixed Bottom (positioned cleanly above the native macOS Dock), Floating Window with 1:1 screen-tracked drag handle, Fixed Top, Fixed Left, and Fixed Right.
+- **Smart Edge Triggers &amp; Glass Styling**: Independent Auto-Hide, Fullscreen hiding, and Window Hover fade triggers; Adaptive Light Glass, Dark Glass, Liquid Glass, and Clear themes; plus searchable 16-widget gallery.
 
 ---
 
@@ -181,7 +176,7 @@ Because the macOS mouse cursor cannot travel beyond the physical boundary of the
 ## Installation
 
 ### Method 1: Direct DMG Download (Recommended)
-1. Download the latest universal disk image: **[MacStash-v2.7.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
+1. Download the latest universal disk image: **[MacStash-v2.14.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
 2. Open the disk image and drag **MacStash** into your `Applications` folder.
 3. Launch MacStash from Launchpad, Spotlight, or `Applications`.
 
@@ -217,14 +212,16 @@ MacStash is committed to absolute user privacy. It operates **100% locally and o
 | `Option + Space` | Bloom Cursor Radial Palette | Global |
 | `Control + Option + S` | Toggle Stash Drop Shelf | Global |
 | `Control + Option + D` | Toggle Second Dock | Global |
+| `Command + 1..8` | Switch Active Second Dock Profile | Global |
 | `Control + Option + N` | Toggle Quick Scratchpad | Global |
 | `Option + S` | Toggle Screen Hot Corner Dials | Global |
-| `Command + ,` | Open MacStash Preferences | Global / In-App |
-| `Command + W` | Close Preferences or Guide Window | In-App |
-| `Command + ?` | Open In-App Interactive Guide | Global / In-App |
+| `Command + ,` | Open MacStash Settings Window | Global / In-App |
+| `Command + W` | Close Active Settings or Guide Window | In-App |
+| `Command + ?` | Open In-App Markdown User Guide | Global / In-App |
 | `Command + Q` | Quit MacStash completely | In-App |
+| `Esc` | Dismiss Open Cursor Palette, Shelf, or Scratchpad | Overlay |
 
-Customize dwell delays, hit-zone radii, haptic intensity, audio feedback, and corner dial assignments anytime in **Preferences &gt; Hot Corners**.
+Record custom global hotkeys with live `ShortcutValidator` conflict detection, adjust dwell delays, pick appearance themes, and explore the Interactive Screen Map anytime in **Settings &gt; Shortcuts / Hot Corners**.
 
 ---
 

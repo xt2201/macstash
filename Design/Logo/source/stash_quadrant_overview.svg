@@ -1,173 +1,254 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="1200" height="640">
   <defs>
-    <!-- Background Gradient -->
-    <linearGradient id="quadBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#161A24" />
-      <stop offset="50%" stop-color="#0F121A" />
-      <stop offset="100%" stop-color="#090B0F" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0D13"/>
+      <stop offset="100%" stop-color="#141925"/>
     </linearGradient>
 
-    <!-- Display Bezel Gradient -->
-    <linearGradient id="bezelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2A3040" />
-      <stop offset="100%" stop-color="#181C26" />
+    <linearGradient id="screenBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#131926"/>
+      <stop offset="50%" stop-color="#172033"/>
+      <stop offset="100%" stop-color="#101521"/>
     </linearGradient>
 
-    <!-- Screen Glass Gradient -->
-    <linearGradient id="screenGlass" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#131720" />
-      <stop offset="100%" stop-color="#0A0C12" />
+    <linearGradient id="arcVol" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BF5AF2"/>
+      <stop offset="100%" stop-color="#5E5CE6"/>
     </linearGradient>
 
-    <!-- Cyan Glow -->
-    <linearGradient id="cyanArc" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0A84FF" />
-      <stop offset="100%" stop-color="#00D2FF" />
+    <linearGradient id="arcBri" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF"/>
+      <stop offset="100%" stop-color="#0A84FF"/>
     </linearGradient>
 
-    <!-- Amber Glow for Keyboard -->
-    <linearGradient id="amberArc" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF9F0A" />
-      <stop offset="100%" stop-color="#FFD60A" />
+    <linearGradient id="arcPomo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#30D158"/>
+      <stop offset="100%" stop-color="#34C759"/>
     </linearGradient>
 
-    <!-- Emerald Glow for Pomodoro -->
-    <linearGradient id="emeraldArc" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#30D158" />
-      <stop offset="100%" stop-color="#66D4CF" />
+    <linearGradient id="arcKbd" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD60A"/>
+      <stop offset="100%" stop-color="#FF9F0A"/>
     </linearGradient>
 
-    <!-- Violet Glow for Audio -->
-    <linearGradient id="violetArc" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#BF5AF2" />
-      <stop offset="100%" stop-color="#5E5CE6" />
-    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
 
-  <!-- Background -->
-  <rect width="1200" height="640" rx="24" fill="url(#quadBg)" />
+  <!-- Canvas Background -->
+  <rect width="1200" height="640" fill="url(#bg)"/>
 
-  <!-- Ambient Backdrop Lights -->
-  <circle cx="280" cy="180" r="180" fill="#FF9F0A" opacity="0.06" filter="blur(70px)" />
-  <circle cx="920" cy="180" r="180" fill="#00D2FF" opacity="0.08" filter="blur(70px)" />
-  <circle cx="280" cy="460" r="180" fill="#30D158" opacity="0.06" filter="blur(70px)" />
-  <circle cx="920" cy="460" r="180" fill="#BF5AF2" opacity="0.07" filter="blur(70px)" />
-
-  <!-- HEADER TITLE & BADGE -->
-  <g transform="translate(60, 48)">
-    <rect x="0" y="0" width="168" height="26" rx="6" fill="#0A84FF" fill-opacity="0.15" stroke="#0A84FF" stroke-opacity="0.35" stroke-width="1" />
-    <text x="12" y="17" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="11" font-weight="700" letter-spacing="1.5" fill="#00D2FF">FITTS'S LAW CORNERS</text>
-    <text x="184" y="19" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">Tactile Screen Quadrants &amp; Hidden Radial Controls</text>
+  <!-- Subtle Structural Grid -->
+  <g stroke="#FFFFFF" stroke-opacity="0.03" stroke-width="1">
+    <line x1="0" y1="80" x2="1200" y2="80"/>
+    <line x1="0" y1="340" x2="1200" y2="340"/>
+    <line x1="0" y1="600" x2="1200" y2="600"/>
+    <line x1="200" y1="0" x2="200" y2="640"/>
+    <line x1="600" y1="0" x2="600" y2="640"/>
+    <line x1="1000" y1="0" x2="1000" y2="640"/>
   </g>
 
-  <!-- MAIN MONITOR FRAME (Center x=600, y=340, width=980, height=500) -->
-  <!-- Screen Bounds: x=110, y=100, width=980, height=480 -->
-  <rect x="106" y="96" width="988" height="488" rx="20" fill="none" stroke="url(#bezelGrad)" stroke-width="8" />
-  <rect x="110" y="100" width="980" height="480" rx="16" fill="url(#screenGlass)" />
-
-  <!-- TOP MENU BAR SIMULATION -->
-  <rect x="110" y="100" width="980" height="28" fill="#1C212D" fill-opacity="0.8" />
-  <!-- Apple Logo & Menu Items -->
-  <circle cx="132" cy="114" r="5" fill="#FFFFFF" fill-opacity="0.6" />
-  <rect x="148" y="111" width="36" height="6" rx="3" fill="#FFFFFF" fill-opacity="0.4" />
-  <rect x="194" y="111" width="28" height="6" rx="3" fill="#FFFFFF" fill-opacity="0.25" />
-  <rect x="232" y="111" width="32" height="6" rx="3" fill="#FFFFFF" fill-opacity="0.25" />
-  <!-- Menu Bar Status Icons (Right) -->
-  <rect x="1000" y="111" width="16" height="6" rx="2" fill="#FFFFFF" fill-opacity="0.3" />
-  <rect x="1024" y="111" width="20" height="6" rx="2" fill="#00D2FF" fill-opacity="0.8" />
-  <text x="1052" y="118" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#AEAEB2">9:41 AM</text>
-
-  <!-- SCREEN CENTER SUBTLE WATERMARK -->
-  <text x="600" y="330" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="28" font-weight="700" letter-spacing="4" fill="#FFFFFF" fill-opacity="0.08">MacStash</text>
-  <text x="600" y="356" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="12" font-weight="500" letter-spacing="1" fill="#FFFFFF" fill-opacity="0.12">ZERO-PIXEL HIT-ZONES · REAL-TIME HAPTICS</text>
-
-  <!-- ==================== QUADRANT 1: TOP-LEFT (Keyboard Backlight) ==================== -->
-  <g transform="translate(110, 128)">
-    <!-- Dial Arc (Quadrant sweeping from 0 to 90 deg, R=110) -->
-    <path d="M 0 110 A 110 110 0 0 0 110 0" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="12" />
-    <path d="M 0 80 A 80 80 0 0 0 80 0" fill="none" stroke="url(#amberArc)" stroke-width="12" stroke-linecap="round" />
-    <!-- Center Pivot Pin -->
-    <circle cx="0" cy="0" r="22" fill="#191D26" stroke="url(#amberArc)" stroke-width="3" />
-    <circle cx="0" cy="0" r="8" fill="#FFD60A" />
-    <!-- Detent Ticks -->
-    <line x1="0" y1="116" x2="0" y2="124" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="2" />
-    <line x1="78" y1="78" x2="84" y2="84" stroke="#FFD60A" stroke-width="3" />
-    <line x1="116" y1="0" x2="124" y2="0" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="2" />
-  </g>
-  <!-- Card Tag TL -->
-  <g transform="translate(140, 160)">
-    <rect x="0" y="0" width="180" height="52" rx="10" fill="#181D26" fill-opacity="0.85" stroke="#FF9F0A" stroke-opacity="0.4" stroke-width="1" />
-    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="#FFD60A">TOP-LEFT DIAL</text>
-    <text x="14" y="40" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Keyboard Backlight</text>
+  <!-- Header -->
+  <g transform="translate(110, 34)">
+    <rect x="0" y="0" width="186" height="28" rx="14" fill="#00D2FF" fill-opacity="0.14" stroke="#00D2FF" stroke-opacity="0.38"/>
+    <text x="93" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.4" fill="#00D2FF">WORKSPACE ARCHITECTURE</text>
+    <text x="204" y="20" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">Corner Dials, Edge Sliders, Stash Shelf &amp; Second Dock</text>
   </g>
 
-  <!-- ==================== QUADRANT 2: TOP-RIGHT (Display Brightness) ==================== -->
-  <g transform="translate(1090, 128)">
-    <!-- Dial Arc (Quadrant sweeping from 90 to 180 deg, R=110) -->
-    <path d="M 0 110 A 110 110 0 0 1 -110 0" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="12" />
-    <path d="M 0 95 A 95 95 0 0 1 -95 0" fill="none" stroke="url(#cyanArc)" stroke-width="12" stroke-linecap="round" />
-    <!-- Center Pivot Pin -->
-    <circle cx="0" cy="0" r="22" fill="#191D26" stroke="url(#cyanArc)" stroke-width="3" />
-    <circle cx="0" cy="0" r="8" fill="#00D2FF" />
-    <!-- Detent Ticks -->
-    <line x1="0" y1="116" x2="0" y2="124" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="2" />
-    <line x1="-78" y1="78" x2="-84" y2="84" stroke="#00D2FF" stroke-width="3" />
-    <line x1="-116" y1="0" x2="-124" y2="0" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="2" />
-  </g>
-  <!-- Card Tag TR -->
-  <g transform="translate(880, 160)">
-    <rect x="0" y="0" width="180" height="52" rx="10" fill="#181D26" fill-opacity="0.85" stroke="#00D2FF" stroke-opacity="0.4" stroke-width="1" />
-    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="#00D2FF">TOP-RIGHT DIAL</text>
-    <text x="14" y="40" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Hardware Brightness (DDC)</text>
+  <!-- Simulated macOS Display Frame -->
+  <rect x="110" y="88" width="980" height="504" rx="22" fill="url(#screenBg)" stroke="#38445C" stroke-width="2"/>
+
+  <!-- Screen Menu Bar & Notch -->
+  <path d="M 132 88 L 1068 88 Q 1090 88 1090 110 L 1090 118 L 110 118 L 110 110 Q 110 88 132 88 Z" fill="#000000" fill-opacity="0.46"/>
+  <rect x="556" y="88" width="88" height="22" rx="8" fill="#080A0F"/>
+
+  <!-- Left Menu Bar Items (shifted right of Top-Left Dial) -->
+  <text x="266" y="107" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="600" fill="#D1D1D6">Finder   File   Edit   View</text>
+
+  <!-- Right Menu Bar MacStash Status Item + Pomodoro Readout (shifted left of Top-Right Dial) -->
+  <g transform="translate(836, 94)">
+    <rect x="0" y="0" width="94" height="18" rx="9" fill="#0A84FF" fill-opacity="0.22" stroke="#00D2FF" stroke-opacity="0.5" stroke-width="0.9"/>
+    <circle cx="11" cy="9" r="4" fill="#00D2FF"/>
+    <text x="21" y="12.5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" fill="#FFFFFF">24:15</text>
+    <text x="58" y="12.5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#AEAEB2">9:41</text>
   </g>
 
-  <!-- ==================== QUADRANT 3: BOTTOM-LEFT (Pomodoro Timer) ==================== -->
-  <g transform="translate(110, 580)">
-    <!-- Dial Arc (Quadrant sweeping from 270 to 360 deg, R=110) -->
-    <path d="M 0 -110 A 110 110 0 0 1 110 0" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="12" />
-    <path d="M 0 -85 A 85 85 0 0 1 85 0" fill="none" stroke="url(#emeraldArc)" stroke-width="12" stroke-linecap="round" />
-    <!-- Center Pivot Pin -->
-    <circle cx="0" cy="0" r="22" fill="#191D26" stroke="url(#emeraldArc)" stroke-width="3" />
-    <circle cx="0" cy="0" r="8" fill="#30D158" />
-    <!-- Satellite Buttons Simulation -->
-    <circle cx="50" cy="-20" r="10" fill="#242B38" stroke="#30D158" stroke-width="1.5" />
-    <circle cx="20" cy="-50" r="10" fill="#242B38" stroke="#30D158" stroke-width="1.5" />
-  </g>
-  <!-- Card Tag BL -->
-  <g transform="translate(140, 480)">
-    <rect x="0" y="0" width="180" height="52" rx="10" fill="#181D26" fill-opacity="0.85" stroke="#30D158" stroke-opacity="0.4" stroke-width="1" />
-    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="#30D158">BOTTOM-LEFT DIAL</text>
-    <text x="14" y="40" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Pomodoro Focus Timer</text>
+  <!-- Center-Right Clean Brand Watermark & Mini Control Card -->
+  <g transform="translate(730, 314)">
+    <text x="0" y="0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="24" font-weight="700" letter-spacing="3" fill="#FFFFFF" fill-opacity="0.16">MacStash</text>
+    <text x="0" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="11" font-weight="600" letter-spacing="1.2" fill="#00D2FF" fill-opacity="0.32">LIQUID GLASS CONTROL CENTER</text>
   </g>
 
-  <!-- ==================== QUADRANT 4: BOTTOM-RIGHT (Master Volume & Device) ==================== -->
-  <g transform="translate(1090, 580)">
-    <!-- Dial Arc (Quadrant sweeping from 180 to 270 deg, R=110) -->
-    <path d="M 0 -110 A 110 110 0 0 0 -110 0" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="12" />
-    <path d="M 0 -75 A 75 75 0 0 0 -75 0" fill="none" stroke="url(#violetArc)" stroke-width="12" stroke-linecap="round" />
-    <!-- Center Pivot Pin -->
-    <circle cx="0" cy="0" r="22" fill="#191D26" stroke="url(#violetArc)" stroke-width="3" />
-    <circle cx="0" cy="0" r="8" fill="#BF5AF2" />
-  </g>
-  <!-- Card Tag BR -->
-  <g transform="translate(880, 480)">
-    <rect x="0" y="0" width="180" height="52" rx="10" fill="#181D26" fill-opacity="0.85" stroke="#BF5AF2" stroke-opacity="0.4" stroke-width="1" />
-    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="#BF5AF2">BOTTOM-RIGHT DIAL</text>
-    <text x="14" y="40" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Master Audio &amp; Routing</text>
+  <!-- 1. TOP-LEFT CORNER: Keyboard Backlight -->
+  <g transform="translate(110, 88)">
+    <path d="M 0 0 L 138 0 A 138 138 0 0 1 0 138 Z" fill="#0F141E" fill-opacity="0.88" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1.2"/>
+    <path d="M 106 8 A 98 98 0 0 1 8 106" fill="none" stroke="url(#arcKbd)" stroke-width="13" stroke-linecap="round" filter="url(#glow)"/>
+    <circle cx="8" cy="106" r="7" fill="#FFFFFF"/>
+    <circle cx="46" cy="46" r="19" fill="#1E2534" stroke="#FFD60A" stroke-opacity="0.6" stroke-width="1.2"/>
+    <text x="46" y="50" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#FFD60A">75%</text>
   </g>
 
-  <!-- ==================== HIDDEN EDGE SLIDER DOCK SHELF (Right Edge) ==================== -->
-  <g transform="translate(1068, 290)">
-    <rect x="0" y="0" width="22" height="100" rx="11" fill="#202634" fill-opacity="0.9" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="1.5" />
-    <!-- Shelf Handle dots -->
-    <circle cx="11" cy="40" r="2.5" fill="#FFFFFF" fill-opacity="0.6" />
-    <circle cx="11" cy="50" r="2.5" fill="#FFFFFF" fill-opacity="0.6" />
-    <circle cx="11" cy="60" r="2.5" fill="#FFFFFF" fill-opacity="0.6" />
+  <!-- 2. TOP-RIGHT CORNER: Hardware Brightness -->
+  <g transform="translate(1090, 88)">
+    <path d="M 0 0 L -138 0 A 138 138 0 0 0 0 138 Z" fill="#0F141E" fill-opacity="0.88" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1.2"/>
+    <path d="M -106 8 A 98 98 0 0 0 -8 106" fill="none" stroke="url(#arcBri)" stroke-width="13" stroke-linecap="round" filter="url(#glow)"/>
+    <circle cx="-8" cy="106" r="7" fill="#FFFFFF"/>
+    <circle cx="-46" cy="46" r="19" fill="#1E2534" stroke="#00D2FF" stroke-opacity="0.6" stroke-width="1.2"/>
+    <text x="-46" y="50" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#00D2FF">85%</text>
   </g>
-  <!-- Edge Shelf Callout Tag -->
-  <g transform="translate(500, 480)">
-    <rect x="0" y="0" width="200" height="44" rx="8" fill="#181D26" fill-opacity="0.8" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="1" />
-    <text x="14" y="18" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="700" letter-spacing="1" fill="#AEAEB2">HIDDEN DOCK SHELF</text>
-    <text x="14" y="34" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="500" fill="#FFFFFF">Border Slide-Out &amp; Launcher</text>
+
+  <!-- 3. BOTTOM-LEFT CORNER: Pomodoro Timer -->
+  <g transform="translate(110, 592)">
+    <path d="M 0 0 L 138 0 A 138 138 0 0 0 0 -138 Z" fill="#0F141E" fill-opacity="0.88" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1.2"/>
+    <path d="M 8 -106 A 98 98 0 0 1 106 -8" fill="none" stroke="url(#arcPomo)" stroke-width="13" stroke-linecap="round" filter="url(#glow)"/>
+    <circle cx="106" cy="-8" r="7" fill="#FFFFFF"/>
+    <circle cx="46" cy="-46" r="20" fill="#1E2534" stroke="#30D158" stroke-opacity="0.6" stroke-width="1.2"/>
+    <text x="46" y="-42" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10.5" font-weight="700" fill="#30D158">24:15</text>
+  </g>
+
+  <!-- 4. BOTTOM-RIGHT CORNER: Master Audio Volume -->
+  <g transform="translate(1090, 592)">
+    <path d="M 0 0 L -138 0 A 138 138 0 0 1 0 -138 Z" fill="#0F141E" fill-opacity="0.88" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1.2"/>
+    <path d="M -8 -106 A 98 98 0 0 0 -106 -8" fill="none" stroke="url(#arcVol)" stroke-width="13" stroke-linecap="round" filter="url(#glow)"/>
+    <circle cx="-106" cy="-8" r="7" fill="#FFFFFF"/>
+    <circle cx="-46" cy="-46" r="19" fill="#1E2534" stroke="#BF5AF2" stroke-opacity="0.6" stroke-width="1.2"/>
+    <text x="-46" y="-42" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#BF5AF2">65%</text>
+  </g>
+
+  <!-- 5. LEFT EDGE DRAWER: Stash Shelf & Quick Scratchpad -->
+  <g transform="translate(118, 248)">
+    <rect x="0" y="0" width="134" height="174" rx="16" fill="#0D1119" fill-opacity="0.92" stroke="#FF9F0A" stroke-opacity="0.45" stroke-width="1.2"/>
+    <rect x="10" y="10" width="54" height="16" rx="8" fill="#FF9F0A" fill-opacity="0.22"/>
+    <text x="37" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8" font-weight="700" fill="#FF9F0A">STASH</text>
+    <rect x="70" y="10" width="54" height="16" rx="8" fill="#FFFFFF" fill-opacity="0.08"/>
+    <text x="97" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8" font-weight="600" fill="#AEAEB2">NOTES</text>
+
+    <!-- Stash Cards -->
+    <rect x="10" y="36" width="114" height="32" rx="8" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.1"/>
+    <rect x="18" y="44" width="16" height="16" rx="4" fill="#0A84FF" fill-opacity="0.8"/>
+    <text x="41" y="51" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#FFFFFF">Mockup.fig</text>
+    <text x="41" y="61" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="7.5" fill="#98989D">14.2 MB · Ready</text>
+
+    <rect x="10" y="75" width="114" height="32" rx="8" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.1"/>
+    <rect x="18" y="83" width="16" height="16" rx="4" fill="#30D158" fill-opacity="0.8"/>
+    <text x="41" y="90" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#FFFFFF">Specs.pdf</text>
+    <text x="41" y="100" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="7.5" fill="#98989D">Snippet · Pinned</text>
+
+    <rect x="10" y="114" width="114" height="24" rx="7" fill="#FFFFFF" fill-opacity="0.04" stroke="#FF9F0A" stroke-opacity="0.25" stroke-dasharray="3 2"/>
+    <text x="67" y="129" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="600" fill="#FFD60A">Drop or Paste Files</text>
+
+    <text x="67" y="157" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8" font-weight="600" fill="#98989D">Shake Drag · Ctrl+Opt+S</text>
+  </g>
+
+  <!-- 6. RIGHT EDGE SLIDER + NOW PLAYING -->
+  <g transform="translate(1038, 232)">
+    <rect x="0" y="0" width="46" height="206" rx="23" fill="#0D1119" fill-opacity="0.92" stroke="#00D2FF" stroke-opacity="0.45" stroke-width="1.2"/>
+    <rect x="18" y="14" width="10" height="96" rx="5" fill="#FFFFFF" fill-opacity="0.1"/>
+    <rect x="18" y="44" width="10" height="66" rx="5" fill="url(#arcBri)"/>
+    <circle cx="23" cy="44" r="7" fill="#FFFFFF"/>
+    <text x="23" y="123" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" fill="#00D2FF">68%</text>
+
+    <rect x="11" y="132" width="24" height="24" rx="6" fill="url(#arcVol)"/>
+    <circle cx="23" cy="144" r="5" fill="#FFFFFF" fill-opacity="0.85"/>
+    <g transform="translate(11, 164)" fill="#00D2FF">
+      <rect x="0" y="6" width="3" height="10" rx="1.5"/>
+      <rect x="5" y="1" width="3" height="15" rx="1.5"/>
+      <rect x="10" y="4" width="3" height="12" rx="1.5"/>
+      <rect x="15" y="0" width="3" height="16" rx="1.5"/>
+      <rect x="20" y="5" width="3" height="11" rx="1.5"/>
+    </g>
+    <text x="23" y="194" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="7.5" font-weight="700" fill="#AEAEB2">PLAY</text>
+  </g>
+
+  <!-- 7. CENTER-LEFT: CURSOR RADIAL PALETTE (Opt+Space) -->
+  <g transform="translate(462, 336)">
+    <circle cx="0" cy="0" r="92" fill="#0F141E" fill-opacity="0.92" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1.4" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="29" fill="#182032" stroke="#00D2FF" stroke-opacity="0.5" stroke-width="1"/>
+    <!-- 4 Colored Arc Sectors -->
+    <path d="M 0 -76 A 76 76 0 0 1 76 0" fill="none" stroke="#00D2FF" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 76 0 A 76 76 0 0 1 0 76" fill="none" stroke="#BF5AF2" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 0 76 A 76 76 0 0 1 -76 0" fill="none" stroke="#30D158" stroke-width="10" stroke-linecap="round"/>
+    <path d="M -76 0 A 76 76 0 0 1 0 -76" fill="none" stroke="#FFD60A" stroke-width="10" stroke-linecap="round"/>
+
+    <text x="0" y="-45" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="700" fill="#FFFFFF">BRIGHT</text>
+    <text x="49" y="3" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="700" fill="#FFFFFF">VOL</text>
+    <text x="0" y="51" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="700" fill="#FFFFFF">TIMER</text>
+    <text x="-49" y="3" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="700" fill="#FFFFFF">AWAKE</text>
+
+    <text x="0" y="-2" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8" font-weight="700" fill="#00D2FF">PALETTE</text>
+    <text x="0" y="10" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="7.5" font-weight="600" fill="#AEAEB2">Opt+Space</text>
+  </g>
+
+  <!-- 8. SECOND DOCK + LIVE WIDGETS BAR -->
+  <g transform="translate(300, 520)">
+    <rect x="0" y="0" width="600" height="58" rx="18" fill="#0F141F" fill-opacity="0.94" stroke="#34C759" stroke-opacity="0.45" stroke-width="1.2"/>
+    <rect x="12" y="10" width="96" height="38" rx="11" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.12"/>
+    <text x="60" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="11.5" font-weight="700" fill="#FFFFFF">09:41:22</text>
+    <text x="60" y="40" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8" fill="#00D2FF">Flip Clock</text>
+
+    <rect x="116" y="10" width="110" height="38" rx="11" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.12"/>
+    <text x="171" y="26" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF">CPU 14% · RAM 52%</text>
+    <text x="171" y="40" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8" fill="#30D158">System Stats</text>
+
+    <rect x="234" y="10" width="84" height="38" rx="11" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.12"/>
+    <text x="276" y="26" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10.5" font-weight="700" fill="#FFD60A">24C Clear</text>
+    <text x="276" y="40" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8" fill="#AEAEB2">Weather</text>
+
+    <line x1="330" y1="14" x2="330" y2="44" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="1.5"/>
+
+    <rect x="342" y="13" width="30" height="30" rx="8" fill="#0A84FF"/>
+    <circle cx="357" cy="48" r="2.5" fill="#FFFFFF"/>
+
+    <rect x="380" y="13" width="30" height="30" rx="8" fill="#30D158"/>
+    <circle cx="395" cy="48" r="2.5" fill="#FFFFFF"/>
+
+    <rect x="418" y="13" width="30" height="30" rx="8" fill="#BF5AF2"/>
+    <rect x="456" y="13" width="30" height="30" rx="8" fill="#FF9F0A"/>
+
+    <rect x="498" y="12" width="90" height="34" rx="10" fill="#34C759" fill-opacity="0.16" stroke="#34C759" stroke-opacity="0.4"/>
+    <text x="543" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" fill="#30D158">SECOND DOCK</text>
+    <text x="543" y="38" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="7.5" font-weight="600" fill="#FFFFFF">16 Live Widgets</text>
+  </g>
+
+  <!-- Feature Legend Badges (Outer Corners) -->
+  <g transform="translate(20, 128)">
+    <rect x="0" y="0" width="80" height="44" rx="9" fill="#FFD60A" fill-opacity="0.12" stroke="#FFD60A" stroke-opacity="0.35"/>
+    <text x="40" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" fill="#FFD60A">TOP-LEFT</text>
+    <text x="40" y="33" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#FFFFFF">Backlight</text>
+  </g>
+
+  <g transform="translate(1100, 128)">
+    <rect x="0" y="0" width="82" height="44" rx="9" fill="#00D2FF" fill-opacity="0.12" stroke="#00D2FF" stroke-opacity="0.35"/>
+    <text x="41" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" fill="#00D2FF">TOP-RIGHT</text>
+    <text x="41" y="33" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#FFFFFF">Brightness</text>
+  </g>
+
+  <g transform="translate(20, 504)">
+    <rect x="0" y="0" width="80" height="44" rx="9" fill="#30D158" fill-opacity="0.12" stroke="#30D158" stroke-opacity="0.35"/>
+    <text x="40" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" fill="#30D158">BTM-LEFT</text>
+    <text x="40" y="33" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#FFFFFF">Pomodoro</text>
+  </g>
+
+  <g transform="translate(1100, 504)">
+    <rect x="0" y="0" width="82" height="44" rx="9" fill="#BF5AF2" fill-opacity="0.12" stroke="#BF5AF2" stroke-opacity="0.35"/>
+    <text x="41" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" fill="#BF5AF2">BTM-RIGHT</text>
+    <text x="41" y="33" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#FFFFFF">Volume</text>
+  </g>
+
+  <g transform="translate(1100, 312)">
+    <rect x="0" y="0" width="82" height="48" rx="9" fill="#0A84FF" fill-opacity="0.14" stroke="#00D2FF" stroke-opacity="0.35"/>
+    <text x="41" y="19" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="700" fill="#00D2FF">EDGE BAR</text>
+    <text x="41" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="600" fill="#FFFFFF">Left / Right</text>
+  </g>
+
+  <g transform="translate(18, 312)">
+    <rect x="0" y="0" width="82" height="48" rx="9" fill="#FF9F0A" fill-opacity="0.14" stroke="#FF9F0A" stroke-opacity="0.35"/>
+    <text x="41" y="19" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="700" fill="#FF9F0A">DRAWERS</text>
+    <text x="41" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="600" fill="#FFFFFF">Stash &amp; Note</text>
   </g>
 </svg>

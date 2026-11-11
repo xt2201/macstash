@@ -104,7 +104,7 @@
           font-size="15" font-weight="400" fill="#AEAEB2">Zero-pixel Fitts's law hot corners, multi-monitor hardware</text>
     <text x="2" y="220"
           font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
-          font-size="15" font-weight="400" fill="#AEAEB2">brightness, tactile master volume, and Pomodoro focus timer.</text>
+          font-size="15" font-weight="400" fill="#AEAEB2">brightness, cursor palette, Stash Shelf, and 16-widget Second Dock.</text>
 
     <!-- Key Pills -->
     <g transform="translate(0, 262)">
@@ -119,6 +119,15 @@
 
       <rect x="478" y="0" width="144" height="32" rx="16" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1" />
       <text x="18" y="21" transform="translate(478, 0)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#F5F5F7">Master Volume</text>
+
+      <rect x="0" y="44" width="146" height="32" rx="16" fill="#00D2FF" fill-opacity="0.14" stroke="#00D2FF" stroke-opacity="0.28" stroke-width="1" />
+      <text x="20" y="65" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#00D2FF">Second Dock</text>
+
+      <rect x="158" y="44" width="146" height="32" rx="16" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1" />
+      <text x="18" y="65" transform="translate(158, 0)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#F5F5F7">Cursor Palette</text>
+
+      <rect x="316" y="44" width="148" height="32" rx="16" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1" />
+      <text x="18" y="65" transform="translate(316, 0)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#F5F5F7">Stash &amp; Notes</text>
     </g>
   </g>
 </svg>

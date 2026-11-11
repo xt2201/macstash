@@ -5,6 +5,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.14.0] - 2026-11-11
+
+### Added
+- Split-Sidebar Settings Window (`880x640`): Redesigned Settings into an 8-category macOS Sequoia sidebar layout (`SettingsView`) with live sidebar badges, master switch header, and grouped `SettingsCard` sections across all tabs.
+- Interactive Desktop Map & `AppPickerHelper` (`HotCornersTab`): Clickable 4-corner + edge + drawer screen diagram, per-app profile enable toggle, Running Applications dropdown, and `/Applications` NSOpenPanel picker.
+- Interactive Liquid Glass Studio (`AppearanceTab`): Live Midnight/Daylight corner dial preview supporting corner switching, action selection, direct arc scrubbing with haptics, and synchronized Light/Dark theme override (`.macStashTheme`).
+- General Modules Matrix & Defaults (`GeneralTab`): 6-tile live status grid with quick toggles, Default Keep Awake Duration selector, and passive foreground permission checks.
+- Display Max Clamp & Presets (`DisplaysTab`), Pomodoro Focus Ring Hero & Mode Switcher (`PomodoroTab`), Interactive Keycap Shortcut Recorders & `ShortcutValidator` conflict audit (`ShortcutsTab`), and Sparkle 2 status badges + JSON export banners (`AboutTab`).
+- Menu Bar Control Center (`MenuBarExtraView`), Rich Markdown Renderer (`UserGuideView`), and Vector `OnboardingView` with inline language switching and live permission badges.
+- Per-Widget Configuration (`WidgetConfigSheet`): Customize Weather city (Open-Meteo geocoding) & °C/°F units, Clock analog/digital/flip style, seconds, 24h format & timezone, Date flags, System Stats CPU/RAM/battery sensors, Pomodoro intervals, and Bookmarks CRUD.
+- Adaptive Light/Dark `LiquidGlassMaterial` & `SideDockGlassBackdrop` glass layers across all floating overlays and widgets.
+
+### Changed
+- Persistent Second Dock Hosting (`SideDockRootWrapper`): Prevents live widgets from resetting timer/scroll/state when running apps change, and adds smooth 1:1 mouse-screen floating dock dragging (`beginFloatingDrag`/`updateFloatingDrag`/`endFloatingDrag`).
+- Dynamic Cursor Palette: Added per-sector progress rings and hover + two-finger scroll scrubbing (`PaletteScrollInterceptor`).
+- Stash Shelf & Scratchpad: Unified padding, search filter (`>= 4` items), clipboard paste, hover action buttons, double-click open, and Send-to-Stash transfer.
+- Efficiency: Gated `NowPlayingManager` 30fps beat visualizer while overlays are closed and reduced idle `AudioManager` polling to `2.5s`.
+
+### Fixed
+- Symmetric Vertical Edge Triggers (`ScreenManager` & `CornerGeometry`): Resolved reversed Left/Right edge dwell timers, hide timers, and outside-click dismissal so Left Edge Slider and Right Edge Drawer work reliably.
+- `AppState` Synchronization: Eliminated split-brain drift between `@Published settings` and mirrored runtime properties (`isEnabled`, `dialRadiusPoints`, `edgeSliderPosition`, `drawerEdgePosition`, `hapticIntensity`, brightness min/max clamps).
+- Accurate Delta CPU & EventKit Reactivity: Switched `SystemStatsWidget` to `CPUTickSample.deltaPercent` real delta tick utilization and added `EKEventStoreChanged` refresh observers for Calendar & Reminders widgets.
+- Edge Trigger Reveal/Hover Logic: Updated `EdgeTriggerManager` to `NSEvent.mouseLocation` and decoupled `autoHide` from `hideOnWindowHover` / `hideInFullscreen`.
+
+---
+
 ## [2.13.1] - 2026-11-10
 
 ### Fixed

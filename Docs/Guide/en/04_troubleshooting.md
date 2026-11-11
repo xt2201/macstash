@@ -3,17 +3,18 @@
 ## Permissions Setup
 
 1. **Accessibility**:
-   Required for global cursor position tracking and non-activating overlay management.
+   Required for global cursor position tracking, hot corners, vertical edges, and non-activating overlay management.
    Grant access in macOS System Settings > Privacy & Security > Accessibility.
 
 2. **Input Monitoring**:
-   Required to monitor modifier keys and scroll events while adjusting values.
+   Required to monitor modifier keys and two-finger scroll events while adjusting dials or the Cursor Palette.
    Grant access in macOS System Settings > Privacy & Security > Input Monitoring.
 
 3. **Notifications**:
    Required to post completion banners for Pomodoro focus intervals.
    Grant access in macOS System Settings > Notifications > MacStash.
-   MacStash integrates native foreground presentation (`UNUserNotificationCenterDelegate`), audible alert chimes (`Glass`), and Dock icon bouncing (`requestUserAttention`) ensuring completion alerts are never missed even when working in other applications.
+
+Permission statuses refresh automatically when MacStash Settings or Onboarding returns to the foreground.
 
 ## Accidental Trigger Prevention
 
@@ -21,44 +22,30 @@ If corner dials appear too easily or interfere with app controls:
 - Reduce Hit-Zone Sensitivity to 3-5 points in Settings > Hot Corners.
 - Increase Dwell Activation Delay to 200-300 milliseconds.
 - Enable window dragging and full screen suppression.
-- Add specific full-screen or creative software to the Excluded Applications list.
+- Add specific full-screen or creative software to the Excluded Applications list using the Running Apps menu or Browse Applications picker.
 
-## Changing Interface Language
+## Changing Interface Language & Glass Theme
 
-You can freely switch between English and Vietnamese at any time:
-- Open Settings (`Command+,`) > **General** tab > **Interface Language**.
-- Select **English**, **Tiếng Việt**, or **System Default**. All preferences tabs, status item popup, and user guides update dynamically without requiring an application restart.
+You can switch language or visual glass theme anytime without restarting:
+- **Language**: Open Settings (`Command+,`) > **General** > **Interface Language** (System Default, Tiếng Việt, or English).
+- **Theme**: Open Settings > **Appearance** > **Appearance Theme** (`Match System`, `Light`, or `Dark`) to synchronize Liquid Glass overlays, Dock, Settings, and Menu Bar contrast.
 
-## Menu Bar Icon Display & Appearance
+## Edge Slider or Drawer Not Appearing on Left / Right Edge
 
-- If the menu bar icon appears crowded, drag it with `Command + Left Click` to reorder its position on the macOS menu bar.
-- The status bar icon is rendered as an alpha-channel template image; if you use third-party menu bar colorizers, MacStash respects the active system appearance palette automatically.
+- Verify that **Edge Slider Position** (`Left Edge` or `Right Edge`) and **Attached Edge** for Drawers match the physical screen boundary you hover over in Settings > Hot Corners.
+- Ensure you hold the cursor flush at the outer screen border (`x = minX` for Left Edge, `x = maxX` for Right Edge) for the dwell interval, and check that no adjacent monitor is attached to that seam if **Trigger only outer desktop corners** is enabled.
+- Notice clicking outside an open Cursor Palette, Edge Slider, or unpinned Stash/Scratchpad dismisses it cleanly.
 
-## Pomodoro Duration Scrubbing & Dial Interaction
+## Menu Bar Icon Visibility
 
-- To adjust session duration when the timer is idle, drag the outer dial arc band (outside the central circular badge). The dial tracks precisely from 1 to 60 minutes with subtle haptic detents.
-- Tapping directly on the center badge starts or pauses the timer and will never overwrite your configured session minutes.
-- Use the satellite buttons inside the dial to quickly Reset or Skip to the next mode.
+- If you hide the Menu Bar icon under Settings > **General** (`Show Icon in Menu Bar`), reopen MacStash anytime via Spotlight or `/Applications/MacStash.app` to bring Settings back to the front.
 
-## Right Edge Slider Visibility
+## Second Dock Widget & Floating Drag Tips
 
-- The right-edge vertical slider is completely hidden when idle to keep your display clean and unobstructed.
-- To reveal the slider, move your mouse cursor to the rightmost edge of your screen. It will smoothly glide into view, allowing quick adjustment of volume or display brightness.
-
-## Keyboard Backlight Slider & Top Bar Controls
-
-- The keyboard backlight slider provides buttery-smooth, real-time tracking that stays in immediate lockstep with MacBook hardware sensors.
-- Whenever you open the Menu Bar popover, MacStash automatically refreshes the current hardware backlight level and master volume, ensuring the sliders reflect external adjustments made via physical keys or macOS Control Center.
-- You can tap directly on the keyboard icon to quickly toggle the keyboard backlight on or off.
-
-## Multi-Monitor Systems & Corner Activation
-
-- MacStash provides full support for all 4 corner dials and the right edge slider across every connected display (including built-in MacBook screens and external monitors).
-- You can activate corner dials instantaneously by clicking directly in the corner (Click-to-Activate) or by hovering for the dwell duration (Dwell Activation).
-- To prevent dials from appearing along internal screen seams between displays, enable "Trigger only outer desktop corners (suppress inner display seams)" under Settings > Hot Corners.
-- The Menu Bar control popover dynamically detects the active display when invoked, opening smoothly underneath the clicked menu bar location on that display.
+- When Placement is set to **Floating Window**, drag the dock using its grip handle (`dock.dragToMove`) to reposition smoothly 1:1 across displays; its position saves automatically when released.
+- Right-click any widget tile on the dock or click the gear icon in Settings > **Second Dock** to configure widget options (such as Weather city & temperature scale, Clock analog/digital/flip style & timezone, System Stats sensors, or Bookmarks).
 
 ## Two-Finger Trackpad & Scroll Wheel Adjustment
 
-- If trackpad two-finger scrolling does not adjust values, verify that "Two-finger scroll to adjust" is enabled under Settings > Hot Corners > Interaction Gestures.
-- Value adjustments occur strictly while fingers remain on the trackpad. Inertial flicks (momentum) are automatically filtered out to prevent volume or brightness from overshooting.
+- Verify that **Two-finger scroll to adjust** is enabled under Settings > **Hot Corners**.
+- On the Cursor Radial Palette (`Option+Space`), hover any of the four sectors (Brightness, Volume, Timer, Keep Awake) and scroll two fingers to scrub smoothly, or click a sector to toggle.

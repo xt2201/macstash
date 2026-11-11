@@ -1,37 +1,43 @@
-# Settings Scene Reference
+# Settings Reference Guide
 
-MacStash provides a comprehensive 8-tab configuration window compliant with macOS Human Interface Guidelines. Open using Command+, or via the menu bar icon.
+MacStash provides an 8-category split-sidebar Settings window (`Command+,`) designed cleanly for macOS:
 
-## Tab Directory
+## 1. General
+- **Master Controls**: Master toggle, Menu Bar icon visibility (`Show Icon in Menu Bar`), Launch at Login (`SMAppService`), and Default Keep Awake Duration (15m, 30m, 1h, 2h, Indefinitely).
+- **Active Modules Overview**: 6 interactive module cards displaying live ON/OFF toggles and navigation shortcuts for Corner Dials, Edge Slider, Second Dock, Stash Shelf, Quick Scratchpad, and Cursor Palette.
+- **Language & Locale**: Dynamic switcher across System Default, Tiếng Việt, and English.
+- **System Permissions**: Live verification and request links for Accessibility, Input Monitoring, and Notifications.
+- **Factory Reset**: Restore all preferences and per-app profiles back to factory defaults.
 
-1. **General**:
-   Master switch, menu bar icon toggle, language switcher (English, Vietnamese), launch at login, and permissions status dashboard for Accessibility, Input Monitoring, and Notifications.
+## 2. Hot Corners
+- **Interactive Screen Map & Profiles**: Live visual monitor preview allowing click-to-focus on any corner, edge slider, or drawer, paired with per-application profile management via Running Apps or `/Applications` picker.
+- **Corner Assignment**: Enable/disable individual corners and assign Volume, Brightness, Keyboard Backlight, Pomodoro Timer, Keep Awake, Stash Shelf, Scratchpad, or Disabled.
+- **Edge Sliders & Media Controls**: Enable or disable the vertical edge slider, select **Left Edge** or **Right Edge**, choose its controlled action, and toggle Now Playing album artwork, vertical controls, and dancing waveform visualizer.
+- **Drawer Utilities & Cursor Palette**: Configure Stash Shelf, Quick Scratchpad, Drawer Attached Edge (`Left Edge` / `Right Edge`), and Cursor Radial Palette.
+- **Trigger Precision, Gestures, Suppression & Excluded Apps**: Tune Hit-Zone Sensitivity, Dwell Delay, Auto-Dismiss Delay, Two-Finger Scroll adjustment, Mouse-Pressed / Fullscreen / Outer-Corners suppression, Display Target (`Built-in`, `External`, `All`), and Excluded Applications picker.
 
-2. **Hot Corners**:
-   Application Profile manager (Default plus custom per-app profiles with automatic frontmost app detection), master toggle for corner dials, per-corner enable toggles and action assignments (Volume, Brightness, Backlight, Pomodoro, Keep Awake, Stash Shelf, Scratchpad, None), Display Target selection (Built-in Mac screen only, External displays only, or Both/All screens), Edge Sliders toggle, screen edge selector (Left Edge or Right Edge) and action assignment, with Now Playing media controls option under Volume (live album artwork, dancing audio waveform visualizer, and vertical transport controls: Previous on top, Play/Pause in middle, Next at bottom), hit-zone sensitivity (1-20pt), dwell activation delay (0-1000ms), auto-hide delay (50-1000ms), interaction gestures (two-finger scroll adjustment without click-and-drag), mouse drag suppression, fullscreen suppression, inner display seam suppression, and excluded applications.
+## 3. Second Dock
+- **Profiles & Placement**: Create, switch, export, import, or delete Dock profiles; choose Fixed Bottom, Floating Window, Fixed Top, Fixed Left, or Fixed Right placement; tune Scale, Tile Spacing, and Screen Edge Offset.
+- **Behavior & Appearance**: Configure Auto-Hide, Reveal Delay, Edge Zone Thickness, Fullscreen / Window Hover hiding, Reserve Dock Space, Running Apps bar, Liquid/Light/Dark/Clear Glass backdrop styles, and Reduce Motion.
+- **Items & Widget Gallery**: Reorder apps, folders, separators, and widgets; browse all 16 widgets in the Widget Gallery; open individual Widget Configuration sheets (Weather city/units, Clock style/timezone, System Stats sensors, Pomodoro durations, Bookmarks).
 
-3. **Second Dock**:
-   Master toggle to display an auxiliary live widget and application dock running alongside native macOS Dock. Configure placement (Fixed Bottom sitting above native Dock with zero overlap, Floating window, Fixed Top, Fixed Left, Fixed Right), scaling (0.7x to 1.5x), tile spacing, edge offset, auto-hide with customizable reveal delay (0.0s to 3.0s) and edge trigger activation thickness (2px to 20px), hide in fullscreen, hide on window hover, reserve dock space, glass backdrop styles (Auto System, Light Glass, Dark Glass, Liquid Glass, Clear frameless), profile switcher, Dock Items & Applications manager (add custom apps from /Applications, delete default apps like Safari and Terminal, reorder items, add separators), widget gallery with 16 live widgets, and Reset Layout emergency recovery.
+## 4. Appearance
+- **Interactive Liquid Glass Studio**: Test Dial Arc Radius, Background Glass Opacity, Appearance Theme (`Match System`, `Light`, `Dark`), corner selection (`TL`/`TR`/`BL`/`BR`), and control actions directly by scrubbing on a live Midnight/Daylight preview stage.
+- **Animation & Feedback**: Adjust Animation Duration multiplier, Respect System Reduce Motion, Mechanical Sound Effects volume, Trackpad Haptic Detents intensity (`Light`, `Medium`, `Strong`), and run a Test Haptic & Sound check.
 
-4. **Appearance**:
-   Dial radius (110-200pt), glass opacity (30-100%), theme selection (System, Light, Dark), animation speed, Reduce Motion support, mechanical audio click sounds, and trackpad haptic intensity (Off, Subtle, Medium, Strong).
+## 5. Displays
+- **Connected Displays**: Inspect all built-in and external monitors, switch between Automatic, Hardware DDC/CI, and Software Dimming per display, and scrub live brightness or click Quick Presets (25%, 50%, 75%, 100%).
+- **Brightness Precision**: Configure adjustment step size (1%, 5%, 10%) plus safe hardware Minimum and Maximum Brightness Clamps.
 
-5. **Displays**:
-   Active display inventory with UUIDs, method selector (Auto, DDC/CI, Software Dimming, Native), fallback status explanation, live brightness testing sliders, hardware clamp limits, and persistent per-display profile storage.
+## 6. Pomodoro
+- **Live Focus Ring Hero**: Real-time circular countdown timer with Play/Pause, Skip, Reset controls, session mode switcher (`Focus`, `Short Break`, `Long Break`), completed round dots, and Reset Rounds button.
+- **Intervals & Alerts**: Configure Focus, Short Break, Long Break durations, Rounds Before Long Break, auto-start break, and chime alerts.
 
-6. **Pomodoro**:
-   Focus duration, short break duration, long break duration, rounds before long break, auto-start breaks, and completion chime alerts.
+## 7. Shortcuts
+- **Keycap Shortcut Recorders**: Interactive click-to-record controls for Toggle Corner Dials, Cursor Radial Palette, Stash Drop Shelf, and Quick Scratchpad with Reset Defaults.
+- **Conflict Analysis**: Live audit detecting macOS reserved system shortcuts (`Command+Space`, `Command+Tab`, `Control+Option+D`) and internal duplicate assignments.
+- **Reference Sheet**: Quick lookup for Second Dock (`Control+Option+D`, `Command+1..8`) and built-in window shortcuts.
 
-7. **Shortcuts**:
-   Configurable dynamic global hotkeys for toggling dials, cursor radial palette, stash shelf, and scratchpad notes drawer, with automated conflict analysis against macOS system reserved combinations.
-
-8. **About / Advanced**:
-   Version information, 1-click in-place background updates (Sparkle 2) with Ed25519 cryptographic verification, Console log viewer launcher, user manual link, full JSON backup export and import (AppSettings and App Profiles), and factory reset.
-
-## Drawer Utilities & Cursor Palette (Hot Corners tab)
-
-- Stash Drop Shelf: modular enable/disable toggle (default: OFF) for holding dragged files, images, links and text snippets.
-- Quick Scratchpad: modular enable/disable toggle (default: OFF) for capturing ephemeral notes with automatic local persistence.
-- Attached Edge: configure whether drawer utilities slide out from the Left Edge or Right Edge of the screen.
-- Cursor Radial Palette: enable or disable the radial dials summoned directly at the mouse cursor.
-- Corner and edge actions accept Volume, Brightness, Keyboard Backlight, Pomodoro, Keep Awake, Stash Shelf, and Scratchpad.
+## 8. About / Advanced
+- **App Identity & Sparkle 2 Updates**: Live version display, update status pill, last check timestamp, and one-click Check for Updates.
+- **Diagnostics & Backup**: Debug logging (`com.macstash.app`) toggle, Console launcher, User Guide shortcut, JSON Settings Export/Import with status feedback, and Factory Reset.

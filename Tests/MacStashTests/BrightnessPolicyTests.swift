@@ -6,6 +6,7 @@ public enum BrightnessPolicyTests {
         testClamping()
         testMethodResolution()
         testKeyboardBrightnessPolicy()
+        testMinMaxRangeClampingAndLocalization()
     }
 
     private static func testKeyboardBrightnessPolicy() {
@@ -43,5 +44,17 @@ public enum BrightnessPolicyTests {
 
         let r4 = BrightnessPolicy.resolveActualMethod(preferred: .software, isBuiltIn: false, isDDCSupported: true)
         TestAssertion.assertEqual(r4.method, BrightnessMethod.software)
+    }
+
+    private static func testMinMaxRangeClampingAndLocalization() {
+        TestAssertion.assertEqual(BrightnessPolicy.clamp(0.05, min: 0.2, max: 0.85), Float(0.2))
+        TestAssertion.assertEqual(BrightnessPolicy.clamp(0.95, min: 0.2, max: 0.85), Float(0.85))
+        TestAssertion.assertEqual(BrightnessPolicy.clamp(0.55, min: 0.2, max: 0.85), Float(0.55))
+
+        TestAssertion.assertEqual(BrightnessMethod.ddc.localizedDisplayName(using: "en"), "DDC/CI Hardware")
+        TestAssertion.assertEqual(BrightnessMethod.ddc.localizedDisplayName(using: "vi"), "Phần cứng DDC/CI")
+
+        let viRes = BrightnessPolicy.resolveActualMethod(preferred: .auto, isBuiltIn: false, isDDCSupported: true, language: "vi")
+        TestAssertion.assertTrue(viRes.reason.contains("DDC/CI"), "Localized reason preserves protocol token")
     }
 }

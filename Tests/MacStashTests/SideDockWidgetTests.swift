@@ -12,6 +12,7 @@ public enum SideDockWidgetTests {
         testMultiProfileManagement()
         testProfileExportImport()
         testPhase2WidgetViews()
+        testCPUTickSampleDeltaCalculation()
     }
 
     private static func testWidgetRegistryRegistration() {
@@ -115,5 +116,18 @@ public enum SideDockWidgetTests {
             _ = registry.makeWidgetView(for: item)
             TestAssertion.assertTrue(true, "Widget view generated cleanly for kind: \(kind)")
         }
+    }
+
+    private static func testCPUTickSampleDeltaCalculation() {
+        let initial = CPUTickSample(activeTicks: 250, totalTicks: 1000)
+        TestAssertion.assertEqual(CPUTickSample.deltaPercent(from: nil, to: initial), 25.0)
+
+        let next = CPUTickSample(activeTicks: 310, totalTicks: 1200)
+        // delta active = 60, delta total = 200 -> 30.0%
+        TestAssertion.assertEqual(CPUTickSample.deltaPercent(from: initial, to: next), 30.0)
+
+        let stalled = CPUTickSample(activeTicks: 310, totalTicks: 1200)
+        let fallback = CPUTickSample(activeTicks: 10, totalTicks: 100)
+        TestAssertion.assertEqual(CPUTickSample.deltaPercent(from: stalled, to: fallback), 10.0)
     }
 }

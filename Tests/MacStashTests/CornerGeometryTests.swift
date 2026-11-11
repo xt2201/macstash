@@ -12,6 +12,7 @@ public enum CornerGeometryTests {
         testDirectCornerIsOuterCorner()
         testOuterRightEdge()
         testOuterLeftEdge()
+        testVerticalEdgeAndHitRectSymmetry()
     }
 
     private static func testSingleDisplayAllCornersAreOuter() {
@@ -155,5 +156,40 @@ public enum CornerGeometryTests {
         let offsetDual = [mb, extOffset]
         TestAssertion.assertTrue(CornerGeometry.isOuterLeftEdge(screen: mb, in: offsetDual), "MB left edge is outer")
         TestAssertion.assertFalse(CornerGeometry.isOuterLeftEdge(screen: extOffset, in: offsetDual), "Ext left edge touches MB")
+    }
+
+    private static func testVerticalEdgeAndHitRectSymmetry() {
+        let screen = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let sliderRect = CGRect(x: 0, y: 200, width: 80, height: 320)
+
+        TestAssertion.assertTrue(
+            CornerGeometry.isCursorAtVerticalEdge(point: CGPoint(x: 1.0, y: 350), screenFrame: screen, verticalRange: sliderRect, edge: .left),
+            "Cursor at extreme left edge inside vertical range qualifies"
+        )
+        TestAssertion.assertFalse(
+            CornerGeometry.isCursorAtVerticalEdge(point: CGPoint(x: 1.0, y: 50), screenFrame: screen, verticalRange: sliderRect, edge: .left),
+            "Cursor outside vertical range must not qualify"
+        )
+        TestAssertion.assertTrue(
+            CornerGeometry.isCursorAtVerticalEdge(point: CGPoint(x: 1511.0, y: 350), screenFrame: screen, verticalRange: sliderRect, edge: .right),
+            "Cursor at extreme right edge inside vertical range qualifies"
+        )
+        TestAssertion.assertFalse(
+            CornerGeometry.isCursorAtVerticalEdge(point: CGPoint(x: 1511.0, y: 350), screenFrame: screen, verticalRange: sliderRect, edge: .top),
+            "Top edge returns false for vertical edge helper"
+        )
+
+        let leftHit = CornerGeometry.edgeSliderHitRect(screenFrame: screen, sliderPanelRect: sliderRect, edge: .left, hitWidth: 84)
+        TestAssertion.assertEqual(leftHit, CGRect(x: 0, y: 200, width: 84, height: 320))
+
+        let rightHit = CornerGeometry.edgeSliderHitRect(screenFrame: screen, sliderPanelRect: sliderRect, edge: .right, hitWidth: 84)
+        TestAssertion.assertEqual(rightHit, CGRect(x: 1428, y: 200, width: 84, height: 320))
+
+        let drawerRect = CGRect(x: 0, y: 100, width: 320, height: 500)
+        let leftDrawerHit = CornerGeometry.edgeDrawerHitRect(screenFrame: screen, drawerPanelRect: drawerRect, edge: .left, drawerWidth: 300, drawerHeight: 400, margin: 20)
+        TestAssertion.assertEqual(leftDrawerHit, CGRect(x: 0, y: 140, width: 320, height: 420))
+
+        let rightDrawerHit = CornerGeometry.edgeDrawerHitRect(screenFrame: screen, drawerPanelRect: drawerRect, edge: .right, drawerWidth: 300, drawerHeight: 400, margin: 20)
+        TestAssertion.assertEqual(rightDrawerHit, CGRect(x: 1192, y: 140, width: 320, height: 420))
     }
 }

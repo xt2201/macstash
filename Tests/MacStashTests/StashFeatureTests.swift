@@ -22,6 +22,7 @@ public enum StashFeatureTests {
         testLeftEdgeDrawerAutoCloseBounds()
         testLeftEdgeExtremeDwellSymmetry()
         testRightEdgeExtremeDwellSymmetry()
+        testShortcutValidatorAudit()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -431,5 +432,32 @@ public enum StashFeatureTests {
         let insideWindowPt = CGPoint(x: frame.maxX - 10.0, y: rightRect.midY)
         let notAtEdge = insideWindowPt.x >= (frame.maxX - 2.5) && insideWindowPt.x <= (frame.maxX + 1.0)
         TestAssertion.assertFalse(notAtEdge, "Point away from extreme right edge must not trigger dwell summon")
+    }
+
+    private static func testShortcutValidatorAudit() {
+        TestAssertion.assertEqual(ShortcutValidator.canonicalize("cmd-option-s"), "option+command+s")
+        TestAssertion.assertEqual(ShortcutValidator.keycapTokens(for: "Control+Option+S"), ["⌃", "⌥", "S"])
+
+        let clean = ShortcutValidator.auditConflicts(
+            shortcuts: [
+                ("Toggle Dials", "Option+S"),
+                ("Palette", "Option+Space"),
+                ("Stash Shelf", "Control+Option+S"),
+                ("Scratchpad", "Control+Option+N")
+            ],
+            language: "en"
+        )
+        TestAssertion.assertTrue(clean.isEmpty, "Default non-overlapping shortcuts produce zero conflicts")
+
+        let conflicting = ShortcutValidator.auditConflicts(
+            shortcuts: [
+                ("Toggle Dials", "Command+Space"),
+                ("Palette", "Control+Option+D"),
+                ("Stash Shelf", "Option+S"),
+                ("Scratchpad", "Option+S")
+            ],
+            language: "vi"
+        )
+        TestAssertion.assertEqual(conflicting.count, 3, "Detects Spotlight, Second Dock reserved conflict, and duplicate internal binding")
     }
 }

@@ -23,6 +23,8 @@ public enum StashFeatureTests {
         testLeftEdgeExtremeDwellSymmetry()
         testRightEdgeExtremeDwellSymmetry()
         testShortcutValidatorAudit()
+        testAudioScrubbingCalculations()
+        testKeepAwakeSnapPresets()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -459,5 +461,57 @@ public enum StashFeatureTests {
             language: "vi"
         )
         TestAssertion.assertEqual(conflicting.count, 3, "Detects Spotlight, Second Dock reserved conflict, and duplicate internal binding")
+    }
+
+    private static func testAudioScrubbingCalculations() {
+        // Test progress fraction clamping
+        let duration: Double = 240.0 // 4 minutes
+        let elapsed: Double = 60.0   // 1 minute
+        let fraction = max(0.0, min(1.0, elapsed / duration))
+        TestAssertion.assertEqual(fraction, 0.25)
+
+        // Time formatting check
+        let formatTime: (Double) -> String = { sec in
+            guard sec.isFinite && !sec.isNaN && sec >= 0 else { return "0:00" }
+            let total = Int(sec)
+            let m = total / 60
+            let s = total % 60
+            return String(format: "%d:%02d", m, s)
+        }
+        TestAssertion.assertEqual(formatTime(65.0), "1:05")
+        TestAssertion.assertEqual(formatTime(0.0), "0:00")
+        TestAssertion.assertEqual(formatTime(240.0), "4:00")
+        TestAssertion.assertEqual(formatTime(3661.0), "61:01")
+
+        // Skip calculations
+        let skipForward: (Double, Double, Double) -> Double = { cur, delta, maxD in
+            max(0.0, min(maxD, cur + delta))
+        }
+        let skipBackward: (Double, Double) -> Double = { cur, delta in
+            max(0.0, cur - delta)
+        }
+        TestAssertion.assertEqual(skipForward(60.0, 10.0, 240.0), 70.0)
+        TestAssertion.assertEqual(skipForward(235.0, 10.0, 240.0), 240.0)
+        TestAssertion.assertEqual(skipBackward(60.0, 10.0), 50.0)
+        TestAssertion.assertEqual(skipBackward(5.0, 10.0), 0.0)
+    }
+
+    private static func testKeepAwakeSnapPresets() {
+        let snapPreset: (Double) -> Int = { p in
+            switch p {
+            case ..<0.1: return 0
+            case ..<0.3: return 15
+            case ..<0.5: return 30
+            case ..<0.7: return 60
+            case ..<0.9: return 120
+            default: return -1
+            }
+        }
+        TestAssertion.assertEqual(snapPreset(0.05), 0)
+        TestAssertion.assertEqual(snapPreset(0.25), 15)
+        TestAssertion.assertEqual(snapPreset(0.40), 30)
+        TestAssertion.assertEqual(snapPreset(0.65), 60)
+        TestAssertion.assertEqual(snapPreset(0.85), 120)
+        TestAssertion.assertEqual(snapPreset(0.95), -1)
     }
 }

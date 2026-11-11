@@ -94,6 +94,18 @@ public final class AppState: ObservableObject {
         settings.hapticFeedbackEnabled ? hapticIntensity : .off
     }
 
+    public var hasDrawerFeatureActive: Bool {
+        settings.isStashShelfEnabled || settings.isScratchpadEnabled
+            || settings.cornerActions.values.contains(.stashShelf)
+            || settings.cornerActions.values.contains(.scratchpad)
+            || activeProfile.cornerActions.values.contains(.stashShelf)
+            || activeProfile.cornerActions.values.contains(.scratchpad)
+            || activeProfile.rightEdgeAction == .stashShelf
+            || activeProfile.rightEdgeAction == .scratchpad
+            || stashShelf.isShelfOpen
+            || scratchpad.isScratchpadOpen
+    }
+
     private func scheduleSaveSettings() {
         settingsSaveWorkItem?.cancel()
         let item = DispatchWorkItem { [weak self] in
@@ -191,6 +203,7 @@ public final class AppState: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
     private var pomodoroTimer: Timer?
+    private var hardwareSyncTimer: Timer?
     private var lastValueNotch: Int = -1
 
     private init() {
@@ -241,6 +254,7 @@ public final class AppState: ObservableObject {
         setupSubscribers()
         setupPomodoroTimer()
         setupSystemWakeObserver()
+        setupHardwareSyncTimer()
 
         sideDock.onOpenSettings = { [weak self] in
             self?.requestedSettingsTab = "Second Dock"
@@ -440,6 +454,29 @@ public final class AppState: ObservableObject {
         }
     }
 
+    private func setupHardwareSyncTimer() {
+        hardwareSyncTimer?.invalidate()
+        let t = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.syncHardwareState()
+            }
+        }
+        RunLoop.main.add(t, forMode: .common)
+        self.hardwareSyncTimer = t
+    }
+
+    public func syncHardwareState() {
+        audio.updateVolumeFromHardware(force: true)
+        let displays = connectedDisplays()
+        for d in displays {
+            let old = brightnessService.profile(for: d.uuid)?.brightnessLevel
+            let live = brightnessService.syncHardwareBrightness(for: d)
+            if let old = old, abs(old - live) > 0.005 {
+                objectWillChange.send()
+            }
+        }
+    }
+
     // MARK: - Action Mapping
 
     public func action(for corner: CornerPosition) -> ControlAction {
@@ -460,9 +497,8 @@ public final class AppState: ObservableObject {
             let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
             let displays = connectedDisplays()
             if let display = displays.first(where: { $0.id == targetID }) {
-                if let profile = brightnessService.profile(for: display.uuid) {
-                    return Double(profile.brightnessLevel)
-                }
+                let live = brightnessService.syncHardwareBrightness(for: display)
+                return Double(live)
             }
             return Double(Defaults.Brightness.defaultLevel)
         case .keyboardBrightness:
@@ -572,11 +608,25 @@ public final class AppState: ObservableObject {
             haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .stashShelf:
+            if !settings.isStashShelfEnabled {
+                settings.isStashShelfEnabled = true
+                ScreenManager.shared.reconfigureOverlays()
+            }
             stashShelf.isShelfOpen.toggle()
+            if stashShelf.isShelfOpen {
+                scratchpad.isScratchpadOpen = false
+            }
             haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .scratchpad:
+            if !settings.isScratchpadEnabled {
+                settings.isScratchpadEnabled = true
+                ScreenManager.shared.reconfigureOverlays()
+            }
             scratchpad.isScratchpadOpen.toggle()
+            if scratchpad.isScratchpadOpen {
+                stashShelf.closeShelf()
+            }
             haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .none:

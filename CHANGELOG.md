@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.15.0] - 2026-11-11
+
+### Added
+- Real-Time Audio Scrubbing & Seeking: Added fine-grained audio seeking and transport controls on both Hot Corners and Edge Bars, including interactive progress scrubbers, Skip Forward 10s (`goforward.10`), Skip Backward 10s (`gobackward.10`), and live `elapsed / total` timestamps.
+- Direct Hot Corner File Drop: Dragging files directly onto the hot corner assigned to Stash Shelf immediately adds them to the shelf with tactile detents and audio feedback.
+- Hot Corner Utility Satellite Controls: Added quick satellite micro-buttons for Keep Awake (Indefinite toggle & turn off), Stash Shelf (Open shelf drawer & clear items), and Scratchpad (Open note drawer & copy notes).
+- Edge Bar Utility Cards: Replaced meaningless 0-100% volume-style tracks with dedicated interactive preview cards for Scratchpad, Stash Shelf, and stepped presets (OFF, 15m, 30m, 1h, 2h, ∞) for Caffeine / Keep Awake.
+
+### Changed
+- Automatic Utility Panel Activation: Assigning any corner or edge to Scratchpad or Stash Shelf automatically ensures the underlying overlay panels exist and activate without manual configuration friction.
+
+### Fixed
+- Live Physical Brightness & Volume Hardware Sync: Eliminated split-brain caching where physical Mac keyboard adjustments (e.g. lowering brightness from 100% to 80% with F1/F2 keys) were ignored by hot corner dials. Calling `getValue(for: .brightness)` now queries hardware directly, accompanied by a 1.5s background sync and immediate sync on corner/edge hover and dwell.
+- Mute & Silent Sync: Real-time CoreAudio mute and volume reflection on corner dials and edge bars during rapid physical key presses.
+
+---
+
 ## [2.14.0] - 2026-11-11
 
 ### Added

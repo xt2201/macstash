@@ -1,5 +1,17 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.15.0 (2026-11-11)
+
+### Đồng Bộ Phần Cứng Trực Tiếp, Tua Nhạc & Tối Ưu Góc Tiện Ích
+
+- **Đồng bộ Phần cứng Tức thì**: Truy vấn trực tiếp độ sáng màn hình vật lý và âm lượng CoreAudio từ hệ thống macOS. Mọi thao tác bấm phím vật lý trên bàn phím Mac (F1/F2 hoặc phím âm lượng) lập tức cập nhật chuẩn xác lên núm xoay góc nóng và thanh trượt cạnh màn hình, loại bỏ hoàn toàn hiện tượng lệch trạng thái.
+- **Tính năng Tua Nhạc & Điều khiển Đa phương tiện**: Bổ sung thanh tua nhạc tương tác trực tiếp trên cả Thanh trượt cạnh và Vòng xoay góc nóng. Hỗ trợ kéo tua đến vị trí mong muốn, nút Tua tới 10 giây (`goforward.10`), Tua lùi 10 giây (`gobackward.10`) cùng nhãn thời gian thực (`1:24 / 3:45`) cho Apple Music, Spotify và trình phát hệ thống.
+- **Thả Tệp Trực Tiếp Vào Góc Nóng & Phím Vệ Tinh**: Cho phép kéo thả trực tiếp tệp tin vào góc nóng được gán cho Kệ thả tệp Stash Shelf. Vành xoay của góc tiện ích bổ sung các nút vệ tinh một chạm để mở ngăn kéo, sao chép ghi chú nhanh, kích hoạt giữ máy thức vô hạn hoặc dọn sạch tệp.
+- **Thẻ Tiện Ích Trên Thanh Trượt Cạnh**: Thanh cạnh màn hình khi gán cho Ghi chú, Kệ thả tệp hoặc Giữ máy thức (Caffeine) chuyển sang giao diện thẻ chuyên dụng với xem trước nội dung và các mốc đặt sẵn (Tắt, 15p, 30p, 1h, 2h, Vô hạn) thay vì thanh trượt 0-100% chung chung.
+- **Tự Động Kích Hoạt Ngăn Kéo**: Thiết lập bất kỳ góc nóng hoặc thanh cạnh nào sang Ghi chú hoặc Kệ thả tệp sẽ tự động dựng và cấp quyền hiển thị cho lớp phủ ngăn kéo mà không cần bật thủ công trong Cài đặt.
+
+---
+
 ## Phiên bản 2.14.0 (2026-11-11)
 
 ### Đại tu toàn diện UI/UX và Logic Nghiệp Vụ

@@ -28,18 +28,25 @@ public final class BuiltInBrightnessService: BrightnessControlProtocol, @uncheck
         }
     }
 
-    public func getBrightness(for display: DisplayInfo) async -> Float {
+    /// Synchronously queries the physical hardware brightness for a given display ID.
+    /// Returns the live clamped level (0.0 ... 1.0) or nil if query failed or symbol unavailable.
+    public func currentBrightness(for displayID: CGDirectDisplayID) -> Float? {
         guard let getBrightness = getBrightnessFunc else {
-            return Defaults.Brightness.defaultLevel
+            return nil
         }
-
         var current: Float = Defaults.Brightness.defaultLevel
-        let result = getBrightness(display.id, &current)
+        let result = getBrightness(displayID, &current)
         if result == 0 {
             return BrightnessPolicy.clamp(current)
         }
+        AppLogger.brightness.debug("DisplayServicesGetBrightness returned status \(result) for display \(displayID)")
+        return nil
+    }
 
-        AppLogger.brightness.debug("DisplayServicesGetBrightness returned status \(result) for display \(display.id)")
+    public func getBrightness(for display: DisplayInfo) async -> Float {
+        if let live = currentBrightness(for: display.id) {
+            return live
+        }
         return Defaults.Brightness.defaultLevel
     }
 

@@ -945,6 +945,86 @@
         }
       }
     },
+    "corners.media.seekForward": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip Forward 10s"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tua tới 10 giây"
+          }
+        }
+      }
+    },
+    "corners.media.seekBackward": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip Backward 10s"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tua lùi 10 giây"
+          }
+        }
+      }
+    },
+    "corners.media.scrubber": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio Scrubber"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thanh tua nhạc"
+          }
+        }
+      }
+    },
+    "corners.action.openScratchpad": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Scratchpad"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở ghi chú nhanh"
+          }
+        }
+      }
+    },
+    "corners.action.openShelf": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Stash Shelf"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở kệ thả tệp"
+          }
+        }
+      }
+    },
     "corners.dwellDelay": {
       "localizations": {
         "en": {

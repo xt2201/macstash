@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.14.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.15.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.14.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.15.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -84,6 +84,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 ### 2. Multi-Monitor Hardware Brightness (DDC/CI &amp; Native)
 - Controls third-party HDMI and DisplayPort monitors directly via DDC/CI hardware I2C packets.
 - Smooth fallback to Apple Native CoreDisplay services for built-in Retina panels and Pro Display XDR / Studio Display.
+- **Synchronous Hardware Brightness Querying**: Physical Mac keyboard brightness adjustments (F1/F2 keys) are continuously synchronized in real-time without state drift, keeping hot corner dials 100% accurate.
 - Synchronized multi-display dimming or independent per-display adjustment.
 
 ### 3. Tactile Pomodoro Focus Engine
@@ -92,10 +93,10 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Corner satellite micro-buttons for immediate one-click Session Reset and Interval Skip.
 - Live ticking title in the macOS menu bar status item while running.
 
-### 4. Master Audio &amp; Endpoint Routing
-- Instant volume scrubbing with linear perceived loudness scaling.
+### 4. Master Audio, Real-Time Transport &amp; Seeking
+- Instant volume scrubbing with linear perceived loudness scaling and real-time CoreAudio physical key sync.
+- **Fine-Grained Audio Seeking & Transport**: Full scrubber bar, Skip Forward 10s (`goforward.10`), Skip Backward 10s (`gobackward.10`), and live timestamp readouts directly on both screen edge bars and corner dials.
 - Rapid audio output device switcher directly from the corner popover.
-- Low-latency synchronization with macOS CoreAudio subsystem.
 
 ### 5. The Liquid Docking Bay (Stash Drop Shelf) & Quick Scratchpad
 - **Modular Enable/Disable**: Both Stash Shelf and Quick Scratchpad feature independent toggles (default: OFF) so screen edges remain completely clean and zero-resource until you choose to enable them.
@@ -176,7 +177,7 @@ Because the macOS mouse cursor cannot travel beyond the physical boundary of the
 ## Installation
 
 ### Method 1: Direct DMG Download (Recommended)
-1. Download the latest universal disk image: **[MacStash-v2.14.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
+1. Download the latest universal disk image: **[MacStash-v2.15.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
 2. Open the disk image and drag **MacStash** into your `Applications` folder.
 3. Launch MacStash from Launchpad, Spotlight, or `Applications`.
 

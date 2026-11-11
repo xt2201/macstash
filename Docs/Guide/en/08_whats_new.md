@@ -1,5 +1,17 @@
 # Release Notes & Changelog
 
+## Version 2.15.0 (2026-11-11)
+
+### Real-Time Hardware Sync, Audio Scrubbing & Utility Corners
+
+- **Live Hardware Synchronization**: Synchronously queries physical display brightness and master CoreAudio volume directly from macOS private frameworks and hardware services. Keyboard brightness adjustments (e.g. F1/F2 keys) and volume keys immediately update hot corner dials and edge bars without state drift.
+- **Audio Seeking & Transport Controls**: Added full audio scrubbing support to both Edge Bars and Corner Dials. Includes interactive draggable seek bar, Skip Forward 10s (`goforward.10`), Skip Backward 10s (`gobackward.10`), and live time readouts (`1:24 / 3:45`) supporting Apple Music, Spotify, and system media.
+- **Hot Corner File Drop & Utility Satellites**: Dragging files to a hot corner mapped to Stash Shelf immediately stores them. When hovering utility corners, satellite micro-controls provide 1-click access to open full drawers, copy notes, toggle indefinite caffeine, or clear items.
+- **Edge Bar Utility Cards**: Edge Bars mapped to Scratchpad, Stash Shelf, or Caffeine display dedicated quick cards and stepped presets (OFF, 15m, 30m, 1h, 2h, ∞) rather than generic sliders.
+- **Auto-Provisioned Utility Panels**: Configuring any corner dial or edge bar to Scratchpad or Stash Shelf automatically mounts the required edge panels without requiring separate manual activation.
+
+---
+
 ## Version 2.14.0 (2026-11-11)
 
 ### Major UI/UX Overhaul & Architecture Improvements

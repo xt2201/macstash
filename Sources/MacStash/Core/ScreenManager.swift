@@ -508,7 +508,7 @@ public final class ScreenManager: ObservableObject {
         }
 
         // 1. Drawer Interactivity & Extreme Edge Dwell (Shelf & Scratchpad)
-        if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
+        if appState.hasDrawerFeatureActive {
             let allFrames = NSScreen.screens.map { $0.frame }
             let isOpen = shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen
             let isDrawerRight = appState.settings.drawerEdgePosition == .right
@@ -682,6 +682,7 @@ public final class ScreenManager: ObservableObject {
                     edge: targetEdge
                 )
                 if matchesEdge {
+                    self.appState.syncHardwareState()
                     self.appState.activeDisplayID = displayID
                     self.appState.isRightSliderActive = true
                     for (id, inst) in self.instances {
@@ -911,6 +912,7 @@ public final class ScreenManager: ObservableObject {
 
     public func activateDial(corner: CornerPosition, displayID: CGDirectDisplayID) {
         AppLogger.hotcorner.info("Activating corner dial at \(corner.rawValue) on display \(displayID)")
+        appState.syncHardwareState()
         appState.activeCorner = corner
         appState.activeDisplayID = displayID
         instances[displayID]?.setMouseInteractive(true, for: corner)

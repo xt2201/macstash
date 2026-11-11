@@ -108,7 +108,7 @@ public final class ScreenOverlayInstance {
     }
 
     private func createDrawerPanelIfNeeded() {
-        guard appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled else {
+        guard appState.hasDrawerFeatureActive else {
             leftEdgePanel?.orderOut(nil)
             return
         }
@@ -238,7 +238,7 @@ public final class ScreenOverlayInstance {
             rightEdgePanel?.orderOut(nil)
         }
 
-        if appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled {
+        if appState.hasDrawerFeatureActive {
             if let leftPanel = leftEdgePanel {
                 let isRight = appState.settings.drawerEdgePosition == .right
                 let shouldShow: Bool

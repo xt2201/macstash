@@ -22,6 +22,7 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
     typealias SendCommandFn = @convention(c) (Int32, CFDictionary?) -> Bool
     typealias SendCommandToPlayerFn = @convention(c) (Int32, CFDictionary?, AnyObject, Int32, DispatchQueue, @escaping (UInt32, NSArray?) -> Void) -> Void
     typealias ArtworkCopyImageDataFn = @convention(c) (AnyObject) -> Unmanaged<CFData>?
+    typealias SetElapsedTimeFn = @convention(c) (Double) -> Void
 
     let queue = DispatchQueue(label: "com.macstash.nowplaying.adapter", qos: .userInteractive)
 
@@ -42,6 +43,7 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
     var sendCommand: SendCommandFn?
     var sendCommandToPlayer: SendCommandToPlayerFn?
     var artworkCopyImageData: ArtworkCopyImageDataFn?
+    var setElapsedTime: SetElapsedTimeFn?
 
     private var lastActivePlayerPath: AnyObject?
     private var lastPlayerPathsByPID: [Int32: AnyObject] = [:]
@@ -76,6 +78,7 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
         sendCommand = sym("MRMediaRemoteSendCommand", as: SendCommandFn.self)
         sendCommandToPlayer = sym("MRMediaRemoteSendCommandToPlayer", as: SendCommandToPlayerFn.self)
         artworkCopyImageData = sym("MRNowPlayingArtworkCopyImageData", as: ArtworkCopyImageDataFn.self)
+        setElapsedTime = sym("MRMediaRemoteSetElapsedTime", as: SetElapsedTimeFn.self)
     }
 
     struct CandidateSnapshot {
@@ -568,13 +571,55 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
         let parts = trimmed.split(separator: " ").map(String.init)
         var targetPID: Int32 = 0
         var commandWord = trimmed.lowercased()
+        var seekParam: Double? = nil
 
         if parts.count >= 4 && parts[0].lowercased() == "play", let parsedPID = Int32(parts[1]) {
             targetPID = parsedPID
             commandWord = parts[3].lowercased()
+        } else if parts.count >= 3 && parts[0].lowercased() == "seek", let parsedPID = Int32(parts[1]), let sec = Double(parts[2]) {
+            targetPID = parsedPID
+            commandWord = "seek"
+            seekParam = sec
         } else if parts.count == 2, let parsedPID = Int32(parts[1]) {
             targetPID = parsedPID
             commandWord = parts[0].lowercased()
+        } else if parts.count == 2, let sec = Double(parts[1]) {
+            commandWord = parts[0].lowercased()
+            seekParam = sec
+        }
+
+        if commandWord == "seek" || commandWord == "forward" || commandWord == "skip_forward" || commandWord == "backward" || commandWord == "skip_backward" {
+            let current = 0.0
+            let targetSeconds: Double
+            if commandWord == "forward" || commandWord == "skip_forward" {
+                let delta = seekParam ?? 10.0
+                targetSeconds = max(0.0, current + delta)
+            } else if commandWord == "backward" || commandWord == "skip_backward" {
+                let delta = seekParam ?? 10.0
+                targetSeconds = max(0.0, current - delta)
+            } else {
+                targetSeconds = max(0.0, seekParam ?? 0.0)
+            }
+
+            queue.async { [weak self] in
+                guard let self = self else { return }
+                self.setElapsedTime?(targetSeconds)
+
+                let options: CFDictionary = [
+                    "kMRMediaRemoteOptionPlaybackPosition" as CFString: NSNumber(value: targetSeconds)
+                ] as CFDictionary
+
+                let targetPlayerPath = (targetPID > 0 ? self.lastPlayerPathsByPID[targetPID] : nil) ?? self.lastActivePlayerPath
+                if let playerPath = targetPlayerPath, let sendToPlayer = self.sendCommandToPlayer {
+                    sendToPlayer(48, options, playerPath, 0, self.queue) { [weak self] _, _ in
+                        self?.schedulePostCommandEmit()
+                    }
+                } else if let sendGlobal = self.sendCommand {
+                    _ = sendGlobal(48, options)
+                    self.schedulePostCommandEmit()
+                }
+            }
+            return
         }
 
         let commandID: Int32

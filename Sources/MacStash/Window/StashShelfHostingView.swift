@@ -41,7 +41,7 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
     }
 
     public override func hitTest(_ point: NSPoint) -> NSView? {
-        guard appState.isEnabled && (appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled) else {
+        guard appState.isEnabled && appState.hasDrawerFeatureActive else {
             return nil
         }
 

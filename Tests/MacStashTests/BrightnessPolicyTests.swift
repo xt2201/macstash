@@ -7,6 +7,7 @@ public enum BrightnessPolicyTests {
         testMethodResolution()
         testKeyboardBrightnessPolicy()
         testMinMaxRangeClampingAndLocalization()
+        testHardwareBrightnessSync()
     }
 
     private static func testKeyboardBrightnessPolicy() {
@@ -56,5 +57,13 @@ public enum BrightnessPolicyTests {
 
         let viRes = BrightnessPolicy.resolveActualMethod(preferred: .auto, isBuiltIn: false, isDDCSupported: true, language: "vi")
         TestAssertion.assertTrue(viRes.reason.contains("DDC/CI"), "Localized reason preserves protocol token")
+    }
+
+    private static func testHardwareBrightnessSync() {
+        let service = CompositeBrightnessService()
+        let disp = DisplayInfo(id: 1, uuid: "builtin-1", name: "Built-in Retina", frame: .zero, isBuiltIn: true)
+        let live = service.syncHardwareBrightness(for: disp)
+        TestAssertion.assertTrue(live >= 0.0 && live <= 1.0, "Hardware brightness within valid normalized range")
+        TestAssertion.assertEqual(service.profile(for: "builtin-1")?.brightnessLevel, live)
     }
 }

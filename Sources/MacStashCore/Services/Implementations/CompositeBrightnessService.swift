@@ -32,6 +32,42 @@ public final class CompositeBrightnessService: ObservableObject, @unchecked Send
         return Defaults.Brightness.defaultLevel
     }
 
+    /// Synchronously checks the live physical brightness from hardware (for built-in Apple displays).
+    public func currentHardwareBrightness(for display: DisplayInfo) -> Float? {
+        if display.isBuiltIn {
+            return builtInService.currentBrightness(for: display.id)
+        }
+        return nil
+    }
+
+    /// Synchronously synchronizes internal profile state with the live hardware brightness.
+    /// Returns the live clamped brightness value.
+    @discardableResult
+    public func syncHardwareBrightness(for display: DisplayInfo) -> Float {
+        if let live = currentHardwareBrightness(for: display) {
+            var profile = profiles[display.uuid] ?? DisplayBrightnessProfile(
+                displayUUID: display.uuid,
+                displayName: display.name,
+                isBuiltIn: display.isBuiltIn
+            )
+            if abs(profile.brightnessLevel - live) > 0.005 {
+                profile.brightnessLevel = live
+                profile.actualMethod = .builtIn
+                let updated = profile
+                profiles[display.uuid] = updated
+            }
+            return live
+        }
+        return profiles[display.uuid]?.brightnessLevel ?? Defaults.Brightness.defaultLevel
+    }
+
+    /// Synchronizes all connected displays with physical hardware values.
+    public func syncAllDisplays(_ displays: [DisplayInfo]) {
+        for display in displays {
+            syncHardwareBrightness(for: display)
+        }
+    }
+
     public func setBrightness(_ level: Float, for display: DisplayInfo) async -> Bool {
         let clamped = BrightnessPolicy.clamp(level)
         var profile = profiles[display.uuid] ?? DisplayBrightnessProfile(

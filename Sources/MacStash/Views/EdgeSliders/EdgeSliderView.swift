@@ -32,7 +32,7 @@ public struct EdgeSliderView: View {
     }
 
     private var containerHeight: CGFloat {
-        shouldShowMediaControls ? 426 : 254
+        shouldShowMediaControls ? 476 : 254
     }
 
     private var currentValue: Float {
@@ -109,45 +109,115 @@ public struct EdgeSliderView: View {
                 .help(topHelpText(isMuted: isMuted))
                 .padding(.top, 10)
 
-                // Precision Crystal Tube Liquid Track
-                GeometryReader { geo in
-                    let trackH = max(1, geo.size.height)
-
-                    ZStack {
-                        LiquidVerticalTrack(
-                            progress: Double(currentValue),
-                            primaryTint: action.accentColors.first ?? .cyan,
-                            secondaryTint: action.accentColors.last ?? .blue,
-                            trackWidth: 16,
-                            isMuted: isMuted
+                if action == .scratchpad {
+                    Button(action: {
+                        appState.toggleAction(.scratchpad, displayID: displayID)
+                    }) {
+                        VStack(spacing: 8) {
+                            Image(systemName: "note.text")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundStyle(LinearGradient(colors: action.accentColors, startPoint: .top, endPoint: .bottom))
+                            Text(appState.scratchpad.text.isEmpty ? appState.localized("dial.notes") : "\(appState.scratchpad.wordCount)w")
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
+                            Text(appState.localized("corners.action.openScratchpad"))
+                                .font(.system(size: 8.5, weight: .medium))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                        }
+                        .frame(width: 48, height: 144)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.primary.opacity(0.06))
                         )
-
-                        Color.clear
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    .contentShape(Rectangle())
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { gesture in
-                                isDragging = true
-                                let progress = 1.0 - (gesture.location.y / trackH)
-                                let clamped = max(0.0, min(1.0, Float(progress)))
-                                dragValue = clamped
-                                appState.liveEdgeSliderValue = clamped
-                                appState.setValue(for: action, value: Double(clamped), displayID: displayID)
-                            }
-                            .onEnded { _ in
-                                isDragging = false
-                                appState.liveEdgeSliderValue = nil
-                                appState.saveSettings()
-                            }
-                    )
-                }
-                .frame(width: 48, height: shouldShowMediaControls ? 112 : 144)
-                .padding(.horizontal, 4)
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 4)
 
-                readoutLabel(isMuted: isMuted)
-                    .padding(.bottom, shouldShowMediaControls ? 6 : 12)
+                    readoutLabel(isMuted: isMuted)
+                        .padding(.bottom, 12)
+                } else if action == .stashShelf {
+                    Button(action: {
+                        appState.toggleAction(.stashShelf, displayID: displayID)
+                    }) {
+                        VStack(spacing: 8) {
+                            Image(systemName: "tray.2.fill")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundStyle(LinearGradient(colors: action.accentColors, startPoint: .top, endPoint: .bottom))
+                            Text("\(appState.stashShelf.items.count)")
+                                .font(.system(size: 14, weight: .heavy, design: .rounded))
+                                .foregroundColor(.primary)
+                            Text(appState.localized("corners.action.openShelf"))
+                                .font(.system(size: 8.5, weight: .medium))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                        }
+                        .frame(width: 48, height: 144)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.primary.opacity(0.06))
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 4)
+
+                    readoutLabel(isMuted: isMuted)
+                        .padding(.bottom, 12)
+                } else {
+                    // Precision Crystal Tube Liquid Track
+                    GeometryReader { geo in
+                        let trackH = max(1, geo.size.height)
+
+                        ZStack {
+                            LiquidVerticalTrack(
+                                progress: Double(currentValue),
+                                primaryTint: action.accentColors.first ?? .cyan,
+                                secondaryTint: action.accentColors.last ?? .blue,
+                                trackWidth: 16,
+                                isMuted: isMuted
+                            )
+
+                            Color.clear
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { gesture in
+                                    isDragging = true
+                                    let progress = 1.0 - (gesture.location.y / trackH)
+                                    let clamped: Float
+                                    if action == .keepAwake {
+                                        switch progress {
+                                        case ..<0.1: clamped = 0.0
+                                        case ..<0.3: clamped = 0.2
+                                        case ..<0.5: clamped = 0.4
+                                        case ..<0.7: clamped = 0.6
+                                        case ..<0.9: clamped = 0.8
+                                        default: clamped = 1.0
+                                        }
+                                    } else {
+                                        clamped = max(0.0, min(1.0, Float(progress)))
+                                    }
+                                    dragValue = clamped
+                                    appState.liveEdgeSliderValue = clamped
+                                    appState.setValue(for: action, value: Double(clamped), displayID: displayID)
+                                }
+                                .onEnded { _ in
+                                    isDragging = false
+                                    appState.liveEdgeSliderValue = nil
+                                    appState.saveSettings()
+                                }
+                        )
+                    }
+                    .frame(width: 48, height: shouldShowMediaControls ? 112 : 144)
+                    .padding(.horizontal, 4)
+
+                    readoutLabel(isMuted: isMuted)
+                        .padding(.bottom, shouldShowMediaControls ? 6 : 12)
+                }
             }
 
             // 2. Vertical Media Controller (Shown beneath Volume slider)

@@ -13,13 +13,24 @@ public struct EdgeMediaControlView: View {
     @State private var isPrevHovered: Bool = false
     @State private var isPlayHovered: Bool = false
     @State private var isNextHovered: Bool = false
+    @State private var isRewindHovered: Bool = false
+    @State private var isForwardHovered: Bool = false
+    @State private var isScrubbing: Bool = false
+    @State private var scrubFraction: Double = 0.0
 
     public init(appState: AppState) {
         self.appState = appState
     }
 
+    private var activeProgress: Double {
+        if isScrubbing {
+            return scrubFraction
+        }
+        return nowPlaying.progressFraction
+    }
+
     public var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             // 1. Album Artwork / Cover
             artworkView
                 .onTapGesture {
@@ -38,15 +49,17 @@ public struct EdgeMediaControlView: View {
                 .padding(.vertical, 1)
             }
 
-            // 3. Transport Controls in exact vertical order:
-            // Previous (Top) -> Play/Pause (Middle) -> Next (Bottom)
-            VStack(spacing: 6) {
+            // 3. Audio Scrubber Bar with Time Label
+            scrubberView
+
+            // 4. Transport Controls & Seeking
+            VStack(spacing: 5) {
                 // Previous Track Button (Top)
                 Button(action: { nowPlaying.previousTrack() }) {
                     Image(systemName: "backward.fill")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                         .foregroundColor(isPrevHovered ? .primary : .secondary)
-                        .frame(width: 26, height: 26)
+                        .frame(width: 24, height: 22)
                         .circularLiquidGlass(
                             tint: .clear,
                             specularIntensity: 0.8,
@@ -58,7 +71,24 @@ public struct EdgeMediaControlView: View {
                 .help(appState.localized("corners.media.previous"))
                 .onHover { isPrevHovered = $0 }
 
-                // Play / Pause Toggle Button (Middle)
+                // Quick Skip Backward 10s Button
+                Button(action: { nowPlaying.skipBackward(seconds: 10) }) {
+                    Image(systemName: "gobackward.10")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(isRewindHovered ? nowPlaying.artworkTint : .secondary)
+                        .frame(width: 28, height: 22)
+                        .circularLiquidGlass(
+                            tint: isRewindHovered ? nowPlaying.artworkTint : .clear,
+                            specularIntensity: 0.9,
+                            causticOpacity: 0.20,
+                            isHighlighted: isRewindHovered
+                        )
+                }
+                .buttonStyle(.plain)
+                .help(appState.localized("corners.media.seekBackward"))
+                .onHover { isRewindHovered = $0 }
+
+                // Play / Pause Toggle Button (Center)
                 Button(action: { nowPlaying.togglePlayPause() }) {
                     ZStack {
                         Image(systemName: nowPlaying.isPlaying ? "pause.fill" : "play.fill")
@@ -78,12 +108,29 @@ public struct EdgeMediaControlView: View {
                 .help(nowPlaying.isPlaying ? appState.localized("corners.media.pause") : appState.localized("corners.media.play"))
                 .onHover { isPlayHovered = $0 }
 
+                // Quick Skip Forward 10s Button
+                Button(action: { nowPlaying.skipForward(seconds: 10) }) {
+                    Image(systemName: "goforward.10")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(isForwardHovered ? nowPlaying.artworkTint : .secondary)
+                        .frame(width: 28, height: 22)
+                        .circularLiquidGlass(
+                            tint: isForwardHovered ? nowPlaying.artworkTint : .clear,
+                            specularIntensity: 0.9,
+                            causticOpacity: 0.20,
+                            isHighlighted: isForwardHovered
+                        )
+                }
+                .buttonStyle(.plain)
+                .help(appState.localized("corners.media.seekForward"))
+                .onHover { isForwardHovered = $0 }
+
                 // Next Track Button (Bottom)
                 Button(action: { nowPlaying.nextTrack() }) {
                     Image(systemName: "forward.fill")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                         .foregroundColor(isNextHovered ? .primary : .secondary)
-                        .frame(width: 26, height: 26)
+                        .frame(width: 24, height: 22)
                         .circularLiquidGlass(
                             tint: .clear,
                             specularIntensity: 0.8,
@@ -102,6 +149,64 @@ public struct EdgeMediaControlView: View {
         .onAppear {
             nowPlaying.refreshNowPlaying()
         }
+    }
+
+    // MARK: - Scrubber View
+
+    @ViewBuilder
+    private var scrubberView: some View {
+        VStack(spacing: 3) {
+            GeometryReader { geo in
+                let w = max(1, geo.size.width)
+                ZStack(alignment: .leading) {
+                    // Track background
+                    Capsule()
+                        .fill(Color.primary.opacity(0.14))
+                        .frame(height: 5)
+
+                    // Active progress fill
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [nowPlaying.artworkTint, nowPlaying.artworkSecondaryTint],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: max(4, w * CGFloat(activeProgress)), height: 5)
+
+                    // Scrubber thumb
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: isScrubbing ? 9 : 7, height: isScrubbing ? 9 : 7)
+                        .shadow(color: Color.black.opacity(0.35), radius: 2, x: 0, y: 1)
+                        .offset(x: max(0, min(w - 7, (w * CGFloat(activeProgress)) - 3.5)))
+                }
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            isScrubbing = true
+                            let fraction = max(0.0, min(1.0, value.location.x / w))
+                            scrubFraction = fraction
+                        }
+                        .onEnded { value in
+                            let fraction = max(0.0, min(1.0, value.location.x / w))
+                            nowPlaying.seekToProgress(fraction: fraction)
+                            isScrubbing = false
+                        }
+                )
+            }
+            .frame(width: 44, height: 8)
+
+            // Time readout
+            Text(nowPlaying.duration > 0 ? "\(nowPlaying.formattedElapsedTime) / \(nowPlaying.formattedDuration)" : nowPlaying.formattedElapsedTime)
+                .font(.system(size: 7.5, weight: .bold, design: .monospaced))
+                .foregroundColor(.secondary)
+                .lineLimit(1)
+        }
+        .help(appState.localized("corners.media.scrubber"))
+        .padding(.vertical, 2)
     }
 
     // MARK: - Album Artwork View

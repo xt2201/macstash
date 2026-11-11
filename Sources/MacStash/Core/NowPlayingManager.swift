@@ -39,6 +39,8 @@ public final class NowPlayingManager: ObservableObject {
 
     // Beat / rhythm envelope generator state
     private var rhythmTimer: Timer?
+    private var playbackProgressTimer: Timer?
+    private var lastElapsedUpdateTime: TimeInterval = 0
     private var isVisualizerActive: Bool = false
     private var smoothedBands: [Double] = [0.18, 0.18, 0.18, 0.18, 0.18]
     private var beatPhase: Double = 0.0
@@ -48,10 +50,12 @@ public final class NowPlayingManager: ObservableObject {
     private typealias MRMediaRemoteGetNowPlayingInfoFunction = @convention(c) (DispatchQueue, @escaping ([String: Any]?) -> Void) -> Void
     private typealias MRMediaRemoteGetIsPlayingFunction = @convention(c) (DispatchQueue, @escaping (Bool) -> Void) -> Void
     private typealias MRMediaRemoteSendCommandFunction = @convention(c) (Int32, AnyObject?) -> Bool
+    private typealias MRMediaRemoteSetElapsedTimeFunction = @convention(c) (Double) -> Void
 
     private var getNowPlayingInfoFunc: MRMediaRemoteGetNowPlayingInfoFunction?
     private var getIsPlayingFunc: MRMediaRemoteGetIsPlayingFunction?
     private var sendCommandFunc: MRMediaRemoteSendCommandFunction?
+    private var setElapsedTimeFunc: MRMediaRemoteSetElapsedTimeFunction?
 
     private let backgroundQueue = DispatchQueue(label: "com.macstash.nowplaying", qos: .userInteractive)
 
@@ -203,6 +207,7 @@ public final class NowPlayingManager: ObservableObject {
         self.playingPID = newPID
         self.duration = newDuration
         self.elapsedTime = newElapsed
+        self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
         self.isPlaying = newPlaying
         self.hasMedia = !newTitle.isEmpty || newPlaying
         updateRhythmEngineState()
@@ -385,6 +390,15 @@ public final class NowPlayingManager: ObservableObject {
     }
 
     private func updateRhythmEngineState() {
+        if isPlaying {
+            if playbackProgressTimer == nil {
+                startPlaybackProgressTimer()
+            }
+        } else {
+            playbackProgressTimer?.invalidate()
+            playbackProgressTimer = nil
+        }
+
         if isPlaying && isVisualizerActive {
             if rhythmTimer == nil {
                 startRhythmEngine()
@@ -395,6 +409,25 @@ public final class NowPlayingManager: ObservableObject {
             smoothedBands = [0.18, 0.18, 0.18, 0.18, 0.18]
             audioLevels = [0.18, 0.18, 0.18, 0.18, 0.18]
         }
+    }
+
+    private func startPlaybackProgressTimer() {
+        playbackProgressTimer?.invalidate()
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self, self.isPlaying, self.duration > 0 else { return }
+                let now = ProcessInfo.processInfo.systemUptime
+                if self.lastElapsedUpdateTime > 0 {
+                    let dt = now - self.lastElapsedUpdateTime
+                    if dt > 0 && dt < 2.5 {
+                        self.elapsedTime = min(self.duration, self.elapsedTime + dt)
+                    }
+                }
+                self.lastElapsedUpdateTime = now
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        self.playbackProgressTimer = timer
     }
 
     private func startRhythmEngine() {
@@ -483,6 +516,9 @@ public final class NowPlayingManager: ObservableObject {
         if let sendCmdSym = dlsym(handle, "MRMediaRemoteSendCommand") {
             sendCommandFunc = unsafeBitCast(sendCmdSym, to: MRMediaRemoteSendCommandFunction.self)
         }
+        if let setElapsedSym = dlsym(handle, "MRMediaRemoteSetElapsedTime") {
+            setElapsedTimeFunc = unsafeBitCast(setElapsedSym, to: MRMediaRemoteSetElapsedTimeFunction.self)
+        }
     }
 
     private func refreshNowPlayingFallback() {
@@ -558,6 +594,85 @@ public final class NowPlayingManager: ObservableObject {
         }
 
         sendSystemMediaKey(key: 18)
+    }
+
+    // MARK: - Playback Scrubbing & Seeking
+
+    public var progressFraction: Double {
+        guard duration > 0.0 else { return 0.0 }
+        return max(0.0, min(1.0, elapsedTime / duration))
+    }
+
+    public var formattedElapsedTime: String {
+        formatTime(elapsedTime)
+    }
+
+    public var formattedDuration: String {
+        formatTime(duration)
+    }
+
+    private func formatTime(_ seconds: Double) -> String {
+        guard seconds.isFinite && !seconds.isNaN && seconds >= 0 else { return "0:00" }
+        let total = Int(seconds)
+        let m = total / 60
+        let s = total % 60
+        return String(format: "%d:%02d", m, s)
+    }
+
+    public func seek(to seconds: Double) {
+        let maxDuration = duration > 0 ? duration : 3600.0
+        let clamped = max(0.0, min(maxDuration, seconds))
+        self.elapsedTime = clamped
+        self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
+
+        HapticManager.shared.performDetentTick()
+        SoundEffectManager.shared.playAccent()
+
+        if sendHelperCommand("seek \(String(format: "%.2f", clamped))") {
+            return
+        }
+
+        if let setElapsed = setElapsedTimeFunc {
+            setElapsed(clamped)
+        }
+
+        seekViaAppleScript(targetSeconds: clamped)
+    }
+
+    public func seekToProgress(fraction: Double) {
+        guard duration > 0.0 else { return }
+        let target = max(0.0, min(1.0, fraction)) * duration
+        seek(to: target)
+    }
+
+    public func skipForward(seconds: Double = 10.0) {
+        let target = elapsedTime + seconds
+        seek(to: target)
+    }
+
+    public func skipBackward(seconds: Double = 10.0) {
+        let target = max(0.0, elapsedTime - seconds)
+        seek(to: target)
+    }
+
+    private func seekViaAppleScript(targetSeconds: Double) {
+        let bundle = appBundleID.lowercased()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let appName: String?
+            if bundle.contains("spotify") {
+                appName = "Spotify"
+            } else if bundle.contains("music") {
+                appName = "Music"
+            } else {
+                appName = nil
+            }
+            guard let targetApp = appName else { return }
+            let script = "tell application \"\(targetApp)\" to set player position to \(targetSeconds)"
+            if let appleScript = NSAppleScript(source: script) {
+                var err: NSDictionary?
+                appleScript.executeAndReturnError(&err)
+            }
+        }
     }
 
     public func activateCurrentApp() {

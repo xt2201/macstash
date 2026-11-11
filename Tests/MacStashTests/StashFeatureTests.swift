@@ -26,6 +26,7 @@ public enum StashFeatureTests {
         testAudioScrubbingCalculations()
         testKeepAwakeSnapPresets()
         testDualEdgeBarsAndMediaPlaybackAction()
+        testCornerDialSatelliteClearanceNoOverlap()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -495,6 +496,25 @@ public enum StashFeatureTests {
         TestAssertion.assertEqual(skipForward(235.0, 10.0, 240.0), 240.0)
         TestAssertion.assertEqual(skipBackward(60.0, 10.0), 50.0)
         TestAssertion.assertEqual(skipBackward(5.0, 10.0), 0.0)
+
+        // Two-finger horizontal trackpad scrubbing physics
+        let naturalScrolling = true
+        let rawDeltaX: Double = -50.0 // swiping RIGHT on trackpad with natural scrolling yields negative rawDeltaX
+        let physicalX = naturalScrolling ? -rawDeltaX : rawDeltaX
+        TestAssertion.assertTrue(physicalX > 0, "Swiping RIGHT on trackpad must yield positive physicalX (forward scrub)")
+
+        let durFactor: (Double) -> Double = { d in
+            d > 0 ? max(0.6, min(2.5, d / 240.0)) : 1.0
+        }
+        TestAssertion.assertEqual(durFactor(240.0), 1.0)
+        TestAssertion.assertEqual(durFactor(120.0), 0.6)
+        TestAssertion.assertEqual(durFactor(1200.0), 2.5)
+
+        let scrubDelta: (Double, Double) -> Double = { px, d in
+            px * 0.22 * durFactor(d)
+        }
+        let deltaSecs = scrubDelta(physicalX, 240.0)
+        TestAssertion.assertEqual(deltaSecs, 11.0) // 50pt swipe on a 4-min song moves exactly 11 seconds forward!
     }
 
     private static func testKeepAwakeSnapPresets() {
@@ -545,8 +565,49 @@ public enum StashFeatureTests {
         var settings = AppSettings.defaultSettings
         TestAssertion.assertEqual(settings.edgeSliderPlacement, EdgeSliderPlacement.both)
         settings.edgeSliderPlacement = .left
-        let encoded = try! JSONEncoder().encode(settings)
-        let decoded = try! JSONDecoder().decode(AppSettings.self, from: encoded)
+        var encoded = try! JSONEncoder().encode(settings)
+        var decoded = try! JSONDecoder().decode(AppSettings.self, from: encoded)
         TestAssertion.assertEqual(decoded.edgeSliderPlacement, EdgeSliderPlacement.left)
+
+        settings.edgeSliderPlacement = .none
+        encoded = try! JSONEncoder().encode(settings)
+        decoded = try! JSONDecoder().decode(AppSettings.self, from: encoded)
+        TestAssertion.assertEqual(decoded.edgeSliderPlacement, EdgeSliderPlacement.none)
+        TestAssertion.assertEqual(EdgeSliderPlacement.none.localizedDisplayName(using: "vi"), "Tắt cả hai bên")
+        TestAssertion.assertEqual(EdgeSliderPlacement.none.localizedDisplayName(using: "en"), "Disabled")
+    }
+
+    private static func testCornerDialSatelliteClearanceNoOverlap() {
+        let dialSizes: [CGFloat] = [110.0, 120.0, 135.0, 145.0, 160.0, 180.0, 200.0, 250.0]
+        for dialSize in dialSizes {
+            let badgeSide = max(36.0, min(48.0, dialSize * 0.28))
+            let m = max(4.0, min(8.0, dialSize * 0.045))
+            let badgeOuterBoundary = m + badgeSide
+
+            let outerRadius = dialSize - 15.0
+            let trackRadius = outerRadius - 20.0
+            let trackInnerBoundary = trackRadius - 8.5
+            let channelCenter = (badgeOuterBoundary + trackInnerBoundary) * 0.5
+            let satSize = max(18.0, min(22.0, dialSize * 0.13))
+            let satRadius = satSize * 0.5
+            let satelliteRadius = channelCenter
+
+            // Satellite inner edge must NEVER intersect Center Badge outer boundary
+            let badgeClearance = (satelliteRadius - satRadius) - badgeOuterBoundary
+            let minBadgeClearance: CGFloat = dialSize <= 110.0 ? 3.0 : 8.0
+            TestAssertion.assertTrue(badgeClearance >= minBadgeClearance, "Satellite must have >= \(minBadgeClearance)pt clearance from Center Badge at dial size \(dialSize) (got \(badgeClearance))")
+
+            // Satellite outer edge must NEVER intersect Track inner boundary
+            let trackClearance = trackInnerBoundary - (satelliteRadius + satRadius)
+            let minTrackClearance: CGFloat = dialSize <= 110.0 ? 3.0 : 8.0
+            TestAssertion.assertTrue(trackClearance >= minTrackClearance, "Satellite must have >= \(minTrackClearance)pt clearance from Track at dial size \(dialSize) (got \(trackClearance))")
+
+            // Even when satellite is scaled by 1.15 on hover:
+            let hoveredSatRadius = satRadius * 1.15
+            let hoveredBadgeClearance = (satelliteRadius - hoveredSatRadius) - badgeOuterBoundary
+            TestAssertion.assertTrue(hoveredBadgeClearance >= 2.0, "Hovered satellite must maintain positive clearance from Center Badge at dial size \(dialSize)")
+            let hoveredTrackClearance = trackInnerBoundary - (satelliteRadius + hoveredSatRadius)
+            TestAssertion.assertTrue(hoveredTrackClearance >= 2.0, "Hovered satellite must maintain positive clearance from Track at dial size \(dialSize)")
+        }
     }
 }

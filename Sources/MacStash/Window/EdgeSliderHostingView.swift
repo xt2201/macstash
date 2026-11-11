@@ -121,15 +121,42 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return
         }
 
+        let rawDeltaX = event.hasPreciseScrollingDeltas ? event.scrollingDeltaX : (event.deltaX * 10.0)
         let rawDeltaY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
-        guard abs(rawDeltaY) > 0.001 else { return }
 
-        // With Natural Scrolling on macOS, swiping fingers UP produces negative rawDeltaY.
-        // On a vertical slider, swiping fingers UP should slide the slider UP (increase).
-        let deltaY: CGFloat = event.isDirectionInvertedFromDevice ? -rawDeltaY : rawDeltaY
+        // Physical finger movement vector accounting for macOS Natural Scrolling
+        let physicalX: Double = event.isDirectionInvertedFromDevice ? -Double(rawDeltaX) : Double(rawDeltaX)
+        let physicalY: Double = event.isDirectionInvertedFromDevice ? -Double(rawDeltaY) : Double(rawDeltaY)
+
+        let loc = convert(event.locationInWindow, from: nil)
+        let isOverBottomMedia = loc.y < 160.0
+        let hasMedia = NowPlayingManager.shared.hasMedia
+
+        // Horizontal audio scrubbing: when cursor is over media island OR when swiping horizontally with active media
+        let isHorizontalScrub = hasMedia && (isOverBottomMedia || abs(physicalX) > abs(physicalY) * 1.25) && abs(physicalX) > 0.05
+
+        if isHorizontalScrub {
+            ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
+
+            let dur = NowPlayingManager.shared.duration
+            let durFactor = dur > 0 ? max(0.6, min(2.5, dur / 240.0)) : 1.0
+            let deltaSeconds = physicalX * 0.22 * durFactor
+
+            NowPlayingManager.shared.updateInteractiveScrub(deltaSeconds: deltaSeconds)
+
+            if event.phase == .ended || event.phase == .cancelled {
+                NowPlayingManager.shared.commitInteractiveScrub()
+                ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
+            }
+            return
+        }
+
+        guard abs(physicalY) > 0.001 else { return }
+
+        ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
 
         let sensitivity: Float = 0.005
-        let step = Float(deltaY) * sensitivity
+        let step = Float(physicalY) * sensitivity
         let current = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue) ?? Float(appState.getValue(for: action, displayID: rootView.displayID))
         let clamped = max(0.0, min(1.0, current + step))
 
@@ -148,6 +175,7 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
                 appState.liveRightSliderValue = nil
             }
             appState.saveSettings()
+            ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
         } else {
             let item = DispatchWorkItem { [weak self] in
                 guard let self = self else { return }

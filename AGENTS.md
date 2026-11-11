@@ -54,6 +54,7 @@ Các đường dẫn trọng yếu (lưu ý `Scripts/` viết hoa chữ `S`):
 - **Thời gian Đơn điệu & Kiểm soát Tài nguyên (NFR-02 / NFR-03)**:
   - Mọi bộ đếm (Pomodoro, Dwell, Keep Awake) dùng mốc thời gian đơn điệu (`ProcessInfo.processInfo.systemUptime`) kết hợp `Date` đích trên `RunLoop.main` mode `.common`, không giảm biến đếm thủ công trong `Timer` mặc định (tránh đứng timer khi kéo chuột hoặc sleep).
   - **Idle Resource Gating**: Visualizer 30fps, audio polling, cursor polling và `DockWidget.start()`/`stop()` phải tạm dừng khi overlay/dock đang ẩn (giữ CPU idle < 1%, RAM < 150MB).
+  - **Live Playback State Invariants**: Tuyệt đối không ghi đè `elapsedTime = 0` khi cùng một bài hát đang tiếp tục phát (chỉ reset về 0 khi đổi bài `trackChanged` hoặc ngừng phát hẳn). Định kỳ đối soát vị trí phát thực tế từ AppleScript / MediaRemote timestamp để thanh tua (scrubber) và số giây hiển thị luôn đồng bộ chính xác.
 - **Persistence An toàn & Phục hồi Phần cứng**:
   - Cấu hình lưu qua debounce + atomic write (`write(..., options: .atomic)` + `replaceItemAt`), có `schemaVersion` + migration, và tự cô lập file hỏng sang `.corrupted.<timestamp>.json`.
   - `SoftwareDimmingService` phải bảo đảm gọi `CGDisplayRestoreColorSyncSettings()` khi thoát app hoặc chuyển phương thức điều chỉnh độ sáng.
@@ -78,6 +79,13 @@ Các đường dẫn trọng yếu (lưu ý `Scripts/` viết hoa chữ `S`):
 - **Accessibility & Song ngữ (EN / VI)**:
   - Mọi nút chỉ có icon, radial dial và edge slider phải có `.accessibilityLabel`, `.accessibilityValue` và `.accessibilityHint`. Tôn trọng `accessibilityDisplayShouldReduceMotion` và `Reduce Transparency`.
   - SSOT runtime cho chuỗi UI là `LocalizationService.catalog` (`Sources/MacStashCore/Localization/LocalizationService.swift`), bắt buộc đối xứng 100% EN và VI có dấu tiếng Việt chuẩn. Khi cập nhật/dịch mới hoặc chỉnh key lớn, giữ `Localizable.xcstrings` sạch và không chứa chuỗi phiên bản cứng.
+- **Toán học Tránh Trùng đè Hình học (Geometric Non-Overlap & Polar Clearance Invariants)**:
+  - Mọi bố cục vòng tròn / hướng tâm (Radial Dials, Center Action Badge, Satellites, Arc Track) phải quy về cùng một hệ tọa độ cực (`RadialDialGeometry`).
+  - Cấm dùng offset điểm cố định khi kích thước co giãn theo thiết lập người dùng (`dialRadiusPoints`). Bán kính vệ tinh (`satelliteRadius`) phải luôn nằm tại tâm kênh (`(badgeOuterBoundary + trackInnerBoundary) * 0.5`) và chứng minh khoảng cách an toàn bằng unit test (`clearance >= 8.0pt` ở kích thước mặc định, `>= 3.0pt` ở kích thước tối thiểu, bảo đảm không chạm khi hover scale 1.15x và đổ bóng 6pt).
+- **Bố cục Cài đặt Chống Tràn viền & Cắt chữ (Settings Responsive Form Standards)**:
+  - Trong `SettingsCard`, tuyệt đối **cấm đặt `Picker` segmented nằm ngang (`HStack`) cạnh nhãn dài** gây tràn thẻ và cắt chữ khi dịch sang tiếng Việt hoặc ngôn ngữ dài.
+  - Mọi Segmented Picker từ 3 lựa chọn trở lên hoặc có nhãn đa ngữ dài phải đặt trong `VStack(alignment: .leading, spacing: 6)` với `.labelsHidden()` để tự động giãn đều 100% chiều rộng thẻ.
+  - Hàng gán tính năng (`edgeAssignmentRow`, `cornerAssignmentRow`) phải dùng cấu trúc co giãn linh hoạt, khống chế min/max width của menu picker (`.frame(minWidth: 160, maxWidth: 225)`).
 
 ---
 
@@ -136,4 +144,6 @@ Lệnh chuẩn:
 - Chỉnh sửa phần đang chạy tốt ngoài phạm vi hoặc ghi đè thay đổi WIP của người dùng khi chưa được yêu cầu.
 - Che lỗi bằng `try?`, bỏ qua lỗi persistence/process, dùng `NSLog`/`print` trong `Sources/`, dùng `try!`/`as!`/`Bundle.module` hoặc thêm emoji.
 - Hardcode số phiên bản trong chuỗi UI/catalog, sửa tay file PNG/ICNS nhị phân, hoặc để `README.md`/hình minh họa bị lệch so với code khi release.
+- Đặt Segmented Picker nằm ngang cạnh nhãn dài trong `SettingsCard` gây tràn viền/cắt chữ, hoặc hardcode khoảng cách điểm làm trùng đè các nút điều khiển trong Corner Dial / Edge Bar.
+- Ghi đè `elapsedTime` thành 0 khi cùng một bản nhạc đang tiếp tục phát.
 - Báo "xong" khi chưa chạy lại `make test` và kiểm chứng thực tế sau chỉnh sửa cuối cùng.

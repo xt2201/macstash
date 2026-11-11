@@ -29,6 +29,11 @@ public final class NowPlayingManager: ObservableObject {
     @Published public private(set) var duration: Double = 0.0
     @Published public private(set) var elapsedTime: Double = 0.0
     @Published public private(set) var audioLevels: [CGFloat] = [0.18, 0.18, 0.18, 0.18, 0.18]
+    @Published public var isInteractiveScrubbing: Bool = false
+    @Published public var liveScrubTime: Double = 0.0
+
+    private var scrubCommitDebounceWorkItem: DispatchWorkItem?
+    private var lastHapticDetentSecond: Int = -1
 
     private var helperProcess: Process?
     private var stdinPipe: Pipe?
@@ -191,7 +196,8 @@ public final class NowPlayingManager: ObservableObject {
         let newPlaying = (dict["isPlaying"] as? Bool) ?? ((dict["isPlaying"] as? NSNumber)?.boolValue ?? false)
         let artworkUnchanged = (dict["artworkUnchanged"] as? Bool) ?? false
 
-        if newTitle != self.title || newArtist != self.artist {
+        let trackChanged = newTitle != self.title || newArtist != self.artist
+        if trackChanged {
             var hasher = Hasher()
             hasher.combine(newTitle)
             hasher.combine(newArtist)
@@ -205,9 +211,20 @@ public final class NowPlayingManager: ObservableObject {
         self.appName = newAppName
         self.appBundleID = newBundleID
         self.playingPID = newPID
-        self.duration = newDuration
-        self.elapsedTime = newElapsed
-        self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
+        if newDuration > 0.0 {
+            self.duration = newDuration
+        } else if trackChanged {
+            self.duration = 0.0
+        }
+
+        if newElapsed > 0.01 {
+            self.elapsedTime = newElapsed
+            self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
+        } else if trackChanged || !newPlaying {
+            self.elapsedTime = newElapsed
+            self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
+        }
+
         self.isPlaying = newPlaying
         self.hasMedia = !newTitle.isEmpty || newPlaying
         updateRhythmEngineState()
@@ -411,11 +428,18 @@ public final class NowPlayingManager: ObservableObject {
         }
     }
 
+    private var progressTicksCount: Int = 0
+
     private func startPlaybackProgressTimer() {
         playbackProgressTimer?.invalidate()
+        progressTicksCount = 0
         let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self = self, self.isPlaying, self.duration > 0 else { return }
+                self.progressTicksCount += 1
+                if self.progressTicksCount % 4 == 0 {
+                    self.pollLivePlaybackPosition()
+                }
                 let now = ProcessInfo.processInfo.systemUptime
                 if self.lastElapsedUpdateTime > 0 {
                     let dt = now - self.lastElapsedUpdateTime
@@ -495,10 +519,43 @@ public final class NowPlayingManager: ObservableObject {
     // MARK: - State Refresh
 
     public func refreshNowPlaying() {
+        pollLivePlaybackPosition()
         if sendHelperCommand("refresh") {
             return
         }
         startHelperProcessIfPossible()
+    }
+
+    public func pollLivePlaybackPosition() {
+        guard isPlaying else { return }
+        let bundle = appBundleID.lowercased()
+        let appName: String?
+        if bundle.contains("spotify") {
+            appName = "Spotify"
+        } else if bundle.contains("music") {
+            appName = "Music"
+        } else {
+            appName = nil
+        }
+        guard let targetApp = appName else { return }
+
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let script = "tell application \"\(targetApp)\" to get player position"
+            if let appleScript = NSAppleScript(source: script) {
+                var error: NSDictionary?
+                let result = appleScript.executeAndReturnError(&error)
+                if error == nil {
+                    let pos = result.doubleValue
+                    if pos >= 0 {
+                        Task { @MainActor [weak self] in
+                            guard let self = self, self.isPlaying else { return }
+                            self.elapsedTime = pos
+                            self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Fallback In-Process Loader
@@ -617,6 +674,40 @@ public final class NowPlayingManager: ObservableObject {
         let m = total / 60
         let s = total % 60
         return String(format: "%d:%02d", m, s)
+    }
+
+    public func updateInteractiveScrub(deltaSeconds: Double) {
+        let maxDur = duration > 0.0 ? duration : 3600.0
+        let baseTime = isInteractiveScrubbing ? liveScrubTime : elapsedTime
+        let newTime = max(0.0, min(maxDur, baseTime + deltaSeconds))
+
+        isInteractiveScrubbing = true
+        liveScrubTime = newTime
+        self.elapsedTime = newTime
+        self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
+
+        // Haptic feedback when scrubbing across 5-second increments
+        let currentDetent = Int(newTime / 5.0)
+        if currentDetent != lastHapticDetentSecond {
+            lastHapticDetentSecond = currentDetent
+            HapticManager.shared.performDetentTick()
+        }
+
+        // Debounce commit to player
+        scrubCommitDebounceWorkItem?.cancel()
+        let item = DispatchWorkItem { [weak self] in
+            self?.commitInteractiveScrub()
+        }
+        scrubCommitDebounceWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28, execute: item)
+    }
+
+    public func commitInteractiveScrub() {
+        scrubCommitDebounceWorkItem?.cancel()
+        scrubCommitDebounceWorkItem = nil
+        guard isInteractiveScrubbing else { return }
+        isInteractiveScrubbing = false
+        seek(to: liveScrubTime)
     }
 
     public func seek(to seconds: Double) {

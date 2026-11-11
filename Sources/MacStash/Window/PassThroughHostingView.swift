@@ -109,6 +109,18 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
         let totalMotion = hypot(physicalX, physicalY)
         guard totalMotion > 0.001 else { return }
 
+        if action == .mediaPlayback {
+            let dur = NowPlayingManager.shared.duration
+            let durFactor = dur > 0 ? max(0.6, min(2.5, dur / 240.0)) : 1.0
+            let effectiveStep = physicalY + physicalX
+            let deltaSeconds = effectiveStep * 0.25 * durFactor
+            NowPlayingManager.shared.updateInteractiveScrub(deltaSeconds: deltaSeconds)
+            if event.phase == .ended || event.phase == .cancelled {
+                NowPlayingManager.shared.commitInteractiveScrub()
+            }
+            return
+        }
+
         // Unified natural swipe physics across all 4 corner dials:
         // 0% is aligned at the bottom/lower perimeter, 100% rises to the top/upper edge.
         // Swiping fingers UP (+physicalY) or RIGHT (+physicalX) turns UP the value.

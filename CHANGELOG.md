@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.1] - 2026-11-12
+
+### Added
+- Two-Finger Trackpad Audio Scrubbing: Swiping left or right with two fingers over the Edge Bar or Dynamic Island smoothly scrubs backward or forward through the audio track, with duration-adaptive physical scaling, 120fps visual feedback, and tactile 5-second haptic detent ticks.
+- Dynamic Island Extreme-Edge Volume Button: Placed a dedicated Volume Logo button at the screen-outermost edge of the Dynamic Island (to the right of Next on right edge, to the left of Previous on left edge); hovering reveals the vertical volume slider flush against the screen border with matching album art glass tint.
+- Corner Dial Media Playback Swipe Scrubbing: Swiping on a hot corner configured with the Media Playback action scrubs track progress with identical physics and haptic detents.
+
+### Changed
+- Settings Card Layout & Anti-Clipping Standards: Replaced horizontal segmented pickers in SettingsCard across Hot Corners, General, Appearance, and Displays tabs with clean vertical full-width stacks and independent left/right edge configuration rows, preventing string truncation and card overflow in all languages.
+
+### Fixed
+- Corner Dial Center Badge & Satellite Overlap: Overhauled radial geometry with mathematically guaranteed polar clearances across all dial sizes (110pt to 250pt), ensuring Play/Pause and seek satellites never intersect the Center Action Badge or arc track.
+- Audio Scrubber Real-Time Synchronization: Resolved state reset bug where live playback position reset to 0:00 on mouse hover; incoming helper payloads now preserve active playback time while live player position periodically synchronizes via AppleScript and timestamp projection.
+
+---
+
 ## [2.16.0] - 2026-11-11
 
 ### Added

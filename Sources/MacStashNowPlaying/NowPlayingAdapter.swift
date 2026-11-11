@@ -483,7 +483,15 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
                 snap.duration = dur
             }
             if let elap = (dict["kMRMediaRemoteNowPlayingInfoElapsedTime"] as? NSNumber)?.doubleValue {
-                snap.elapsedTime = elap
+                var computed = elap
+                if let tsDate = dict["kMRMediaRemoteNowPlayingInfoTimestamp"] as? Date {
+                    let delta = Date().timeIntervalSince(tsDate)
+                    let rate = (dict["kMRMediaRemoteNowPlayingInfoPlaybackRate"] as? NSNumber)?.doubleValue ?? (snap.isPlaying ? 1.0 : 0.0)
+                    if delta > 0 && rate > 0.001 {
+                        computed += delta * rate
+                    }
+                }
+                snap.elapsedTime = computed
             }
             if let rate = (dict["kMRMediaRemoteNowPlayingInfoPlaybackRate"] as? NSNumber)?.doubleValue {
                 snap.playbackRate = rate

@@ -12,7 +12,8 @@ public struct EdgeMediaIslandView: View {
     @ObservedObject var appState: AppState
     public let edge: EdgePosition
 
-    @State private var isIslandExpanded: Bool = false
+    @Binding var isIslandExpanded: Bool
+    @Binding var isVolumeHovered: Bool
     @State private var collapseWorkItem: DispatchWorkItem?
 
     @State private var isPrevHovered: Bool = false
@@ -20,20 +21,34 @@ public struct EdgeMediaIslandView: View {
     @State private var isPlayHovered: Bool = false
     @State private var isForwardHovered: Bool = false
     @State private var isNextHovered: Bool = false
+    @State private var isVolBtnHovered: Bool = false
 
     @State private var isScrubbing: Bool = false
     @State private var scrubFraction: Double = 0.0
 
-    public init(appState: AppState, edge: EdgePosition = .right) {
+    public init(
+        appState: AppState,
+        edge: EdgePosition = .right,
+        isIslandExpanded: Binding<Bool>,
+        isVolumeHovered: Binding<Bool>
+    ) {
         self.appState = appState
         self.edge = edge
+        self._isIslandExpanded = isIslandExpanded
+        self._isVolumeHovered = isVolumeHovered
     }
 
     private var activeProgress: Double {
         if isScrubbing {
             return scrubFraction
         }
-        return nowPlaying.progressFraction
+        if nowPlaying.isInteractiveScrubbing && nowPlaying.duration > 0.0 {
+            return max(0.0, min(1.0, nowPlaying.liveScrubTime / nowPlaying.duration))
+        }
+        if nowPlaying.duration > 0.0 {
+            return max(0.0, min(1.0, nowPlaying.elapsedTime / nowPlaying.duration))
+        }
+        return 0.0
     }
 
     public var body: some View {
@@ -44,26 +59,18 @@ public struct EdgeMediaIslandView: View {
             if isExpanded {
                 expandedIslandView
                     .transition(.asymmetric(
-                        insertion: .scale(scale: 0.85, anchor: unitPoint(for: edge)).combined(with: .opacity),
-                        removal: .scale(scale: 0.85, anchor: unitPoint(for: edge)).combined(with: .opacity)
+                        insertion: .scale(scale: 0.88, anchor: unitPoint(for: edge)).combined(with: .opacity),
+                        removal: .scale(scale: 0.88, anchor: unitPoint(for: edge)).combined(with: .opacity)
                     ))
             } else {
                 collapsedCapsuleView
                     .transition(.opacity)
             }
         }
-        .frame(width: isExpanded ? 280 : 44, height: isExpanded ? 98 : 44, alignment: alignment)
+        .frame(width: isExpanded ? 312 : 44, height: isExpanded ? 98 : 44, alignment: alignment)
         .animation(.spring(response: 0.32, dampingFraction: 0.78), value: isExpanded)
-        .onHover { hovering in
-            if hovering {
-                collapseWorkItem?.cancel()
-                collapseWorkItem = nil
-                withAnimation(.spring(response: 0.30, dampingFraction: 0.76)) {
-                    isIslandExpanded = true
-                }
-            } else {
-                scheduleCollapse()
-            }
+        .onAppear {
+            nowPlaying.pollLivePlaybackPosition()
         }
     }
 
@@ -211,16 +218,21 @@ public struct EdgeMediaIslandView: View {
             // Row 2: Audio Scrubber Bar with Time Readouts
             islandScrubberView
 
-            // Row 3: 5 Transport Controls (Prev, -10s, Play/Pause, +10s, Next)
-            HStack(spacing: 12) {
-                Spacer()
+            // Row 3: Transport Controls + Extreme Edge Volume Logo Button
+            HStack(spacing: 8) {
+                if edge == .left {
+                    volumeButton
+                    Spacer(minLength: 2)
+                } else {
+                    Spacer(minLength: 2)
+                }
 
                 // Previous Track
                 Button(action: { nowPlaying.previousTrack() }) {
                     Image(systemName: "backward.fill")
-                        .font(.system(size: 10.5, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                         .foregroundColor(isPrevHovered ? .primary : .secondary)
-                        .frame(width: 26, height: 24)
+                        .frame(width: 24, height: 24)
                         .circularLiquidGlass(tint: .clear, specularIntensity: 0.8, causticOpacity: 0.15, isHighlighted: isPrevHovered)
                 }
                 .buttonStyle(.plain)
@@ -230,9 +242,9 @@ public struct EdgeMediaIslandView: View {
                 // Quick Skip Backward 10s
                 Button(action: { nowPlaying.skipBackward(seconds: 10) }) {
                     Image(systemName: "gobackward.10")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 10.5, weight: .semibold))
                         .foregroundColor(isRewindHovered ? nowPlaying.artworkTint : .secondary)
-                        .frame(width: 28, height: 24)
+                        .frame(width: 26, height: 24)
                         .circularLiquidGlass(tint: isRewindHovered ? nowPlaying.artworkTint : .clear, specularIntensity: 0.9, causticOpacity: 0.20, isHighlighted: isRewindHovered)
                 }
                 .buttonStyle(.plain)
@@ -245,7 +257,7 @@ public struct EdgeMediaIslandView: View {
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.primary)
                         .offset(x: nowPlaying.isPlaying ? 0 : 0.8)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 30, height: 30)
                         .circularLiquidGlass(
                             tint: nowPlaying.isPlaying ? nowPlaying.artworkTint : .clear,
                             specularIntensity: 1.2,
@@ -260,9 +272,9 @@ public struct EdgeMediaIslandView: View {
                 // Quick Skip Forward 10s
                 Button(action: { nowPlaying.skipForward(seconds: 10) }) {
                     Image(systemName: "goforward.10")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 10.5, weight: .semibold))
                         .foregroundColor(isForwardHovered ? nowPlaying.artworkTint : .secondary)
-                        .frame(width: 28, height: 24)
+                        .frame(width: 26, height: 24)
                         .circularLiquidGlass(tint: isForwardHovered ? nowPlaying.artworkTint : .clear, specularIntensity: 0.9, causticOpacity: 0.20, isHighlighted: isForwardHovered)
                 }
                 .buttonStyle(.plain)
@@ -272,21 +284,26 @@ public struct EdgeMediaIslandView: View {
                 // Next Track
                 Button(action: { nowPlaying.nextTrack() }) {
                     Image(systemName: "forward.fill")
-                        .font(.system(size: 10.5, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                         .foregroundColor(isNextHovered ? .primary : .secondary)
-                        .frame(width: 26, height: 24)
+                        .frame(width: 24, height: 24)
                         .circularLiquidGlass(tint: .clear, specularIntensity: 0.8, causticOpacity: 0.15, isHighlighted: isNextHovered)
                 }
                 .buttonStyle(.plain)
                 .help(appState.localized("corners.media.next"))
                 .onHover { isNextHovered = $0 }
 
-                Spacer()
+                if edge == .right {
+                    Spacer(minLength: 2)
+                    volumeButton
+                } else {
+                    Spacer(minLength: 2)
+                }
             }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .frame(width: 280, height: 98)
+        .frame(width: 312, height: 98)
         .background(
             ZStack {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -323,15 +340,61 @@ public struct EdgeMediaIslandView: View {
         .shadow(color: Color.black.opacity(0.40), radius: 14, x: 0, y: 6)
     }
 
+    // MARK: - Edge Volume Logo Button
+
+    @ViewBuilder
+    private var volumeButton: some View {
+        Button(action: {
+            appState.audio.toggleMute()
+        }) {
+            Image(systemName: appState.audio.isMuted ? "speaker.slash.fill" : (audio.volume > 0.5 ? "speaker.wave.2.fill" : (audio.volume > 0.01 ? "speaker.wave.1.fill" : "speaker.fill")))
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(isVolBtnHovered ? .white : nowPlaying.artworkTint)
+                .frame(width: 28, height: 26)
+                .circularLiquidGlass(
+                    tint: nowPlaying.artworkTint,
+                    specularIntensity: 1.2,
+                    causticOpacity: 0.30,
+                    isHighlighted: isVolBtnHovered || isVolumeHovered
+                )
+                .scaleEffect((isVolBtnHovered || isVolumeHovered) ? 1.12 : 1.0)
+                .animation(.spring(response: 0.20, dampingFraction: 0.72), value: isVolBtnHovered || isVolumeHovered)
+        }
+        .buttonStyle(.plain)
+        .help(appState.audio.isMuted ? appState.localized("menubar.unmute") : appState.localized("menubar.mute"))
+        .onHover { hovering in
+            isVolBtnHovered = hovering
+            isVolumeHovered = hovering
+        }
+    }
+
+    private var displayedElapsedText: String {
+        if isScrubbing && nowPlaying.duration > 0.0 {
+            let secs = scrubFraction * nowPlaying.duration
+            let m = Int(secs) / 60
+            let s = Int(secs) % 60
+            return String(format: "%d:%02d", m, s)
+        }
+        if nowPlaying.isInteractiveScrubbing {
+            let secs = nowPlaying.liveScrubTime
+            let m = Int(secs) / 60
+            let s = Int(secs) % 60
+            return String(format: "%d:%02d", m, s)
+        }
+        return nowPlaying.formattedElapsedTime
+    }
+
     // MARK: - Scrubber View
 
     @ViewBuilder
     private var islandScrubberView: some View {
+        let isScrubbingActive = isScrubbing || nowPlaying.isInteractiveScrubbing
+
         HStack(spacing: 6) {
-            Text(nowPlaying.formattedElapsedTime)
-                .font(.system(size: 8, weight: .bold, design: .monospaced))
-                .foregroundColor(.secondary)
-                .frame(width: 28, alignment: .leading)
+            Text(displayedElapsedText)
+                .font(.system(size: 8.5, weight: isScrubbingActive ? .heavy : .bold, design: .monospaced))
+                .foregroundColor(isScrubbingActive ? nowPlaying.artworkTint : .secondary)
+                .frame(width: 32, alignment: .leading)
 
             GeometryReader { geo in
                 let w = max(1, geo.size.width)
@@ -352,12 +415,18 @@ public struct EdgeMediaIslandView: View {
                         )
                         .frame(width: max(4, w * CGFloat(activeProgress)), height: 5)
 
-                    // Scrubber thumb
+                    // Scrubber thumb with active glow on 2-finger swipe or drag
                     Circle()
                         .fill(Color.white)
-                        .frame(width: isScrubbing ? 9 : 7, height: isScrubbing ? 9 : 7)
-                        .shadow(color: Color.black.opacity(0.4), radius: 2, x: 0, y: 1)
-                        .offset(x: max(0, min(w - 7, (w * CGFloat(activeProgress)) - 3.5)))
+                        .frame(width: isScrubbingActive ? 10 : 8, height: isScrubbingActive ? 10 : 8)
+                        .overlay(
+                            Circle()
+                                .stroke(nowPlaying.artworkTint.opacity(isScrubbingActive ? 0.85 : 0.0), lineWidth: 1.5)
+                        )
+                        .shadow(color: isScrubbingActive ? nowPlaying.artworkTint.opacity(0.6) : Color.black.opacity(0.4), radius: isScrubbingActive ? 4 : 2, x: 0, y: 1)
+                        .offset(x: max(0, min(w - 8, (w * CGFloat(activeProgress)) - 4)))
+                        .scaleEffect(isScrubbingActive ? 1.25 : 1.0)
+                        .animation(.spring(response: 0.18, dampingFraction: 0.75), value: isScrubbingActive)
                 }
                 .contentShape(Rectangle())
                 .gesture(
@@ -376,10 +445,10 @@ public struct EdgeMediaIslandView: View {
             }
             .frame(height: 8)
 
-            Text(nowPlaying.formattedDuration)
-                .font(.system(size: 8, weight: .bold, design: .monospaced))
+            Text(nowPlaying.duration > 0 ? nowPlaying.formattedDuration : "--:--")
+                .font(.system(size: 8.5, weight: .bold, design: .monospaced))
                 .foregroundColor(.secondary)
-                .frame(width: 28, alignment: .trailing)
+                .frame(width: 32, alignment: .trailing)
         }
         .frame(height: 12)
         .help(appState.localized("corners.media.scrubber"))

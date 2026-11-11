@@ -1,5 +1,17 @@
 # Release Notes & Changelog
 
+## Version 2.16.1 (2026-11-12)
+
+### Two-Finger Trackpad Audio Scrubbing, Settings Polish & Dial Clearance
+
+- **Two-Finger Trackpad Audio Scrubbing**: Hovering over the Edge Bar media island or a corner dial allows two-finger horizontal trackpad swiping to scrub backward or forward through the current track. Features natural scrolling inversion, duration-adaptive physical scaling, 120fps visual feedback, and tactile 5-second haptic detent ticks.
+- **Dynamic Island Outer-Edge Volume Dropdown**: Placed a dedicated Volume Logo button at the screen-outermost edge of the Dynamic Island (to the right of Next on the right edge, to the left of Previous on the left edge). Hovering reveals the matching vertical volume slider flush against the screen border with artwork glass tint.
+- **Settings Card Anti-Clipping Standards**: Overhauled Segmented Pickers in SettingsCard across Hot Corners, General, Appearance, and Displays tabs into full-width vertical stacks with independent left/right edge configuration rows, preventing text clipping and card border overflow in all languages.
+- **Corner Dial Polar Non-Overlap Guarantee**: Mathematically re-engineered center badge and satellite coordinates to guarantee >= 8.0pt clearance at standard dial sizes and >= 3.0pt clearance down to 110pt, eliminating any overlap between Play/Pause and the Center Action Badge.
+- **Live Scrubber Time Synchronization**: Fixed playback position reset bug on hover; live player position continuously reflects active Spotify, Music, or system media playback with monotonic timestamps.
+
+---
+
 ## Version 2.16.0 (2026-11-11)
 
 ### Dynamic Island Audio, Dual Edge Bars & Standalone Media Scrubber

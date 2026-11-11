@@ -1,5 +1,17 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.1 (2026-11-12)
+
+### Vuốt 2 Ngón Tua Nhạc, Chuẩn Hóa Cài Đặt & Khắc Phục Trùng Đè
+
+- **Vuốt 2 Ngón Trên Trackpad Tua Nhạc**: Khi di chuột vào khu vực Media Island trên thanh cạnh hoặc góc nóng, người dùng có thể vuốt ngang bằng 2 ngón tay sang trái/phải để tua lùi hoặc tua tiến bài hát. Hỗ trợ tự động đảo chiều theo Natural Scrolling, co giãn bước tua theo độ dài bài hát, phản hồi mượt 120fps và rung xúc giác (haptic detent ticks) mỗi 5 giây tua.
+- **Nút Âm Lượng Thả Xuống Sát Mép Dynamic Island**: Thêm nút biểu tượng Âm lượng nằm ở vị trí sát mép viền nhất của đảo âm thanh (bên phải nút Next ở cạnh phải, bên trái nút Previous ở cạnh trái); khi hover sẽ trượt thanh volume xuống bám sát mép màn hình với tông màu kính hòa trộn theo ảnh bìa.
+- **Chuẩn Hóa Thẻ Cài Đặt Chống Tràn Viền**: Chuyển đổi toàn bộ các thanh Segmented Picker đa ngữ trong Cài đặt (tab Góc Nóng, Cài Đặt Chung, Giao Diện, Màn Hình) sang bố cục dọc full-width và phân tách hàng cấu hình cạnh Trái/Phải độc lập, xóa bỏ hiện tượng tràn thẻ và cắt chữ.
+- **Bảo Đảm Khoảng Cách An Toàn Trên Góc Nóng**: Quy chuẩn lại toạ độ cực và bán kính của Center Badge cùng các nút vệ tinh, bảo đảm khoảng hở an toàn >= 8.0pt ở cỡ chuẩn và >= 3.0pt ở cỡ tối thiểu (110pt), loại bỏ hoàn toàn việc nút Play/Pause bị che lấp bởi viền huy hiệu trung tâm.
+- **Đồng Bộ Thời Gian Tua Thực Tế**: Khắc phục lỗi thanh tua bị reset về 0 khi di chuột; định kỳ đối soát vị trí phát thực tế từ Spotify, Music và trình phát hệ thống.
+
+---
+
 ## Phiên bản 2.16.0 (2026-11-11)
 
 ### Dynamic Island Âm Thanh, Thanh Trượt Cạnh Kép & Tua Nhạc Độc Lập

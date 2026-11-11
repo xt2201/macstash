@@ -67,7 +67,12 @@ public struct CornerDialView: View {
                 )
 
                 let isExpanded = isDragging || (appState.activeCorner == corner && appState.activeDisplayID == displayID)
-                let satelliteRadius = max(66, min(geom.outerRadius - 44, dialSize * 0.58))
+                let badgeOuterBoundary = CenterActionBadge.badgeOuterRadius(for: dialSize)
+                let trackRadius = geom.outerRadius - 20
+                let trackInnerBoundary = trackRadius - 8.5
+                let channelCenter = (badgeOuterBoundary + trackInnerBoundary) * 0.5
+                let satSize = max(18.0, min(22.0, dialSize * 0.13))
+                let satelliteRadius = channelCenter
                 let shouldReduceMotion = appState.settings.respectReduceMotion && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
                 ZStack {
@@ -93,352 +98,7 @@ public struct CornerDialView: View {
                         gradientColors: actionColors
                     )
 
-                    // 4. Satellite micro-controls (Floating liquid mercury droplets)
-                    if isExpanded {
-                        if action == .timer {
-                            let resetPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
-                            Button(action: {
-                                appState.resetPomodoro()
-                            }) {
-                                Image(systemName: "arrow.counterclockwise")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.primary)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: .purple,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isResetHovered
-                                    )
-                                    .scaleEffect(isResetHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isResetHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("menubar.reset"))
-                            .onHover { isResetHovered = $0 }
-                            .position(x: resetPt.x, y: resetPt.y)
-
-                            let skipPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
-                            Button(action: {
-                                appState.skipPomodoroMode()
-                            }) {
-                                Image(systemName: "forward.fill")
-                                    .font(.system(size: 8, weight: .bold))
-                                    .foregroundColor(appState.pomodoroMode == .focus ? .purple : .green)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: appState.pomodoroMode == .focus ? .purple : .green,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isSkipHovered
-                                    )
-                                    .scaleEffect(isSkipHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isSkipHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("menubar.skip"))
-                            .onHover { isSkipHovered = $0 }
-                            .position(x: skipPt.x, y: skipPt.y)
-                        } else if action == .volume && appState.nowPlaying.hasMedia {
-                            // Audio Scrubbing: Skip Backward 10s (0.16)
-                            let rwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.16))
-                            Button(action: {
-                                appState.nowPlaying.skipBackward(seconds: 10)
-                            }) {
-                                Image(systemName: "gobackward.10")
-                                    .font(.system(size: 9.5, weight: .bold))
-                                    .foregroundColor(appState.nowPlaying.artworkTint)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: appState.nowPlaying.artworkTint,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isRewindHovered
-                                    )
-                                    .scaleEffect(isRewindHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isRewindHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("corners.media.seekBackward"))
-                            .onHover { isRewindHovered = $0 }
-                            .position(x: rwdPt.x, y: rwdPt.y)
-
-                            // Audio Play/Pause (0.50)
-                            let ppPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.50))
-                            Button(action: {
-                                appState.nowPlaying.togglePlayPause()
-                            }) {
-                                Image(systemName: appState.nowPlaying.isPlaying ? "pause.fill" : "play.fill")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.primary)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: appState.nowPlaying.isPlaying ? appState.nowPlaying.artworkTint : .clear,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isPlayPauseHovered
-                                    )
-                                    .scaleEffect(isPlayPauseHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPlayPauseHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.nowPlaying.isPlaying ? appState.localized("corners.media.pause") : appState.localized("corners.media.play"))
-                            .onHover { isPlayPauseHovered = $0 }
-                            .position(x: ppPt.x, y: ppPt.y)
-
-                            // Audio Scrubbing: Skip Forward 10s (0.84)
-                            let fwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.84))
-                            Button(action: {
-                                appState.nowPlaying.skipForward(seconds: 10)
-                            }) {
-                                Image(systemName: "goforward.10")
-                                    .font(.system(size: 9.5, weight: .bold))
-                                    .foregroundColor(appState.nowPlaying.artworkTint)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: appState.nowPlaying.artworkTint,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isForwardHovered
-                                    )
-                                    .scaleEffect(isForwardHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isForwardHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("corners.media.seekForward"))
-                            .onHover { isForwardHovered = $0 }
-                            .position(x: fwdPt.x, y: fwdPt.y)
-                        } else if action == .mediaPlayback {
-                            // Dedicated Media Controller Satellites: Prev, -10s, +10s, Next
-                            let prevPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
-                            Button(action: {
-                                appState.nowPlaying.previousTrack()
-                            }) {
-                                Image(systemName: "backward.fill")
-                                    .font(.system(size: 8.5, weight: .bold))
-                                    .foregroundColor(appState.nowPlaying.artworkTint)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: appState.nowPlaying.artworkTint,
-                                        specularIntensity: 0.9,
-                                        causticOpacity: 0.20,
-                                        isHighlighted: isPrevTrackHovered
-                                    )
-                                    .scaleEffect(isPrevTrackHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPrevTrackHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("corners.media.previous"))
-                            .onHover { isPrevTrackHovered = $0 }
-                            .position(x: prevPt.x, y: prevPt.y)
-
-                            let rwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.38))
-                            Button(action: {
-                                appState.nowPlaying.skipBackward(seconds: 10)
-                            }) {
-                                Image(systemName: "gobackward.10")
-                                    .font(.system(size: 9.5, weight: .bold))
-                                    .foregroundColor(appState.nowPlaying.artworkTint)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: appState.nowPlaying.artworkTint,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isRewindHovered
-                                    )
-                                    .scaleEffect(isRewindHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isRewindHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("corners.media.seekBackward"))
-                            .onHover { isRewindHovered = $0 }
-                            .position(x: rwdPt.x, y: rwdPt.y)
-
-                            let fwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.62))
-                            Button(action: {
-                                appState.nowPlaying.skipForward(seconds: 10)
-                            }) {
-                                Image(systemName: "goforward.10")
-                                    .font(.system(size: 9.5, weight: .bold))
-                                    .foregroundColor(appState.nowPlaying.artworkTint)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: appState.nowPlaying.artworkTint,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isForwardHovered
-                                    )
-                                    .scaleEffect(isForwardHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isForwardHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("corners.media.seekForward"))
-                            .onHover { isForwardHovered = $0 }
-                            .position(x: fwdPt.x, y: fwdPt.y)
-
-                            let nextPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
-                            Button(action: {
-                                appState.nowPlaying.nextTrack()
-                            }) {
-                                Image(systemName: "forward.fill")
-                                    .font(.system(size: 8.5, weight: .bold))
-                                    .foregroundColor(appState.nowPlaying.artworkTint)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: appState.nowPlaying.artworkTint,
-                                        specularIntensity: 0.9,
-                                        causticOpacity: 0.20,
-                                        isHighlighted: isNextTrackHovered
-                                    )
-                                    .scaleEffect(isNextTrackHovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isNextTrackHovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("corners.media.next"))
-                            .onHover { isNextTrackHovered = $0 }
-                            .position(x: nextPt.x, y: nextPt.y)
-                        } else if action == .keepAwake {
-                            // Indefinite Keep Awake (0.14)
-                            let infPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
-                            Button(action: {
-                                appState.keepAwake.activate(minutes: -1)
-                            }) {
-                                Image(systemName: "infinity")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.orange)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: .orange,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isActionSat1Hovered
-                                    )
-                                    .scaleEffect(isActionSat1Hovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat1Hovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help("Indefinite Keep Awake")
-                            .onHover { isActionSat1Hovered = $0 }
-                            .position(x: infPt.x, y: infPt.y)
-
-                            // Deactivate Keep Awake (0.86)
-                            let offPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
-                            Button(action: {
-                                appState.keepAwake.deactivate()
-                            }) {
-                                Image(systemName: "power")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.secondary)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: .clear,
-                                        specularIntensity: 0.8,
-                                        causticOpacity: 0.15,
-                                        isHighlighted: isActionSat2Hovered
-                                    )
-                                    .scaleEffect(isActionSat2Hovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat2Hovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help("Turn Off Keep Awake")
-                            .onHover { isActionSat2Hovered = $0 }
-                            .position(x: offPt.x, y: offPt.y)
-                        } else if action == .stashShelf {
-                            // Open Shelf Drawer (0.14)
-                            let shelfPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
-                            Button(action: {
-                                appState.toggleAction(.stashShelf, displayID: displayID)
-                            }) {
-                                Image(systemName: "tray.full.fill")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.cyan)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: .cyan,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isActionSat1Hovered
-                                    )
-                                    .scaleEffect(isActionSat1Hovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat1Hovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("corners.action.openShelf"))
-                            .onHover { isActionSat1Hovered = $0 }
-                            .position(x: shelfPt.x, y: shelfPt.y)
-
-                            // Clear Stash Shelf (0.86)
-                            let clearPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
-                            Button(action: {
-                                appState.stashShelf.clearAll()
-                            }) {
-                                Image(systemName: "trash")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.secondary)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: .clear,
-                                        specularIntensity: 0.8,
-                                        causticOpacity: 0.15,
-                                        isHighlighted: isActionSat2Hovered
-                                    )
-                                    .scaleEffect(isActionSat2Hovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat2Hovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("general.clearAll"))
-                            .onHover { isActionSat2Hovered = $0 }
-                            .position(x: clearPt.x, y: clearPt.y)
-                        } else if action == .scratchpad {
-                            // Open Scratchpad Drawer (0.14)
-                            let padPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
-                            Button(action: {
-                                appState.toggleAction(.scratchpad, displayID: displayID)
-                            }) {
-                                Image(systemName: "note.text.badge.plus")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.green)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: .green,
-                                        specularIntensity: 1.0,
-                                        causticOpacity: 0.25,
-                                        isHighlighted: isActionSat1Hovered
-                                    )
-                                    .scaleEffect(isActionSat1Hovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat1Hovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("corners.action.openScratchpad"))
-                            .onHover { isActionSat1Hovered = $0 }
-                            .position(x: padPt.x, y: padPt.y)
-
-                            // Copy Notes (0.86)
-                            let copyPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
-                            Button(action: {
-                                appState.scratchpad.copyAll()
-                            }) {
-                                Image(systemName: "doc.on.doc")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.secondary)
-                                    .frame(width: 24, height: 24)
-                                    .circularLiquidGlass(
-                                        tint: .clear,
-                                        specularIntensity: 0.8,
-                                        causticOpacity: 0.15,
-                                        isHighlighted: isActionSat2Hovered
-                                    )
-                                    .scaleEffect(isActionSat2Hovered ? 1.15 : 1.0)
-                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat2Hovered)
-                            }
-                            .buttonStyle(.plain)
-                            .help(appState.localized("scratchpad.copyAll"))
-                            .onHover { isActionSat2Hovered = $0 }
-                            .position(x: copyPt.x, y: copyPt.y)
-                        }
-                    }
-
-                    // 5. Floating Glass Jewel Center Action Badge
+                    // 4. Floating Glass Jewel Center Action Badge
                     Button(action: {
                         appState.toggleAction(action, displayID: displayID)
                     }) {
@@ -463,6 +123,366 @@ public struct CornerDialView: View {
                         )
                     }
                     .buttonStyle(.plain)
+
+                    // 5. Satellite micro-controls (Floating liquid mercury droplets)
+                    if isExpanded {
+                        if action == .timer {
+                            let resetPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
+                            Button(action: {
+                                appState.resetPomodoro()
+                            }) {
+                                Image(systemName: "arrow.counterclockwise")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.primary)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: .purple,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isResetHovered
+                                    )
+                                    .scaleEffect(isResetHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isResetHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("menubar.reset"))
+                            .onHover { isResetHovered = $0 }
+                            .position(x: resetPt.x, y: resetPt.y)
+
+                            let skipPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
+                            Button(action: {
+                                appState.skipPomodoroMode()
+                            }) {
+                                Image(systemName: "forward.fill")
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundColor(appState.pomodoroMode == .focus ? .purple : .green)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: appState.pomodoroMode == .focus ? .purple : .green,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isSkipHovered
+                                    )
+                                    .scaleEffect(isSkipHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isSkipHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("menubar.skip"))
+                            .onHover { isSkipHovered = $0 }
+                            .position(x: skipPt.x, y: skipPt.y)
+                        } else if action == .volume && appState.nowPlaying.hasMedia {
+                            // Audio Scrubbing: Skip Backward 10s (0.16)
+                            let rwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.16))
+                            Button(action: {
+                                appState.nowPlaying.skipBackward(seconds: 10)
+                            }) {
+                                Image(systemName: "gobackward.10")
+                                    .font(.system(size: 9.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isRewindHovered
+                                    )
+                                    .scaleEffect(isRewindHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isRewindHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.seekBackward"))
+                            .onHover { isRewindHovered = $0 }
+                            .position(x: rwdPt.x, y: rwdPt.y)
+
+                            // Audio Play/Pause (0.50)
+                            let ppPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.50))
+                            Button(action: {
+                                appState.nowPlaying.togglePlayPause()
+                            }) {
+                                Image(systemName: appState.nowPlaying.isPlaying ? "pause.fill" : "play.fill")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.primary)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.isPlaying ? appState.nowPlaying.artworkTint : .clear,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isPlayPauseHovered
+                                    )
+                                    .scaleEffect(isPlayPauseHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPlayPauseHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.nowPlaying.isPlaying ? appState.localized("corners.media.pause") : appState.localized("corners.media.play"))
+                            .onHover { isPlayPauseHovered = $0 }
+                            .position(x: ppPt.x, y: ppPt.y)
+
+                            // Audio Scrubbing: Skip Forward 10s (0.84)
+                            let fwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.84))
+                            Button(action: {
+                                appState.nowPlaying.skipForward(seconds: 10)
+                            }) {
+                                Image(systemName: "goforward.10")
+                                    .font(.system(size: 9.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isForwardHovered
+                                    )
+                                    .scaleEffect(isForwardHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isForwardHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.seekForward"))
+                            .onHover { isForwardHovered = $0 }
+                            .position(x: fwdPt.x, y: fwdPt.y)
+                        } else if action == .mediaPlayback {
+                            // Dedicated Media Controller Satellites: Prev, -10s, +10s, Next
+                            let prevPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
+                            Button(action: {
+                                appState.nowPlaying.previousTrack()
+                            }) {
+                                Image(systemName: "backward.fill")
+                                    .font(.system(size: 8.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 0.9,
+                                        causticOpacity: 0.20,
+                                        isHighlighted: isPrevTrackHovered
+                                    )
+                                    .scaleEffect(isPrevTrackHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPrevTrackHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.previous"))
+                            .onHover { isPrevTrackHovered = $0 }
+                            .position(x: prevPt.x, y: prevPt.y)
+
+                            let rwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.38))
+                            Button(action: {
+                                appState.nowPlaying.skipBackward(seconds: 10)
+                            }) {
+                                Image(systemName: "gobackward.10")
+                                    .font(.system(size: 9.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isRewindHovered
+                                    )
+                                    .scaleEffect(isRewindHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isRewindHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.seekBackward"))
+                            .onHover { isRewindHovered = $0 }
+                            .position(x: rwdPt.x, y: rwdPt.y)
+
+                            let fwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.62))
+                            Button(action: {
+                                appState.nowPlaying.skipForward(seconds: 10)
+                            }) {
+                                Image(systemName: "goforward.10")
+                                    .font(.system(size: 9.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isForwardHovered
+                                    )
+                                    .scaleEffect(isForwardHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isForwardHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.seekForward"))
+                            .onHover { isForwardHovered = $0 }
+                            .position(x: fwdPt.x, y: fwdPt.y)
+
+                            let nextPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
+                            Button(action: {
+                                appState.nowPlaying.nextTrack()
+                            }) {
+                                Image(systemName: "forward.fill")
+                                    .font(.system(size: 8.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 0.9,
+                                        causticOpacity: 0.20,
+                                        isHighlighted: isNextTrackHovered
+                                    )
+                                    .scaleEffect(isNextTrackHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isNextTrackHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.next"))
+                            .onHover { isNextTrackHovered = $0 }
+                            .position(x: nextPt.x, y: nextPt.y)
+                        } else if action == .keepAwake {
+                            // Indefinite Keep Awake (0.14)
+                            let infPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
+                            Button(action: {
+                                appState.keepAwake.activate(minutes: -1)
+                            }) {
+                                Image(systemName: "infinity")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.orange)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: .orange,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isActionSat1Hovered
+                                    )
+                                    .scaleEffect(isActionSat1Hovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat1Hovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help("Indefinite Keep Awake")
+                            .onHover { isActionSat1Hovered = $0 }
+                            .position(x: infPt.x, y: infPt.y)
+
+                            // Deactivate Keep Awake (0.86)
+                            let offPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
+                            Button(action: {
+                                appState.keepAwake.deactivate()
+                            }) {
+                                Image(systemName: "power")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.secondary)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: .clear,
+                                        specularIntensity: 0.8,
+                                        causticOpacity: 0.15,
+                                        isHighlighted: isActionSat2Hovered
+                                    )
+                                    .scaleEffect(isActionSat2Hovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat2Hovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help("Turn Off Keep Awake")
+                            .onHover { isActionSat2Hovered = $0 }
+                            .position(x: offPt.x, y: offPt.y)
+                        } else if action == .stashShelf {
+                            // Open Shelf Drawer (0.14)
+                            let shelfPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
+                            Button(action: {
+                                appState.toggleAction(.stashShelf, displayID: displayID)
+                            }) {
+                                Image(systemName: "tray.full.fill")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.cyan)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: .cyan,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isActionSat1Hovered
+                                    )
+                                    .scaleEffect(isActionSat1Hovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat1Hovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.action.openShelf"))
+                            .onHover { isActionSat1Hovered = $0 }
+                            .position(x: shelfPt.x, y: shelfPt.y)
+
+                            // Clear Stash Shelf (0.86)
+                            let clearPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
+                            Button(action: {
+                                appState.stashShelf.clearAll()
+                            }) {
+                                Image(systemName: "trash")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.secondary)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: .clear,
+                                        specularIntensity: 0.8,
+                                        causticOpacity: 0.15,
+                                        isHighlighted: isActionSat2Hovered
+                                    )
+                                    .scaleEffect(isActionSat2Hovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat2Hovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("general.clearAll"))
+                            .onHover { isActionSat2Hovered = $0 }
+                            .position(x: clearPt.x, y: clearPt.y)
+                        } else if action == .scratchpad {
+                            // Open Scratchpad Drawer (0.14)
+                            let padPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
+                            Button(action: {
+                                appState.toggleAction(.scratchpad, displayID: displayID)
+                            }) {
+                                Image(systemName: "note.text.badge.plus")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.green)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: .green,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isActionSat1Hovered
+                                    )
+                                    .scaleEffect(isActionSat1Hovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat1Hovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.action.openScratchpad"))
+                            .onHover { isActionSat1Hovered = $0 }
+                            .position(x: padPt.x, y: padPt.y)
+
+                            // Copy Notes (0.86)
+                            let copyPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
+                            Button(action: {
+                                appState.scratchpad.copyAll()
+                            }) {
+                                Image(systemName: "doc.on.doc")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.secondary)
+                                    .frame(width: satSize, height: satSize)
+                                    .contentShape(Circle())
+                                    .circularLiquidGlass(
+                                        tint: .clear,
+                                        specularIntensity: 0.8,
+                                        causticOpacity: 0.15,
+                                        isHighlighted: isActionSat2Hovered
+                                    )
+                                    .scaleEffect(isActionSat2Hovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isActionSat2Hovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("scratchpad.copyAll"))
+                            .onHover { isActionSat2Hovered = $0 }
+                            .position(x: copyPt.x, y: copyPt.y)
+                        }
+                    }
                 }
                 .frame(width: dialSize, height: dialSize)
                 .scaleEffect(isExpanded ? 1.0 : 0.05, anchor: unitPoint(for: corner))
@@ -482,7 +502,7 @@ public struct CornerDialView: View {
                             let dist = hypot(loc.x - center.x, loc.y - center.y)
 
                             // Ignore touches on center badge or outside dial perimeter
-                            let centerDeadRadius = max(44, dialSize * 0.38)
+                            let centerDeadRadius = badgeOuterBoundary
                             guard dist >= centerDeadRadius && dist <= dialSize + 30 else {
                                 return
                             }
@@ -756,16 +776,17 @@ public struct CenterActionBadge: View {
     }
 
     public var body: some View {
-        let offset = badgeOffset(for: corner, in: dialSize)
-        let badgeSide = max(54.0, min(72.0, dialSize * (64.0 / 145.0)))
+        let offset = CenterActionBadge.badgeOffset(for: corner, in: dialSize)
+        let badgeSide = CenterActionBadge.badgeSide(for: dialSize)
         let isDark = colorScheme == .dark
 
-        VStack(spacing: 2) {
+        VStack(spacing: 1.5) {
             actionIconView
 
             actionReadoutView
         }
         .frame(width: badgeSide, height: badgeSide)
+        .contentShape(Circle())
         .background(
             ZStack {
                 Circle().fill(.ultraThinMaterial)
@@ -798,26 +819,26 @@ public struct CenterActionBadge: View {
                     lineWidth: isExpanded ? 1.4 : 1.15
                 )
         )
-        .shadow(color: Color.black.opacity(isDark ? 0.35 : 0.15), radius: 7, x: 0, y: 3)
+        .shadow(color: Color.black.opacity(isDark ? 0.35 : 0.15), radius: 6, x: 0, y: 2)
         .offset(x: offset.x, y: offset.y)
     }
 
     @ViewBuilder
     private var actionIconView: some View {
         if action == .timer {
-            HStack(spacing: 3) {
+            HStack(spacing: 2.5) {
                 Image(systemName: isPomodoroRunning ? "pause.fill" : "play.fill")
-                    .font(.system(size: 8, weight: .bold))
+                    .font(.system(size: 7.5, weight: .bold))
                     .foregroundColor(pomodoroMode == .focus ? Color(red: 0.85, green: 0.45, blue: 1.0) : Color(red: 0.3, green: 0.9, blue: 0.55))
 
                 Image(systemName: pomodoroMode == .focus ? "brain.head.profile" : "cup.and.saucer.fill")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 12.5, weight: .semibold))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(pomodoroMode == .focus ? Color.purple : Color.green)
             }
         } else if action == .keepAwake {
             Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -828,7 +849,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .stashShelf {
             Image(systemName: "tray.2.fill")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -839,7 +860,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .scratchpad {
             Image(systemName: "note.text")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -850,7 +871,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .volume {
             Image(systemName: isMuted ? "speaker.slash.fill" : (value > 0.66 ? "speaker.wave.3.fill" : (value > 0.33 ? "speaker.wave.2.fill" : (value > 0.01 ? "speaker.wave.1.fill" : "speaker.fill"))))
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     isMuted
@@ -859,7 +880,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .brightness {
             Image(systemName: "sun.max.fill")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -870,7 +891,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .keyboardBrightness {
             Image(systemName: isKeyboardSupported ? "keyboard.fill" : "keyboard.badge.ellipsis")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     isKeyboardSupported
@@ -879,7 +900,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .mediaPlayback {
             Image(systemName: "music.note")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -890,7 +911,7 @@ public struct CenterActionBadge: View {
                 )
         } else {
             Image(systemName: action.systemImage)
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundColor(action.accentColors.first ?? .accentColor)
         }
@@ -901,7 +922,7 @@ public struct CenterActionBadge: View {
         if action == .timer {
             VStack(spacing: 1.5) {
                 Text(formattedTimer)
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
                     .foregroundColor(.primary)
 
                 if totalRounds > 0 {
@@ -916,62 +937,83 @@ public struct CenterActionBadge: View {
             }
         } else if action == .keepAwake {
             Text(formattedKeepAwake)
-                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                .font(.system(size: 9.5, weight: .heavy, design: .rounded))
                 .foregroundColor(value > 0 ? .primary : .secondary)
         } else if action == .stashShelf {
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text("\(stashItemCount)")
-                    .font(.system(size: 13, weight: .heavy, design: .rounded))
+                    .font(.system(size: 12, weight: .heavy, design: .rounded))
                     .monospacedDigit()
                     .foregroundColor(.primary)
                 Text(LocalizationService.shared.localized("dial.items"))
-                    .font(.system(size: 8, weight: .semibold, design: .rounded))
+                    .font(.system(size: 7.5, weight: .semibold, design: .rounded))
                     .foregroundColor(.secondary)
             }
         } else if action == .scratchpad {
             Text(LocalizationService.shared.localized("dial.notes"))
-                .font(.system(size: 9.5, weight: .heavy, design: .rounded))
+                .font(.system(size: 9, weight: .heavy, design: .rounded))
                 .foregroundColor(.primary)
         } else if action == .volume && isMuted {
             Text(LocalizationService.shared.localized("dial.mute"))
-                .font(.system(size: 9.5, weight: .heavy, design: .rounded))
+                .font(.system(size: 9, weight: .heavy, design: .rounded))
                 .foregroundColor(.red)
         } else if (action == .volume || action == .mediaPlayback), let time = mediaTimeText, !time.isEmpty {
             Text(time)
-                .font(.system(size: 9.5, weight: .heavy, design: .monospaced))
+                .font(.system(size: 9, weight: .heavy, design: .monospaced))
                 .monospacedDigit()
                 .foregroundColor(.primary)
         } else if action == .keyboardBrightness && !isKeyboardSupported {
             Text(LocalizationService.shared.localized("dial.na"))
-                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                .font(.system(size: 9.5, weight: .heavy, design: .rounded))
                 .foregroundColor(.secondary)
         } else {
             HStack(alignment: .firstTextBaseline, spacing: 1) {
                 Text("\(Int(round(value * 100)))")
-                    .font(.system(size: 13, weight: .heavy, design: .rounded))
+                    .font(.system(size: 12, weight: .heavy, design: .rounded))
                     .monospacedDigit()
                     .foregroundColor(.primary)
 
                 Text("%")
-                    .font(.system(size: 8.5, weight: .bold, design: .rounded))
+                    .font(.system(size: 8, weight: .bold, design: .rounded))
                     .foregroundColor(.secondary)
             }
         }
     }
 
-    private func badgeOffset(for corner: CornerPosition, in size: CGFloat) -> CGPoint {
-        // Mathematically centered along the 45° line of symmetry (39pt at 145pt dial size => 19pt edge clearance)
-        let offsetDist: CGFloat = size * (39.0 / 145.0)
+    public static func badgeSide(for dialSize: CGFloat) -> CGFloat {
+        max(36.0, min(48.0, dialSize * 0.28))
+    }
+
+    public static func cornerMargin(for dialSize: CGFloat) -> CGFloat {
+        max(4.0, min(8.0, dialSize * 0.045))
+    }
+
+    public static func offsetDist(for dialSize: CGFloat) -> CGFloat {
+        let side = badgeSide(for: dialSize)
+        let m = cornerMargin(for: dialSize)
+        let radius = side * 0.5
+        let centerDist = (m + radius) / sqrt(2.0)
+        return (dialSize * 0.5) - centerDist
+    }
+
+    public static func badgeOffset(for corner: CornerPosition, in size: CGFloat) -> CGPoint {
+        let dist = offsetDist(for: size)
         switch corner {
         case .topLeft:
-            return CGPoint(x: -offsetDist, y: -offsetDist)
+            return CGPoint(x: -dist, y: -dist)
         case .topRight:
-            return CGPoint(x: offsetDist, y: -offsetDist)
+            return CGPoint(x: dist, y: -dist)
         case .bottomLeft:
-            return CGPoint(x: -offsetDist, y: offsetDist)
+            return CGPoint(x: -dist, y: dist)
         case .bottomRight:
-            return CGPoint(x: offsetDist, y: offsetDist)
+            return CGPoint(x: dist, y: dist)
         }
+    }
+
+    public static func badgeOuterRadius(for dialSize: CGFloat) -> CGFloat {
+        let side = badgeSide(for: dialSize)
+        let m = cornerMargin(for: dialSize)
+        return m + side
     }
 }
 

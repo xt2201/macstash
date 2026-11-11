@@ -57,17 +57,17 @@ public struct DisplaysTab: View {
                 systemImage: "slider.horizontal.3",
                 accentColor: .blue
             ) {
-                HStack {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(appState.localized("displays.stepSize"))
                         .font(.system(size: 12.5, weight: .medium))
-                    Spacer()
+
                     Picker("", selection: $appState.settings.brightnessStepFraction) {
                         Text(appState.localized("displays.stepUltraFine")).tag(Float(0.01))
                         Text(appState.localized("displays.stepBalanced")).tag(Float(0.05))
                         Text(appState.localized("displays.stepCoarse")).tag(Float(0.10))
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 310)
+                    .labelsHidden()
                 }
 
                 Divider()

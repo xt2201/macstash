@@ -133,7 +133,14 @@ public final class AppState: ObservableObject {
         didSet { if !isSyncingSettings { settings.isCornerDialsEnabled = isCornerDialsEnabled } }
     }
     @Published public var isEdgeSlidersEnabled: Bool = true {
-        didSet { if !isSyncingSettings { settings.isEdgeSlidersEnabled = isEdgeSlidersEnabled } }
+        didSet {
+            if !isSyncingSettings {
+                settings.isEdgeSlidersEnabled = isEdgeSlidersEnabled
+                if isEdgeSlidersEnabled && edgeSliderPlacement == .none {
+                    edgeSliderPlacement = .both
+                }
+            }
+        }
     }
     @Published public var edgeBarShowMediaControls: Bool = true {
         didSet { if !isSyncingSettings { settings.edgeBarShowMediaControls = edgeBarShowMediaControls } }

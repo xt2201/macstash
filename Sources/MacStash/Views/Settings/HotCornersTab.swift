@@ -12,6 +12,7 @@ public struct HotCornersTab: View {
     @State private var newProfileName: String = ""
     @State private var newProfileBundleID: String = ""
     @State private var focusedCorner: CornerPosition? = nil
+    @State private var focusedEdge: EdgePosition? = nil
     @State private var highlightTarget: InteractiveMapTarget? = nil
 
     enum InteractiveMapTarget: Equatable {
@@ -154,55 +155,18 @@ public struct HotCornersTab: View {
                 Toggle(appState.localized("corners.enableEdgeDynamic"), isOn: $appState.isEdgeSlidersEnabled)
                     .font(.system(size: 13, weight: .semibold))
 
-                HStack {
-                    Text(appState.localized("corners.edgePlacement"))
-                        .font(.system(size: 12.5, weight: .medium))
-                    Spacer()
-                    Picker("", selection: $appState.edgeSliderPlacement) {
-                        ForEach(EdgeSliderPlacement.allCases) { p in
-                            Text(p.localizedDisplayName(using: appState.effectiveLanguage)).tag(p)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 280)
-                }
-                .disabled(!appState.isEdgeSlidersEnabled)
+                Divider()
 
-                if appState.edgeSliderPlacement == .both || appState.edgeSliderPlacement == .left {
-                    HStack {
-                        Text(appState.localized("corners.leftEdgeAction"))
-                            .font(.system(size: 12.5, weight: .medium))
-                        Spacer()
-                        Picker("", selection: leftEdgeActionBinding(for: selectedProfileIndex)) {
-                            ForEach(ControlAction.allCases) { action in
-                                Text(localizedActionName(action)).tag(action)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .frame(width: 220)
-                    }
-                    .disabled(!appState.isEdgeSlidersEnabled)
+                VStack(spacing: 10) {
+                    edgeAssignmentRow(edge: .left, labelKey: "corners.edgeLeft")
+                    edgeAssignmentRow(edge: .right, labelKey: "corners.edgeRight")
                 }
-
-                if appState.edgeSliderPlacement == .both || appState.edgeSliderPlacement == .right {
-                    HStack {
-                        Text(appState.localized("corners.rightEdgeAction"))
-                            .font(.system(size: 12.5, weight: .medium))
-                        Spacer()
-                        Picker("", selection: rightEdgeActionBinding(for: selectedProfileIndex)) {
-                            ForEach(ControlAction.allCases) { action in
-                                Text(localizedActionName(action)).tag(action)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .frame(width: 220)
-                    }
-                    .disabled(!appState.isEdgeSlidersEnabled)
-                }
+                .opacity(appState.isEdgeSlidersEnabled ? 1.0 : 0.55)
 
                 Text(appState.localized("corners.edgeSlidersHint"))
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Divider()
 
@@ -233,16 +197,15 @@ public struct HotCornersTab: View {
                 Toggle(appState.localized("corners.scratchpadToggle"), isOn: $appState.settings.isScratchpadEnabled)
                     .font(.system(size: 12.5, weight: .medium))
 
-                HStack {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(appState.localized("corners.drawerPosition"))
                         .font(.system(size: 12.5, weight: .medium))
-                    Spacer()
                     Picker("", selection: $appState.drawerEdgePosition) {
                         Text(appState.localized("corners.edgeLeft")).tag(EdgePosition.left)
                         Text(appState.localized("corners.edgeRight")).tag(EdgePosition.right)
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 210)
+                    .labelsHidden()
                 }
 
                 Divider()
@@ -564,6 +527,7 @@ public struct HotCornersTab: View {
         return Button {
             withAnimation(.easeInOut(duration: 0.16)) {
                 focusedCorner = corner
+                focusedEdge = nil
                 highlightTarget = .corner(corner)
             }
         } label: {
@@ -601,9 +565,11 @@ public struct HotCornersTab: View {
     private func mapEdgeSliderNode(for edge: EdgePosition) -> some View {
         let action = edge == .left ? selectedProfile.leftEdgeAction : selectedProfile.rightEdgeAction
         let tint = action.accentColors.first ?? .blue
+        let isHighlighted = (focusedEdge == edge) || (highlightTarget == .edgeSlider && focusedEdge == nil)
         return Button {
             withAnimation(.easeInOut(duration: 0.16)) {
                 focusedCorner = nil
+                focusedEdge = edge
                 highlightTarget = .edgeSlider
             }
         } label: {
@@ -623,7 +589,7 @@ public struct HotCornersTab: View {
             .padding(.horizontal, 6)
             .padding(.vertical, 8)
             .background(Capsule().fill(.ultraThinMaterial))
-            .overlay(Capsule().strokeBorder(tint.opacity(highlightTarget == .edgeSlider ? 0.9 : 0.35), lineWidth: 1.0))
+            .overlay(Capsule().strokeBorder(tint.opacity(isHighlighted ? 0.9 : 0.35), lineWidth: 1.0))
         }
         .buttonStyle(.plain)
     }
@@ -632,6 +598,7 @@ public struct HotCornersTab: View {
         Button {
             withAnimation(.easeInOut(duration: 0.16)) {
                 focusedCorner = nil
+                focusedEdge = nil
                 highlightTarget = .drawer
             }
         } label: {
@@ -690,6 +657,52 @@ public struct HotCornersTab: View {
             .frame(width: 225)
 
             Toggle("", isOn: cornerEnabledBinding(for: corner))
+                .toggleStyle(.switch)
+                .labelsHidden()
+                .controlSize(.mini)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(isFocused ? tint.opacity(0.12) : Color.clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(isFocused ? tint.opacity(0.45) : Color.clear, lineWidth: 1.0)
+        )
+    }
+
+    private func edgeAssignmentRow(edge: EdgePosition, labelKey: String) -> some View {
+        let action = effectiveEdgeAction(for: edge)
+        let tint = action.accentColors.first ?? .secondary
+        let isFocused = focusedEdge == edge
+        let isEdgeOn = isEdgeEnabled(edge)
+
+        return HStack(spacing: 10) {
+            Image(systemName: action.systemImage)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(isEdgeOn && action != .none ? .white : .secondary)
+                .frame(width: 24, height: 24)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(isEdgeOn && action != .none ? tint : Color.primary.opacity(0.1))
+                )
+
+            Text(appState.localized(labelKey))
+                .font(.system(size: 12.5, weight: .medium))
+
+            Spacer()
+
+            Picker("", selection: edgeActionBinding(for: selectedProfileIndex, edge: edge)) {
+                ForEach(ControlAction.allCases) { act in
+                    Text(localizedActionName(act)).tag(act)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(width: 225)
+
+            Toggle("", isOn: edgeEnabledBinding(for: edge))
                 .toggleStyle(.switch)
                 .labelsHidden()
                 .controlSize(.mini)
@@ -826,6 +839,17 @@ public struct HotCornersTab: View {
         return appState.settings.cornerActions[corner] ?? .none
     }
 
+    private func effectiveEdgeAction(for edge: EdgePosition) -> ControlAction {
+        switch edge {
+        case .left:
+            return selectedProfile.leftEdgeAction
+        case .right:
+            return selectedProfile.rightEdgeAction
+        default:
+            return .none
+        }
+    }
+
     private func actionBinding(for profileIdx: Int, corner: CornerPosition) -> Binding<ControlAction> {
         Binding(
             get: {
@@ -887,8 +911,48 @@ public struct HotCornersTab: View {
         )
     }
 
-    private func edgeActionBinding(for profileIdx: Int) -> Binding<ControlAction> {
-        rightEdgeActionBinding(for: profileIdx)
+    private func edgeActionBinding(for profileIdx: Int, edge: EdgePosition) -> Binding<ControlAction> {
+        switch edge {
+        case .left:
+            return leftEdgeActionBinding(for: profileIdx)
+        case .right:
+            return rightEdgeActionBinding(for: profileIdx)
+        default:
+            return .constant(.none)
+        }
+    }
+
+    private func isEdgeEnabled(_ edge: EdgePosition) -> Bool {
+        switch edge {
+        case .left:
+            return appState.edgeSliderPlacement == .both || appState.edgeSliderPlacement == .left
+        case .right:
+            return appState.edgeSliderPlacement == .both || appState.edgeSliderPlacement == .right
+        default:
+            return false
+        }
+    }
+
+    private func edgeEnabledBinding(for edge: EdgePosition) -> Binding<Bool> {
+        Binding(
+            get: { isEdgeEnabled(edge) },
+            set: { isEnabled in
+                let currentLeft = isEdgeEnabled(.left)
+                let currentRight = isEdgeEnabled(.right)
+                let newLeft = edge == .left ? isEnabled : currentLeft
+                let newRight = edge == .right ? isEnabled : currentRight
+
+                if newLeft && newRight {
+                    appState.edgeSliderPlacement = .both
+                } else if newLeft {
+                    appState.edgeSliderPlacement = .left
+                } else if newRight {
+                    appState.edgeSliderPlacement = .right
+                } else {
+                    appState.edgeSliderPlacement = .none
+                }
+            }
+        )
     }
 
     private func profileEnabledBinding(for profileIdx: Int) -> Binding<Bool> {

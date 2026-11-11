@@ -153,17 +153,17 @@ public struct GeneralTab: View {
                 systemImage: "globe",
                 accentColor: .indigo
             ) {
-                HStack {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(appState.localized("general.interfaceLanguage"))
                         .font(.system(size: 12.5, weight: .medium))
-                    Spacer()
+
                     Picker("", selection: $appState.settings.language) {
                         Text(appState.localized("general.systemDefault")).tag("system")
                         Text(appState.localized("general.vietnamese")).tag("vi")
                         Text(appState.localized("general.english")).tag("en")
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 280)
+                    .labelsHidden()
                 }
 
                 Text(appState.localized("general.languageHint"))

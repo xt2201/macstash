@@ -102,17 +102,17 @@ public struct AppearanceTab: View {
 
                 Divider()
 
-                HStack {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(appState.localized("appearance.theme"))
                         .font(.system(size: 12.5, weight: .medium))
-                    Spacer()
+
                     Picker("", selection: $appState.settings.appearanceTheme) {
                         Text(appState.localized("appearance.themeMatchSystem")).tag("system")
                         Text(appState.localized("appearance.themeLight")).tag("light")
                         Text(appState.localized("appearance.themeDark")).tag("dark")
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 260)
+                    .labelsHidden()
                 }
             }
 
@@ -181,18 +181,17 @@ public struct AppearanceTab: View {
                     .font(.system(size: 12.5, weight: .medium))
 
                 if appState.settings.hapticFeedbackEnabled {
-                    HStack {
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(appState.localized("appearance.hapticIntensity"))
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.secondary)
-                        Spacer()
                         Picker("", selection: $appState.settings.hapticIntensity) {
                             Text(appState.localized("appearance.hapticLight")).tag("light")
                             Text(appState.localized("appearance.hapticMedium")).tag("medium")
                             Text(appState.localized("appearance.hapticStrong")).tag("strong")
                         }
                         .pickerStyle(.segmented)
-                        .frame(width: 220)
+                        .labelsHidden()
                     }
                     .padding(.leading, 18)
                 }

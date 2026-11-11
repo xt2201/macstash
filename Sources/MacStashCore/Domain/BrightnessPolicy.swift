@@ -7,11 +7,16 @@ public enum BrightnessMethod: String, Codable, CaseIterable, Sendable {
     case software
 
     public var displayName: String {
+        localizedDisplayName()
+    }
+
+    public func localizedDisplayName(using language: String? = nil) -> String {
+        let isVi = (language ?? LocalizationService.shared.effectiveLanguage) == "vi"
         switch self {
-        case .auto: return "Automatic (Recommended)"
-        case .builtIn: return "Native Display Services"
-        case .ddc: return "DDC/CI Hardware"
-        case .software: return "Software Dimming"
+        case .auto: return isVi ? "Tự động (Khuyên dùng)" : "Automatic (Recommended)"
+        case .builtIn: return isVi ? "Dịch vụ hiển thị mặc định" : "Native Display Services"
+        case .ddc: return isVi ? "Phần cứng DDC/CI" : "DDC/CI Hardware"
+        case .software: return isVi ? "Giảm sáng phần mềm" : "Software Dimming"
         }
     }
 }
@@ -49,32 +54,48 @@ public enum BrightnessPolicy {
         max(Defaults.Brightness.minLevel, min(Defaults.Brightness.maxLevel, level))
     }
 
+    public static func clamp(_ level: Float, min minClamp: Float, max maxClamp: Float) -> Float {
+        let low = max(Defaults.Brightness.minLevel, min(0.95, minClamp))
+        let high = max(low, min(Defaults.Brightness.maxLevel, maxClamp))
+        return max(low, min(high, level))
+    }
+
     public static func resolveActualMethod(
         preferred: BrightnessMethod,
         isBuiltIn: Bool,
-        isDDCSupported: Bool
+        isDDCSupported: Bool,
+        language: String? = nil
     ) -> (method: BrightnessMethod, reason: String) {
+        let isVi = (language ?? LocalizationService.shared.effectiveLanguage) == "vi"
         if isBuiltIn {
-            return (.builtIn, "Built-in display uses native macOS display services.")
+            return (.builtIn, isVi
+                ? "Màn hình tích hợp sử dụng dịch vụ hiển thị gốc của macOS."
+                : "Built-in display uses native macOS display services.")
         }
 
         switch preferred {
         case .auto:
             if isDDCSupported {
-                return (.ddc, "DDC/CI hardware control active.")
+                return (.ddc, isVi ? "Đang điều khiển phần cứng DDC/CI." : "DDC/CI hardware control active.")
             } else {
-                return (.software, "Hardware DDC not responding; fell back to software dimming.")
+                return (.software, isVi
+                    ? "DDC phần cứng không phản hồi; tự chuyển sang giảm sáng phần mềm."
+                    : "Hardware DDC not responding; fell back to software dimming.")
             }
         case .ddc:
             if isDDCSupported {
-                return (.ddc, "DDC/CI hardware control active.")
+                return (.ddc, isVi ? "Đang điều khiển phần cứng DDC/CI." : "DDC/CI hardware control active.")
             } else {
-                return (.software, "Hardware DDC forced but not responding; fell back to software dimming.")
+                return (.software, isVi
+                    ? "Đã chọn DDC phần cứng nhưng màn hình không phản hồi; chuyển sang giảm sáng phần mềm."
+                    : "Hardware DDC forced but not responding; fell back to software dimming.")
             }
         case .software:
-            return (.software, "Software dimming selected by user.")
+            return (.software, isVi ? "Người dùng chọn giảm sáng phần mềm." : "Software dimming selected by user.")
         case .builtIn:
-            return (.software, "Display is external; fell back to software dimming.")
+            return (.software, isVi
+                ? "Là màn hình ngoài; tự chuyển sang giảm sáng phần mềm."
+                : "Display is external; fell back to software dimming.")
         }
     }
 }

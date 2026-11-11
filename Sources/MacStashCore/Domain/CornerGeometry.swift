@@ -161,4 +161,54 @@ public enum CornerGeometry {
         }
         return true
     }
+
+    /// Checks whether a cursor point is flush against the specified physical screen edge within `edgeTolerance`
+    /// and vertically bounded inside `verticalRange`.
+    public static func isCursorAtVerticalEdge(
+        point: CGPoint,
+        screenFrame: CGRect,
+        verticalRange: CGRect,
+        edge: EdgePosition,
+        edgeTolerance: CGFloat = 2.5,
+        outerTolerance: CGFloat = 1.0
+    ) -> Bool {
+        let withinY = point.y >= verticalRange.minY && point.y <= verticalRange.maxY
+        guard withinY else { return false }
+
+        switch edge {
+        case .left:
+            return point.x <= (screenFrame.minX + edgeTolerance) && point.x >= (screenFrame.minX - outerTolerance)
+        case .right:
+            return point.x >= (screenFrame.maxX - edgeTolerance) && point.x <= (screenFrame.maxX + outerTolerance)
+        case .top, .bottom:
+            return false
+        }
+    }
+
+    /// Returns the expanded interactive hit rectangle for a vertical edge slider on either left or right edge.
+    public static func edgeSliderHitRect(
+        screenFrame: CGRect,
+        sliderPanelRect: CGRect,
+        edge: EdgePosition,
+        hitWidth: CGFloat = 84.0
+    ) -> CGRect {
+        let x: CGFloat = (edge == .left) ? screenFrame.minX : (screenFrame.maxX - hitWidth)
+        return CGRect(x: x, y: sliderPanelRect.minY, width: hitWidth, height: sliderPanelRect.height)
+    }
+
+    /// Returns the interactive hit rectangle for the Stash Shelf or Scratchpad drawer attached to either left or right edge.
+    public static func edgeDrawerHitRect(
+        screenFrame: CGRect,
+        drawerPanelRect: CGRect,
+        edge: EdgePosition,
+        drawerWidth: CGFloat,
+        drawerHeight: CGFloat,
+        margin: CGFloat = 0.0
+    ) -> CGRect {
+        let totalW = drawerWidth + margin
+        let totalH = drawerHeight + margin
+        let y = drawerPanelRect.minY + (drawerPanelRect.height - totalH) / 2.0
+        let x = (edge == .right) ? (screenFrame.maxX - totalW) : screenFrame.minX
+        return CGRect(x: x, y: y, width: totalW, height: totalH)
+    }
 }

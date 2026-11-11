@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import SideDockCore
+import MacStashCore
 
 public struct FolderEntry: Identifiable, Equatable {
     public let id: String
@@ -34,6 +35,10 @@ public struct FolderPopoverView: View {
     @State private var selectedSort: FolderSortOrder
     @State private var searchText: String = ""
 
+    private func localized(_ key: String) -> String {
+        LocalizationService.shared.localized(key)
+    }
+
     public init(folderItem: FolderItem) {
         self.folderItem = folderItem
         let initialURL = URL(fileURLWithPath: (folderItem.folderPath as NSString).expandingTildeInPath)
@@ -63,7 +68,6 @@ public struct FolderPopoverView: View {
 
     public var body: some View {
         VStack(spacing: 8) {
-            // Header: Breadcrumb & Sort
             HStack(spacing: 6) {
                 if currentURL.path != (folderItem.folderPath as NSString).expandingTildeInPath {
                     Button {
@@ -83,13 +87,13 @@ public struct FolderPopoverView: View {
                 Spacer()
 
                 Picker("", selection: $selectedSort) {
-                    Text("Name").tag(FolderSortOrder.name)
-                    Text("Kind").tag(FolderSortOrder.kind)
-                    Text("Size").tag(FolderSortOrder.size)
-                    Text("Date").tag(FolderSortOrder.dateModified)
+                    Text(localized("folder.name")).tag(FolderSortOrder.name)
+                    Text(localized("folder.kind")).tag(FolderSortOrder.kind)
+                    Text(localized("folder.size")).tag(FolderSortOrder.size)
+                    Text(localized("folder.date")).tag(FolderSortOrder.dateModified)
                 }
                 .pickerStyle(.menu)
-                .frame(width: 80)
+                .frame(width: 86)
 
                 Button {
                     NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: currentURL.path)
@@ -98,60 +102,73 @@ public struct FolderPopoverView: View {
                         .font(.system(size: 11))
                 }
                 .buttonStyle(.plain)
-                .help("Open in Finder")
+                .help(localized("dock.openInFinder"))
             }
             .padding(.horizontal, 10)
             .padding(.top, 8)
 
-            // Search filter
-            TextField("Search in folder...", text: $searchText)
-                .textFieldStyle(.roundedBorder)
-                .font(.system(size: 11))
-                .padding(.horizontal, 10)
+            HStack(spacing: 6) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+                TextField(localized("folder.searchPlaceholder"), text: $searchText)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 11))
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.06)))
+            .padding(.horizontal, 10)
 
             Divider()
 
-            // File list
-            ScrollView {
-                LazyVStack(spacing: 2) {
-                    ForEach(sortedEntries) { entry in
-                        Button {
-                            if entry.isDirectory {
-                                currentURL = entry.url
-                                loadEntries()
-                            } else {
-                                NSWorkspace.shared.open(entry.url)
-                            }
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(nsImage: NSWorkspace.shared.icon(forFile: entry.url.path))
-                                    .resizable()
-                                    .frame(width: 18, height: 18)
-
-                                Text(entry.name)
-                                    .font(.system(size: 11))
-                                    .lineLimit(1)
-
-                                Spacer()
-
-                                if !entry.isDirectory && entry.fileSize > 0 {
-                                    Text(ByteCountFormatter.string(fromByteCount: entry.fileSize, countStyle: .file))
-                                        .font(.system(size: 9))
-                                        .foregroundColor(.secondary)
+            if sortedEntries.isEmpty {
+                Text(localized("folder.empty"))
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, minHeight: 80)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 2) {
+                        ForEach(sortedEntries) { entry in
+                            Button {
+                                if entry.isDirectory {
+                                    currentURL = entry.url
+                                    loadEntries()
+                                } else {
+                                    NSWorkspace.shared.open(entry.url)
                                 }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(nsImage: NSWorkspace.shared.icon(forFile: entry.url.path))
+                                        .resizable()
+                                        .frame(width: 18, height: 18)
+
+                                    Text(entry.name)
+                                        .font(.system(size: 11))
+                                        .lineLimit(1)
+
+                                    Spacer()
+
+                                    if !entry.isDirectory && entry.fileSize > 0 {
+                                        Text(ByteCountFormatter.string(fromByteCount: entry.fileSize, countStyle: .file))
+                                            .font(.system(size: 9))
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .contentShape(Rectangle())
                             }
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .contentShape(Rectangle())
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
+                    .padding(.horizontal, 6)
                 }
-                .padding(.horizontal, 6)
+                .frame(maxHeight: 280)
             }
-            .frame(maxHeight: 280)
         }
-        .frame(width: 280)
+        .frame(width: 290)
         .padding(.bottom, 8)
         .onAppear {
             loadEntries()

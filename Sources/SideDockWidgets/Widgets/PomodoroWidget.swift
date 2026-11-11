@@ -18,6 +18,7 @@ public struct PomodoroWidgetView: View {
     @State private var remainingSeconds: Int = 25 * 60
     @State private var isRunning: Bool = false
     @State private var isBreak: Bool = false
+    @State private var targetEndDate: Date? = nil
     @State private var timer: Timer?
 
     public init(config: PomodoroConfig = PomodoroConfig(), size: WidgetSize = .small) {
@@ -65,8 +66,17 @@ public struct PomodoroWidgetView: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 8)
         .padding(.vertical, 4)
+        .onAppear {
+            if isRunning {
+                startTimer(preserveTarget: true)
+            }
+        }
+        .onDisappear {
+            timer?.invalidate()
+            timer = nil
+        }
     }
 
     private func toggleTimer() {
@@ -77,13 +87,18 @@ public struct PomodoroWidgetView: View {
         }
     }
 
-    private func startTimer() {
+    private func startTimer(preserveTarget: Bool = false) {
         isRunning = true
+        if !preserveTarget || targetEndDate == nil {
+            targetEndDate = Date().addingTimeInterval(TimeInterval(remainingSeconds))
+        }
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             Task { @MainActor in
-                if self.remainingSeconds > 0 {
-                    self.remainingSeconds -= 1
+                guard let end = self.targetEndDate else { return }
+                let rem = Int(ceil(end.timeIntervalSinceNow))
+                if rem > 0 {
+                    self.remainingSeconds = rem
                 } else {
                     self.handleComplete()
                 }
@@ -93,6 +108,7 @@ public struct PomodoroWidgetView: View {
 
     private func pauseTimer() {
         isRunning = false
+        targetEndDate = nil
         timer?.invalidate()
         timer = nil
     }

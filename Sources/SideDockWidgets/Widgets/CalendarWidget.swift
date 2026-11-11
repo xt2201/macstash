@@ -107,6 +107,11 @@ public struct CalendarWidgetView: View {
         .onAppear {
             checkPermissionAndFetch()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .EKEventStoreChanged)) { _ in
+            if hasPermission {
+                fetchNextEvent()
+            }
+        }
     }
 
     private func checkPermissionAndFetch() {

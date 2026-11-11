@@ -52,28 +52,57 @@ public struct ClockWidgetView: View {
         return df
     }
 
+    private var flipComponents: (hour: String, minute: String, suffix: String) {
+        var cal = Calendar.current
+        cal.timeZone = targetTimeZone
+        let h24 = cal.component(.hour, from: currentDate)
+        let m = cal.component(.minute, from: currentDate)
+        if config.is24Hour {
+            return (String(format: "%02d", h24), String(format: "%02d", m), "")
+        } else {
+            let h12 = h24 % 12 == 0 ? 12 : h24 % 12
+            let ampm = h24 >= 12 ? "PM" : "AM"
+            return (String(format: "%02d", h12), String(format: "%02d", m), ampm)
+        }
+    }
+
     public var body: some View {
         HStack(spacing: 6) {
             switch config.style {
-            case .digital, .flip:
+            case .digital:
                 VStack(spacing: 2) {
                     Text(timeFormatter.string(from: currentDate))
                         .font(.system(size: size == .small ? 13 : 15, weight: .semibold, design: .monospaced))
+                        .monospacedDigit()
                         .foregroundColor(.primary)
 
                     if size != .small {
-                        Text(targetTimeZone.localizedName(for: .generic, locale: .current) ?? targetTimeZone.identifier)
+                        Text(targetTimeZone.localizedName(for: .shortGeneric, locale: .current) ?? targetTimeZone.identifier)
                             .font(.system(size: 9))
                             .foregroundColor(.secondary)
                             .lineLimit(1)
                     }
                 }
+            case .flip:
+                let parts = flipComponents
+                HStack(spacing: 3) {
+                    flipCard(parts.hour)
+                    Text(":")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.secondary)
+                    flipCard(parts.minute)
+                    if !parts.suffix.isEmpty && size != .small {
+                        Text(parts.suffix)
+                            .font(.system(size: 8.5, weight: .bold))
+                            .foregroundColor(.secondary)
+                    }
+                }
             case .analog:
                 AnalogClockFace(date: currentDate, timeZone: targetTimeZone)
-                    .frame(width: size == .small ? 36 : 44, height: size == .small ? 36 : 44)
+                    .frame(width: size == .small ? 36 : 40, height: size == .small ? 36 : 40)
             }
         }
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .onAppear {
             startTimer()
@@ -83,8 +112,30 @@ public struct ClockWidgetView: View {
         }
     }
 
+    private func flipCard(_ text: String) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
+                .fill(Color.primary.opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        .strokeBorder(Color.primary.opacity(0.14), lineWidth: 0.6)
+                )
+
+            Text(text)
+                .font(.system(size: size == .small ? 12 : 14, weight: .bold, design: .monospaced))
+                .monospacedDigit()
+                .foregroundColor(.primary)
+
+            Rectangle()
+                .fill(Color.primary.opacity(0.16))
+                .frame(height: 0.8)
+        }
+        .frame(width: size == .small ? 22 : 26, height: size == .small ? 26 : 30)
+    }
+
     private func startTimer() {
         stopTimer()
+        currentDate = Date()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             Task { @MainActor in
                 self.currentDate = Date()
@@ -103,8 +154,9 @@ private struct AnalogClockFace: View {
     let timeZone: TimeZone
 
     var body: some View {
-        GeometryReader { geo in
-            let calendar = Calendar.current
+        GeometryReader { _ in
+            var calendar = Calendar.current
+            let _ = (calendar.timeZone = timeZone)
             let hour = calendar.component(.hour, from: date) % 12
             let minute = calendar.component(.minute, from: date)
             let second = calendar.component(.second, from: date)
@@ -115,22 +167,19 @@ private struct AnalogClockFace: View {
 
             ZStack {
                 Circle()
-                    .stroke(Color.primary.opacity(0.3), lineWidth: 1.5)
+                    .stroke(Color.primary.opacity(0.35), lineWidth: 1.5)
 
-                // Hour Hand
-                HandShape(lengthFraction: 0.5)
+                HandShape(lengthFraction: 0.52)
                     .rotation(.degrees(hourAngle))
-                    .stroke(Color.primary, lineWidth: 2)
+                    .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
 
-                // Minute Hand
-                HandShape(lengthFraction: 0.75)
+                HandShape(lengthFraction: 0.76)
                     .rotation(.degrees(minAngle))
-                    .stroke(Color.primary.opacity(0.8), lineWidth: 1.5)
+                    .stroke(Color.primary.opacity(0.85), style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
 
-                // Second Hand
-                HandShape(lengthFraction: 0.85)
+                HandShape(lengthFraction: 0.86)
                     .rotation(.degrees(secAngle))
-                    .stroke(Color.red, lineWidth: 1)
+                    .stroke(Color.red, style: StrokeStyle(lineWidth: 1, lineCap: .round))
 
                 Circle()
                     .fill(Color.primary)

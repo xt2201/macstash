@@ -21,20 +21,25 @@ public final class EdgeTriggerManager: @unchecked Sendable {
         triggerThickness: Double,
         revealDelaySeconds: Double,
         dockFrame: CGRect,
+        autoHide: Bool = true,
         hideInFullscreen: Bool = false,
         hideOnWindowHover: Bool = false,
+        initiallyRevealed: Bool = false,
         onHoverAlphaChanged: (@Sendable (CGFloat) -> Void)? = nil
     ) {
         stop()
+        isCurrentlyRevealed = initiallyRevealed
 
-        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved]) { [weak self] event in
+        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved]) { [weak self] _ in
             guard let self = self else { return }
+            let screenMouseLocation = NSEvent.mouseLocation
             self.handleMouseMove(
-                location: event.locationInWindow,
+                location: screenMouseLocation,
                 placement: placement,
                 triggerThickness: triggerThickness,
                 revealDelaySeconds: revealDelaySeconds,
                 dockFrame: dockFrame,
+                autoHide: autoHide,
                 hideInFullscreen: hideInFullscreen,
                 hideOnWindowHover: hideOnWindowHover,
                 onHoverAlphaChanged: onHoverAlphaChanged
@@ -59,11 +64,11 @@ public final class EdgeTriggerManager: @unchecked Sendable {
         triggerThickness: Double,
         revealDelaySeconds: Double,
         dockFrame: CGRect,
+        autoHide: Bool,
         hideInFullscreen: Bool,
         hideOnWindowHover: Bool,
         onHoverAlphaChanged: (@Sendable (CGFloat) -> Void)?
     ) {
-        // Resolve screen based on cursor location or primary screen
         let screen = NSScreen.screens.first(where: { $0.frame.contains(location) }) ?? NSScreen.main
         guard let targetScreen = screen else { return }
         let screenFrame = targetScreen.frame
@@ -78,7 +83,6 @@ public final class EdgeTriggerManager: @unchecked Sendable {
 
         let insideDock = dockFrame.insetBy(dx: -10, dy: -10).contains(location)
 
-        // Hide on window hover: fade dock to transparent if cursor hovers over it
         if hideOnWindowHover {
             if insideDock {
                 onHoverAlphaChanged?(0.15)
@@ -87,12 +91,10 @@ public final class EdgeTriggerManager: @unchecked Sendable {
             }
         }
 
-        // Fullscreen detection
         var isFullscreen = false
         if hideInFullscreen {
             if let frontApp = NSWorkspace.shared.frontmostApplication,
                frontApp.bundleIdentifier != Bundle.main.bundleIdentifier {
-                // If frontmost application window matches or exceeds screen dimensions
                 let appRef = AXUIElementCreateApplication(frontApp.processIdentifier)
                 var focusedWindow: CFTypeRef?
                 if AXUIElementCopyAttributeValue(appRef, kAXFocusedWindowAttribute as CFString, &focusedWindow) == .success,
@@ -113,13 +115,15 @@ public final class EdgeTriggerManager: @unchecked Sendable {
             }
         }
 
-        if insideTrigger || (insideDock && (!hideInFullscreen || !isFullscreen)) {
+        let shouldHideWhenIdle = autoHide || (hideInFullscreen && isFullscreen)
+
+        if !shouldHideWhenIdle || insideTrigger || (insideDock && (!hideInFullscreen || !isFullscreen)) {
             hideTimer?.invalidate()
             hideTimer = nil
 
             if !isCurrentlyRevealed && revealTimer == nil {
                 let effectiveDelay = isFullscreen ? max(1.0, revealDelaySeconds) : revealDelaySeconds
-                if effectiveDelay <= 0.05 {
+                if !shouldHideWhenIdle || effectiveDelay <= 0.05 {
                     self.isCurrentlyRevealed = true
                     self.onStateChanged(true)
                 } else {

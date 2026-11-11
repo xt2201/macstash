@@ -17,6 +17,28 @@ public struct SystemStatsConfig: Codable, Equatable, Sendable {
     }
 }
 
+public struct CPUTickSample: Equatable, Sendable {
+    public let activeTicks: UInt64
+    public let totalTicks: UInt64
+
+    public init(activeTicks: UInt64, totalTicks: UInt64) {
+        self.activeTicks = activeTicks
+        self.totalTicks = totalTicks
+    }
+
+    public static func deltaPercent(from previous: CPUTickSample?, to current: CPUTickSample) -> Double {
+        guard let prev = previous,
+              current.totalTicks > prev.totalTicks,
+              current.activeTicks >= prev.activeTicks else {
+            guard current.totalTicks > 0 else { return 0.0 }
+            return min(100.0, max(0.0, (Double(current.activeTicks) / Double(current.totalTicks)) * 100.0))
+        }
+        let deltaActive = Double(current.activeTicks - prev.activeTicks)
+        let deltaTotal = Double(current.totalTicks - prev.totalTicks)
+        return min(100.0, max(0.0, (deltaActive / deltaTotal) * 100.0))
+    }
+}
+
 public struct SystemMetrics: Equatable, Sendable {
     public let cpuPercent: Double
     public let ramPercent: Double
@@ -43,6 +65,7 @@ public struct SystemStatsWidgetView: View {
     public let config: SystemStatsConfig
     public let size: WidgetSize
     @State private var metrics: SystemMetrics = SystemMetrics()
+    @State private var previousSample: CPUTickSample? = nil
     @State private var timer: Timer?
 
     public init(config: SystemStatsConfig = SystemStatsConfig(), size: WidgetSize = .medium) {
@@ -53,39 +76,26 @@ public struct SystemStatsWidgetView: View {
     public var body: some View {
         HStack(spacing: 8) {
             if config.showCPU {
-                HStack(spacing: 2) {
-                    Image(systemName: "cpu")
-                        .font(.system(size: 10))
-                        .foregroundColor(.blue)
-                    Text("\(Int(metrics.cpuPercent))%")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                }
+                metricBadge(icon: "cpu", color: .blue, text: "\(Int(round(metrics.cpuPercent)))%")
             }
 
             if config.showRAM {
-                HStack(spacing: 2) {
-                    Image(systemName: "memorychip")
-                        .font(.system(size: 10))
-                        .foregroundColor(.purple)
-                    Text("\(Int(metrics.ramPercent))%")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                }
+                metricBadge(icon: "memorychip", color: .purple, text: "\(Int(round(metrics.ramPercent)))%")
             }
 
             if config.showBattery && size != .small {
-                HStack(spacing: 2) {
-                    Image(systemName: metrics.isCharging ? "battery.100.bolt" : "battery.75")
-                        .font(.system(size: 10))
-                        .foregroundColor(metrics.batteryPercent <= 20 ? .red : .green)
-                    Text("\(metrics.batteryPercent)%")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                }
+                metricBadge(
+                    icon: metrics.isCharging ? "battery.100.bolt" : "battery.75",
+                    color: metrics.batteryPercent <= 20 ? .red : .green,
+                    text: "\(metrics.batteryPercent)%"
+                )
             }
         }
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .onAppear {
             readMetrics()
+            timer?.invalidate()
             timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
                 Task { @MainActor in
                     self.readMetrics()
@@ -98,8 +108,21 @@ public struct SystemStatsWidgetView: View {
         }
     }
 
+    private func metricBadge(icon: String, color: Color, text: String) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(color)
+            Text(text)
+                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                .monospacedDigit()
+        }
+    }
+
     private func readMetrics() {
-        let cpu = readCPUUsage()
+        let cpuSample = sampleCPUTicks()
+        let cpu = CPUTickSample.deltaPercent(from: previousSample, to: cpuSample)
+        self.previousSample = cpuSample
         let ram = readRAMUsage()
         let (bat, charging) = readBattery()
         self.metrics = SystemMetrics(
@@ -110,7 +133,7 @@ public struct SystemStatsWidgetView: View {
         )
     }
 
-    private func readCPUUsage() -> Double {
+    private func sampleCPUTicks() -> CPUTickSample {
         var cpuInfo = host_cpu_load_info()
         var count = mach_msg_type_number_t(MemoryLayout<host_cpu_load_info_data_t>.size / MemoryLayout<integer_t>.size)
         let result = withUnsafeMutablePointer(to: &cpuInfo) {
@@ -118,15 +141,14 @@ public struct SystemStatsWidgetView: View {
                 host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, $0, &count)
             }
         }
-        guard result == KERN_SUCCESS else { return 5.0 }
-        let user = Double(cpuInfo.cpu_ticks.0)
-        let system = Double(cpuInfo.cpu_ticks.1)
-        let idle = Double(cpuInfo.cpu_ticks.2)
-        let nice = Double(cpuInfo.cpu_ticks.3)
-        let total = user + system + idle + nice
-        guard total > 0 else { return 5.0 }
+        guard result == KERN_SUCCESS else { return CPUTickSample(activeTicks: 0, totalTicks: 0) }
+        let user = UInt64(cpuInfo.cpu_ticks.0)
+        let system = UInt64(cpuInfo.cpu_ticks.1)
+        let idle = UInt64(cpuInfo.cpu_ticks.2)
+        let nice = UInt64(cpuInfo.cpu_ticks.3)
         let active = user + system + nice
-        return min(100.0, max(0.0, (active / total) * 100.0))
+        let total = active + idle
+        return CPUTickSample(activeTicks: active, totalTicks: total)
     }
 
     private func readRAMUsage() -> Double {

@@ -95,6 +95,11 @@ public struct RemindersWidgetView: View {
         .onAppear {
             checkPermissionAndFetch()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .EKEventStoreChanged)) { _ in
+            if hasPermission {
+                fetchReminders()
+            }
+        }
     }
 
     private func checkPermissionAndFetch() {

@@ -165,38 +165,45 @@ public struct NowPlayingWidgetView: View {
         end tell
         """
 
-        var error: NSDictionary?
-        if let script = NSAppleScript(source: scriptSource),
-           let result = script.executeAndReturnError(&error).stringValue {
-            let parts = result.components(separatedBy: "|||")
-            if parts.count >= 3 {
-                let isPlaying = parts[0].lowercased().contains("play")
-                let title = parts[1]
-                let artist = parts[2]
-                let dur = parts.count > 3 ? (Double(parts[3]) ?? 0) : 0
-                let pos = parts.count > 4 ? (Double(parts[4]) ?? 0) : 0
-                self.trackState = NowPlayingTrackState(
-                    title: title,
-                    artist: artist,
-                    isPlaying: isPlaying,
-                    duration: dur,
-                    position: pos,
-                    playerSource: appName,
-                    timestamp: Date()
-                )
-                return
+        Task.detached(priority: .utility) {
+            var error: NSDictionary?
+            let result = NSAppleScript(source: scriptSource)?.executeAndReturnError(&error).stringValue
+            await MainActor.run {
+                if let result {
+                    let parts = result.components(separatedBy: "|||")
+                    if parts.count >= 3 {
+                        let isPlaying = parts[0].lowercased().contains("play")
+                        let title = parts[1]
+                        let artist = parts[2]
+                        let dur = parts.count > 3 ? (Double(parts[3]) ?? 0) : 0
+                        let pos = parts.count > 4 ? (Double(parts[4]) ?? 0) : 0
+                        self.trackState = NowPlayingTrackState(
+                            title: title,
+                            artist: artist,
+                            isPlaying: isPlaying,
+                            duration: dur,
+                            position: pos,
+                            playerSource: appName,
+                            timestamp: Date()
+                        )
+                        return
+                    }
+                }
+                self.trackState = NowPlayingTrackState(title: "Not Playing", isPlaying: false, timestamp: Date())
             }
         }
-        self.trackState = NowPlayingTrackState(title: "Not Playing", isPlaying: false, timestamp: Date())
     }
 
     private func sendMediaCommand(_ command: String) {
         let appName = trackState.playerSource.isEmpty ? "Music" : trackState.playerSource
         let scriptSource = "tell application \"\(appName)\" to \(command)"
-        var error: NSDictionary?
-        NSAppleScript(source: scriptSource)?.executeAndReturnError(&error)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            updatePlaybackState()
+        Task.detached(priority: .userInitiated) {
+            var error: NSDictionary?
+            NSAppleScript(source: scriptSource)?.executeAndReturnError(&error)
+            try? await Task.sleep(nanoseconds: 250_000_000)
+            await MainActor.run {
+                self.updatePlaybackState()
+            }
         }
     }
 }

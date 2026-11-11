@@ -2,22 +2,40 @@ import SwiftUI
 import AppKit
 import SideDockCore
 import SideDockWidgets
+import MacStashCore
 
 public struct DockTileView: View {
     public let item: DockItem
+    public let isVertical: Bool
+    public let isRunning: Bool
+    public let reduceMotion: Bool
     public let onRemove: () -> Void
     public let onResize: ((WidgetSize) -> Void)?
+    public let onConfigure: (() -> Void)?
+
     @State private var isHovered: Bool = false
     @State private var showFolderPopover: Bool = false
 
+    private func localized(_ key: String) -> String {
+        LocalizationService.shared.localized(key)
+    }
+
     public init(
         item: DockItem,
+        isVertical: Bool = false,
+        isRunning: Bool = false,
+        reduceMotion: Bool = false,
         onRemove: @escaping () -> Void,
-        onResize: ((WidgetSize) -> Void)? = nil
+        onResize: ((WidgetSize) -> Void)? = nil,
+        onConfigure: (() -> Void)? = nil
     ) {
         self.item = item
+        self.isVertical = isVertical
+        self.isRunning = isRunning
+        self.reduceMotion = reduceMotion
         self.onRemove = onRemove
         self.onResize = onResize
+        self.onConfigure = onConfigure
     }
 
     public var body: some View {
@@ -32,15 +50,15 @@ public struct DockTileView: View {
             case .separator:
                 Rectangle()
                     .fill(Color.primary.opacity(0.18))
-                    .frame(width: 1, height: 26)
-                    .padding(.horizontal, 2)
+                    .frame(width: isVertical ? 26 : 1, height: isVertical ? 1 : 26)
+                    .padding(isVertical ? .vertical : .horizontal, 2)
             case .spacer(_, let width):
                 Spacer()
-                    .frame(width: max(4, width))
+                    .frame(width: isVertical ? 44 : max(4, width), height: isVertical ? max(4, width) : 44)
             }
         }
-        .scaleEffect(isHovered ? 1.06 : 1.0)
-        .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isHovered)
+        .scaleEffect(reduceMotion ? 1.0 : (isHovered ? 1.06 : 1.0))
+        .animation(reduceMotion ? nil : .spring(response: 0.2, dampingFraction: 0.7), value: isHovered)
         .onHover { hovered in
             isHovered = hovered
         }
@@ -52,48 +70,59 @@ public struct DockTileView: View {
         Button {
             launchApp(appItem)
         } label: {
-            ZStack {
-                if let icon = getAppIcon(appItem) {
-                    Image(nsImage: icon)
-                        .resizable()
-                        .interpolation(.high)
-                        .antialiased(true)
-                        .frame(width: 38, height: 38)
-                } else {
-                    Image(systemName: "app.fill")
-                        .font(.system(size: 28))
-                        .foregroundColor(.accentColor)
+            VStack(spacing: 2) {
+                ZStack {
+                    if let icon = getAppIcon(appItem) {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .interpolation(.high)
+                            .antialiased(true)
+                            .frame(width: 36, height: 36)
+                    } else {
+                        Image(systemName: "app.fill")
+                            .font(.system(size: 26))
+                            .foregroundColor(.accentColor)
+                    }
                 }
+                .frame(width: 40, height: 38)
+
+                Circle()
+                    .fill(isRunning ? Color.primary.opacity(0.85) : Color.clear)
+                    .frame(width: 4, height: 4)
             }
-            .frame(width: 44, height: 44)
+            .frame(width: 44, height: 46)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(isHovered ? Color.primary.opacity(0.08) : Color.clear)
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .help(appItem.displayName)
         .contextMenu {
-            Button("Open") {
+            Button(localized("dock.open")) {
                 launchApp(appItem)
             }
-            Button("Show in Finder") {
+            Button(localized("dock.openInFinder")) {
                 showInFinder(appItem)
             }
             Divider()
             if isAppRunning(appItem) {
-                Button("Hide") {
+                Button(localized("dock.hide")) {
                     hideApp(appItem)
                 }
                 if NSEvent.modifierFlags.contains(.option) {
-                    Button("Force Quit") {
+                    Button(localized("dock.forceQuit")) {
                         forceQuitApp(appItem)
                     }
                 } else {
-                    Button("Quit") {
+                    Button(localized("dock.quit")) {
                         quitApp(appItem)
                     }
                 }
                 Divider()
             }
-            Button("Remove from Dock") {
+            Button(localized("dock.remove")) {
                 onRemove()
             }
         }
@@ -116,9 +145,13 @@ public struct DockTileView: View {
                 Image(nsImage: icon)
                     .resizable()
                     .interpolation(.high)
-                    .frame(width: 38, height: 38)
+                    .frame(width: 36, height: 36)
             }
-            .frame(width: 44, height: 44)
+            .frame(width: 44, height: 46)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(isHovered ? Color.primary.opacity(0.08) : Color.clear)
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -127,12 +160,12 @@ public struct DockTileView: View {
             FolderPopoverView(folderItem: folderItem)
         }
         .contextMenu {
-            Button("Open in Finder") {
+            Button(localized("dock.openInFinder")) {
                 let expanded = (folderItem.folderPath as NSString).expandingTildeInPath
                 NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: expanded)
             }
             Divider()
-            Button("Remove from Dock") {
+            Button(localized("dock.remove")) {
                 onRemove()
             }
         }
@@ -142,15 +175,30 @@ public struct DockTileView: View {
 
     private func widgetTileView(_ widgetItem: WidgetItem) -> some View {
         WidgetRegistry.shared.makeWidgetView(for: widgetItem)
+            .frame(minHeight: 44)
+            .background(
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .fill(isHovered ? Color.primary.opacity(0.09) : Color.primary.opacity(0.05))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .strokeBorder(Color.primary.opacity(isHovered ? 0.16 : 0.08), lineWidth: 0.7)
+            )
             .contentShape(Rectangle())
             .contextMenu {
-                Menu("Widget Size") {
-                    Button("Small") { onResize?(.small) }
-                    Button("Medium") { onResize?(.medium) }
-                    Button("Large") { onResize?(.large) }
+                if let onConfigure {
+                    Button(localized("dock.configureWidget")) {
+                        onConfigure()
+                    }
+                    Divider()
+                }
+                Menu(localized("dock.widgetSize")) {
+                    Button(localized("dock.sizeSmall")) { onResize?(.small) }
+                    Button(localized("dock.sizeMedium")) { onResize?(.medium) }
+                    Button(localized("dock.sizeLarge")) { onResize?(.large) }
                 }
                 Divider()
-                Button("Remove Widget") {
+                Button(localized("dock.removeWidget")) {
                     onRemove()
                 }
             }

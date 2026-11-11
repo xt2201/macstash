@@ -9,10 +9,16 @@ public final class SideDockManager: ObservableObject {
     public static let shared = SideDockManager()
 
     public let configStore: DockConfigStore
+    public var onOpenSettings: (@MainActor () -> Void)?
+
     private var dockPanel: SideDockPanel?
+    private var hostingView: SideDockHostingView<SideDockRootWrapper>?
     private var edgeTrigger: EdgeTriggerManager?
     private var runningAppsMonitor = RunningAppsMonitor.shared
     private let layoutEngine = DockLayoutEngine()
+
+    private var dragStartMouseLocation: CGPoint?
+    private var dragStartPanelOrigin: CGPoint?
 
     @Published public var config: SideDockFileConfig
     @Published public var runningApps: [RunningAppInfo] = []
@@ -34,7 +40,10 @@ public final class SideDockManager: ObservableObject {
     }
 
     public var activeProfile: DockProfile {
-        configStore.activeProfile()
+        if let found = config.profiles.first(where: { $0.id == config.activeProfileId }) {
+            return found
+        }
+        return configStore.activeProfile()
     }
 
     public func toggleDock() {
@@ -43,6 +52,7 @@ public final class SideDockManager: ObservableObject {
         }
         self.config = configStore.config
         applyVisibility()
+        reconfigureEdgeTrigger()
     }
 
     public func setDockVisible(_ visible: Bool) {
@@ -51,6 +61,7 @@ public final class SideDockManager: ObservableObject {
         }
         self.config = configStore.config
         applyVisibility()
+        reconfigureEdgeTrigger()
     }
 
     public func selectProfile(_ id: UUID) {
@@ -96,24 +107,45 @@ public final class SideDockManager: ObservableObject {
         updateDockLayout()
     }
 
-    public func handleDragFloating(offset: CGPoint) {
-        let prof = activeProfile
-        guard prof.layoutConfig.placement == .floating, let panel = dockPanel, let screen = panel.screen ?? NSScreen.main else { return }
+    public func beginFloatingDrag() {
+        guard activeProfile.layoutConfig.placement == .floating, let panel = dockPanel else { return }
+        dragStartMouseLocation = NSEvent.mouseLocation
+        dragStartPanelOrigin = panel.frame.origin
+    }
 
-        let currentFrame = panel.frame
-        let proposed = CGPoint(x: currentFrame.origin.x + offset.x, y: currentFrame.origin.y + offset.y)
+    public func updateFloatingDrag() {
+        let prof = activeProfile
+        guard prof.layoutConfig.placement == .floating,
+              let panel = dockPanel,
+              let startMouse = dragStartMouseLocation,
+              let startOrigin = dragStartPanelOrigin,
+              let screen = panel.screen ?? NSScreen.main else { return }
+
+        let currentMouse = NSEvent.mouseLocation
+        let deltaX = currentMouse.x - startMouse.x
+        let deltaY = currentMouse.y - startMouse.y
+
+        let proposed = CGPoint(x: startOrigin.x + deltaX, y: startOrigin.y + deltaY)
         let clamped = layoutEngine.clampFloatingCoordinates(
             proposedPoint: proposed,
-            dockSize: currentFrame.size,
+            dockSize: panel.frame.size,
             screenBounds: screen.visibleFrame
         )
 
         panel.setFrameOrigin(clamped)
+    }
 
-        configStore.updateConfig { cfg in
+    public func endFloatingDrag() {
+        defer {
+            dragStartMouseLocation = nil
+            dragStartPanelOrigin = nil
+        }
+        guard activeProfile.layoutConfig.placement == .floating, let panel = dockPanel else { return }
+        let origin = panel.frame.origin
+        configStore.updateConfig(immediate: true) { cfg in
             if let idx = cfg.profiles.firstIndex(where: { $0.id == cfg.activeProfileId }) {
-                cfg.profiles[idx].layoutConfig.floatingX = clamped.x
-                cfg.profiles[idx].layoutConfig.floatingY = clamped.y
+                cfg.profiles[idx].layoutConfig.floatingX = origin.x
+                cfg.profiles[idx].layoutConfig.floatingY = origin.y
             }
         }
         self.config = configStore.config
@@ -128,24 +160,22 @@ public final class SideDockManager: ObservableObject {
         }
 
         let panel = SideDockPanel(contentRect: NSRect(x: 200, y: 100, width: 400, height: 60))
-        let hostingView = SideDockHostingView(rootView: makeDockRootView())
-        panel.contentView = hostingView
+        let rootWrapper = SideDockRootWrapper(manager: self)
+        let host = SideDockHostingView(rootView: rootWrapper)
+        panel.contentView = host
         self.dockPanel = panel
+        self.hostingView = host
 
         updateDockLayout()
-        applyVisibility()
-        setupEdgeTrigger()
     }
 
     public func updateDockLayout() {
-        guard let panel = dockPanel else { return }
-        let targetScreen = resolveScreen()
-        guard let screen = targetScreen else { return }
+        guard let panel = dockPanel, let host = hostingView else { return }
+        guard let screen = resolveScreen() else { return }
 
-        let hostingView = SideDockHostingView(rootView: makeDockRootView())
-        panel.contentView = hostingView
-
-        let fittingSize = hostingView.fittingSize
+        // Allow SwiftUI to propagate latest @Published config/runningApps before measuring fittingSize
+        host.layoutSubtreeIfNeeded()
+        let fittingSize = host.fittingSize
         let prof = activeProfile
         let targetFrame = layoutEngine.calculateWindowFrame(
             screenFrame: screen.frame,
@@ -155,8 +185,10 @@ public final class SideDockManager: ObservableObject {
         )
 
         panel.setFrame(targetFrame, display: true, animate: !prof.theme.reduceMotion)
+        if !prof.layoutConfig.hideOnWindowHover {
+            panel.alphaValue = 1.0
+        }
 
-        // Update reserve space manager
         if prof.layoutConfig.reserveDockSpace && prof.layoutConfig.placement != .floating {
             ReserveSpaceManager.shared.startObserving { [weak self] in
                 guard let self = self, let panel = self.dockPanel, let screen = panel.screen else { return nil }
@@ -165,45 +197,71 @@ public final class SideDockManager: ObservableObject {
         } else {
             ReserveSpaceManager.shared.stopObserving()
         }
+
+        applyVisibility()
+        reconfigureEdgeTrigger()
     }
 
     private func resolveScreen() -> NSScreen? {
         return dockPanel?.screen ?? NSScreen.main ?? NSScreen.screens.first
     }
 
-    private func applyVisibility() {
+    public func applyVisibility() {
         guard let panel = dockPanel else { return }
-        if config.isDockVisible && isRevealed {
+        let prof = activeProfile
+        let gateByTrigger = prof.layoutConfig.autoHide || prof.layoutConfig.hideInFullscreen
+        let shouldShow = config.isDockVisible && (!gateByTrigger || isRevealed)
+        if shouldShow {
             panel.orderFrontRegardless()
         } else {
             panel.orderOut(nil)
         }
     }
 
-    private func setupEdgeTrigger() {
-        edgeTrigger = EdgeTriggerManager { [weak self] revealed in
-            Task { @MainActor in
-                self?.isRevealed = revealed
-                self?.applyVisibility()
+    private func reconfigureEdgeTrigger() {
+        let prof = activeProfile
+        let needsMonitor = config.isDockVisible && (prof.layoutConfig.autoHide || prof.layoutConfig.hideInFullscreen || prof.layoutConfig.hideOnWindowHover)
+
+        guard needsMonitor, let panel = dockPanel else {
+            edgeTrigger?.stop()
+            edgeTrigger = nil
+            isRevealed = true
+            panelOpacityReset()
+            return
+        }
+
+        if !prof.layoutConfig.autoHide && !isRevealed {
+            isRevealed = true
+        }
+
+        if edgeTrigger == nil {
+            edgeTrigger = EdgeTriggerManager { [weak self] revealed in
+                Task { @MainActor in
+                    self?.isRevealed = revealed
+                    self?.applyVisibility()
+                }
             }
         }
 
-        let prof = activeProfile
-        if prof.layoutConfig.autoHide, let panel = dockPanel {
-            edgeTrigger?.start(
-                placement: prof.layoutConfig.placement,
-                triggerThickness: prof.layoutConfig.edgeTriggerThickness,
-                revealDelaySeconds: prof.layoutConfig.revealDelaySeconds,
-                dockFrame: panel.frame,
-                hideInFullscreen: prof.layoutConfig.hideInFullscreen,
-                hideOnWindowHover: prof.layoutConfig.hideOnWindowHover,
-                onHoverAlphaChanged: { [weak self] alpha in
-                    Task { @MainActor in
-                        self?.dockPanel?.animator().alphaValue = alpha
-                    }
+        edgeTrigger?.start(
+            placement: prof.layoutConfig.placement,
+            triggerThickness: prof.layoutConfig.edgeTriggerThickness,
+            revealDelaySeconds: prof.layoutConfig.revealDelaySeconds,
+            dockFrame: panel.frame,
+            autoHide: prof.layoutConfig.autoHide,
+            hideInFullscreen: prof.layoutConfig.hideInFullscreen,
+            hideOnWindowHover: prof.layoutConfig.hideOnWindowHover,
+            initiallyRevealed: !prof.layoutConfig.autoHide,
+            onHoverAlphaChanged: { [weak self] alpha in
+                Task { @MainActor in
+                    self?.dockPanel?.animator().alphaValue = alpha
                 }
-            )
-        }
+            }
+        )
+    }
+
+    private func panelOpacityReset() {
+        dockPanel?.alphaValue = 1.0
     }
 
     private func setupNotificationObservers() {
@@ -217,18 +275,24 @@ public final class SideDockManager: ObservableObject {
             }
         }
     }
+}
 
-    private func makeDockRootView() -> some View {
+private struct SideDockRootWrapper: View {
+    @ObservedObject var manager: SideDockManager
+
+    var body: some View {
         SideDockBarView(
-            profile: activeProfile,
-            profiles: config.profiles,
-            runningApps: runningApps,
-            onSelectProfile: { [weak self] id in self?.selectProfile(id) },
-            onRemoveItem: { [weak self] id in self?.removeItem(id) },
-            onResizeWidget: { [weak self] id, size in self?.resizeWidget(id: id, newSize: size) },
-            onDragFloating: { [weak self] pt in self?.handleDragFloating(offset: pt) },
+            profile: manager.activeProfile,
+            profiles: manager.config.profiles,
+            runningApps: manager.runningApps,
+            onSelectProfile: { id in manager.selectProfile(id) },
+            onRemoveItem: { id in manager.removeItem(id) },
+            onResizeWidget: { id, size in manager.resizeWidget(id: id, newSize: size) },
+            onDragBegin: { manager.beginFloatingDrag() },
+            onDragUpdate: { manager.updateFloatingDrag() },
+            onDragEnd: { manager.endFloatingDrag() },
             onOpenSettings: {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                manager.onOpenSettings?()
             }
         )
     }

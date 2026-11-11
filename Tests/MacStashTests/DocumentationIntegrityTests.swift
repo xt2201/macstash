@@ -84,6 +84,7 @@ public enum DocumentationIntegrityTests {
         let requiredEnTabs = [
             "General",
             "Hot Corners",
+            "Second Dock",
             "Appearance",
             "Displays",
             "Pomodoro",
@@ -101,12 +102,19 @@ public enum DocumentationIntegrityTests {
         guard let root = findRepoRoot() else { return }
 
         let enShortcutsPath = root.appendingPathComponent("Docs/Guide/en/06_shortcuts.md")
-        guard let enContent = try? String(contentsOf: enShortcutsPath, encoding: .utf8) else {
+        let viShortcutsPath = root.appendingPathComponent("Docs/Guide/vi/06_shortcuts.md")
+        guard let enContent = try? String(contentsOf: enShortcutsPath, encoding: .utf8),
+              let viContent = try? String(contentsOf: viShortcutsPath, encoding: .utf8) else {
             TestAssertion.assertTrue(false, "Failed to read 06_shortcuts.md")
             return
         }
 
         let requiredShortcuts = [
+            "Option+S",
+            "Option+Space",
+            "Control+Option+S",
+            "Control+Option+N",
+            "Control+Option+D",
             "Command+,",
             "Command+W",
             "Command+?",
@@ -114,7 +122,8 @@ public enum DocumentationIntegrityTests {
         ]
 
         for shortcut in requiredShortcuts {
-            TestAssertion.assertTrue(enContent.contains(shortcut), "Shortcuts guide covers '\(shortcut)'")
+            TestAssertion.assertTrue(enContent.contains(shortcut), "English shortcuts guide covers '\(shortcut)'")
+            TestAssertion.assertTrue(viContent.contains(shortcut), "Vietnamese shortcuts guide covers '\(shortcut)'")
         }
     }
 

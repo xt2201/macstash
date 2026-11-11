@@ -98,6 +98,7 @@ public enum LocalizationTests {
         let requiredTabs = [
             "tab.general",
             "tab.hotCorners",
+            "tab.sideDock",
             "tab.appearance",
             "tab.displays",
             "tab.pomodoro",

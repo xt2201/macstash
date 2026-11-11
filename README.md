@@ -12,8 +12,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.15.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
-  <img src="https://img.shields.io/badge/platform-macOS%2013.0%2B-5856D6?style=flat-square" alt="macOS 13.0+">
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.16.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <img src="https://img.shields.io/badge/platform-macOS%2014.0%2B-5856D6?style=flat-square" alt="macOS 14.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License"></a>
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.15.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.16.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -125,9 +125,11 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Press `Option + Space` to summon the 4-quadrant radial dials with per-sector progress rings directly centered at your mouse cursor.
 - Hover any sector (Display Brightness, Master Volume, Focus Timer, Keep Awake) and **scroll two fingers** to adjust smoothly, click to toggle, or click outside / press `Esc` to dismiss.
 
-### 8. Configurable Left / Right Edge Slider &amp; Now Playing Media Controls
-- **Symmetric Left or Right Screen Edge**: Place the edge slider cleanly on either the Right Edge or Left Edge of your display (with automatic separation from Stash/Scratchpad drawers) and configure its top quick-toggle button for any assigned action.
-- Rides flush against your screen border with configurable actions in Settings (`Volume`, `Brightness`, `Keyboard Backlight`, `Pomodoro Timer`, `Keep Awake`, `Stash Shelf`, `Scratchpad`) and 120Hz ProMotion vertical drag/scroll smoothness.
+### 8. Dual Edge Bars (Left &amp; Right) &amp; Dynamic Island Media Controller
+- **Simultaneous Dual Edge Bars**: Enable and configure both Left and Right edge bars simultaneously (default: Both Sides), each with independent actions (e.g., Left for Brightness / Media Playback, Right for Volume).
+- **Dynamic Island Horizontal Audio Expansion**: Hovering over the compact artwork capsule smoothly morphs it outward horizontally into a Dynamic Island widget featuring song title, artist, live audio visualizer, interactive scrubber bar, and 5-button transport controls, keeping the vertical Edge Bar height permanently compact.
+- **Dedicated Media Player &amp; Audio Scrubber**: Standalone `mediaPlayback` action transforms the Edge Bar into a high-precision vertical audio scrubber and the Corner Dial into a tactile media jog wheel.
+- Rides flush against your screen border with configurable actions in Settings (`Volume`, `Brightness`, `Keyboard Backlight`, `Pomodoro Timer`, `Keep Awake`, `Stash Shelf`, `Scratchpad`, `Media Player & Audio Scrubber`) and 120Hz ProMotion vertical drag/scroll smoothness.
 - **Extreme Edge &amp; Dwell Triggering**: Requires moving cursor cleanly to the physical edge (`minX` or `maxX`) with an intentional dwell delay, preventing accidental triggers near app scrollbars.
 - **Universal Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, a 5-bar rhythm audio visualizer (automatically idle-gated when overlays are hidden), and vertical transport controls across browsers and native players.
 - **Two-Finger Edge Scrubbing**: Seamlessly tune volume, brightness, or your chosen action on the edge slider using natural two-finger vertical scrolling.
@@ -177,7 +179,7 @@ Because the macOS mouse cursor cannot travel beyond the physical boundary of the
 ## Installation
 
 ### Method 1: Direct DMG Download (Recommended)
-1. Download the latest universal disk image: **[MacStash-v2.15.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
+1. Download the latest universal disk image: **[MacStash-v2.16.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
 2. Open the disk image and drag **MacStash** into your `Applications` folder.
 3. Launch MacStash from Launchpad, Spotlight, or `Applications`.
 
@@ -229,7 +231,7 @@ Record custom global hotkeys with live `ShortcutValidator` conflict detection, a
 ## Developer Guide
 
 ### Prerequisites
-- macOS 13.0 (Ventura) or newer (Sonoma and Sequoia fully supported).
+- macOS 14.0 (Sonoma) or newer (Sequoia fully supported).
 - Swift 6 compiler toolchain (`xcrun swift --version`).
 - Xcode Command Line Tools (`xcode-select --install`).
 

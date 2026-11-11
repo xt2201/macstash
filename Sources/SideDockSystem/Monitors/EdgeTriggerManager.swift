@@ -98,14 +98,16 @@ public final class EdgeTriggerManager: @unchecked Sendable {
                 let appRef = AXUIElementCreateApplication(frontApp.processIdentifier)
                 var focusedWindow: CFTypeRef?
                 if AXUIElementCopyAttributeValue(appRef, kAXFocusedWindowAttribute as CFString, &focusedWindow) == .success,
-                   let win = focusedWindow {
+                   let win = focusedWindow,
+                   CFGetTypeID(win) == AXUIElementGetTypeID() {
+                    let windowElement = unsafeBitCast(win, to: AXUIElement.self)
                     var sizeVal: CFTypeRef?
-                    // swiftlint:disable:next force_cast
-                    if AXUIElementCopyAttributeValue(win as! AXUIElement, kAXSizeAttribute as CFString, &sizeVal) == .success,
-                       let sVal = sizeVal {
+                    if AXUIElementCopyAttributeValue(windowElement, kAXSizeAttribute as CFString, &sizeVal) == .success,
+                       let sVal = sizeVal,
+                       CFGetTypeID(sVal) == AXValueGetTypeID() {
+                        let axSizeVal = unsafeBitCast(sVal, to: AXValue.self)
                         var size = CGSize.zero
-                        // swiftlint:disable:next force_cast
-                        if AXValueGetValue(sVal as! AXValue, .cgSize, &size) {
+                        if AXValueGetValue(axSizeVal, .cgSize, &size) {
                             if size.width >= screenFrame.width && size.height >= screenFrame.height {
                                 isFullscreen = true
                             }

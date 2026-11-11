@@ -59,6 +59,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var isScratchpadEnabled: Bool
 
     // Edge & Drawer Placements
+    public var edgeSliderPlacement: EdgeSliderPlacement
     public var edgeSliderPosition: EdgePosition
     public var drawerEdgePosition: EdgePosition
 
@@ -130,6 +131,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         keepAwakeDefaultMinutes: Int = Defaults.KeepAwake.defaultDurationMinutes,
         isStashShelfEnabled: Bool = Defaults.StashShelf.defaultEnabled,
         isScratchpadEnabled: Bool = Defaults.Scratchpad.defaultEnabled,
+        edgeSliderPlacement: EdgeSliderPlacement = .both,
         edgeSliderPosition: EdgePosition = Defaults.EdgeSliders.defaultPosition,
         drawerEdgePosition: EdgePosition = Defaults.LeftEdgeDrawer.defaultPosition,
         isCursorPaletteEnabled: Bool = true,
@@ -182,6 +184,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.keepAwakeDefaultMinutes = keepAwakeDefaultMinutes
         self.isStashShelfEnabled = isStashShelfEnabled
         self.isScratchpadEnabled = isScratchpadEnabled
+        self.edgeSliderPlacement = edgeSliderPlacement
         self.edgeSliderPosition = edgeSliderPosition
         self.drawerEdgePosition = drawerEdgePosition
         self.isCursorPaletteEnabled = isCursorPaletteEnabled
@@ -239,7 +242,16 @@ public struct AppSettings: Codable, Equatable, Sendable {
         let keepAwakeDefaultMinutes = try container.decodeIfPresent(Int.self, forKey: .keepAwakeDefaultMinutes) ?? def.keepAwakeDefaultMinutes
         let isStashShelfEnabled = try container.decodeIfPresent(Bool.self, forKey: .isStashShelfEnabled) ?? def.isStashShelfEnabled
         let isScratchpadEnabled = try container.decodeIfPresent(Bool.self, forKey: .isScratchpadEnabled) ?? def.isScratchpadEnabled
+        let decodedPlacement = try container.decodeIfPresent(EdgeSliderPlacement.self, forKey: .edgeSliderPlacement)
         let edgeSliderPosition = try container.decodeIfPresent(EdgePosition.self, forKey: .edgeSliderPosition) ?? def.edgeSliderPosition
+        let edgeSliderPlacement: EdgeSliderPlacement
+        if let decodedPlacement = decodedPlacement {
+            edgeSliderPlacement = decodedPlacement
+        } else if let edgePos = try? container.decodeIfPresent(EdgePosition.self, forKey: .edgeSliderPosition) {
+            edgeSliderPlacement = edgePos == .left ? .left : (edgePos == .right ? .right : .both)
+        } else {
+            edgeSliderPlacement = .both
+        }
         let drawerEdgePosition = try container.decodeIfPresent(EdgePosition.self, forKey: .drawerEdgePosition) ?? def.drawerEdgePosition
         let isCursorPaletteEnabled = try container.decodeIfPresent(Bool.self, forKey: .isCursorPaletteEnabled) ?? def.isCursorPaletteEnabled
         let isSoundEnabled = try container.decodeIfPresent(Bool.self, forKey: .isSoundEnabled) ?? def.isSoundEnabled
@@ -292,6 +304,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
             keepAwakeDefaultMinutes: keepAwakeDefaultMinutes,
             isStashShelfEnabled: isStashShelfEnabled,
             isScratchpadEnabled: isScratchpadEnabled,
+            edgeSliderPlacement: edgeSliderPlacement,
             edgeSliderPosition: edgeSliderPosition,
             drawerEdgePosition: drawerEdgePosition,
             isCursorPaletteEnabled: isCursorPaletteEnabled,

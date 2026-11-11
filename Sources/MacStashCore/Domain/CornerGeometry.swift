@@ -190,7 +190,7 @@ public enum CornerGeometry {
         screenFrame: CGRect,
         sliderPanelRect: CGRect,
         edge: EdgePosition,
-        hitWidth: CGFloat = 84.0
+        hitWidth: CGFloat = 340.0
     ) -> CGRect {
         let x: CGFloat = (edge == .left) ? screenFrame.minX : (screenFrame.maxX - hitWidth)
         return CGRect(x: x, y: sliderPanelRect.minY, width: hitWidth, height: sliderPanelRect.height)

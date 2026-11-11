@@ -30,7 +30,12 @@ public final class ScreenManager: ObservableObject {
     private var rightEdgeDwellWorkItem: DispatchWorkItem?
     private var rightEdgeHideWorkItem: DispatchWorkItem?
 
-    // Left Edge Dwell and Hide State
+    // Left Edge Slider Dwell and Hide State
+    private var pendingLeftSliderDisplayID: CGDirectDisplayID?
+    private var leftSliderDwellWorkItem: DispatchWorkItem?
+    private var leftSliderHideWorkItem: DispatchWorkItem?
+
+    // Left Edge Drawer Dwell and Hide State
     private var pendingLeftEdgeDisplayID: CGDirectDisplayID?
     private var leftEdgeDwellWorkItem: DispatchWorkItem?
     private var leftEdgeHideWorkItem: DispatchWorkItem?
@@ -330,14 +335,13 @@ public final class ScreenManager: ObservableObject {
 
             if appState.isRightSliderActive {
                 var clickedInsideSlider = false
-                let sliderEdge = appState.settings.edgeSliderPosition
                 for instance in instances.values {
                     let frame = instance.screen.frame
-                    let sliderRect = instance.sliderRect(in: frame)
+                    let sliderRect = instance.sliderRect(for: .right, in: frame)
                     let expandedHitRect = CornerGeometry.edgeSliderHitRect(
                         screenFrame: frame,
                         sliderPanelRect: sliderRect,
-                        edge: sliderEdge
+                        edge: .right
                     )
                     if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
                         clickedInsideSlider = true
@@ -345,7 +349,27 @@ public final class ScreenManager: ObservableObject {
                     }
                 }
                 if !clickedInsideSlider {
-                    dismissRightSlider()
+                    dismissEdgeSlider(edge: .right)
+                }
+            }
+
+            if appState.isLeftSliderActive {
+                var clickedInsideSlider = false
+                for instance in instances.values {
+                    let frame = instance.screen.frame
+                    let sliderRect = instance.sliderRect(for: .left, in: frame)
+                    let expandedHitRect = CornerGeometry.edgeSliderHitRect(
+                        screenFrame: frame,
+                        sliderPanelRect: sliderRect,
+                        edge: .left
+                    )
+                    if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
+                        clickedInsideSlider = true
+                        break
+                    }
+                }
+                if !clickedInsideSlider {
+                    dismissEdgeSlider(edge: .left)
                 }
             }
 
@@ -585,127 +609,180 @@ public final class ScreenManager: ObservableObject {
             }
         }
 
-        // 2. Edge Slider Interactivity
-        if appState.isEdgeSlidersEnabled && appState.activeProfile.rightEdgeAction != .none {
+        // 2. Edge Slider Interactivity (Dual Edge Sliders)
+        if appState.isEdgeSlidersEnabled {
             let allFrames = NSScreen.screens.map { $0.frame }
-            let isSliderLeft = appState.settings.edgeSliderPosition == .left
+            let placement = appState.settings.edgeSliderPlacement
 
-            if appState.isRightSliderActive {
-                var isInsideActiveSlider = false
-                for (id, instance) in instances {
-                    guard appState.activeDisplayID == 0 || appState.activeDisplayID == id else {
-                        instance.setRightEdgeInteractive(false)
-                        continue
-                    }
-                    let frame = instance.screen.frame
-                    let sRect = instance.sliderRect(in: frame)
-                    let hitX = isSliderLeft ? frame.minX : (frame.maxX - 80)
-                    let expandedHitRect = NSRect(x: hitX, y: sRect.minY, width: 80, height: sRect.height)
-                    if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
-                        isInsideActiveSlider = true
-                        rightEdgeHideWorkItem?.cancel()
-                        rightEdgeHideWorkItem = nil
-                        instance.setRightEdgeInteractive(true)
-                        break
-                    }
-                }
-                if !isInsideActiveSlider {
-                    scheduleRightEdgeHideTimer()
-                }
-            } else {
-                var candidateInstance: ScreenOverlayInstance?
-                var candidateFrame: NSRect = .zero
-                var candidateSliderRect: NSRect = .zero
+            for targetEdge in [EdgePosition.left, EdgePosition.right] {
+                let isAllowed = (placement == .both)
+                    || (targetEdge == .left && placement == .left)
+                    || (targetEdge == .right && placement == .right)
+                let action = targetEdge == .left ? appState.activeProfile.leftEdgeAction : appState.activeProfile.rightEdgeAction
 
-                for instance in instances.values {
-                    let frame = instance.screen.frame
-                    let isOuterEdge: Bool
-                    if appState.settings.onlyOuterCorners {
-                        isOuterEdge = isSliderLeft
-                            ? CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames)
-                            : CornerGeometry.isOuterRightEdge(screen: frame, in: allFrames)
-                    } else {
-                        isOuterEdge = true
+                guard isAllowed && action != .none else {
+                    cancelPendingEdgeDwell(edge: targetEdge)
+                    for instance in instances.values {
+                        instance.setEdgeInteractive(false, for: targetEdge)
                     }
-
-                    guard isOuterEdge else {
-                        instance.setRightEdgeInteractive(false)
-                        continue
-                    }
-
-                    let sRect = instance.sliderRect(in: frame)
-                    let isAtEdgeX = isSliderLeft
-                        ? (mouseLoc.x <= (frame.minX + 2.5) && mouseLoc.x >= (frame.minX - 1.0))
-                        : (mouseLoc.x >= (frame.maxX - 2.5) && mouseLoc.x <= (frame.maxX + 1.0))
-                    let isWithinEdgeY = mouseLoc.y >= sRect.minY && mouseLoc.y <= sRect.maxY
-
-                    if isAtEdgeX && isWithinEdgeY {
-                        candidateInstance = instance
-                        candidateFrame = frame
-                        candidateSliderRect = sRect
-                        break
-                    } else {
-                        instance.setRightEdgeInteractive(false)
-                    }
+                    continue
                 }
 
-                if let candidate = candidateInstance {
-                    scheduleRightEdgeDwellTimer(displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateSliderRect)
+                let isActive = targetEdge == .left ? appState.isLeftSliderActive : appState.isRightSliderActive
+                if isActive {
+                    var isInsideActiveSlider = false
+                    for (id, instance) in instances {
+                        guard appState.activeDisplayID == 0 || appState.activeDisplayID == id else {
+                            instance.setEdgeInteractive(false, for: targetEdge)
+                            continue
+                        }
+                        let frame = instance.screen.frame
+                        let sRect = instance.sliderRect(for: targetEdge, in: frame)
+                        let expandedHitRect = CornerGeometry.edgeSliderHitRect(
+                            screenFrame: frame,
+                            sliderPanelRect: sRect,
+                            edge: targetEdge
+                        )
+                        if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
+                            isInsideActiveSlider = true
+                            cancelEdgeHideTimer(edge: targetEdge)
+                            instance.setEdgeInteractive(true, for: targetEdge)
+                            break
+                        }
+                    }
+                    if !isInsideActiveSlider {
+                        scheduleEdgeHideTimer(edge: targetEdge)
+                    }
                 } else {
-                    cancelPendingRightEdgeDwell()
+                    var candidateInstance: ScreenOverlayInstance?
+                    var candidateFrame: NSRect = .zero
+                    var candidateSliderRect: NSRect = .zero
+
+                    for instance in instances.values {
+                        let frame = instance.screen.frame
+                        let isOuterEdge: Bool
+                        if appState.settings.onlyOuterCorners {
+                            isOuterEdge = targetEdge == .left
+                                ? CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames)
+                                : CornerGeometry.isOuterRightEdge(screen: frame, in: allFrames)
+                        } else {
+                            isOuterEdge = true
+                        }
+
+                        guard isOuterEdge else {
+                            instance.setEdgeInteractive(false, for: targetEdge)
+                            continue
+                        }
+
+                        let sRect = instance.sliderRect(for: targetEdge, in: frame)
+                        let isAtEdgeX = targetEdge == .left
+                            ? (mouseLoc.x <= (frame.minX + 2.5) && mouseLoc.x >= (frame.minX - 1.0))
+                            : (mouseLoc.x >= (frame.maxX - 2.5) && mouseLoc.x <= (frame.maxX + 1.0))
+                        let isWithinEdgeY = mouseLoc.y >= sRect.minY && mouseLoc.y <= sRect.maxY
+
+                        if isAtEdgeX && isWithinEdgeY {
+                            candidateInstance = instance
+                            candidateFrame = frame
+                            candidateSliderRect = sRect
+                            break
+                        } else {
+                            instance.setEdgeInteractive(false, for: targetEdge)
+                        }
+                    }
+
+                    if let candidate = candidateInstance {
+                        scheduleEdgeDwellTimer(edge: targetEdge, displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateSliderRect)
+                    } else {
+                        cancelPendingEdgeDwell(edge: targetEdge)
+                    }
                 }
             }
         } else {
-            cancelPendingRightEdgeDwell()
+            cancelPendingEdgeDwell(edge: .left)
+            cancelPendingEdgeDwell(edge: .right)
             for instance in instances.values {
-                instance.setRightEdgeInteractive(false)
+                instance.setEdgeInteractive(false, for: .left)
+                instance.setEdgeInteractive(false, for: .right)
             }
         }
     }
 
-    private func scheduleRightEdgeDwellTimer(displayID: CGDirectDisplayID, screenFrame: NSRect, verticalRange: NSRect) {
-        if pendingRightEdgeDisplayID == displayID { return }
-        cancelPendingRightEdgeDwell()
-        pendingRightEdgeDisplayID = displayID
+    public func scheduleEdgeDwellTimer(edge: EdgePosition, displayID: CGDirectDisplayID, screenFrame: NSRect, verticalRange: NSRect) {
+        if edge == .left {
+            if pendingLeftSliderDisplayID == displayID { return }
+            cancelPendingEdgeDwell(edge: .left)
+            pendingLeftSliderDisplayID = displayID
+        } else {
+            if pendingRightEdgeDisplayID == displayID { return }
+            cancelPendingEdgeDwell(edge: .right)
+            pendingRightEdgeDisplayID = displayID
+        }
 
         let delay = max(0.15, appState.cornerDwellDelay)
-        let targetEdge = appState.settings.edgeSliderPosition
         let item = DispatchWorkItem { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
-                guard self.pendingRightEdgeDisplayID == displayID else { return }
+                if edge == .left {
+                    guard self.pendingLeftSliderDisplayID == displayID else { return }
+                } else {
+                    guard self.pendingRightEdgeDisplayID == displayID else { return }
+                }
+
                 let cur = NSEvent.mouseLocation
                 let matchesEdge = CornerGeometry.isCursorAtVerticalEdge(
                     point: cur,
                     screenFrame: screenFrame,
                     verticalRange: verticalRange,
-                    edge: targetEdge
+                    edge: edge
                 )
                 if matchesEdge {
                     self.appState.syncHardwareState()
                     self.appState.activeDisplayID = displayID
-                    self.appState.isRightSliderActive = true
+                    if edge == .left {
+                        self.appState.isLeftSliderActive = true
+                    } else {
+                        self.appState.isRightSliderActive = true
+                    }
                     for (id, inst) in self.instances {
-                        inst.setRightEdgeInteractive(id == displayID)
+                        inst.setEdgeInteractive(id == displayID, for: edge)
                     }
                     HapticManager.shared.performDetentTick(intensity: self.appState.effectiveHapticIntensity)
                 }
-                self.pendingRightEdgeDisplayID = nil
+                if edge == .left {
+                    self.pendingLeftSliderDisplayID = nil
+                } else {
+                    self.pendingRightEdgeDisplayID = nil
+                }
             }
         }
-        self.rightEdgeDwellWorkItem = item
+
+        if edge == .left {
+            self.leftSliderDwellWorkItem = item
+        } else {
+            self.rightEdgeDwellWorkItem = item
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
     }
 
-    private func cancelPendingRightEdgeDwell() {
-        rightEdgeDwellWorkItem?.cancel()
-        rightEdgeDwellWorkItem = nil
-        pendingRightEdgeDisplayID = nil
+    public func cancelPendingEdgeDwell(edge: EdgePosition) {
+        if edge == .left {
+            leftSliderDwellWorkItem?.cancel()
+            leftSliderDwellWorkItem = nil
+            pendingLeftSliderDisplayID = nil
+        } else {
+            rightEdgeDwellWorkItem?.cancel()
+            rightEdgeDwellWorkItem = nil
+            pendingRightEdgeDisplayID = nil
+        }
     }
 
-    public func scheduleRightEdgeHideTimer() {
-        guard rightEdgeHideWorkItem == nil else { return }
-        let sliderEdge = appState.settings.edgeSliderPosition
+    public func scheduleEdgeHideTimer(edge: EdgePosition) {
+        if edge == .left {
+            guard leftSliderHideWorkItem == nil else { return }
+        } else {
+            guard rightEdgeHideWorkItem == nil else { return }
+        }
+
         let item = DispatchWorkItem { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
@@ -716,11 +793,11 @@ public final class ScreenManager: ObservableObject {
                         continue
                     }
                     let frame = instance.screen.frame
-                    let sliderRect = instance.sliderRect(in: frame)
+                    let sliderRect = instance.sliderRect(for: edge, in: frame)
                     let expandedHitRect = CornerGeometry.edgeSliderHitRect(
                         screenFrame: frame,
                         sliderPanelRect: sliderRect,
-                        edge: sliderEdge
+                        edge: edge
                     )
                     if CornerGeometry.rectContains(expandedHitRect, cur) {
                         stillInside = true
@@ -728,28 +805,61 @@ public final class ScreenManager: ObservableObject {
                     }
                 }
                 if !stillInside {
-                    self.dismissRightSlider()
+                    self.dismissEdgeSlider(edge: edge)
                 }
-                self.rightEdgeHideWorkItem = nil
+                if edge == .left {
+                    self.leftSliderHideWorkItem = nil
+                } else {
+                    self.rightEdgeHideWorkItem = nil
+                }
             }
         }
-        rightEdgeHideWorkItem = item
+
+        if edge == .left {
+            leftSliderHideWorkItem = item
+        } else {
+            rightEdgeHideWorkItem = item
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.18, execute: item)
     }
 
-    public func dismissRightSlider() {
-        cancelPendingRightEdgeDwell()
-        rightEdgeHideWorkItem?.cancel()
-        rightEdgeHideWorkItem = nil
-        appState.isRightSliderActive = false
-        // Allow the 0.28s spring slide-out animation to complete before disabling mouse interactivity
+    public func cancelEdgeHideTimer(edge: EdgePosition) {
+        if edge == .left {
+            leftSliderHideWorkItem?.cancel()
+            leftSliderHideWorkItem = nil
+        } else {
+            rightEdgeHideWorkItem?.cancel()
+            rightEdgeHideWorkItem = nil
+        }
+    }
+
+    public func dismissEdgeSlider(edge: EdgePosition) {
+        cancelPendingEdgeDwell(edge: edge)
+        cancelEdgeHideTimer(edge: edge)
+        if edge == .left {
+            appState.isLeftSliderActive = false
+        } else {
+            appState.isRightSliderActive = false
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self = self, !self.appState.isRightSliderActive else { return }
-            self.appState.activeDisplayID = 0
+            guard let self = self else { return }
+            let stillActive = edge == .left ? self.appState.isLeftSliderActive : self.appState.isRightSliderActive
+            guard !stillActive else { return }
+            if !self.appState.isLeftSliderActive && !self.appState.isRightSliderActive {
+                self.appState.activeDisplayID = 0
+            }
             for instance in self.instances.values {
-                instance.setRightEdgeInteractive(false)
+                instance.setEdgeInteractive(false, for: edge)
             }
         }
+    }
+
+    public func scheduleRightEdgeHideTimer() {
+        scheduleEdgeHideTimer(edge: .right)
+    }
+
+    public func dismissRightSlider() {
+        dismissEdgeSlider(edge: .right)
     }
 
     public func reconfigureOverlays() {

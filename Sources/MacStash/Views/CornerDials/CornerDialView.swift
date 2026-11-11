@@ -16,6 +16,8 @@ public struct CornerDialView: View {
     @State private var isForwardHovered: Bool = false
     @State private var isActionSat1Hovered: Bool = false
     @State private var isActionSat2Hovered: Bool = false
+    @State private var isPrevTrackHovered: Bool = false
+    @State private var isNextTrackHovered: Bool = false
 
     private var dialSize: CGFloat {
         appState.settings.dialRadiusPoints
@@ -65,7 +67,7 @@ public struct CornerDialView: View {
                 )
 
                 let isExpanded = isDragging || (appState.activeCorner == corner && appState.activeDisplayID == displayID)
-                let satelliteRadius = max(72, (dialSize - 35) * 0.87)
+                let satelliteRadius = max(66, min(geom.outerRadius - 44, dialSize * 0.58))
                 let shouldReduceMotion = appState.settings.respectReduceMotion && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
                 ZStack {
@@ -138,8 +140,8 @@ public struct CornerDialView: View {
                             .onHover { isSkipHovered = $0 }
                             .position(x: skipPt.x, y: skipPt.y)
                         } else if action == .volume && appState.nowPlaying.hasMedia {
-                            // Audio Scrubbing: Skip Backward 10s (0.14)
-                            let rwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
+                            // Audio Scrubbing: Skip Backward 10s (0.16)
+                            let rwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.16))
                             Button(action: {
                                 appState.nowPlaying.skipBackward(seconds: 10)
                             }) {
@@ -184,8 +186,8 @@ public struct CornerDialView: View {
                             .onHover { isPlayPauseHovered = $0 }
                             .position(x: ppPt.x, y: ppPt.y)
 
-                            // Audio Scrubbing: Skip Forward 10s (0.86)
-                            let fwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
+                            // Audio Scrubbing: Skip Forward 10s (0.84)
+                            let fwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.84))
                             Button(action: {
                                 appState.nowPlaying.skipForward(seconds: 10)
                             }) {
@@ -206,6 +208,95 @@ public struct CornerDialView: View {
                             .help(appState.localized("corners.media.seekForward"))
                             .onHover { isForwardHovered = $0 }
                             .position(x: fwdPt.x, y: fwdPt.y)
+                        } else if action == .mediaPlayback {
+                            // Dedicated Media Controller Satellites: Prev, -10s, +10s, Next
+                            let prevPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
+                            Button(action: {
+                                appState.nowPlaying.previousTrack()
+                            }) {
+                                Image(systemName: "backward.fill")
+                                    .font(.system(size: 8.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: 24, height: 24)
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 0.9,
+                                        causticOpacity: 0.20,
+                                        isHighlighted: isPrevTrackHovered
+                                    )
+                                    .scaleEffect(isPrevTrackHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPrevTrackHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.previous"))
+                            .onHover { isPrevTrackHovered = $0 }
+                            .position(x: prevPt.x, y: prevPt.y)
+
+                            let rwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.38))
+                            Button(action: {
+                                appState.nowPlaying.skipBackward(seconds: 10)
+                            }) {
+                                Image(systemName: "gobackward.10")
+                                    .font(.system(size: 9.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: 24, height: 24)
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isRewindHovered
+                                    )
+                                    .scaleEffect(isRewindHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isRewindHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.seekBackward"))
+                            .onHover { isRewindHovered = $0 }
+                            .position(x: rwdPt.x, y: rwdPt.y)
+
+                            let fwdPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.62))
+                            Button(action: {
+                                appState.nowPlaying.skipForward(seconds: 10)
+                            }) {
+                                Image(systemName: "goforward.10")
+                                    .font(.system(size: 9.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: 24, height: 24)
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 1.0,
+                                        causticOpacity: 0.25,
+                                        isHighlighted: isForwardHovered
+                                    )
+                                    .scaleEffect(isForwardHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isForwardHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.seekForward"))
+                            .onHover { isForwardHovered = $0 }
+                            .position(x: fwdPt.x, y: fwdPt.y)
+
+                            let nextPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.86))
+                            Button(action: {
+                                appState.nowPlaying.nextTrack()
+                            }) {
+                                Image(systemName: "forward.fill")
+                                    .font(.system(size: 8.5, weight: .bold))
+                                    .foregroundColor(appState.nowPlaying.artworkTint)
+                                    .frame(width: 24, height: 24)
+                                    .circularLiquidGlass(
+                                        tint: appState.nowPlaying.artworkTint,
+                                        specularIntensity: 0.9,
+                                        causticOpacity: 0.20,
+                                        isHighlighted: isNextTrackHovered
+                                    )
+                                    .scaleEffect(isNextTrackHovered ? 1.15 : 1.0)
+                                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isNextTrackHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help(appState.localized("corners.media.next"))
+                            .onHover { isNextTrackHovered = $0 }
+                            .position(x: nextPt.x, y: nextPt.y)
                         } else if action == .keepAwake {
                             // Indefinite Keep Awake (0.14)
                             let infPt = geom.point(radius: satelliteRadius, angleDegrees: geom.angle(for: 0.14))
@@ -786,6 +877,17 @@ public struct CenterActionBadge: View {
                         ? LinearGradient(colors: [Color(red: 0.85, green: 0.92, blue: 1.0), Color(red: 0.5, green: 0.75, blue: 0.98)], startPoint: .top, endPoint: .bottom)
                         : LinearGradient(colors: [Color.secondary, Color.secondary.opacity(0.6)], startPoint: .top, endPoint: .bottom)
                 )
+        } else if action == .mediaPlayback {
+            Image(systemName: "music.note")
+                .font(.system(size: 18, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(red: 1.0, green: 0.32, blue: 0.58), Color(red: 0.88, green: 0.12, blue: 0.45)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
         } else {
             Image(systemName: action.systemImage)
                 .font(.system(size: 18, weight: .bold))
@@ -834,7 +936,7 @@ public struct CenterActionBadge: View {
             Text(LocalizationService.shared.localized("dial.mute"))
                 .font(.system(size: 9.5, weight: .heavy, design: .rounded))
                 .foregroundColor(.red)
-        } else if action == .volume, let time = mediaTimeText, !time.isEmpty {
+        } else if (action == .volume || action == .mediaPlayback), let time = mediaTimeText, !time.isEmpty {
             Text(time)
                 .font(.system(size: 9.5, weight: .heavy, design: .monospaced))
                 .monospacedDigit()

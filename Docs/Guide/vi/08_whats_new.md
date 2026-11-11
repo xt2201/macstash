@@ -1,5 +1,16 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.0 (2026-11-11)
+
+### Dynamic Island Âm Thanh, Thanh Trượt Cạnh Kép & Tua Nhạc Độc Lập
+
+- **Mở Rộng Âm Thanh Kiểu Dynamic Island Trên Thanh Cạnh**: Khi rê chuột qua ảnh bìa nhạc nhỏ gọn ở cuối thanh trượt, widget sẽ chuyển động mở rộng ngang mượt mà kiểu Dynamic Island hiển thị tên bài hát, nghệ sĩ, sóng nhạc, thanh tua nhạc tương tác và 5 nút điều khiển (Bài trước, Lùi 10s, Phát/Dừng, Tiến 10s, Bài tiếp), giữ cho thanh trượt dọc luôn gọn gàng.
+- **Thanh Trượt Cạnh Kép (Hỗ Trợ Đồng Thời Cả Hai Bên Trái & Phải)**: Người dùng có thể tùy chọn kích hoạt cả hai bên mép màn hình cùng lúc (mặc định), với cấu hình tác vụ độc lập cho từng bên (ví dụ Cạnh trái cho Độ sáng / Tua nhạc, Cạnh phải cho Âm lượng).
+- **Tác Vụ Tua & Điều Khiển Đa Phương Tiện Độc Lập (`mediaPlayback`)**: Bổ sung tính năng điều khiển âm thanh độc lập có thể gán riêng cho bất kỳ góc nóng hoặc thanh trượt cạnh nào, biến góc nóng thành đĩa xoay tua nhạc chuyên nghiệp và thanh cạnh thành thanh tua tiến độ bài hát.
+- **Khắc Phục Trùng Lặp Nút Vệ Tinh Góc Nóng**: Định vị lại các nút vệ tinh âm thanh (Lùi 10s, Phát/Dừng, Tiến 10s) vào quỹ đạo bên trong với khoảng cách rộng rãi, loại bỏ hoàn toàn hiện tượng nút bấm đè lên viền cung đo âm lượng.
+
+---
+
 ## Phiên bản 2.15.0 (2026-11-11)
 
 ### Đồng Bộ Phần Cứng Trực Tiếp, Tua Nhạc & Tối Ưu Góc Tiện Ích

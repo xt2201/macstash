@@ -2,10 +2,12 @@ import SwiftUI
 import MacStashCore
 
 /// EdgeBar vertical slider view that slides out from the physical screen edge.
-/// Dynamically supports both Left and Right screen edges, adapts to Light/Dark themes,
-/// and hosts the vertical Now Playing controller when configured for Volume.
+/// Dynamically supports both Left and Right screen edges independently (Dual Edge Bars),
+/// integrates the Dynamic Island horizontal media expansion capsule, and supports dedicated
+/// media playback scrubbing.
 public struct EdgeSliderView: View {
     @ObservedObject var appState: AppState
+    public let edge: EdgePosition
     public let displayID: CGDirectDisplayID
 
     @State private var isDragging: Bool = false
@@ -14,25 +16,22 @@ public struct EdgeSliderView: View {
 
     private let sliderWidth: CGFloat = 56
 
-    public init(appState: AppState, displayID: CGDirectDisplayID = 0) {
+    public init(appState: AppState, edge: EdgePosition = .right, displayID: CGDirectDisplayID = 0) {
         self.appState = appState
+        self.edge = edge
         self.displayID = displayID
     }
 
-    private var edge: EdgePosition {
-        appState.settings.edgeSliderPosition
-    }
-
     private var action: ControlAction {
-        appState.activeProfile.rightEdgeAction
+        edge == .left ? appState.activeProfile.leftEdgeAction : appState.activeProfile.rightEdgeAction
     }
 
-    private var shouldShowMediaControls: Bool {
-        action == .volume && appState.settings.edgeBarShowMediaControls
+    private var shouldShowMediaIsland: Bool {
+        (action == .volume && appState.settings.edgeBarShowMediaControls) || action == .mediaPlayback
     }
 
     private var containerHeight: CGFloat {
-        shouldShowMediaControls ? 476 : 254
+        shouldShowMediaIsland ? 304 : 254
     }
 
     private var currentValue: Float {
@@ -42,15 +41,22 @@ public struct EdgeSliderView: View {
         if action == .volume && appState.audio.isMuted {
             return 0.0
         }
-        if let live = appState.liveEdgeSliderValue {
+        if let live = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue) {
             return live
         }
         return Float(appState.getValue(for: action, displayID: displayID))
     }
 
+    private var isExpanded: Bool {
+        let active = edge == .left ? appState.isLeftSliderActive : appState.isRightSliderActive
+        return isDragging || (active && (appState.activeDisplayID == displayID || appState.activeDisplayID == 0))
+    }
+
     public var body: some View {
-        let isVisible = appState.isEnabled && appState.isEdgeSlidersEnabled && action != .none
-        let isExpanded = isDragging || (appState.isRightSliderActive && (appState.activeDisplayID == displayID || appState.activeDisplayID == 0))
+        let isPlacementActive = appState.settings.edgeSliderPlacement == .both
+            || (edge == .left && appState.settings.edgeSliderPlacement == .left)
+            || (edge == .right && appState.settings.edgeSliderPlacement == .right)
+        let isVisible = appState.isEnabled && appState.isEdgeSlidersEnabled && isPlacementActive && action != .none
         let shouldReduceMotion = appState.settings.respectReduceMotion && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
         ZStack(alignment: edge == .right ? .trailing : .leading) {
@@ -68,8 +74,8 @@ public struct EdgeSliderView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .trailing : .leading)
         .onHover { hovering in
-            if !hovering && !isDragging && appState.isRightSliderActive {
-                ScreenManager.shared.scheduleRightEdgeHideTimer()
+            if !hovering && !isDragging && isExpanded {
+                ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
             }
         }
         .macStashTheme(appState.resolvedColorScheme)
@@ -80,9 +86,9 @@ public struct EdgeSliderView: View {
         let isMuted = action == .volume && appState.audio.isMuted
         let accentTint = isMuted ? Color.red : (action.accentColors.first ?? .clear)
 
-        VStack(spacing: 0) {
-            // 1. Primary Slider Section
-            VStack(spacing: 10) {
+        VStack(spacing: 8) {
+            // 1. Primary Slider Section (Glass Column)
+            VStack(spacing: 8) {
                 // Action Toggle Button
                 Button(action: {
                     appState.toggleAction(action, displayID: displayID)
@@ -107,7 +113,7 @@ public struct EdgeSliderView: View {
                 .buttonStyle(.plain)
                 .onHover { isTopHovered = $0 }
                 .help(topHelpText(isMuted: isMuted))
-                .padding(.top, 10)
+                .padding(.top, 8)
 
                 if action == .scratchpad {
                     Button(action: {
@@ -136,7 +142,7 @@ public struct EdgeSliderView: View {
                     .padding(.horizontal, 4)
 
                     readoutLabel(isMuted: isMuted)
-                        .padding(.bottom, 12)
+                        .padding(.bottom, 10)
                 } else if action == .stashShelf {
                     Button(action: {
                         appState.toggleAction(.stashShelf, displayID: displayID)
@@ -164,7 +170,7 @@ public struct EdgeSliderView: View {
                     .padding(.horizontal, 4)
 
                     readoutLabel(isMuted: isMuted)
-                        .padding(.bottom, 12)
+                        .padding(.bottom, 10)
                 } else {
                     // Precision Crystal Tube Liquid Track
                     GeometryReader { geo in
@@ -202,50 +208,47 @@ public struct EdgeSliderView: View {
                                         clamped = max(0.0, min(1.0, Float(progress)))
                                     }
                                     dragValue = clamped
-                                    appState.liveEdgeSliderValue = clamped
+                                    if edge == .left {
+                                        appState.liveLeftSliderValue = clamped
+                                    } else {
+                                        appState.liveRightSliderValue = clamped
+                                    }
                                     appState.setValue(for: action, value: Double(clamped), displayID: displayID)
                                 }
                                 .onEnded { _ in
                                     isDragging = false
-                                    appState.liveEdgeSliderValue = nil
+                                    if edge == .left {
+                                        appState.liveLeftSliderValue = nil
+                                    } else {
+                                        appState.liveRightSliderValue = nil
+                                    }
                                     appState.saveSettings()
                                 }
                         )
                     }
-                    .frame(width: 48, height: shouldShowMediaControls ? 112 : 144)
+                    .frame(width: 48, height: 138)
                     .padding(.horizontal, 4)
 
                     readoutLabel(isMuted: isMuted)
-                        .padding(.bottom, shouldShowMediaControls ? 6 : 12)
+                        .padding(.bottom, 10)
                 }
             }
+            .frame(width: sliderWidth)
+            .liquidGlass(
+                cornerRadius: 20,
+                tint: action.accentColors.first ?? .clear,
+                specularIntensity: 1.1,
+                causticOpacity: 0.18,
+                shadowRadius: 16,
+                backdropOpacity: appState.settings.dialOpacity
+            )
 
-            // 2. Vertical Media Controller (Shown beneath Volume slider)
-            if shouldShowMediaControls {
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.primary.opacity(0.18), Color.primary.opacity(0.03)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(width: 34, height: 1)
-                    .padding(.vertical, 4)
-
-                EdgeMediaControlView(appState: appState)
-                    .padding(.bottom, 8)
+            // 2. Dynamic Island Expandable Audio Controller
+            if shouldShowMediaIsland {
+                EdgeMediaIslandView(appState: appState, edge: edge)
             }
         }
-        .frame(width: sliderWidth, height: containerHeight)
-        .liquidGlass(
-            cornerRadius: 20,
-            tint: action.accentColors.first ?? .clear,
-            specularIntensity: 1.1,
-            causticOpacity: 0.18,
-            shadowRadius: 16,
-            backdropOpacity: appState.settings.dialOpacity
-        )
+        .frame(width: isExpanded ? 280 : sliderWidth, alignment: edge == .right ? .trailing : .leading)
     }
 
     @ViewBuilder
@@ -272,6 +275,11 @@ public struct EdgeSliderView: View {
             Text(appState.localized("dial.notes"))
                 .font(.system(size: 9.5, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
+        } else if action == .mediaPlayback {
+            Text(appState.nowPlaying.formattedElapsedTime)
+                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .monospacedDigit()
+                .foregroundColor(.primary)
         } else {
             Text("\(Int(round(currentValue * 100)))%")
                 .font(.system(size: 11, weight: .bold, design: .monospaced))
@@ -285,6 +293,9 @@ public struct EdgeSliderView: View {
         if action == .timer {
             return appState.isPomodoroRunning ? "pause.fill" : "play.fill"
         }
+        if action == .mediaPlayback {
+            return appState.nowPlaying.isPlaying ? "pause.fill" : "play.fill"
+        }
         return action.systemImage
     }
 
@@ -294,6 +305,9 @@ public struct EdgeSliderView: View {
         }
         if action == .timer {
             return appState.isPomodoroRunning ? appState.localized("menubar.pause") : appState.localized("menubar.start")
+        }
+        if action == .mediaPlayback {
+            return appState.nowPlaying.isPlaying ? appState.localized("corners.media.pause") : appState.localized("corners.media.play")
         }
         return "\(action.localizedDisplayName(using: appState.effectiveLanguage)) — \(appState.localized("edge.toggleAction"))"
     }

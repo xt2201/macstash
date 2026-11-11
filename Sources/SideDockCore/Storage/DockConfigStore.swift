@@ -1,4 +1,5 @@
 import Foundation
+import os.log
 
 public struct SideDockFileConfig: Codable, Equatable, Sendable {
     public var version: Int
@@ -23,6 +24,7 @@ public struct SideDockFileConfig: Codable, Equatable, Sendable {
 }
 
 public final class DockConfigStore: @unchecked Sendable {
+    private static let logger = Logger(subsystem: "com.macstash.app", category: "sidedock")
     private let fileURL: URL
     private let fileManager: FileManager
     private let lock = NSLock()
@@ -118,7 +120,7 @@ public final class DockConfigStore: @unchecked Sendable {
             try data.write(to: tempURL, options: .atomic)
             _ = try fileManager.replaceItemAt(fileURL, withItemAt: tempURL)
         } catch {
-            NSLog("[SideDockConfigStore] Failed to write config atomically: %@", error.localizedDescription)
+            Self.logger.error("Failed to write config atomically: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -141,7 +143,7 @@ public final class DockConfigStore: @unchecked Sendable {
             }
             return loaded
         } catch {
-            NSLog("[SideDockConfigStore] Config file corrupted: %@. Isolating and resetting defaults.", error.localizedDescription)
+            Self.logger.error("Config file corrupted: \(error.localizedDescription, privacy: .public). Isolating and resetting defaults.")
             isolateCorruptedFile()
             let fallback = SideDockFileConfig()
             writeToDiskAtomic(fallback)

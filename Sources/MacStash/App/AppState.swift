@@ -62,6 +62,7 @@ public final class AppState: ObservableObject {
         if scrollAdjustmentEnabled != settings.scrollAdjustmentEnabled { scrollAdjustmentEnabled = settings.scrollAdjustmentEnabled }
         if cornerSensitivityRadius != settings.cornerSensitivityPoints { cornerSensitivityRadius = settings.cornerSensitivityPoints }
         if cornerDwellDelay != settings.cornerDwellDelaySeconds { cornerDwellDelay = settings.cornerDwellDelaySeconds }
+        if edgeSliderPlacement != settings.edgeSliderPlacement { edgeSliderPlacement = settings.edgeSliderPlacement }
         if edgeSliderPosition != settings.edgeSliderPosition { edgeSliderPosition = settings.edgeSliderPosition }
         if drawerEdgePosition != settings.drawerEdgePosition { drawerEdgePosition = settings.drawerEdgePosition }
         if isSoundEnabled != settings.isSoundEnabled { isSoundEnabled = settings.isSoundEnabled }
@@ -74,6 +75,7 @@ public final class AppState: ObservableObject {
             || old.isStashShelfEnabled != settings.isStashShelfEnabled
             || old.isScratchpadEnabled != settings.isScratchpadEnabled
             || old.onlyOuterCorners != settings.onlyOuterCorners
+            || old.edgeSliderPlacement != settings.edgeSliderPlacement
             || old.edgeSliderPosition != settings.edgeSliderPosition
             || old.drawerEdgePosition != settings.drawerEdgePosition
 
@@ -100,6 +102,8 @@ public final class AppState: ObservableObject {
             || settings.cornerActions.values.contains(.scratchpad)
             || activeProfile.cornerActions.values.contains(.stashShelf)
             || activeProfile.cornerActions.values.contains(.scratchpad)
+            || activeProfile.leftEdgeAction == .stashShelf
+            || activeProfile.leftEdgeAction == .scratchpad
             || activeProfile.rightEdgeAction == .stashShelf
             || activeProfile.rightEdgeAction == .scratchpad
             || stashShelf.isShelfOpen
@@ -152,6 +156,13 @@ public final class AppState: ObservableObject {
     @Published public var cornerDwellDelay: TimeInterval = Defaults.HotCorner.defaultDwellDelaySeconds {
         didSet { if !isSyncingSettings { settings.cornerDwellDelaySeconds = cornerDwellDelay } }
     }
+    @Published public var edgeSliderPlacement: EdgeSliderPlacement = .both {
+        didSet {
+            if !isSyncingSettings {
+                settings.edgeSliderPlacement = edgeSliderPlacement
+            }
+        }
+    }
     @Published public var edgeSliderPosition: EdgePosition = Defaults.EdgeSliders.defaultPosition {
         didSet {
             if !isSyncingSettings {
@@ -183,8 +194,17 @@ public final class AppState: ObservableObject {
 
     @Published public var activeCorner: CornerPosition? = nil
     @Published public var activeDisplayID: CGDirectDisplayID = 0
+    @Published public var isLeftSliderActive: Bool = false
     @Published public var isRightSliderActive: Bool = false
-    @Published public var liveEdgeSliderValue: Float? = nil
+    @Published public var liveLeftSliderValue: Float? = nil
+    @Published public var liveRightSliderValue: Float? = nil
+    public var liveEdgeSliderValue: Float? {
+        get { liveRightSliderValue ?? liveLeftSliderValue }
+        set {
+            liveRightSliderValue = newValue
+            liveLeftSliderValue = newValue
+        }
+    }
     @Published public var isAudioDevicePickerPresented: Bool = false
     @Published public var isCursorPalettePresented: Bool = false
     @Published public var requestedSettingsTab: String? = nil
@@ -226,6 +246,7 @@ public final class AppState: ObservableObject {
         self.cornerDwellDelay = loaded.cornerDwellDelaySeconds
         self.isSoundEnabled = loaded.isSoundEnabled
         self.soundVolume = loaded.soundVolume
+        self.edgeSliderPlacement = loaded.edgeSliderPlacement
         self.edgeSliderPosition = loaded.edgeSliderPosition
         self.drawerEdgePosition = loaded.drawerEdgePosition
         self.hapticIntensity = HapticIntensity(rawValue: loaded.hapticIntensity.capitalized) ?? .medium
@@ -524,6 +545,8 @@ public final class AppState: ObservableObject {
             return min(1.0, Double(stashShelf.items.count) / 10.0)
         case .scratchpad:
             return scratchpad.text.isEmpty ? 0.0 : 1.0
+        case .mediaPlayback:
+            return Double(nowPlaying.progressFraction)
         case .none:
             return 0.0
         }
@@ -572,6 +595,8 @@ public final class AppState: ObservableObject {
             }
         case .keepAwake:
             keepAwake.setFromDialProgress(Double(clamped))
+        case .mediaPlayback:
+            nowPlaying.seekToProgress(fraction: Double(clamped))
         case .stashShelf, .scratchpad, .none:
             break
         }
@@ -627,6 +652,10 @@ public final class AppState: ObservableObject {
             if scratchpad.isScratchpadOpen {
                 stashShelf.closeShelf()
             }
+            haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
+            sound.playAccent(enabled: isSoundEnabled)
+        case .mediaPlayback:
+            nowPlaying.togglePlayPause()
             haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .none:

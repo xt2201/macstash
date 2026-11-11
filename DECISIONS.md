@@ -46,3 +46,13 @@ This log records major technical and architecture decisions for SideDock with ra
 - **Context:** Users need to backup, share, and migrate dock profiles between setups, and access fast utility widgets (clipboard, notes, screenshots, color picker, converter, bookmarks).
 - **Decision:** Implement `DockProfileTransferService` with standardized `.sidedock-profile` JSON envelope, generating fresh UUIDs on import to prevent profile collisions. Add 6 local-first Phase 2 widgets without external network dependencies.
 - **Rationale:** 100% offline, privacy-first, zero telemetry, seamless user customization.
+
+## ADR-010: MediaRemote Perl Bridge, DisplayServices Boundary, and macOS 14.0+ Baseline
+- **Context:** macOS 15.4+ restricted `MediaRemote.framework` entitlements to platform binaries, limiting AppleScript-only metadata (ADR-004) for browsers and modern media apps. Meanwhile, `Package.swift` and SwiftUI views already rely on macOS 14.0+ APIs (such as two-parameter `.onChange`), whereas `Scripts/Info.plist` and `README.md` still advertised `13.0`.
+- **Decision:** Supersede ADR-004's AppleScript-only constraint with the isolated `MacStashNowPlaying` dylib loaded inside `/usr/bin/perl` (`now-playing.pl`) plus AppleScript fallback, retain `BuiltInBrightnessService` dynamic `dlopen` (`DisplayServices.framework`) with DDC/CI and gamma fallbacks, prohibit adding any new private frameworks, and standardize `LSMinimumSystemVersion` and docs on `14.0`.
+- **Rationale:** Preserves universal media detection and native Retina brightness while enforcing strict crash-safe boundaries and factual platform metadata.
+
+## ADR-011: Two-Mode Agent Harness (`AGENTS.md` + `CLAUDE.md`) and Automated Code Hygiene Gates
+- **Context:** `AGENTS.md` previously referenced a missing "Section 1", lacked domain invariants and UI/UX Liquid Glass specifications, mixed iterative development with mandatory DMG/tag releases, and lacked automated enforcement against `NSLog` or `as!` regressions.
+- **Decision:** Reconstruct `AGENTS.md` as a concise control plane backed by progressive-disclosure specs under `Docs/Agent/`, add `CLAUDE.md` (`@AGENTS.md`) for cross-agent interoperability, separate Dev Inner Loop from Release Pipeline, and enforce banned-pattern/OS-alignment/documentation checks via `CodeHygieneTests` and updated `DocumentationIntegrityTests`.
+- **Rationale:** Keeps AI agent context crisp, prevents architectural drift deterministically in `make test`, and accelerates iterative development without sacrificing release rigor.

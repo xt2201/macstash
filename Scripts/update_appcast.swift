@@ -52,7 +52,7 @@ let newItem = """
             <pubDate>\(pubDate)</pubDate>
             <sparkle:version>\(buildNumber)</sparkle:version>
             <sparkle:shortVersionString>\(version)</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <description><![CDATA[
 \(releaseNotes.trimmingCharacters(in: .whitespacesAndNewlines))
             ]]></description>

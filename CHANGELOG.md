@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.0] - 2026-11-11
+
+### Added
+- Dynamic Island Horizontal Audio Expansion in Edge Bar: Hovering over the compact album artwork capsule fluidly morphs it horizontally into an expanded Dynamic Island widget featuring song title, artist, live audio visualizer, interactive scrubber bar, and complete 5-button transport controls (Previous, -10s, Play/Pause, +10s, Next), keeping the vertical Edge Bar height permanently compact.
+- Dual Edge Bars (Left & Right Simultaneous Support): Users can now independently enable and configure both Left and Right edge bars simultaneously (default: Both sides enabled), each with its own action assignment (e.g. Left Edge for Brightness / Media Playback, Right Edge for Volume).
+- Dedicated Media Player & Audio Scrubber Action (`mediaPlayback`): Introduced a standalone control action for both Hot Corners and Edge Bars, turning the corner dial into a dedicated media jog wheel and the edge slider into an interactive audio track scrubber.
+
+### Changed
+- Edge Bar Vertical Footprint: Vertically streamlined the Edge Bar down from 476pt to a clean ~260pt by delegating extended media playback and scrubbing to the horizontal Dynamic Island capsule.
+- Edge Slider Settings Experience: Added Edge Placement picker (Both Sides, Left Only, Right Only) and independent Left Edge Action and Right Edge Action pickers in Settings.
+
+### Fixed
+- Hot Corner Volume Satellite Overlap: Repositioned satellite controls (Rewind 10s, Play/Pause, Forward 10s) to a dedicated inner orbit radius with ample breathing room, eliminating visual overlap with the outer volume arc track.
+
+---
+
 ## [2.15.0] - 2026-11-11
 
 ### Added

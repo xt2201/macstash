@@ -12,6 +12,22 @@ packages:
     url: https://github.com/sparkle-project/Sparkle
     from: 2.6.4
 targets:
+  MacStashCore:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/MacStashCore
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.MacStashCore
+
+  MacStashNowPlaying:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/MacStashNowPlaying
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.MacStashNowPlaying
+
   SideDockCore:
     type: framework
     platform: macOS
@@ -26,6 +42,7 @@ targets:
     sources:
       - Sources/SideDockWidgets
     dependencies:
+      - target: MacStashCore
       - target: SideDockCore
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockWidgets
@@ -36,6 +53,7 @@ targets:
     sources:
       - Sources/SideDockUI
     dependencies:
+      - target: MacStashCore
       - target: SideDockCore
       - target: SideDockWidgets
     settings:
@@ -59,6 +77,7 @@ targets:
     sources:
       - Sources/MacStash
     dependencies:
+      - target: MacStashCore
       - target: SideDockCore
       - target: SideDockWidgets
       - target: SideDockUI

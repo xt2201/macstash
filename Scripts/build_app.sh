@@ -1,10 +1,13 @@
 #!/bin/bash
+# Local development convenience script used by Scripts/run.sh.
+# For production Universal DMG and Sparkle ZIP releases, always use Scripts/build_dmg.sh.
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
-echo "Building MacStash v2.0 (Release mode)..."
+VERSION="$(tr -d '[:space:]' < "$PROJECT_DIR/VERSION" 2>/dev/null || echo "dev")"
+echo "Building MacStash v${VERSION} (Release mode, local app bundle)..."
 swift build -c release
 
 BIN_PATH="$PROJECT_DIR/.build/release/MacStash"
@@ -45,7 +48,7 @@ mkdir -p "$DMG_STAGING"
 cp -R "$APP_BUNDLE" "$DMG_STAGING/"
 ln -s /Applications "$DMG_STAGING/Applications"
 
-hdiutil create -volname "MacStash v2.0" -srcfolder "$DMG_STAGING" -ov -format UDZO "$DMG_PATH" > /dev/null
+hdiutil create -volname "MacStash v${VERSION}" -srcfolder "$DMG_STAGING" -ov -format UDZO "$DMG_PATH" > /dev/null
 rm -rf "$DMG_STAGING"
 
 echo "Build Complete!"

@@ -817,6 +817,38 @@
         }
       }
     },
+    "corners.edgePlacement": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active Screen Edges:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cạnh màn hình kích hoạt:"
+          }
+        }
+      }
+    },
+    "corners.leftEdgeAction": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left Edge Action:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tác vụ cạnh trái:"
+          }
+        }
+      }
+    },
     "corners.rightEdgeAction": {
       "localizations": {
         "en": {
@@ -829,6 +861,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tác vụ cạnh phải:"
+          }
+        }
+      }
+    },
+    "corners.action.mediaPlayback": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Media & Scrubber"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trình phát & Tua nhạc"
+          }
+        }
+      }
+    },
+    "corners.media.openApp": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Media Player"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở ứng dụng phát nhạc"
           }
         }
       }

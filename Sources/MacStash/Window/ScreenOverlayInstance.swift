@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import MacStashCore
 
-/// Manages floating overlay panels (4 corners, left edge shelf, and right edge slider) for one specific display
+/// Manages floating overlay panels (4 corners, left edge shelf/drawer, left edge slider, and right edge slider) for one specific display.
 @MainActor
 public final class ScreenOverlayInstance {
     public let displayID: CGDirectDisplayID
@@ -11,10 +11,19 @@ public final class ScreenOverlayInstance {
 
     private var cornerPanels: [CornerPosition: NSPanel] = [:]
     private var passThroughViews: [CornerPosition: PassThroughHostingView<CornerDialView>] = [:]
-    private var rightEdgePanel: MacStashInteractivePanel?
-    private var edgeHostingView: EdgeSliderHostingView?
+
+    private var rightSliderPanel: MacStashInteractivePanel?
+    private var rightSliderHostingView: EdgeSliderHostingView?
+
+    private var leftSliderPanel: MacStashInteractivePanel?
+    private var leftSliderHostingView: EdgeSliderHostingView?
+
     private var leftEdgePanel: MacStashInteractivePanel?
     private var stashHostingView: StashShelfHostingView?
+
+    // Backwards compatibility references
+    public var rightEdgePanel: MacStashInteractivePanel? { rightSliderPanel }
+    public var edgeHostingView: EdgeSliderHostingView? { rightSliderHostingView }
 
     private var cornerSize: CGFloat {
         appState.settings.dialRadiusPoints + Defaults.HotCorner.cornerWindowPaddingPoints
@@ -72,10 +81,30 @@ public final class ScreenOverlayInstance {
     }
 
     public func setRightEdgeInteractive(_ interactive: Bool) {
-        guard let panel = rightEdgePanel else { return }
+        setRightSliderInteractive(interactive)
+    }
+
+    public func setRightSliderInteractive(_ interactive: Bool) {
+        guard let panel = rightSliderPanel else { return }
         panel.ignoresMouseEvents = !interactive
         if interactive {
             panel.orderFrontRegardless()
+        }
+    }
+
+    public func setLeftSliderInteractive(_ interactive: Bool) {
+        guard let panel = leftSliderPanel else { return }
+        panel.ignoresMouseEvents = !interactive
+        if interactive {
+            panel.orderFrontRegardless()
+        }
+    }
+
+    public func setEdgeInteractive(_ interactive: Bool, for edge: EdgePosition) {
+        if edge == .left {
+            setLeftSliderInteractive(interactive)
+        } else {
+            setRightSliderInteractive(interactive)
         }
     }
 
@@ -103,7 +132,7 @@ public final class ScreenOverlayInstance {
             passThroughViews[corner] = hostingView
         }
 
-        createSliderPanelIfNeeded()
+        createSliderPanelsIfNeeded()
         createDrawerPanelIfNeeded()
     }
 
@@ -134,10 +163,13 @@ public final class ScreenOverlayInstance {
 
     public func drawerRect(in frame: NSRect) -> NSRect {
         let isRight = appState.settings.drawerEdgePosition == .right
-        let sameEdge = isRight == (appState.settings.edgeSliderPosition == .right) && appState.settings.isEdgeSlidersEnabled
+        let placement = appState.settings.edgeSliderPlacement
+        let isSliderPresentOnDrawerEdge = appState.settings.isEdgeSlidersEnabled && (
+            isRight ? (placement == .both || placement == .right) : (placement == .both || placement == .left)
+        )
         let panelWidth: CGFloat = Defaults.LeftEdgeDrawer.panelWidthPoints
         let panelHeight: CGFloat = Defaults.LeftEdgeDrawer.panelHeightPoints
-        let panelY = sameEdge
+        let panelY = isSliderPresentOnDrawerEdge
             ? max(frame.minY + 10, frame.midY - panelHeight + 40)
             : frame.minY + (frame.height - panelHeight) / 2
         let panelX = isRight ? (frame.maxX - panelWidth) : frame.minX
@@ -148,39 +180,58 @@ public final class ScreenOverlayInstance {
         drawerRect(in: frame)
     }
 
-    private func createSliderPanelIfNeeded() {
+    private func createSliderPanelsIfNeeded() {
         guard appState.settings.isEdgeSlidersEnabled else {
-            rightEdgePanel?.orderOut(nil)
+            rightSliderPanel?.orderOut(nil)
+            leftSliderPanel?.orderOut(nil)
             return
         }
 
-        let isLeft = appState.settings.edgeSliderPosition == .left
-        if appState.settings.onlyOuterCorners {
-            let allFrames = NSScreen.screens.map { $0.frame }
-            if isLeft {
-                guard CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames) else { return }
-            } else {
-                guard CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames) else { return }
-            }
+        let placement = appState.settings.edgeSliderPlacement
+        let allFrames = NSScreen.screens.map { $0.frame }
+
+        // Right Edge Slider
+        let rightAllowed = (placement == .both || placement == .right) && appState.activeProfile.rightEdgeAction != .none
+        let rightOuter = !appState.settings.onlyOuterCorners || CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames)
+        if rightAllowed && rightOuter {
+            let edgeFrame = sliderRect(for: .right, in: screen.frame)
+            let panel = makeEdgePanel(contentRect: edgeFrame)
+            let sliderView = EdgeSliderView(appState: appState, edge: .right, displayID: displayID)
+            let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID)
+
+            panel.contentView = hostingView
+            panel.orderFrontRegardless()
+
+            self.rightSliderPanel = panel
+            self.rightSliderHostingView = hostingView
+        } else {
+            rightSliderPanel?.orderOut(nil)
         }
 
-        let edgeFrame = sliderRect(in: screen.frame)
-        let panel = makeEdgePanel(contentRect: edgeFrame)
-        let sliderView = EdgeSliderView(appState: appState, displayID: displayID)
-        let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID)
+        // Left Edge Slider
+        let leftAllowed = (placement == .both || placement == .left) && appState.activeProfile.leftEdgeAction != .none
+        let leftOuter = !appState.settings.onlyOuterCorners || CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames)
+        if leftAllowed && leftOuter {
+            let edgeFrame = sliderRect(for: .left, in: screen.frame)
+            let panel = makeEdgePanel(contentRect: edgeFrame)
+            let sliderView = EdgeSliderView(appState: appState, edge: .left, displayID: displayID)
+            let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID)
 
-        panel.contentView = hostingView
-        panel.orderFrontRegardless()
+            panel.contentView = hostingView
+            panel.orderFrontRegardless()
 
-        self.rightEdgePanel = panel
-        self.edgeHostingView = hostingView
+            self.leftSliderPanel = panel
+            self.leftSliderHostingView = hostingView
+        } else {
+            leftSliderPanel?.orderOut(nil)
+        }
     }
 
-    public func sliderRect(in frame: NSRect) -> NSRect {
-        let isLeft = appState.settings.edgeSliderPosition == .left
-        let sameEdge = (appState.settings.drawerEdgePosition == .left) == isLeft && (appState.settings.isStashShelfEnabled || appState.settings.isScratchpadEnabled)
-        let panelWidth: CGFloat = 80
-        let panelHeight: CGFloat = 460
+    public func sliderRect(for edge: EdgePosition, in frame: NSRect) -> NSRect {
+        let isLeft = edge == .left
+        let sameEdge = (appState.settings.drawerEdgePosition == .left) == isLeft && appState.hasDrawerFeatureActive
+        let panelWidth: CGFloat = 340
+        let panelHeight: CGFloat = 340
         let panelY = sameEdge
             ? min(frame.maxY - panelHeight - 10, frame.midY - 40)
             : frame.minY + (frame.height - panelHeight) / 2
@@ -188,8 +239,12 @@ public final class ScreenOverlayInstance {
         return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
     }
 
+    public func sliderRect(in frame: NSRect) -> NSRect {
+        sliderRect(for: .right, in: frame)
+    }
+
     public func rightEdgeRect(in frame: NSRect) -> NSRect {
-        sliderRect(in: frame)
+        sliderRect(for: .right, in: frame)
     }
 
     public func repositionPanels() {
@@ -212,30 +267,41 @@ public final class ScreenOverlayInstance {
         }
 
         if appState.settings.isEdgeSlidersEnabled {
-            if let edgePanel = rightEdgePanel {
-                let isLeft = appState.settings.edgeSliderPosition == .left
-                let shouldShow: Bool
-                if appState.settings.onlyOuterCorners {
-                    let allFrames = NSScreen.screens.map { $0.frame }
-                    shouldShow = isLeft
-                        ? CornerGeometry.isOuterLeftEdge(screen: screen.frame, in: allFrames)
-                        : CornerGeometry.isOuterRightEdge(screen: screen.frame, in: allFrames)
-                } else {
-                    shouldShow = true
-                }
+            let placement = appState.settings.edgeSliderPlacement
+            let allFrames = NSScreen.screens.map { $0.frame }
 
+            // Right Slider
+            if let rightPanel = rightSliderPanel {
+                let rightAllowed = (placement == .both || placement == .right) && appState.activeProfile.rightEdgeAction != .none
+                let shouldShow = rightAllowed && (!appState.settings.onlyOuterCorners || CornerGeometry.isOuterRightEdge(screen: frame, in: allFrames))
                 if shouldShow {
-                    let rect = sliderRect(in: frame)
-                    edgePanel.setFrame(rect, display: true)
-                    edgePanel.orderFrontRegardless()
+                    let rect = sliderRect(for: .right, in: frame)
+                    rightPanel.setFrame(rect, display: true)
+                    rightPanel.orderFrontRegardless()
                 } else {
-                    edgePanel.orderOut(nil)
+                    rightPanel.orderOut(nil)
                 }
             } else {
-                createSliderPanelIfNeeded()
+                createSliderPanelsIfNeeded()
+            }
+
+            // Left Slider
+            if let leftPanel = leftSliderPanel {
+                let leftAllowed = (placement == .both || placement == .left) && appState.activeProfile.leftEdgeAction != .none
+                let shouldShow = leftAllowed && (!appState.settings.onlyOuterCorners || CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames))
+                if shouldShow {
+                    let rect = sliderRect(for: .left, in: frame)
+                    leftPanel.setFrame(rect, display: true)
+                    leftPanel.orderFrontRegardless()
+                } else {
+                    leftPanel.orderOut(nil)
+                }
+            } else {
+                createSliderPanelsIfNeeded()
             }
         } else {
-            rightEdgePanel?.orderOut(nil)
+            rightSliderPanel?.orderOut(nil)
+            leftSliderPanel?.orderOut(nil)
         }
 
         if appState.hasDrawerFeatureActive {
@@ -272,10 +338,15 @@ public final class ScreenOverlayInstance {
         cornerPanels.removeAll()
         passThroughViews.removeAll()
 
-        rightEdgePanel?.orderOut(nil)
-        rightEdgePanel?.close()
-        rightEdgePanel = nil
-        edgeHostingView = nil
+        rightSliderPanel?.orderOut(nil)
+        rightSliderPanel?.close()
+        rightSliderPanel = nil
+        rightSliderHostingView = nil
+
+        leftSliderPanel?.orderOut(nil)
+        leftSliderPanel?.close()
+        leftSliderPanel = nil
+        leftSliderHostingView = nil
 
         leftEdgePanel?.orderOut(nil)
         leftEdgePanel?.close()
@@ -290,7 +361,6 @@ public final class ScreenOverlayInstance {
             backing: .buffered,
             defer: false
         )
-        // Default to passive (ignoring mouse events) so underlying macOS apps receive all clicks cleanly
         panel.ignoresMouseEvents = true
         return panel
     }
@@ -323,7 +393,6 @@ public final class ScreenOverlayInstance {
         panel.acceptsMouseMovedEvents = true
         panel.ignoresMouseEvents = true
         panel.isMovable = false
-        panel.isMovableByWindowBackground = false
         return panel
     }
 }

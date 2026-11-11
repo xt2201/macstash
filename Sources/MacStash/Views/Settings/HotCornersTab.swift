@@ -155,31 +155,50 @@ public struct HotCornersTab: View {
                     .font(.system(size: 13, weight: .semibold))
 
                 HStack {
-                    Text(appState.localized("corners.edgePosition"))
+                    Text(appState.localized("corners.edgePlacement"))
                         .font(.system(size: 12.5, weight: .medium))
                     Spacer()
-                    Picker("", selection: $appState.edgeSliderPosition) {
-                        Text(appState.localized("corners.edgeLeft")).tag(EdgePosition.left)
-                        Text(appState.localized("corners.edgeRight")).tag(EdgePosition.right)
+                    Picker("", selection: $appState.edgeSliderPlacement) {
+                        ForEach(EdgeSliderPlacement.allCases) { p in
+                            Text(p.localizedDisplayName(using: appState.effectiveLanguage)).tag(p)
+                        }
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 210)
+                    .frame(width: 280)
                 }
                 .disabled(!appState.isEdgeSlidersEnabled)
 
-                HStack {
-                    Text(appState.localized("corners.edgeActionFor"))
-                        .font(.system(size: 12.5, weight: .medium))
-                    Spacer()
-                    Picker("", selection: edgeActionBinding(for: selectedProfileIndex)) {
-                        ForEach(ControlAction.allCases) { action in
-                            Text(localizedActionName(action)).tag(action)
+                if appState.edgeSliderPlacement == .both || appState.edgeSliderPlacement == .left {
+                    HStack {
+                        Text(appState.localized("corners.leftEdgeAction"))
+                            .font(.system(size: 12.5, weight: .medium))
+                        Spacer()
+                        Picker("", selection: leftEdgeActionBinding(for: selectedProfileIndex)) {
+                            ForEach(ControlAction.allCases) { action in
+                                Text(localizedActionName(action)).tag(action)
+                            }
                         }
+                        .pickerStyle(.menu)
+                        .frame(width: 220)
                     }
-                    .pickerStyle(.menu)
-                    .frame(width: 220)
+                    .disabled(!appState.isEdgeSlidersEnabled)
                 }
-                .disabled(!appState.isEdgeSlidersEnabled)
+
+                if appState.edgeSliderPlacement == .both || appState.edgeSliderPlacement == .right {
+                    HStack {
+                        Text(appState.localized("corners.rightEdgeAction"))
+                            .font(.system(size: 12.5, weight: .medium))
+                        Spacer()
+                        Picker("", selection: rightEdgeActionBinding(for: selectedProfileIndex)) {
+                            ForEach(ControlAction.allCases) { action in
+                                Text(localizedActionName(action)).tag(action)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: 220)
+                    }
+                    .disabled(!appState.isEdgeSlidersEnabled)
+                }
 
                 Text(appState.localized("corners.edgeSlidersHint"))
                     .font(.system(size: 11))
@@ -487,14 +506,20 @@ public struct HotCornersTab: View {
             }
             .padding(10)
 
-            // Edge Slider Node (Left or Right)
+            // Edge Slider Nodes (Dual Edges: Left & Right)
             if appState.isEdgeSlidersEnabled {
                 HStack {
-                    if appState.edgeSliderPosition == .right { Spacer() }
-                    mapEdgeSliderNode
-                        .padding(.vertical, 36)
-                        .padding(.horizontal, 6)
-                    if appState.edgeSliderPosition == .left { Spacer() }
+                    if appState.edgeSliderPlacement == .both || appState.edgeSliderPlacement == .left {
+                        mapEdgeSliderNode(for: .left)
+                            .padding(.vertical, 36)
+                            .padding(.horizontal, 6)
+                    }
+                    Spacer()
+                    if appState.edgeSliderPlacement == .both || appState.edgeSliderPlacement == .right {
+                        mapEdgeSliderNode(for: .right)
+                            .padding(.vertical, 36)
+                            .padding(.horizontal, 6)
+                    }
                 }
             }
 
@@ -573,8 +598,8 @@ public struct HotCornersTab: View {
         .buttonStyle(.plain)
     }
 
-    private var mapEdgeSliderNode: some View {
-        let action = selectedProfile.rightEdgeAction
+    private func mapEdgeSliderNode(for edge: EdgePosition) -> some View {
+        let action = edge == .left ? selectedProfile.leftEdgeAction : selectedProfile.rightEdgeAction
         let tint = action.accentColors.first ?? .blue
         return Button {
             withAnimation(.easeInOut(duration: 0.16)) {
@@ -589,7 +614,7 @@ public struct HotCornersTab: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(tint.opacity(0.7))
                     .frame(width: 4, height: 24)
-                if appState.edgeBarShowMediaControls {
+                if (action == .volume && appState.edgeBarShowMediaControls) || action == .mediaPlayback {
                     Image(systemName: "music.note")
                         .font(.system(size: 8, weight: .semibold))
                         .foregroundColor(.pink)
@@ -826,10 +851,10 @@ public struct HotCornersTab: View {
         )
     }
 
-    private func edgeActionBinding(for profileIdx: Int) -> Binding<ControlAction> {
+    private func rightEdgeActionBinding(for profileIdx: Int) -> Binding<ControlAction> {
         Binding(
             get: {
-                guard appState.appProfiles.indices.contains(profileIdx) else { return .brightness }
+                guard appState.appProfiles.indices.contains(profileIdx) else { return .volume }
                 return appState.appProfiles[profileIdx].rightEdgeAction
             },
             set: { newValue in
@@ -842,6 +867,28 @@ public struct HotCornersTab: View {
                 appState.saveSettings()
             }
         )
+    }
+
+    private func leftEdgeActionBinding(for profileIdx: Int) -> Binding<ControlAction> {
+        Binding(
+            get: {
+                guard appState.appProfiles.indices.contains(profileIdx) else { return .brightness }
+                return appState.appProfiles[profileIdx].leftEdgeAction
+            },
+            set: { newValue in
+                guard appState.appProfiles.indices.contains(profileIdx) else { return }
+                appState.appProfiles[profileIdx].leftEdgeAction = newValue
+                let updated = appState.appProfiles[profileIdx]
+                if appState.activeProfile.id == updated.id {
+                    appState.activeProfile = updated
+                }
+                appState.saveSettings()
+            }
+        )
+    }
+
+    private func edgeActionBinding(for profileIdx: Int) -> Binding<ControlAction> {
+        rightEdgeActionBinding(for: profileIdx)
     }
 
     private func profileEnabledBinding(for profileIdx: Int) -> Binding<Bool> {
@@ -881,6 +928,7 @@ public struct HotCornersTab: View {
             name: trimmedName,
             bundleIdentifier: trimmedBundle,
             cornerActions: base.cornerActions,
+            leftEdgeAction: base.leftEdgeAction,
             rightEdgeAction: base.rightEdgeAction,
             isEnabled: true
         )
@@ -934,6 +982,7 @@ public struct HotCornersTab: View {
         case .keepAwake: return appState.localized("corners.action.keepAwake")
         case .stashShelf: return appState.localized("corners.action.stashShelf")
         case .scratchpad: return appState.localized("corners.action.scratchpad")
+        case .mediaPlayback: return appState.localized("corners.action.mediaPlayback")
         case .none: return appState.localized("menubar.off")
         }
     }

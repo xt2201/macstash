@@ -53,23 +53,24 @@ public final class ReserveSpaceManager: ObservableObject {
             return
         }
 
-        // swiftlint:disable:next force_cast
-        let windowRef = windowVal as! AXUIElement
+        let windowRef = unsafeBitCast(windowVal, to: AXUIElement.self)
 
         var posVal: CFTypeRef?
         var sizeVal: CFTypeRef?
         guard AXUIElementCopyAttributeValue(windowRef, kAXPositionAttribute as CFString, &posVal) == .success,
               AXUIElementCopyAttributeValue(windowRef, kAXSizeAttribute as CFString, &sizeVal) == .success,
-              let posVal = posVal, let sizeVal = sizeVal else {
+              let posVal = posVal, let sizeVal = sizeVal,
+              CFGetTypeID(posVal) == AXValueGetTypeID(),
+              CFGetTypeID(sizeVal) == AXValueGetTypeID() else {
             return
         }
 
+        let posAXVal = unsafeBitCast(posVal, to: AXValue.self)
+        let sizeAXVal = unsafeBitCast(sizeVal, to: AXValue.self)
         var origin = CGPoint.zero
         var size = CGSize.zero
-        // swiftlint:disable:next force_cast
-        guard AXValueGetValue(posVal as! AXValue, .cgPoint, &origin),
-              // swiftlint:disable:next force_cast
-              AXValueGetValue(sizeVal as! AXValue, .cgSize, &size) else {
+        guard AXValueGetValue(posAXVal, .cgPoint, &origin),
+              AXValueGetValue(sizeAXVal, .cgSize, &size) else {
             return
         }
 

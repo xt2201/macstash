@@ -8,6 +8,7 @@ public enum ControlAction: String, CaseIterable, Identifiable, Codable, Sendable
     case keepAwake
     case stashShelf
     case scratchpad
+    case mediaPlayback
     case none
 
     public var id: String { rawValue }
@@ -27,6 +28,7 @@ public enum ControlAction: String, CaseIterable, Identifiable, Codable, Sendable
         case .keepAwake: return isVi ? "Giữ máy luôn thức (Caffeine)" : "Keep Awake (Caffeine)"
         case .stashShelf: return isVi ? "Kệ thả tệp Stash Shelf" : "Stash Drop Shelf"
         case .scratchpad: return isVi ? "Ghi chú nhanh Scratchpad" : "Quick Scratchpad"
+        case .mediaPlayback: return isVi ? "Trình phát & Tua âm thanh" : "Media Player & Audio Scrubber"
         case .none: return isVi ? "Không gán (Tắt)" : "Disabled"
         }
     }
@@ -40,6 +42,7 @@ public enum ControlAction: String, CaseIterable, Identifiable, Codable, Sendable
         case .keepAwake: return "AWAKE"
         case .stashShelf: return "STASH"
         case .scratchpad: return "NOTES"
+        case .mediaPlayback: return "MEDIA"
         case .none: return "OFF"
         }
     }
@@ -53,6 +56,7 @@ public enum ControlAction: String, CaseIterable, Identifiable, Codable, Sendable
         case .keepAwake: return "cup.and.saucer.fill"
         case .stashShelf: return "tray.2.fill"
         case .scratchpad: return "note.text"
+        case .mediaPlayback: return "play.circle.fill"
         case .none: return "slash.circle"
         }
     }

@@ -3,12 +3,16 @@ import SwiftUI
 import MacStashCore
 
 /// An NSView hosting wrapper that provides intelligent pass-through hit testing for edge sliders.
-/// Only the edge trigger strip receives hit tests when collapsed; the full slider body receives
-/// mouse events when hovered, active, or dragging.
+/// Only the edge trigger strip receives hit tests when collapsed; the full slider body and
+/// horizontally expanded Dynamic Island receive mouse events when active or dragging.
 public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
     private let appState: AppState
     public let displayID: CGDirectDisplayID
     private var scrollEndWorkItem: DispatchWorkItem?
+
+    public var edge: EdgePosition {
+        rootView.edge
+    }
 
     public init(
         rootView: EdgeSliderView,
@@ -39,7 +43,8 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return nil
         }
 
-        guard appState.activeProfile.rightEdgeAction != .none else {
+        let action = edge == .left ? appState.activeProfile.leftEdgeAction : appState.activeProfile.rightEdgeAction
+        guard action != .none else {
             return nil
         }
 
@@ -59,8 +64,9 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return nil
         }
 
-        // When slider is active (expanded), intercept mouse events within the 80pt slider panel
-        if appState.isRightSliderActive {
+        // When slider is active (expanded), intercept mouse events
+        let isActive = edge == .left ? appState.isLeftSliderActive : appState.isRightSliderActive
+        if isActive {
             if appState.activeDisplayID != 0 && appState.activeDisplayID != displayID {
                 return nil
             }
@@ -68,7 +74,7 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         }
 
         // When collapsed, return nil completely so background application scrollbars,
-        // window controls, and rightmost click targets remain 100% unobstructed.
+        // window controls, and edge click targets remain 100% unobstructed.
         return nil
     }
 
@@ -93,7 +99,7 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
 
     public override func mouseExited(with event: NSEvent) {
         super.mouseExited(with: event)
-        ScreenManager.shared.scheduleRightEdgeHideTimer()
+        ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
     }
 
     public override func scrollWheel(with event: NSEvent) {
@@ -104,7 +110,7 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return
         }
 
-        let action = appState.activeProfile.rightEdgeAction
+        let action = edge == .left ? appState.activeProfile.leftEdgeAction : appState.activeProfile.rightEdgeAction
         guard action != .none else {
             super.scrollWheel(with: event)
             return
@@ -124,24 +130,35 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
 
         let sensitivity: Float = 0.005
         let step = Float(deltaY) * sensitivity
-        let current = appState.liveEdgeSliderValue ?? Float(appState.getValue(for: action, displayID: rootView.displayID))
+        let current = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue) ?? Float(appState.getValue(for: action, displayID: rootView.displayID))
         let clamped = max(0.0, min(1.0, current + step))
 
-        appState.liveEdgeSliderValue = clamped
+        if edge == .left {
+            appState.liveLeftSliderValue = clamped
+        } else {
+            appState.liveRightSliderValue = clamped
+        }
         appState.setValue(for: action, value: Double(clamped), displayID: rootView.displayID)
 
         scrollEndWorkItem?.cancel()
         if event.phase == .ended || event.phase == .cancelled {
-            appState.liveEdgeSliderValue = nil
+            if edge == .left {
+                appState.liveLeftSliderValue = nil
+            } else {
+                appState.liveRightSliderValue = nil
+            }
             appState.saveSettings()
         } else {
             let item = DispatchWorkItem { [weak self] in
                 guard let self = self else { return }
-                self.appState.liveEdgeSliderValue = nil
-                self.appState.saveSettings()
+                if self.edge == .left {
+                    self.appState.liveLeftSliderValue = nil
+                } else {
+                    self.appState.liveRightSliderValue = nil
+                }
             }
             scrollEndWorkItem = item
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22, execute: item)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
         }
     }
 }

@@ -25,6 +25,7 @@ public enum StashFeatureTests {
         testShortcutValidatorAudit()
         testAudioScrubbingCalculations()
         testKeepAwakeSnapPresets()
+        testDualEdgeBarsAndMediaPlaybackAction()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -513,5 +514,39 @@ public enum StashFeatureTests {
         TestAssertion.assertEqual(snapPreset(0.65), 60)
         TestAssertion.assertEqual(snapPreset(0.85), 120)
         TestAssertion.assertEqual(snapPreset(0.95), -1)
+    }
+
+    private static func testDualEdgeBarsAndMediaPlaybackAction() {
+        // 1. ControlAction.mediaPlayback verification
+        let mediaAction = ControlAction.mediaPlayback
+        TestAssertion.assertEqual(mediaAction.shortTitle, "MEDIA")
+        TestAssertion.assertEqual(mediaAction.systemImageName, "play.circle.fill")
+        TestAssertion.assertEqual(mediaAction.localizedDisplayName(using: "en"), "Media Player & Audio Scrubber")
+        TestAssertion.assertEqual(mediaAction.localizedDisplayName(using: "vi"), "Trình phát & Tua âm thanh")
+
+        // 2. EdgeSliderPlacement verification
+        TestAssertion.assertEqual(EdgeSliderPlacement.both.localizedDisplayName(using: "en"), "Both Sides (Default)")
+        TestAssertion.assertEqual(EdgeSliderPlacement.both.localizedDisplayName(using: "vi"), "Cả hai bên (Mặc định)")
+        TestAssertion.assertEqual(EdgeSliderPlacement.left.localizedDisplayName(using: "en"), "Left Edge Only")
+        TestAssertion.assertEqual(EdgeSliderPlacement.right.localizedDisplayName(using: "vi"), "Chỉ cạnh phải")
+
+        // 3. CornerGeometry.edgeSliderHitRect expanded width check
+        let screen = CGRect(x: 0, y: 0, width: 1920, height: 1080)
+        let sRect = CGRect(x: 1920 - 340, y: 370, width: 340, height: 340)
+        let hitRight = CornerGeometry.edgeSliderHitRect(screenFrame: screen, sliderPanelRect: sRect, edge: .right)
+        TestAssertion.assertEqual(hitRight.width, CGFloat(340.0))
+        TestAssertion.assertEqual(hitRight.minX, CGFloat(1920 - 340))
+
+        let hitLeft = CornerGeometry.edgeSliderHitRect(screenFrame: screen, sliderPanelRect: sRect, edge: .left)
+        TestAssertion.assertEqual(hitLeft.width, CGFloat(340.0))
+        TestAssertion.assertEqual(hitLeft.minX, CGFloat(0.0))
+
+        // 4. AppSettings persistence with edgeSliderPlacement
+        var settings = AppSettings.defaultSettings
+        TestAssertion.assertEqual(settings.edgeSliderPlacement, EdgeSliderPlacement.both)
+        settings.edgeSliderPlacement = .left
+        let encoded = try! JSONEncoder().encode(settings)
+        let decoded = try! JSONDecoder().decode(AppSettings.self, from: encoded)
+        TestAssertion.assertEqual(decoded.edgeSliderPlacement, EdgeSliderPlacement.left)
     }
 }

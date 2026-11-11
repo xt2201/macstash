@@ -1,5 +1,16 @@
 # Release Notes & Changelog
 
+## Version 2.16.0 (2026-11-11)
+
+### Dynamic Island Audio, Dual Edge Bars & Standalone Media Scrubber
+
+- **Dynamic Island Horizontal Audio Expansion in Edge Bar**: Hovering over the compact artwork capsule smoothly morphs it outward horizontally into a Dynamic Island widget featuring song title, artist, live audio visualizer, interactive scrubber bar, and 5-button transport controls, keeping the vertical Edge Bar height permanently compact.
+- **Dual Edge Bars (Simultaneous Left & Right Support)**: You can now enable and configure both Left and Right edge bars simultaneously (default: Both Sides), each with its own independent action assignment (e.g. Left Edge for Brightness / Media Scrubber, Right Edge for Volume).
+- **Dedicated Media Player & Audio Scrubber Action**: Added a standalone `mediaPlayback` control action for Hot Corners and Edge Bars, turning the corner dial into a dedicated media jog wheel and the edge slider into an interactive audio track scrubber.
+- **Hot Corner Volume Satellite Overlap Fix**: Repositioned volume satellite controls (Rewind 10s, Play/Pause, Forward 10s) to an inner orbit radius with ample breathing room, eliminating visual overlap with the outer volume arc track.
+
+---
+
 ## Version 2.15.0 (2026-11-11)
 
 ### Real-Time Hardware Sync, Audio Scrubbing & Utility Corners

@@ -20,6 +20,8 @@ extension ControlAction {
             return [Color(red: 0.0, green: 0.82, blue: 1.0), Color(red: 0.04, green: 0.52, blue: 1.0)]
         case .scratchpad:
             return [Color(red: 0.32, green: 0.88, blue: 0.55), Color(red: 0.1, green: 0.68, blue: 0.38)]
+        case .mediaPlayback:
+            return [Color(red: 1.0, green: 0.28, blue: 0.52), Color(red: 0.85, green: 0.12, blue: 0.42)]
         case .none:
             return [Color.gray, Color.secondary]
         }

@@ -94,25 +94,30 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return true
         }
         let isRight = (edge == .right)
-        let stripWidth: CGFloat = 88.0
-        let stripX = isRight ? (bounds.maxX - stripWidth) : bounds.minX
-        let edgeStripRect = NSRect(x: stripX, y: bounds.minY, width: stripWidth, height: bounds.height)
+        let distFromBottom = isFlipped ? (bounds.maxY - point.y) : (point.y - bounds.minY)
+        let distFromEdge = isRight ? (bounds.maxX - point.x) : (point.x - bounds.minX)
+
+        // Tightly match actual 56pt bar + 8pt screen inset + 4pt shadow bleed = 68pt
+        let barVisibleWidth: CGFloat = 68.0
 
         if interactionState.isMediaExpanded {
-            let bandH: CGFloat = 145.0
+            let islandVisibleWidth: CGFloat = 324.0 // 312pt island + 8pt inset + 4pt shadow
+            if distFromEdge >= 0 && distFromEdge <= islandVisibleWidth && distFromBottom >= 50.0 && distFromBottom <= 168.0 {
+                return true
+            }
             let isVolumeShowing = interactionState.isVolumeColumnVisible
                 || interactionState.isVolumeButtonHovered
                 || interactionState.isVolumeColumnHovered
-            let islandBottom = bounds.height - 60.0
-            let bandY = isFlipped ? (islandBottom - bandH) : (60.0 - 10.0)
-            let islandBandRect = NSRect(x: bounds.minX, y: bandY, width: bounds.width, height: bandH + 10.0)
-            if islandBandRect.contains(point) {
-                return true
-            }
-            return isVolumeShowing && edgeStripRect.contains(point)
+            return isVolumeShowing
+                && distFromEdge >= 0 && distFromEdge <= barVisibleWidth
+                && distFromBottom >= 158.0 && distFromBottom <= 360.0
         }
 
-        return edgeStripRect.contains(point)
+        let action = edge == .left ? appState.activeProfile.leftEdgeAction : appState.activeProfile.rightEdgeAction
+        let hasMedia = ((action == .volume && appState.settings.edgeBarShowMediaControls) || action == .mediaPlayback) && NowPlayingManager.shared.hasMedia
+        let minY: CGFloat = hasMedia ? 52.0 : 98.0
+        let maxY: CGFloat = hasMedia ? 392.0 : 344.0
+        return distFromEdge >= 0 && distFromEdge <= barVisibleWidth && distFromBottom >= minY && distFromBottom <= maxY
     }
 
     // MARK: - Mouse Exit & Tracking Area
@@ -184,15 +189,18 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         )
 
         let loc = convert(event.locationInWindow, from: nil)
-        let boundaryY = isFlipped ? (bounds.maxY - 60.0 - 145.0) : (bounds.minY + 60.0 + 145.0)
+        let boundaryY = isFlipped ? (bounds.maxY - 60.0 - 102.0) : (bounds.minY + 60.0 + 102.0)
         let isInUpperColumnY = isFlipped ? (loc.y < boundaryY) : (loc.y > boundaryY)
-        let isInVolumeBtnRect = EdgeBarScrollPolicy.isCursorInIslandVolumeButton(
+        let rawInVolumeBtnRect = EdgeBarScrollPolicy.isCursorInIslandVolumeButton(
             localPoint: loc,
             bounds: bounds,
             edge: edge,
             isFlipped: isFlipped,
             bottomInset: 60.0
         )
+        let justExpandedAtArtworkSpot = !interactionState.hasLeftVolumeSpotAfterExpand
+            && (ProcessInfo.processInfo.systemUptime - interactionState.mediaExpandedAtUptime < 0.30)
+        let isInVolumeBtnRect = rawInVolumeBtnRect && !justExpandedAtArtworkSpot
 
         let scrollTarget = EdgeBarScrollPolicy.resolveTarget(
             action: action,

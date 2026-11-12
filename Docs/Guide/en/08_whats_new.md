@@ -1,5 +1,14 @@
 # Release Notes & Changelog
 
+## Version 2.16.10 (2026-11-12)
+
+### Zero-Flicker Volume Icon & Tight Edge Bar Auto-Hide / Click Pass-Through
+
+- **Eliminated Volume Icon Hover Flicker**: Fixed the hover loop where hovering the Dynamic Island volume icon flickered continuously between the audio scrubber and vertical volume bar. Hovering the album artwork cleanly opens the Dynamic Island while keeping the vertical bar hidden, hovering the volume icon reveals the volume slider above the island cleanly, moving sideways dismisses it, and moving straight up returns smoothly to Mode A.
+- **Tight Horizontal Hit Zone & Instant Click Pass-Through**: Tightened Mode A's interactive bounds to hug the narrow visible 56pt bar (~74pt with margin instead of the full 340pt panel). Moving your pointer just outside the bar immediately hides it and passes all clicks straight through to apps underneath.
+
+---
+
 ## Version 2.16.9 (2026-11-12)
 
 ### Dynamic Island Volume Dismissal & Seamless Mode A Return

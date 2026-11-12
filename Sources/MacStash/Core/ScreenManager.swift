@@ -341,43 +341,12 @@ public final class ScreenManager: ObservableObject {
                 }
             }
 
-            if appState.isRightSliderActive {
-                var clickedInsideSlider = false
-                for instance in instances.values {
-                    let frame = instance.screen.frame
-                    let sliderRect = instance.sliderRect(for: .right, in: frame)
-                    let expandedHitRect = CornerGeometry.edgeSliderHitRect(
-                        screenFrame: frame,
-                        sliderPanelRect: sliderRect,
-                        edge: .right
-                    )
-                    if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
-                        clickedInsideSlider = true
-                        break
-                    }
-                }
+            for edge in [EdgePosition.right, EdgePosition.left] {
+                let isActive = edge == .left ? appState.isLeftSliderActive : appState.isRightSliderActive
+                guard isActive else { continue }
+                let clickedInsideSlider = instances.values.contains { $0.isPointInActiveSlider(mouseLoc, for: edge) }
                 if !clickedInsideSlider {
-                    dismissEdgeSlider(edge: .right)
-                }
-            }
-
-            if appState.isLeftSliderActive {
-                var clickedInsideSlider = false
-                for instance in instances.values {
-                    let frame = instance.screen.frame
-                    let sliderRect = instance.sliderRect(for: .left, in: frame)
-                    let expandedHitRect = CornerGeometry.edgeSliderHitRect(
-                        screenFrame: frame,
-                        sliderPanelRect: sliderRect,
-                        edge: .left
-                    )
-                    if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
-                        clickedInsideSlider = true
-                        break
-                    }
-                }
-                if !clickedInsideSlider {
-                    dismissEdgeSlider(edge: .left)
+                    dismissEdgeSlider(edge: edge)
                 }
             }
 
@@ -662,14 +631,7 @@ public final class ScreenManager: ObservableObject {
                             instance.setEdgeInteractive(false, for: targetEdge)
                             continue
                         }
-                        let frame = instance.screen.frame
-                        let sRect = instance.sliderRect(for: targetEdge, in: frame)
-                        let expandedHitRect = CornerGeometry.edgeSliderHitRect(
-                            screenFrame: frame,
-                            sliderPanelRect: sRect,
-                            edge: targetEdge
-                        )
-                        if CornerGeometry.rectContains(expandedHitRect, mouseLoc) {
+                        if instance.isPointInActiveSlider(mouseLoc, for: targetEdge) {
                             isInsideActiveSlider = true
                             cancelEdgeHideTimer(edge: targetEdge)
                             instance.setEdgeInteractive(true, for: targetEdge)
@@ -677,7 +639,15 @@ public final class ScreenManager: ObservableObject {
                         }
                     }
                     if !isInsideActiveSlider {
-                        scheduleEdgeHideTimer(edge: targetEdge)
+                        if isDragging || NowPlayingManager.shared.isInteractiveScrubbing {
+                            cancelEdgeHideTimer(edge: targetEdge)
+                        } else {
+                            // Release mouse interception right away outside active bar so background app controls work immediately
+                            for instance in instances.values {
+                                instance.setEdgeInteractive(false, for: targetEdge)
+                            }
+                            scheduleEdgeHideTimer(edge: targetEdge)
+                        }
                     }
                 } else {
                     var candidateInstance: ScreenOverlayInstance?
@@ -818,19 +788,12 @@ public final class ScreenManager: ObservableObject {
                     if self.appState.activeDisplayID != 0 && self.appState.activeDisplayID != id {
                         continue
                     }
-                    let frame = instance.screen.frame
-                    let sliderRect = instance.sliderRect(for: edge, in: frame)
-                    let expandedHitRect = CornerGeometry.edgeSliderHitRect(
-                        screenFrame: frame,
-                        sliderPanelRect: sliderRect,
-                        edge: edge
-                    )
-                    if CornerGeometry.rectContains(expandedHitRect, cur) {
+                    if instance.isPointInActiveSlider(cur, for: edge) {
                         stillInside = true
                         break
                     }
                 }
-                if !stillInside {
+                if !stillInside && NSEvent.pressedMouseButtons == 0 && !NowPlayingManager.shared.isInteractiveScrubbing {
                     self.dismissEdgeSlider(edge: edge)
                 }
                 if edge == .left {
@@ -846,7 +809,7 @@ public final class ScreenManager: ObservableObject {
         } else {
             rightEdgeHideWorkItem = item
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18, execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: item)
     }
 
     public func cancelEdgeHideTimer(edge: EdgePosition) {

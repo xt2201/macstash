@@ -196,6 +196,51 @@ public enum CornerGeometry {
         return CGRect(x: x, y: sliderPanelRect.minY, width: hitWidth, height: sliderPanelRect.height)
     }
 
+    /// Evaluates whether `point` (in AppKit bottom-left screen coordinates) lies inside the active
+    /// visible Edge Bar UI surface so cursor dismissal and outside-click detection hug Mode A's narrow
+    /// 56pt bar (~74pt hit width) rather than keeping the full 340pt Mode B panel occupied.
+    public static func isPointInActiveEdgeSlider(
+        _ point: CGPoint,
+        screenFrame: CGRect,
+        sliderPanelRect: CGRect,
+        edge: EdgePosition,
+        isMediaExpanded: Bool,
+        hasMedia: Bool,
+        isVolumeColumnActive: Bool,
+        horizontalCushion: CGFloat = 10.0
+    ) -> Bool {
+        let localY = point.y - sliderPanelRect.minY
+        let barHitWidth = 64.0 + horizontalCushion // 8pt edge inset + 56pt sliderWidth + cushion
+
+        let withinEdgeX: (CGFloat) -> Bool = { width in
+            switch edge {
+            case .left:
+                return point.x >= (screenFrame.minX - 2.0) && point.x <= (screenFrame.minX + width)
+            case .right:
+                return point.x >= (screenFrame.maxX - width) && point.x <= (screenFrame.maxX + 2.0)
+            case .top, .bottom:
+                return false
+            }
+        }
+
+        if isMediaExpanded {
+            let islandHitWidth = 320.0 + horizontalCushion // 8pt edge inset + 312pt island + cushion
+            let inIslandBand = withinEdgeX(islandHitWidth) && localY >= 50.0 && localY <= 170.0
+            if inIslandBand {
+                return true
+            }
+            if isVolumeColumnActive {
+                return withinEdgeX(barHitWidth) && localY >= 158.0 && localY <= 360.0
+            }
+            return false
+        }
+
+        // Mode A: Tightly match actual Mode A bar width & vertical capsule span
+        let minLocalY: CGFloat = hasMedia ? 50.0 : 98.0
+        let maxLocalY: CGFloat = hasMedia ? 394.0 : 344.0
+        return withinEdgeX(barHitWidth) && localY >= minLocalY && localY <= maxLocalY
+    }
+
     /// Returns the interactive hit rectangle for the Stash Shelf or Scratchpad drawer attached to either left or right edge.
     public static func edgeDrawerHitRect(
         screenFrame: CGRect,

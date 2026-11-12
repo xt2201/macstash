@@ -695,6 +695,31 @@ public enum StashFeatureTests {
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, centeredPoint), "Centered slider point must stay inside the edge hit zone on \(edge)")
             let islandPoint = CGPoint(x: edge == .left ? screen.minX + 300.0 : screen.maxX - 300.0, y: panel.minY + 60.0 + 49.0)
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, islandPoint), "Expanded island far end must stay inside the edge hit zone on \(edge)")
+
+            // Tight Mode A vs Mode B active bounds: moving >74pt horizontally away from Mode A must dismiss bar & allow background clicks
+            TestAssertion.assertTrue(
+                CornerGeometry.isPointInActiveEdgeSlider(centeredPoint, screenFrame: screen, sliderPanelRect: panel, edge: edge, isMediaExpanded: false, hasMedia: true, isVolumeColumnActive: false),
+                "Cursor over Mode A bar stays inside active hit bounds on \(edge)"
+            )
+            let outsideModeAPoint = CGPoint(x: edge == .left ? screen.minX + 90.0 : screen.maxX - 90.0, y: panel.midY)
+            TestAssertion.assertFalse(
+                CornerGeometry.isPointInActiveEdgeSlider(outsideModeAPoint, screenFrame: screen, sliderPanelRect: panel, edge: edge, isMediaExpanded: false, hasMedia: true, isVolumeColumnActive: false),
+                "Cursor 90pt outside Mode A must release bar for immediate hide & click pass-through on \(edge)"
+            )
+            TestAssertion.assertTrue(
+                CornerGeometry.isPointInActiveEdgeSlider(islandPoint, screenFrame: screen, sliderPanelRect: panel, edge: edge, isMediaExpanded: true, hasMedia: true, isVolumeColumnActive: false),
+                "Cursor over Mode B island far end stays inside active hit bounds on \(edge)"
+            )
+            let aboveIslandPoint = CGPoint(x: edge == .left ? screen.minX + 200.0 : screen.maxX - 200.0, y: panel.minY + 250.0)
+            TestAssertion.assertFalse(
+                CornerGeometry.isPointInActiveEdgeSlider(aboveIslandPoint, screenFrame: screen, sliderPanelRect: panel, edge: edge, isMediaExpanded: true, hasMedia: true, isVolumeColumnActive: false),
+                "Empty area above Mode B island must release hit interception on \(edge)"
+            )
+            let upperVolumePoint = CGPoint(x: artworkX, y: panel.minY + 240.0)
+            TestAssertion.assertTrue(
+                CornerGeometry.isPointInActiveEdgeSlider(upperVolumePoint, screenFrame: screen, sliderPanelRect: panel, edge: edge, isMediaExpanded: true, hasMedia: true, isVolumeColumnActive: true),
+                "Popped-up volume column stays interactive when active on \(edge)"
+            )
         }
 
         // Verify shared-edge Drawer and Edge Slider panels do not vertically overlap on 14" & 1080p screens

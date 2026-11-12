@@ -1,5 +1,14 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.10 (2026-11-12)
+
+### Triệt Tiêu Nhảy Nháy Icon Âm Lượng & Tự Ẩn Sát Viền Thanh Cạnh
+
+- **Triệt Tiêu Lỗi Nhảy Nháy Icon Âm Lượng Trên Đảo Nhạc**: Khắc phục triệt để xung đột vùng nhận chuột làm thanh dọc âm lượng nhảy nháy liên tục khi rê chuột vào icon loa sau khi mở phần tua audio. Rê chuột vào ảnh audio mở đảo tua nhạc sạch sẽ; rê vào icon loa sẽ hiện cột âm lượng ổn định; rời khỏi icon loa sang các nút khác sẽ ẩn cột âm lượng; di chuột thẳng lên cột âm lượng sẽ thu gọn phần tua và quay lại giao diện âm lượng ban đầu (Mode A).
+- **Thu Hẹp Vùng Tự Ẩn Sát Thanh Cạnh & Trả Click Nền Tức Thì**: Co vùng nhận diện thanh cạnh Mode A từ `340pt` về khớp sát chiều rộng thực `56pt` của thanh trượt (`~74pt` cả lề). Chỉ cần đưa chuột ra khỏi phần diện tích thanh trượt một khoảng nhỏ theo chiều ngang, thanh cạnh lập tức nhường quyền click lại cho ứng dụng nền và tự ẩn mượt sau `0.12s`.
+
+---
+
 ## Phiên bản 2.16.9 (2026-11-12)
 
 ### Ẩn Thanh Âm Lượng Khi Rời Icon & Tự Động Quay Lại Chỉnh Âm Lượng Ban Đầu

@@ -17,13 +17,12 @@ public struct EdgeSliderView: View {
     @State private var dragValue: Float = 0.5
     @State private var isTopHovered: Bool = false
     @State private var isVolumeColumnShowing: Bool = false
+    @State private var returnedToBaselineAtUptime: TimeInterval = 0
     @State private var collapseWorkItem: DispatchWorkItem?
     @State private var volumeCloseWorkItem: DispatchWorkItem?
 
     @State private var isPrevHovered: Bool = false
-    @State private var isRewindHovered: Bool = false
     @State private var isPlayHovered: Bool = false
-    @State private var isForwardHovered: Bool = false
     @State private var isNextHovered: Bool = false
 
     private let sliderWidth: CGFloat = 56
@@ -103,6 +102,11 @@ public struct EdgeSliderView: View {
                 interactionState.reset()
             }
         }
+        .onChange(of: nowPlaying.hasMedia) { _, hasMedia in
+            if !hasMedia && interactionState.isMediaExpanded {
+                returnToBaselineVolumeMode()
+            }
+        }
         .macStashTheme(appState.resolvedColorScheme)
     }
 
@@ -115,43 +119,20 @@ public struct EdgeSliderView: View {
         let effectiveTint: Color = isVolumeWithMedia ? nowPlaying.artworkTint : (isMuted ? Color.red : (action.accentColors.first ?? .clear))
         let secondaryTint: Color = isVolumeWithMedia ? nowPlaying.artworkSecondaryTint : (action.accentColors.last ?? .blue)
 
-        let showVolumeColumn = isVolumeColumnShowing || interactionState.isVolumeButtonHovered || interactionState.isVolumeColumnHovered || isDragging
+        let showVolumeColumn = isVolumeColumnShowing || interactionState.isVolumeButtonHovered || interactionState.isVolumeColumnHovered
         let volumeTint: Color = appState.audio.isMuted ? .red : (nowPlaying.hasMedia ? nowPlaying.artworkTint : (ControlAction.volume.accentColors.first ?? .blue))
         let volumeSecondaryTint: Color = nowPlaying.hasMedia ? nowPlaying.artworkSecondaryTint : (ControlAction.volume.accentColors.last ?? .cyan)
+        let islandAnchor: UnitPoint = edge == .right ? .bottomTrailing : .bottomLeading
 
         if interactionState.isMediaExpanded && shouldShowMediaIsland {
-            // Mode B: Expanded Dynamic Island Media Mode with Edge-most Volume Button & Dropped-in Volume Slider
-            VStack(alignment: edge == .right ? .trailing : .leading, spacing: 6) {
-                if showVolumeColumn {
-                    verticalVolumeGlassColumn(tint: volumeTint, secondaryTint: volumeSecondaryTint, isMuted: appState.audio.isMuted)
-                        .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading)),
-                            removal: .opacity.combined(with: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading))
-                        ))
-                        .onHover { hovering in
-                            if hovering {
-                                returnToBaselineVolumeMode()
-                            }
-                        }
-                }
-
+            // Mode B: Anchored ZStack keeps 312x98 Dynamic Island rock-steady while volume bar fades above it
+            ZStack(alignment: edge == .right ? .bottomTrailing : .bottomLeading) {
                 EdgeMediaIslandView(
                     appState: appState,
                     edge: edge,
                     isVolumeHovered: volumeButtonHoveredBinding
                 )
-                .overlay(alignment: edge == .right ? .topTrailing : .topLeading) {
-                    if showVolumeColumn {
-                        Color.clear
-                            .frame(width: 44, height: 95)
-                            .contentShape(Rectangle())
-                            .onHover { hovering in
-                                if hovering {
-                                    returnToBaselineVolumeMode()
-                                }
-                            }
-                    }
-                }
+                .zIndex(1)
                 .onHover { hovering in
                     interactionState.isIslandHovered = hovering
                     if hovering {
@@ -163,11 +144,38 @@ public struct EdgeSliderView: View {
                         ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
                     }
                 }
+
+                if showVolumeColumn {
+                    // Hover bridge strictly across the 6pt visual gap above the 98pt island (0pt overlap with island)
+                    Color.clear
+                        .frame(width: sliderWidth, height: 8)
+                        .contentShape(Rectangle())
+                        .padding(.bottom, 98)
+                        .zIndex(2)
+                        .onHover { hovering in
+                            if hovering {
+                                returnToBaselineVolumeMode()
+                            }
+                        }
+
+                    verticalVolumeGlassColumn(tint: volumeTint, secondaryTint: volumeSecondaryTint, isMuted: appState.audio.isMuted)
+                        .padding(.bottom, 104)
+                        .zIndex(3)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .scale(scale: 0.94, anchor: islandAnchor)),
+                            removal: .opacity.combined(with: .scale(scale: 0.94, anchor: islandAnchor))
+                        ))
+                        .onHover { hovering in
+                            if hovering {
+                                returnToBaselineVolumeMode()
+                            }
+                        }
+                }
             }
             .frame(width: 312, alignment: edge == .right ? .trailing : .leading)
             .transition(.asymmetric(
-                insertion: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading).combined(with: .opacity),
-                removal: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading).combined(with: .opacity)
+                insertion: .scale(scale: 0.95, anchor: islandAnchor).combined(with: .opacity),
+                removal: .scale(scale: 0.95, anchor: islandAnchor).combined(with: .opacity)
             ))
             .animation(.spring(response: 0.30, dampingFraction: 0.80), value: interactionState.isMediaExpanded)
         } else {
@@ -191,15 +199,22 @@ public struct EdgeSliderView: View {
         Binding(
             get: { interactionState.isVolumeButtonHovered },
             set: { hovering in
-                interactionState.isVolumeButtonHovered = hovering
                 if hovering {
+                    let sinceExpand = ProcessInfo.processInfo.systemUptime - interactionState.mediaExpandedAtUptime
+                    if !interactionState.hasLeftVolumeSpotAfterExpand && sinceExpand < 0.20 {
+                        // Ignore initial 0ms mount overlap directly beneath the Mode A artwork trigger
+                        return
+                    }
+                    interactionState.isVolumeButtonHovered = true
                     cancelCollapse()
                     cancelVolumeClose()
-                    withAnimation(.easeInOut(duration: 0.18)) {
+                    withAnimation(.easeInOut(duration: 0.16)) {
                         isVolumeColumnShowing = true
                         interactionState.isVolumeColumnVisible = true
                     }
                 } else {
+                    interactionState.isVolumeButtonHovered = false
+                    interactionState.hasLeftVolumeSpotAfterExpand = true
                     scheduleVolumeClose()
                 }
             }
@@ -475,18 +490,33 @@ public struct EdgeSliderView: View {
         .contentShape(Rectangle())
         .onHover { hovering in
             if hovering {
-                cancelCollapse()
-                withAnimation(.spring(response: 0.32, dampingFraction: 0.78)) {
-                    interactionState.isMediaExpanded = true
-                }
+                expandToMediaIsland()
             }
         }
         .onTapGesture {
-            withAnimation(.spring(response: 0.32, dampingFraction: 0.78)) {
-                interactionState.isMediaExpanded.toggle()
+            if interactionState.isMediaExpanded {
+                returnToBaselineVolumeMode()
+            } else {
+                expandToMediaIsland()
             }
         }
         .help(nowPlaying.hasMedia ? "\(nowPlaying.title) • \(nowPlaying.artist)" : appState.localized("edge.noMedia"))
+    }
+
+    private func expandToMediaIsland() {
+        let now = ProcessInfo.processInfo.systemUptime
+        guard now - returnedToBaselineAtUptime >= 0.22 else { return }
+        cancelCollapse()
+        cancelVolumeClose()
+        interactionState.mediaExpandedAtUptime = now
+        interactionState.hasLeftVolumeSpotAfterExpand = false
+        isVolumeColumnShowing = false
+        interactionState.isVolumeColumnVisible = false
+        interactionState.isVolumeButtonHovered = false
+        interactionState.isVolumeColumnHovered = false
+        withAnimation(.spring(response: 0.30, dampingFraction: 0.80)) {
+            interactionState.isMediaExpanded = true
+        }
     }
 
     // MARK: - Collapse & Volume Grace Timer Helpers
@@ -502,26 +532,25 @@ public struct EdgeSliderView: View {
             Task { @MainActor in
                 let activeScrub = nowPlaying.isInteractiveScrubbing
                 if !isDragging && !interactionState.isVolumeColumnHovered && !interactionState.isVolumeButtonHovered && !interactionState.isIslandHovered && !activeScrub {
-                    withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-                        interactionState.isMediaExpanded = false
-                        isVolumeColumnShowing = false
-                        interactionState.isVolumeColumnVisible = false
-                    }
+                    returnToBaselineVolumeMode()
                 }
             }
         }
         collapseWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.40, execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
     }
 
     private func returnToBaselineVolumeMode() {
         cancelCollapse()
         cancelVolumeClose()
+        returnedToBaselineAtUptime = ProcessInfo.processInfo.systemUptime
+        interactionState.hasLeftVolumeSpotAfterExpand = false
         withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
             interactionState.isMediaExpanded = false
             isVolumeColumnShowing = false
             interactionState.isVolumeColumnVisible = false
             interactionState.isVolumeColumnHovered = false
+            interactionState.isVolumeButtonHovered = false
         }
     }
 
@@ -543,7 +572,7 @@ public struct EdgeSliderView: View {
             }
         }
         volumeCloseWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22, execute: item)
     }
 
     // MARK: - Utility Drawer Cards

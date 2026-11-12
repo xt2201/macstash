@@ -11,6 +11,8 @@ public final class EdgeSliderInteractionState: ObservableObject {
     @Published public var isSliderDragging: Bool = false
 
     public var isVolumeColumnVisible: Bool = false
+    public var mediaExpandedAtUptime: TimeInterval = 0
+    public var hasLeftVolumeSpotAfterExpand: Bool = false
 
     public init() {}
 
@@ -21,5 +23,7 @@ public final class EdgeSliderInteractionState: ObservableObject {
         isIslandHovered = false
         isSliderDragging = false
         isVolumeColumnVisible = false
+        mediaExpandedAtUptime = 0
+        hasLeftVolumeSpotAfterExpand = false
     }
 }

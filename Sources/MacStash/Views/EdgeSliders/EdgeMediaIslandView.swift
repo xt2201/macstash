@@ -242,23 +242,25 @@ public struct EdgeMediaIslandView: View {
 
     @ViewBuilder
     private var volumeButton: some View {
+        let isHighlighted = isVolumeHovered
         Button(action: {
             appState.audio.toggleMute()
         }) {
             Image(systemName: appState.audio.isMuted ? "speaker.slash.fill" : (audio.volume > 0.5 ? "speaker.wave.2.fill" : (audio.volume > 0.01 ? "speaker.wave.1.fill" : "speaker.fill")))
                 .font(.system(size: 11, weight: .bold))
-                .foregroundColor(isVolBtnHovered ? .white : nowPlaying.artworkTint)
+                .foregroundColor(isHighlighted ? .white : nowPlaying.artworkTint)
+                .scaleEffect(isHighlighted ? 1.08 : 1.0)
+                .animation(.easeInOut(duration: 0.14), value: isHighlighted)
                 .frame(width: 28, height: 26)
                 .circularLiquidGlass(
                     tint: nowPlaying.artworkTint,
                     specularIntensity: 1.2,
                     causticOpacity: 0.30,
-                    isHighlighted: isVolBtnHovered || isVolumeHovered
+                    isHighlighted: isHighlighted
                 )
-                .scaleEffect((isVolBtnHovered || isVolumeHovered) ? 1.05 : 1.0)
-                .animation(.easeInOut(duration: 0.15), value: isVolBtnHovered || isVolumeHovered)
         }
         .buttonStyle(.plain)
+        .frame(width: 28, height: 26)
         .contentShape(Rectangle())
         .help(appState.audio.isMuted ? appState.localized("menubar.unmute") : appState.localized("menubar.mute"))
         .onHover { hovering in

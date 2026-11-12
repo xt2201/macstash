@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.10] - 2026-11-12
+
+### Fixed
+- Eliminated Infinite Volume Icon Flicker in Dynamic Island (`EdgeSliderView`): Removed the `44x95` transparent overlay that overlapped the bottom volume button inside the `98pt`-tall `EdgeMediaIslandView`, rebuilt Mode B inside an anchored `ZStack` with an 8pt hover gap bridge strictly above the `98pt` island (`0pt` overlap), isolated `.scaleEffect` inside `volumeButton`'s fixed `28x26` frame, and debounced initial mount-frame hover right under Mode A's artwork trigger.
+- Tight Edge Bar Auto-Hide & Immediate Background Click Pass-Through (`CornerGeometry.isPointInActiveEdgeSlider` + `ScreenManager` + `EdgeSliderHostingView`): Tightened Mode A's horizontal interactive bounds from `340pt` to the actual `~74pt` bar width (`68pt` pass-through surface), matched Mode B bounds to the exact `98pt` island band + active vertical volume column, immediately released mouse interception when cursor exits the visible bar, shortened hide delay to `0.12s`, and guarded active drag/scrub gestures against premature dismissal.
+
+---
+
 ## [2.16.9] - 2026-11-12
 
 ### Fixed

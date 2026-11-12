@@ -116,6 +116,27 @@ public final class ScreenOverlayInstance {
         }
     }
 
+    /// Evaluates whether a global AppKit cursor point lies inside the currently visible active UI bounds
+    /// (tight ~74pt Mode A strip vs expanded Mode B Dynamic Island + optional vertical volume bar).
+    public func isPointInActiveSlider(_ point: NSPoint, for edge: EdgePosition) -> Bool {
+        let state = (edge == .left) ? leftInteractionState : rightInteractionState
+        let action = (edge == .left) ? appState.activeProfile.leftEdgeAction : appState.activeProfile.rightEdgeAction
+        let showMedia = ((action == .volume && appState.settings.edgeBarShowMediaControls) || action == .mediaPlayback)
+            && NowPlayingManager.shared.hasMedia
+        let isVolumeActive = state.isVolumeColumnVisible || state.isVolumeButtonHovered || state.isVolumeColumnHovered
+        let frame = screen.frame
+        let sRect = sliderRect(for: edge, in: frame)
+        return CornerGeometry.isPointInActiveEdgeSlider(
+            point,
+            screenFrame: frame,
+            sliderPanelRect: sRect,
+            edge: edge,
+            isMediaExpanded: state.isMediaExpanded,
+            hasMedia: showMedia,
+            isVolumeColumnActive: isVolumeActive
+        )
+    }
+
     private func createPanels() {
         let frame = screen.frame
 

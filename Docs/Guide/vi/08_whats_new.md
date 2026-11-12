@@ -1,5 +1,14 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.4 (2026-11-12)
+
+### Bản Vá Khẩn Cấp Khắc Phục Treo Ứng Dụng Sau Khi Cập Nhật
+
+- **Sửa lỗi không mở được app sau khi cập nhật v2.16.3**: Loại bỏ vòng lặp dựng lại giao diện SwiftUI vô hạn gây treo app và chiếm 100% CPU ngay lúc khởi động do cập nhật thuộc tính `@Published` của đèn nền bàn phím bên trong chu trình vẽ `CornerDialView.body`. Ứng dụng nay mở tức thì và hoạt động ổn định.
+- **Tách Bạch Cơ Chế Đọc Phần Cứng Thuần Túy**: Tách hàm đọc trực tiếp trạng thái phần cứng không gây đột biến `@Published` (`currentHardwareBrightness()`, `readBrightnessLevel(for:)`) cho giao diện, đồng thời lọc bỏ các thông báo `objectWillChange` dư thừa khi âm lượng hoặc độ sáng chưa thay đổi.
+
+---
+
 ## Phiên bản 2.16.3 (2026-11-12)
 
 ### Tua Nhạc Vuốt Dọc 2 Ngón, Căn Chuẩn Chấm Tua & Đại Tu Hit-Test

@@ -76,6 +76,7 @@ Các đường dẫn trọng yếu (lưu ý `Scripts/` viết hoa chữ `S`):
   - Cuộn hai ngón trên trackpad đồng bộ với Natural Scrolling (`NSEvent.isDirectionInvertedFromDevice`); kết hợp haptic detents (`NSHapticFeedbackManager`) và âm thanh click cơ học theo cài đặt.
   - **Zero Main-Thread I/O trong UI**: Icon ứng dụng/file phải qua `StashIconCache`; thẻ danh sách tách subview riêng (`StashItemCardView`) để SwiftUI diff mượt ở 120fps.
   - **Persistent Hosting Identity**: Không hủy/tạo lại root `NSHostingView` khi chỉ cập nhật dữ liệu (giữ trạng thái widget qua `SideDockRootWrapper`).
+  - **Side-Effect-Free `View.body` (Pure Getters)**: Mọi hàm đọc dữ liệu được gọi trong `SwiftUI.View.body` (ví dụ `AppState.getValue(for:displayID:)`, `readBrightnessLevel(for:)`, `currentHardwareBrightness()`) bắt buộc là **pure read**, tuyệt đối **không** gán thuộc tính `@Published` hay phát `objectWillChange` (tránh vòng lặp vô hạn `AttributeGraph` 100% CPU gây treo app ngay khi khởi động). Việc đồng bộ trạng thái từ phần cứng thực hiện trong timer định kỳ (`syncHardwareState`), event dwell/hover hoặc `onAppear` kèm kiểm tra ngưỡng thay đổi trước khi gán `@Published`.
 - **Accessibility & Song ngữ (EN / VI)**:
   - Mọi nút chỉ có icon, radial dial và edge slider phải có `.accessibilityLabel`, `.accessibilityValue` và `.accessibilityHint`. Tôn trọng `accessibilityDisplayShouldReduceMotion` và `Reduce Transparency`.
   - SSOT runtime cho chuỗi UI là `LocalizationService.catalog` (`Sources/MacStashCore/Localization/LocalizationService.swift`), bắt buộc đối xứng 100% EN và VI có dấu tiếng Việt chuẩn. Khi cập nhật/dịch mới hoặc chỉnh key lớn, giữ `Localizable.xcstrings` sạch và không chứa chuỗi phiên bản cứng.
@@ -149,4 +150,5 @@ Lệnh chuẩn:
 - Hardcode số phiên bản trong chuỗi UI/catalog, sửa tay file PNG/ICNS nhị phân, hoặc để `README.md`/hình minh họa bị lệch so với code khi release.
 - Đặt Segmented Picker nằm ngang cạnh nhãn dài trong `SettingsCard` gây tràn viền/cắt chữ, hoặc hardcode khoảng cách điểm làm trùng đè các nút điều khiển trong Corner Dial / Edge Bar.
 - Ghi đè `elapsedTime` thành 0 khi cùng một bản nhạc đang tiếp tục phát.
+- Gọi setter/sync làm thay đổi `@Published` hoặc phát `objectWillChange` bên trong `SwiftUI.View.body` hay `AppState.getValue(for:displayID:)`.
 - Báo "xong" khi chưa chạy lại `make test` và kiểm chứng thực tế sau chỉnh sửa cuối cùng.

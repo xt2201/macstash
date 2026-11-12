@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.4] - 2026-11-12
+
+### Fixed
+- Critical Post-Update Launch Hang (`v2.16.3` Regression): Eliminated an infinite synchronous `AttributeGraph` main-thread re-evaluation loop (100% CPU hang at startup) triggered when SwiftUI evaluated `CornerDialView.body` -> `AppState.getValue(for: .keyboardBrightness)` -> `KeyboardBrightnessManager.updateBrightnessFromHardware()`, which unconditionally assigned `@Published var brightness` during `View.body` evaluation.
+- Side-Effect-Free SwiftUI Value Getters: Made `AppState.getValue(for:displayID:)` strictly pure with zero `@Published` writes by introducing pure read paths `KeyboardBrightnessManager.currentHardwareBrightness()` and `CompositeBrightnessService.readBrightnessLevel(for:)`.
+- Redundant Hardware Sync Notifications: Guarded `@Published` assignments in `KeyboardBrightnessManager.updateBrightnessFromHardware()`, `CompositeBrightnessService.syncHardwareBrightness(for:)`, and `AudioManager.updateVolumeFromHardware(force:)` with change thresholds so periodic background syncs never emit spurious `objectWillChange` events when hardware values are unchanged.
+
+---
+
 ## [2.16.3] - 2026-11-12
 
 ### Changed

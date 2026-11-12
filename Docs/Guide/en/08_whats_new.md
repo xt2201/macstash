@@ -1,5 +1,14 @@
 # Release Notes & Changelog
 
+## Version 2.16.4 (2026-11-12)
+
+### Critical Launch Stability Hotfix
+
+- **Fixed App Hang After Updating to v2.16.3**: Resolved an infinite SwiftUI view re-evaluation loop at startup caused by mutating `@Published` keyboard backlight state inside `CornerDialView`'s rendering pass. MacStash now launches instantaneously with near-zero idle CPU usage.
+- **Pure Hardware Read Architecture**: Separated non-mutating hardware reads (`currentHardwareBrightness()` and `readBrightnessLevel(for:)`) for SwiftUI rendering from periodic hardware syncs, and guarded audio/brightness/keyboard publishers against redundant updates when physical values have not changed.
+
+---
+
 ## Version 2.16.3 (2026-11-12)
 
 ### Audio Scrubbing Mechanics, Scrubber Alignment & Hit-Testing Audit

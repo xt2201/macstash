@@ -62,8 +62,25 @@ public enum BrightnessPolicyTests {
     private static func testHardwareBrightnessSync() {
         let service = CompositeBrightnessService()
         let disp = DisplayInfo(id: 1, uuid: "builtin-1", name: "Built-in Retina", frame: .zero, isBuiltIn: true)
+
+        // Pure read must never mutate @Published profiles or fire objectWillChange (critical for View.body safety)
+        var pureReadChanges = 0
+        let pureSub = service.objectWillChange.sink { pureReadChanges += 1 }
+        let readVal = service.readBrightnessLevel(for: disp)
+        pureSub.cancel()
+        TestAssertion.assertTrue(readVal >= 0.0 && readVal <= 1.0, "Pure hardware read within valid normalized range")
+        TestAssertion.assertEqual(pureReadChanges, 0, "readBrightnessLevel must never emit objectWillChange")
+        TestAssertion.assertTrue(service.profile(for: "builtin-1") == nil, "readBrightnessLevel must not mutate profiles dictionary")
+
+        // Initial sync populates profile once; immediate re-sync without hardware change must not spam objectWillChange
         let live = service.syncHardwareBrightness(for: disp)
         TestAssertion.assertTrue(live >= 0.0 && live <= 1.0, "Hardware brightness within valid normalized range")
         TestAssertion.assertEqual(service.profile(for: "builtin-1")?.brightnessLevel, live)
+
+        var repeatSyncChanges = 0
+        let repeatSub = service.objectWillChange.sink { repeatSyncChanges += 1 }
+        _ = service.syncHardwareBrightness(for: disp)
+        repeatSub.cancel()
+        TestAssertion.assertEqual(repeatSyncChanges, 0, "Unchanged hardware brightness must not emit redundant objectWillChange")
     }
 }

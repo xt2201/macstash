@@ -3,6 +3,7 @@ import Foundation
 public enum CodeHygieneTests {
     public static func run() {
         testNoForbiddenCallsInSources()
+        testAppStateGetValueIsPureRead()
         testZeroEmojisAcrossRepoMarkdownAndCode()
         testMinimumOSAlignment()
         testHarnessFilesExistAndValid()
@@ -98,6 +99,25 @@ public enum CodeHygieneTests {
         TestAssertion.assertTrue(tryBangOffenders.isEmpty, "Zero try! calls in Sources/ (found: \(tryBangOffenders.joined(separator: ", ")))")
         TestAssertion.assertTrue(asBangOffenders.isEmpty, "Zero as! force casts in Sources/ (found: \(asBangOffenders.joined(separator: ", ")))")
         TestAssertion.assertTrue(fatalOffenders.isEmpty, "Zero runtime fatalError() calls outside unavailable initializers (found: \(fatalOffenders.joined(separator: ", ")))")
+    }
+
+    private static func testAppStateGetValueIsPureRead() {
+        guard let root = findRepoRoot() else { return }
+        let appStateURL = root.appendingPathComponent("Sources/MacStash/App/AppState.swift")
+        guard let content = try? String(contentsOf: appStateURL, encoding: .utf8) else {
+            TestAssertion.assertTrue(false, "AppState.swift must be readable")
+            return
+        }
+        guard let startRange = content.range(of: "public func getValue(for action: ControlAction"),
+              let endRange = content.range(of: "public func setValue(for action: ControlAction", range: startRange.upperBound..<content.endIndex) else {
+            TestAssertion.assertTrue(false, "Could not locate AppState.getValue method body")
+            return
+        }
+        let body = String(content[startRange.lowerBound..<endRange.lowerBound])
+        TestAssertion.assertFalse(body.contains("updateBrightnessFromHardware"), "AppState.getValue must not mutate @Published via updateBrightnessFromHardware")
+        TestAssertion.assertFalse(body.contains("syncHardwareBrightness"), "AppState.getValue must not mutate @Published via syncHardwareBrightness")
+        TestAssertion.assertFalse(body.contains("updateVolumeFromHardware"), "AppState.getValue must not mutate @Published via updateVolumeFromHardware")
+        TestAssertion.assertFalse(body.contains("objectWillChange"), "AppState.getValue must never fire objectWillChange inside View.body")
     }
 
     private static func testZeroEmojisAcrossRepoMarkdownAndCode() {

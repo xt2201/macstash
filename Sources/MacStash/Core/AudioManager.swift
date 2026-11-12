@@ -370,12 +370,16 @@ public final class AudioManager: ObservableObject {
         let isEffectivelySilent = hardwareMuted || (status == noErr && vol <= 0.001)
 
         if status == noErr {
-            self.volume = vol
+            if abs(self.volume - vol) > 0.001 {
+                self.volume = vol
+            }
             if vol > 0.02 {
                 self.preMuteVolume = vol
             }
         }
-        self.isMuted = isEffectivelySilent
+        if self.isMuted != isEffectivelySilent {
+            self.isMuted = isEffectivelySilent
+        }
     }
 
     // MARK: - Real-time Listeners

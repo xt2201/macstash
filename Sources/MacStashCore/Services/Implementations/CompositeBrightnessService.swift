@@ -40,24 +40,41 @@ public final class CompositeBrightnessService: ObservableObject, @unchecked Send
         return nil
     }
 
+    /// Purely reads the brightness level for a display without mutating `@Published` state.
+    /// Safe to invoke inside `SwiftUI.View.body`.
+    public func readBrightnessLevel(for display: DisplayInfo) -> Float {
+        if let live = currentHardwareBrightness(for: display) {
+            return live
+        }
+        return profiles[display.uuid]?.brightnessLevel ?? Defaults.Brightness.defaultLevel
+    }
+
     /// Synchronously synchronizes internal profile state with the live hardware brightness.
-    /// Returns the live clamped brightness value.
+    /// Returns the live clamped brightness value without emitting redundant `@Published` updates when unchanged.
     @discardableResult
     public func syncHardwareBrightness(for display: DisplayInfo) -> Float {
-        var profile = profiles[display.uuid] ?? DisplayBrightnessProfile(
+        let existing = profiles[display.uuid]
+        var profile = existing ?? DisplayBrightnessProfile(
             displayUUID: display.uuid,
             displayName: display.name,
             isBuiltIn: display.isBuiltIn
         )
+        let result: Float
         if let live = currentHardwareBrightness(for: display) {
             profile.brightnessLevel = live
             profile.actualMethod = .builtIn
-            profiles[display.uuid] = profile
-            return live
+            result = live
         } else {
-            profiles[display.uuid] = profile
-            return profile.brightnessLevel
+            result = profile.brightnessLevel
         }
+
+        let didChange = existing == nil
+            || abs((existing?.brightnessLevel ?? -1) - profile.brightnessLevel) > 0.002
+            || existing?.actualMethod != profile.actualMethod
+        if didChange {
+            profiles[display.uuid] = profile
+        }
+        return result
     }
 
     /// Synchronizes all connected displays with physical hardware values.

@@ -42,25 +42,38 @@ public final class KeyboardBrightnessManager: ObservableObject {
         }
     }
 
-    public func updateBrightnessFromHardware() {
-        guard isSupported, let client = clientInstance else { return }
+    /// Reads current physical keyboard backlight level without mutating `@Published` state.
+    public func currentHardwareBrightness() -> Float? {
+        guard isSupported, let client = clientInstance else { return nil }
 
         // Method signature: - (float)brightnessForKeyboard:(unsigned long long)arg1;
         // Or backlightLevelForKeyboard:
         typealias GetBrightnessFunc = @convention(c) (AnyObject, Selector, UInt64) -> Float
         let sel = NSSelectorFromString("brightnessForKeyboard:")
         guard client.responds(to: sel),
-              let methodIMP = client.method(for: sel) else { return }
+              let methodIMP = client.method(for: sel) else { return nil }
 
         let fn = unsafeBitCast(methodIMP, to: GetBrightnessFunc.self)
         let current = fn(client, sel, keyboardID)
-        self.brightness = KeyboardBrightnessPolicy.clamp(current)
+        return KeyboardBrightnessPolicy.clamp(current)
+    }
+
+    public func updateBrightnessFromHardware() {
+        guard let clamped = currentHardwareBrightness() else { return }
+        if KeyboardBrightnessPolicy.isSignificantChange(from: self.brightness, to: clamped) {
+            self.brightness = clamped
+        }
     }
 
     public func setBrightness(_ newBrightness: Float) {
         let clamped = KeyboardBrightnessPolicy.clamp(newBrightness)
-        guard KeyboardBrightnessPolicy.isSignificantChange(from: self.brightness, to: clamped) else { return }
-        self.brightness = clamped
+        let hardwareBaseline = currentHardwareBrightness() ?? self.brightness
+        let differsFromCached = KeyboardBrightnessPolicy.isSignificantChange(from: self.brightness, to: clamped)
+        let differsFromHardware = KeyboardBrightnessPolicy.isSignificantChange(from: hardwareBaseline, to: clamped)
+        guard differsFromCached || differsFromHardware else { return }
+        if differsFromCached {
+            self.brightness = clamped
+        }
 
         guard isSupported, let client = clientInstance else { return }
 

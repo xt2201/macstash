@@ -526,13 +526,11 @@ public final class AppState: ObservableObject {
             let targetID = displayID != 0 ? displayID : (activeDisplayID != 0 ? activeDisplayID : CGMainDisplayID())
             let displays = connectedDisplays()
             if let display = displays.first(where: { $0.id == targetID }) {
-                let live = brightnessService.syncHardwareBrightness(for: display)
-                return Double(live)
+                return Double(brightnessService.readBrightnessLevel(for: display))
             }
             return Double(Defaults.Brightness.defaultLevel)
         case .keyboardBrightness:
-            keyboard.updateBrightnessFromHardware()
-            return Double(keyboard.brightness)
+            return Double(keyboard.currentHardwareBrightness() ?? keyboard.brightness)
         case .timer:
             if pomodoroEngine.state.isRunning || isPomodoroPaused {
                 return pomodoroProgress
@@ -633,7 +631,8 @@ public final class AppState: ObservableObject {
             haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)
         case .keyboardBrightness:
-            let next = KeyboardBrightnessPolicy.toggle(current: keyboard.brightness)
+            let current = Float(getValue(for: .keyboardBrightness))
+            let next = KeyboardBrightnessPolicy.toggle(current: current)
             setValue(for: .keyboardBrightness, value: Double(next))
             haptics.performBoundaryClick(intensity: effectiveHapticIntensity)
             sound.playAccent(enabled: isSoundEnabled)

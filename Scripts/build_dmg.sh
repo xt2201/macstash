@@ -124,6 +124,10 @@ fi
 # Copy icon and resources into app bundle
 if [[ -d "$REPO_ROOT/Sources/MacStash/Resources" ]]; then
     cp -R "$REPO_ROOT/Sources/MacStash/Resources/"* "$APP_BUNDLE/Contents/Resources/" 2>/dev/null || true
+    if [[ -d "$REPO_ROOT/Sources/MacStash/Resources/BundledThemes" ]]; then
+        mkdir -p "$APP_BUNDLE/Contents/Resources/Themes"
+        cp -R "$REPO_ROOT/Sources/MacStash/Resources/BundledThemes/"* "$APP_BUNDLE/Contents/Resources/Themes/" 2>/dev/null || true
+    fi
     if [[ -f "$APP_BUNDLE/Contents/Resources/now-playing.pl" ]]; then
         chmod +x "$APP_BUNDLE/Contents/Resources/now-playing.pl"
     fi

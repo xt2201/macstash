@@ -1,5 +1,15 @@
 # Release Notes & Changelog
 
+## Version 2.18.0 (2026-11-12)
+
+### Complete `SideDockEngine` (Docky) Integration & 18 Unified Widgets
+
+- **Full `SideDockEngine` Architecture**: Upgraded Second Dock to run on the full `SideDockEngine` windowing, magnification, live glass backdrop (`LiveGlassBackdrop`), Start Menu (`MenuCatalog`), Bundled Themes, Launchpad (`Control+Option+L`), Live Window Switcher (`Option+Tab`), Space Reservation, and Interactive Dock Editor engine.
+- **9 Exclusive MacStash Widgets Integrated into Docky**: Added `Clock`, `Pomodoro`, `File Shelf`, `Clipboard History`, `Quick Note`, `Screenshot`, `Color Picker`, `Unit Converter`, and `Bookmarks` directly as native `WidgetKind` items inside Docky's Widget Gallery, Smart Stacks, hover-expansion popovers, and per-tile settings.
+- **Synchronized Now Playing & Unified Settings**: Bridged `NowPlayingManager` live metadata, artwork, and playback commands to Docky's Now Playing widget and embedded Docky's full multi-pane configuration studio directly inside **Settings > Second Dock**.
+
+---
+
 ## Version 2.17.0 (2026-11-12)
 
 ### Next-Gen Second Dock: Docky-Parity Overhaul

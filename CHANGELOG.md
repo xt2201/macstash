@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.18.0] - 2026-11-12
+
+### Added
+- **Full `SideDockEngine` Port (Docky Engine + Bundled Resources)**: Replaced the custom Second Dock runtime with the complete `SideDockEngine` architecture (`SideDockEngineCoordinator`, `MainWindow` / `MainWindowController`, `TileStore`, `DockyPreferences`, `ThemeManager`, `MenuCatalogService`, `WindowReservationService`, `WindowSwitcherService`, `LaunchpadOverlayService`, `StartMenuService`, `LiveGlassBackdrop`, and bundled `MenuCatalog`, `BundledThemes`, and onboarding tutorial clips).
+- **18 Unified Widgets Inside Docky Gallery & Smart Stacks (`StashWidgetBridgeView`)**: Bridged all 9 MacStash-exclusive local widgets (`Clock`, `Pomodoro`, `File Shelf`, `Clipboard History`, `Quick Note`, `Screenshot`, `Color Picker`, `Unit Converter`, and `Bookmarks`) directly into Docky's `WidgetKind`, `WidgetCatalog`, `DockEditorOverlayWindowController`, hover-expansion popovers (`WidgetRegistry.shared.makeExpandedView`), Smart Stacks, and per-tile widget settings (`StashWidgetSettingsEditorView`).
+- **Live NowPlaying Media Sync Bridge**: Connected MacStash's `NowPlayingManager` directly to `SideDockEngineCoordinator.updateNowPlaying(...)` and routed Docky media transport commands (`toggle`, `play`, `pause`, `next`, `previous`, `seek`) back to `NowPlayingManager` without bundling an extra MediaRemote framework.
+
+### Changed
+- **Unified Settings & Facade (`SideDockManager` + `SettingsView`)**: Rewired `SideDockManager` in `SideDockSystem` as a lightweight facade delegating to `SideDockEngineCoordinator.shared`, embedded Docky's full split-view `SettingsRootView` inside the MacStash **Second Dock** settings tab alongside quick Launchpad / Edit Dock / Dedicated Window header controls, removed duplicate Launchpad/Window Switcher global hotkey interceptors from `ScreenManager`, and added theme/catalog resource staging to `Scripts/build_dmg.sh`.
+
+---
+
 ## [2.17.0] - 2026-11-12
 
 ### Added

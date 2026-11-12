@@ -1,0 +1,631 @@
+{
+  "version": 1,
+  "packages": [
+    {
+      "id": "docky.core",
+      "title": "Docky Core Actions",
+      "author": "Docky",
+      "version": "1.0.0",
+      "reviewStatus": "curated",
+      "description": "Built-in Docky actions and reviewed scripted extensions.",
+      "actions": [
+        {
+          "id": "app.open",
+          "title": "Open",
+          "kind": "builtin",
+          "builtinIdentifier": "openApp",
+          "tileTypes": ["app"],
+          "permissions": [],
+          "inputs": [],
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "not": { "flag": "isRunning" }
+          }
+        },
+        {
+          "id": "app.show-all-windows",
+          "title": "Show All Windows",
+          "kind": "builtin",
+          "builtinIdentifier": "showAllWindows",
+          "tileTypes": ["app"],
+          "permissions": [],
+          "inputs": [],
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "flag": "isRunning" }
+        },
+        {
+          "id": "app.toggle-pin",
+          "title": "Keep in Dock",
+          "kind": "builtin",
+          "builtinIdentifier": "togglePinnedApp",
+          "tileTypes": ["app"],
+          "permissions": [],
+          "inputs": [],
+          "destructive": false,
+          "toggleFlag": "isPinned",
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "flag": "canTogglePin" }
+        },
+        {
+          "id": "app.show-in-finder",
+          "title": "Show in Finder",
+          "kind": "builtin",
+          "builtinIdentifier": "showAppInFinder",
+          "tileTypes": ["app"],
+          "permissions": [],
+          "inputs": [],
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false
+        },
+        {
+          "id": "app.hide",
+          "title": "Hide",
+          "kind": "builtin",
+          "builtinIdentifier": "hideApp",
+          "tileTypes": ["app"],
+          "permissions": [],
+          "inputs": [],
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "flag": "isRunning" },
+              { "not": { "flag": "isFinder" } }
+            ]
+          }
+        },
+        {
+          "id": "app.hide-others",
+          "title": "Hide Others",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.systemevents",
+          "permissions": ["accessibility"],
+          "inputs": ["bundleIdentifier"],
+          "script": "tell application id \"com.apple.systemevents\"\n    set visible of every application process whose bundle identifier is not \"{{bundleIdentifier}}\" to false\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "flag": "isRunning" },
+              { "not": { "flag": "isFinder" } }
+            ]
+          }
+        },
+        {
+          "id": "app.quit",
+          "title": "Quit",
+          "alternateTitle": "Force Quit",
+          "alternateTitleWhen": { "flag": "optionKey" },
+          "kind": "builtin",
+          "builtinIdentifier": "quitApp",
+          "tileTypes": ["app"],
+          "permissions": [],
+          "inputs": [],
+          "destructive": false,
+          "destructiveWhen": { "flag": "optionKey" },
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "flag": "isRunning" },
+              { "not": { "flag": "isFinder" } }
+            ]
+          }
+        },
+        {
+          "id": "folder.open-in-finder",
+          "title": "Open in Finder",
+          "kind": "builtin",
+          "builtinIdentifier": "openFolderInFinder",
+          "tileTypes": ["folder"],
+          "permissions": ["finderAutomation"],
+          "inputs": [],
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false
+        },
+        {
+          "id": "folder.reveal-in-finder",
+          "title": "Reveal in Finder",
+          "kind": "builtin",
+          "builtinIdentifier": "revealFolderInFinder",
+          "tileTypes": ["folder"],
+          "permissions": ["finderAutomation"],
+          "inputs": [],
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false
+        },
+        {
+          "id": "trash.open",
+          "title": "Open Trash",
+          "kind": "builtin",
+          "builtinIdentifier": "openTrash",
+          "tileTypes": ["trash"],
+          "permissions": ["finderAutomation"],
+          "inputs": [],
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false
+        },
+        {
+          "id": "trash.empty",
+          "title": "Empty Trash",
+          "kind": "builtin",
+          "builtinIdentifier": "emptyTrash",
+          "tileTypes": ["trash"],
+          "permissions": ["finderAutomation"],
+          "inputs": [],
+          "destructive": true,
+          "requiresFrontmost": false,
+          "holdOption": false
+        },
+        {
+          "id": "xcode.run",
+          "title": "Run",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.dt.Xcode",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["Product", "Run"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "symbol": "play.fill",
+          "when": { "bundleIdentifierEquals": "com.apple.dt.Xcode" }
+        },
+        {
+          "id": "xcode.test",
+          "title": "Test",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.dt.Xcode",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["Product", "Test"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "symbol": "checkmark.diamond",
+          "when": { "bundleIdentifierEquals": "com.apple.dt.Xcode" }
+        },
+        {
+          "id": "xcode.profile",
+          "title": "Profile",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.dt.Xcode",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["Product", "Profile"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "symbol": "speedometer",
+          "when": { "bundleIdentifierEquals": "com.apple.dt.Xcode" }
+        },
+        {
+          "id": "xcode.analyze",
+          "title": "Analyze",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.dt.Xcode",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["Product", "Analyze"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "symbol": "stethoscope",
+          "when": { "bundleIdentifierEquals": "com.apple.dt.Xcode" }
+        },
+        {
+          "id": "xcode.clean-build-folder",
+          "title": "Clean Build Folder",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.dt.Xcode",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["Product", "Clean Build Folder"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "symbol": "trash",
+          "when": { "bundleIdentifierEquals": "com.apple.dt.Xcode" }
+        }
+      ]
+    },
+    {
+      "id": "docky.curated-app-integrations",
+      "title": "Curated App Integrations",
+      "author": "Docky",
+      "version": "1.0.0",
+      "reviewStatus": "curated",
+      "description": "Docky-reviewed actions for selected third-party apps and browsers.",
+      "actions": [
+        {
+          "id": "ghostty.new-window",
+          "title": "New Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.mitchellh.ghostty",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.mitchellh.ghostty\"\n    new window\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.mitchellh.ghostty" }
+        },
+        {
+          "id": "ghostty.new-tab",
+          "title": "New Tab",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.mitchellh.ghostty",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.mitchellh.ghostty\"\n    tell front window to new tab\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "bundleIdentifierEquals": "com.mitchellh.ghostty" },
+              { "flag": "isRunning" }
+            ]
+          }
+        },
+        {
+          "id": "arc.new-window",
+          "title": "New Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "company.thebrowser.Browser",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"company.thebrowser.Browser\"\n    make new window\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "company.thebrowser.Browser" }
+        },
+        {
+          "id": "arc.new-incognito-window",
+          "title": "New Incognito Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "company.thebrowser.Browser",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"company.thebrowser.Browser\"\n    make new window with properties {mode:\"incognito\"}\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "company.thebrowser.Browser" }
+        },
+        {
+          "id": "arc.new-tab",
+          "title": "New Tab",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "company.thebrowser.Browser",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"company.thebrowser.Browser\"\n    tell front window to make new tab\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "bundleIdentifierEquals": "company.thebrowser.Browser" },
+              { "flag": "isRunning" }
+            ]
+          }
+        },
+        {
+          "id": "dia.new-window",
+          "title": "New Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "company.thebrowser.dia",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"company.thebrowser.dia\"\n    make new window\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "company.thebrowser.dia" }
+        },
+        {
+          "id": "dia.new-tab",
+          "title": "New Tab",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "company.thebrowser.dia",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"company.thebrowser.dia\"\n    tell front window to make new tab\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "bundleIdentifierEquals": "company.thebrowser.dia" },
+              { "flag": "isRunning" }
+            ]
+          }
+        },
+        {
+          "id": "claude.new-conversation",
+          "title": "New Conversation",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.anthropic.claudefordesktop",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["File", "New Conversation"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.anthropic.claudefordesktop" }
+        },
+        {
+          "id": "safari.new-window",
+          "title": "New Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.Safari",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.apple.Safari\"\n    make new document\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.apple.Safari" }
+        },
+        {
+          "id": "safari.new-private-window",
+          "title": "New Private Window",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.Safari",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["File", "New Private Window"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.apple.Safari" }
+        },
+        {
+          "id": "safari.new-tab",
+          "title": "New Tab",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.apple.Safari",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.apple.Safari\"\n    tell front window to make new tab\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "bundleIdentifierEquals": "com.apple.Safari" },
+              { "flag": "isRunning" }
+            ]
+          }
+        },
+        {
+          "id": "chrome.new-window",
+          "title": "New Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.google.Chrome",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.google.Chrome\"\n    make new window\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.google.Chrome" }
+        },
+        {
+          "id": "chrome.new-incognito-window",
+          "title": "New Incognito Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.google.Chrome",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.google.Chrome\"\n    make new window with properties {mode:\"incognito\"}\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.google.Chrome" }
+        },
+        {
+          "id": "chrome.new-tab",
+          "title": "New Tab",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.google.Chrome",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.google.Chrome\"\n    tell front window to make new tab\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "bundleIdentifierEquals": "com.google.Chrome" },
+              { "flag": "isRunning" }
+            ]
+          }
+        },
+        {
+          "id": "brave.new-window",
+          "title": "New Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.brave.Browser",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.brave.Browser\"\n    make new window\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.brave.Browser" }
+        },
+        {
+          "id": "brave.new-private-window",
+          "title": "New Private Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.brave.Browser",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.brave.Browser\"\n    make new window with properties {mode:\"incognito\"}\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.brave.Browser" }
+        },
+        {
+          "id": "brave.new-tab",
+          "title": "New Tab",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.brave.Browser",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.brave.Browser\"\n    tell front window to make new tab\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "bundleIdentifierEquals": "com.brave.Browser" },
+              { "flag": "isRunning" }
+            ]
+          }
+        },
+        {
+          "id": "edge.new-window",
+          "title": "New Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.microsoft.edgemac",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.microsoft.edgemac\"\n    make new window\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.microsoft.edgemac" }
+        },
+        {
+          "id": "edge.new-inprivate-window",
+          "title": "New InPrivate Window",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.microsoft.edgemac",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.microsoft.edgemac\"\n    make new window with properties {mode:\"incognito\"}\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.microsoft.edgemac" }
+        },
+        {
+          "id": "edge.new-tab",
+          "title": "New Tab",
+          "kind": "applescript",
+          "tileTypes": ["app"],
+          "targetApp": "com.microsoft.edgemac",
+          "permissions": [],
+          "inputs": [],
+          "script": "tell application id \"com.microsoft.edgemac\"\n    tell front window to make new tab\nend tell",
+          "destructive": false,
+          "requiresFrontmost": false,
+          "holdOption": false,
+          "when": {
+            "all": [
+              { "bundleIdentifierEquals": "com.microsoft.edgemac" },
+              { "flag": "isRunning" }
+            ]
+          }
+        },
+        {
+          "id": "firefox.new-window",
+          "title": "New Window",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "org.mozilla.firefox",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["File", "New Window"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "org.mozilla.firefox" }
+        },
+        {
+          "id": "firefox.new-private-window",
+          "title": "New Private Window",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "org.mozilla.firefox",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["File", "New Private Window"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "org.mozilla.firefox" }
+        },
+        {
+          "id": "vscode.new-window",
+          "title": "New Window",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.microsoft.VSCode",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["File", "New Window"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.microsoft.VSCode" }
+        },
+        {
+          "id": "cursor.new-window",
+          "title": "New Window",
+          "kind": "menuClick",
+          "tileTypes": ["app"],
+          "targetApp": "com.todesktop.230313mzl4w4u92",
+          "permissions": ["accessibility"],
+          "inputs": [],
+          "path": ["File", "New Window"],
+          "destructive": false,
+          "requiresFrontmost": true,
+          "holdOption": false,
+          "when": { "bundleIdentifierEquals": "com.todesktop.230313mzl4w4u92" }
+        }
+      ]
+    }
+  ]
+}

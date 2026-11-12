@@ -2,6 +2,7 @@ import SwiftUI
 import AppKit
 import SideDockUI
 import SideDockSystem
+import SideDockEngine
 import MacStashCore
 import MacStashDesignSystem
 
@@ -331,17 +332,80 @@ public struct SettingsView: View {
 
             Divider()
 
-            ScrollView(.vertical, showsIndicators: true) {
-                VStack(alignment: .leading, spacing: 18) {
-                    activeTabContent
+            if selectedTab == .sideDock {
+                VStack(spacing: 0) {
+                    sideDockHeaderControls
+                    Divider()
+                    SideDockEngineCoordinator.shared.makeEmbeddedSettingsView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 20)
-                .frame(maxWidth: 680, alignment: .leading)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
+            } else {
+                ScrollView(.vertical, showsIndicators: true) {
+                    VStack(alignment: .leading, spacing: 18) {
+                        activeTabContent
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 20)
+                    .frame(maxWidth: 680, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                }
             }
         }
         .background(Color(NSColor.windowBackgroundColor))
+    }
+
+    private var sideDockHeaderControls: some View {
+        HStack(spacing: 12) {
+            Toggle(
+                isOn: Binding(
+                    get: { sideDock.config.isDockVisible },
+                    set: { sideDock.setDockVisible($0) }
+                )
+            ) {
+                Text(appState.localized("general.secondDock"))
+                    .font(.system(size: 13, weight: .semibold))
+            }
+            .toggleStyle(.switch)
+
+            Spacer()
+
+            Button {
+                if !sideDock.config.isDockVisible {
+                    sideDock.setDockVisible(true)
+                }
+                sideDock.toggleLaunchpad()
+            } label: {
+                Label("Launchpad", systemImage: "square.grid.3x3.fill")
+                    .font(.system(size: 11.5, weight: .medium))
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+
+            Button {
+                if !sideDock.config.isDockVisible {
+                    sideDock.setDockVisible(true)
+                }
+                sideDock.toggleEditMode()
+            } label: {
+                Label("Edit Dock", systemImage: "slider.horizontal.3")
+                    .font(.system(size: 11.5, weight: .medium))
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
+
+            Button {
+                sideDock.openFullSettingsWindow()
+            } label: {
+                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                    .font(.system(size: 11.5, weight: .medium))
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .help("Open Second Dock in dedicated window")
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 10)
+        .background(Color(NSColor.controlBackgroundColor).opacity(0.45))
     }
 
     @ViewBuilder
@@ -352,19 +416,7 @@ public struct SettingsView: View {
         case .hotCorners:
             HotCornersTab(appState: appState)
         case .sideDock:
-            DockSettingsTabView(
-                config: $sideDock.config,
-                onSave: { immediate in
-                    let snapshot = sideDock.config
-                    sideDock.configStore.updateConfig(immediate: immediate) { cfg in
-                        cfg = snapshot
-                    }
-                    sideDock.updateDockLayout()
-                },
-                onResetLayout: {
-                    sideDock.resetLayout()
-                }
-            )
+            EmptyView()
         case .appearance:
             AppearanceTab(appState: appState)
         case .displays:

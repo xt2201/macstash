@@ -1113,14 +1113,6 @@ public final class ScreenManager: ObservableObject {
         } else if matchesConfiguredShortcut(event: event, shortcutString: "ctrl+opt+d") {
             appState.sideDock.toggleDock()
             HapticManager.shared.performBoundaryClick()
-        } else if matchesConfiguredShortcut(event: event, shortcutString: appState.sideDock.config.launchpadShortcut) {
-            appState.sideDock.toggleLaunchpad()
-            HapticManager.shared.performBoundaryClick()
-        } else if appState.sideDock.config.windowSwitcherEnabled,
-                  (matchesConfiguredShortcut(event: event, shortcutString: appState.sideDock.config.windowSwitcherShortcut) ||
-                   (appState.sideDock.config.windowSwitcherInterceptCmdTab && matchesConfiguredShortcut(event: event, shortcutString: "cmd+tab"))) {
-            appState.sideDock.toggleWindowSwitcher()
-            HapticManager.shared.performBoundaryClick()
         }
 
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
@@ -1135,7 +1127,7 @@ public final class ScreenManager: ObservableObject {
                 26: 6,
                 28: 7
             ]
-            if let profileIdx = digitCodes[event.keyCode], profileIdx < appState.sideDock.config.profiles.count {
+            if let profileIdx = digitCodes[event.keyCode] {
                 appState.sideDock.selectProfile(at: profileIdx)
                 HapticManager.shared.performBoundaryClick()
             }

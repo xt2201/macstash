@@ -1,5 +1,15 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.18.0 (2026-11-12)
+
+### Tích Hợp Toàn Diện `SideDockEngine` (Docky) & 18 Tiện Ích Hợp Nhất
+
+- **Kiến Trúc `SideDockEngine` Đầy Đủ**: Nâng cấp Second Dock lên trọn bộ động cơ cửa sổ, sóng phóng đại, kính thực thời (`LiveGlassBackdrop`), Start Menu (`MenuCatalog`), bộ giao diện tích hợp (`BundledThemes`), Launchpad (`Control+Option+L`), Live Window Switcher (`Option+Tab`), chừa không gian hệ thống và trình chỉnh sửa Dock trực quan.
+- **9 Tiện Ích Độc Quyền Của Stash Trong Thư Viện Docky**: Đưa `Clock`, `Pomodoro`, `File Shelf`, `Clipboard History`, `Quick Note`, `Screenshot`, `Color Picker`, `Unit Converter` và `Bookmarks` thành tiện ích chuẩn `WidgetKind` ngay trong bộ chọn Widget, Smart Stack, thẻ mở rộng khi rê chuột và cài đặt từng tiện ích.
+- **Đồng Bộ Now Playing & Cài Đặt Thống Nhất**: Kết nối `NowPlayingManager` hai chiều với widget Now Playing của Docky và nhúng trực tiếp toàn bộ trình cấu hình đa ngăn của Docky vào tab **Settings > Second Dock**.
+
+---
+
 ## Phiên bản 2.17.0 (2026-11-12)
 
 ### Nâng Cấp Toàn Diện Second Dock Chuẩn Docky

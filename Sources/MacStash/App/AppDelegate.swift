@@ -393,12 +393,12 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if settingsWindow == nil {
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 880, height: 640),
+                contentRect: NSRect(x: 0, y: 0, width: 940, height: 650),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
             )
-            window.minSize = NSSize(width: 820, height: 600)
+            window.minSize = NSSize(width: 860, height: 600)
             window.title = appState.localized("settings.windowTitle")
             window.titlebarAppearsTransparent = false
             window.center()

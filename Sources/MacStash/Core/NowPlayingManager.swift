@@ -4,6 +4,7 @@ import SwiftUI
 import Combine
 import OSLog
 import MacStashCore
+import SideDockEngine
 
 /// Manages system-wide audio media playback detection, track metadata, album artwork,
 /// dominant artwork color tint extraction (`artworkTint`), real-time audio rhythm levels,
@@ -67,8 +68,46 @@ public final class NowPlayingManager: ObservableObject {
     private let backgroundQueue = DispatchQueue(label: "com.macstash.nowplaying", qos: .userInteractive)
 
     private init() {
+        configureSideDockMediaBridge()
         loadFallbackMediaRemoteFramework()
         startHelperProcessIfPossible()
+    }
+
+    private func configureSideDockMediaBridge() {
+        SideDockEngineCoordinator.shared.onSendMediaCommand = { [weak self] command in
+            guard let self else { return }
+            switch command {
+            case "toggle":
+                self.togglePlayPause()
+            case "play":
+                if !self.isPlaying { self.togglePlayPause() }
+            case "pause":
+                if self.isPlaying { self.togglePlayPause() }
+            case "next":
+                self.nextTrack()
+            case "previous":
+                self.previousTrack()
+            default:
+                break
+            }
+        }
+        SideDockEngineCoordinator.shared.onSeekMediaTime = { [weak self] seconds in
+            self?.seek(to: seconds)
+        }
+    }
+
+    private func syncSideDockEngineNowPlaying() {
+        SideDockEngineCoordinator.shared.updateNowPlaying(
+            title: title,
+            artist: artist,
+            album: album,
+            appBundleID: appBundleID,
+            appName: appName,
+            isPlaying: isPlaying,
+            duration: duration,
+            elapsedTime: elapsedTime,
+            artworkImage: artworkImage
+        )
     }
 
     // MARK: - Platform-Binary Perl Bridge (`now-playing.pl` + `libMacStashNowPlaying.dylib`)
@@ -250,6 +289,7 @@ public final class NowPlayingManager: ObservableObject {
             hasArtwork: hasArtwork
         )
         applyArtworkTransition(transition)
+        syncSideDockEngineNowPlaying()
     }
 
     private func applyArtworkTransition(_ transition: NowPlayingArtworkTransition) {
@@ -644,6 +684,7 @@ public final class NowPlayingManager: ObservableObject {
         let nextState = !isPlaying
         isPlaying = nextState
         updateRhythmEngineState()
+        syncSideDockEngineNowPlaying()
 
         if sendHelperCommand("toggle") {
             return

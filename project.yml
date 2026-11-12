@@ -71,6 +71,20 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockUI
 
+  SideDockEngine:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/SideDockEngine
+    dependencies:
+      - target: MacStashCore
+      - target: MacStashDesignSystem
+      - target: SideDockCore
+      - target: SideDockWidgets
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockEngine
+      SWIFT_VERSION: "5.0"
+
   SideDockSystem:
     type: framework
     platform: macOS
@@ -82,6 +96,7 @@ targets:
       - target: SideDockCore
       - target: SideDockWidgets
       - target: SideDockUI
+      - target: SideDockEngine
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockSystem
 
@@ -95,6 +110,7 @@ targets:
       - target: SideDockCore
       - target: SideDockWidgets
       - target: SideDockUI
+      - target: SideDockEngine
       - target: SideDockSystem
       - target: MacStashDesignSystem
       - package: Sparkle

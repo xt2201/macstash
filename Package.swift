@@ -38,6 +38,10 @@ let package = Package(
             targets: ["SideDockUI"]
         ),
         .library(
+            name: "SideDockEngine",
+            targets: ["SideDockEngine"]
+        ),
+        .library(
             name: "SideDockSystem",
             targets: ["SideDockSystem"]
         )
@@ -100,13 +104,27 @@ let package = Package(
             ]
         ),
         .target(
+            name: "SideDockEngine",
+            dependencies: [
+                "MacStashCore",
+                "MacStashDesignSystem",
+                "SideDockCore",
+                "SideDockWidgets"
+            ],
+            path: "Sources/SideDockEngine",
+            swiftSettings: [
+                .unsafeFlags(["-default-isolation", "MainActor"])
+            ]
+        ),
+        .target(
             name: "SideDockSystem",
             dependencies: [
                 "MacStashCore",
                 "MacStashDesignSystem",
                 "SideDockCore",
                 "SideDockWidgets",
-                "SideDockUI"
+                "SideDockUI",
+                "SideDockEngine"
             ],
             path: "Sources/SideDockSystem",
             swiftSettings: [
@@ -120,6 +138,7 @@ let package = Package(
                 "SideDockCore",
                 "SideDockWidgets",
                 "SideDockUI",
+                "SideDockEngine",
                 "SideDockSystem",
                 "MacStashDesignSystem",
                 .product(name: "Sparkle", package: "Sparkle")

@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.17.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.18.0-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2014.0%2B-5856D6?style=flat-square" alt="macOS 14.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.17.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.18.0.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -176,7 +176,7 @@ Because the macOS mouse cursor cannot travel beyond the physical boundary of the
 ## Installation
 
 ### Method 1: Direct DMG Download (Recommended)
-1. Download the latest universal disk image: **[MacStash-v2.17.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
+1. Download the latest universal disk image: **[MacStash-v2.18.0.dmg](https://github.com/xt2201/macstash/releases/latest)**.
 2. Open the disk image and drag **MacStash** into your `Applications` folder.
 3. Launch MacStash from Launchpad, Spotlight, or `Applications`.
 

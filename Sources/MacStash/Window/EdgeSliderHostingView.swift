@@ -22,6 +22,9 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         self.appState = appState
         self.displayID = displayID
         super.init(rootView: rootView)
+        // The panel frame is the single source of truth for the interactive hit zone (ScreenManager hit rects).
+        // SwiftUI content must never resize the window, otherwise the bar drifts outside the hit zone and gets dismissed.
+        sizingOptions = []
     }
 
     @available(*, unavailable)

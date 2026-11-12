@@ -27,6 +27,7 @@ public enum StashFeatureTests {
         testKeepAwakeSnapPresets()
         testDualEdgeBarsAndMediaPlaybackAction()
         testCornerDialSatelliteClearanceNoOverlap()
+        testEdgeSliderPanelContainsExpandedMediaIsland()
     }
 
     private static func testTrackpadDirectionalVectors() {
@@ -608,6 +609,35 @@ public enum StashFeatureTests {
             TestAssertion.assertTrue(hoveredBadgeClearance >= 2.0, "Hovered satellite must maintain positive clearance from Center Badge at dial size \(dialSize)")
             let hoveredTrackClearance = trackInnerBoundary - (satelliteRadius + hoveredSatRadius)
             TestAssertion.assertTrue(hoveredTrackClearance >= 2.0, "Hovered satellite must maintain positive clearance from Track at dial size \(dialSize)")
+        }
+    }
+
+    private static func testEdgeSliderPanelContainsExpandedMediaIsland() {
+        // Dynamic Island (312pt) + 8pt screen-edge inset must fit inside the interactive panel width.
+        let islandWidth: CGFloat = 312.0
+        let edgeInset: CGFloat = 8.0
+        TestAssertion.assertTrue(Defaults.EdgeSliders.panelWidthPoints >= islandWidth + edgeInset, "Edge panel must contain expanded Dynamic Island width")
+
+        // Tallest bar layout (baseline column with vertical transport + artwork) must fit with shadow bleed.
+        let tallestBarHeight: CGFloat = 400.0
+        TestAssertion.assertTrue(Defaults.EdgeSliders.panelHeightPoints >= tallestBarHeight + 24.0, "Edge panel must contain tallest bar layout plus shadow bleed")
+
+        for edge in [EdgePosition.left, EdgePosition.right] {
+            let screen = CGRect(x: 0, y: 0, width: 1512, height: 982)
+            let panelH = Defaults.EdgeSliders.panelHeightPoints
+            let panel = CGRect(
+                x: edge == .left ? screen.minX : screen.maxX - Defaults.EdgeSliders.panelWidthPoints,
+                y: screen.minY + (screen.height - panelH) / 2.0,
+                width: Defaults.EdgeSliders.panelWidthPoints,
+                height: panelH
+            )
+            let hit = CornerGeometry.edgeSliderHitRect(screenFrame: screen, sliderPanelRect: panel, edge: edge)
+            // Artwork capsule sits at the very bottom of the bar, flush with the panel bottom padding.
+            let artworkX = edge == .left ? screen.minX + 30.0 : screen.maxX - 30.0
+            let artworkPoint = CGPoint(x: artworkX, y: panel.minY + 26.0)
+            TestAssertion.assertTrue(CornerGeometry.rectContains(hit, artworkPoint), "Artwork hover point must stay inside the edge hit zone on \(edge)")
+            let islandPoint = CGPoint(x: edge == .left ? screen.minX + 300.0 : screen.maxX - 300.0, y: panel.minY + 50.0)
+            TestAssertion.assertTrue(CornerGeometry.rectContains(hit, islandPoint), "Expanded island far end must stay inside the edge hit zone on \(edge)")
         }
     }
 }

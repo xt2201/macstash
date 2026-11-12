@@ -17,7 +17,7 @@ public enum Defaults {
             }
             current = current.deletingLastPathComponent()
         }
-        return "2.16.1"
+        return "2.16.2"
     }
 
     public enum HotCorner {
@@ -81,6 +81,12 @@ public enum Defaults {
 
     public enum EdgeSliders {
         public static let defaultPosition: EdgePosition = .right
+        /// Interactive panel width; must fully contain the expanded Dynamic Island (312pt) plus its screen-edge inset.
+        public static let panelWidthPoints: CGFloat = 340.0
+        /// Interactive panel height; must fully contain the tallest bar layout (vertical transport controls + artwork capsule) plus shadow bleed.
+        public static let panelHeightPoints: CGFloat = 440.0
+        /// Vertical margin kept between the panel and the top of the screen when sharing an edge with a drawer.
+        public static let drawerClearancePoints: CGFloat = 10.0
     }
 
     public enum LeftEdgeDrawer {

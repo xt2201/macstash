@@ -1,5 +1,14 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.2 (2026-11-12)
+
+### Sửa Lỗi Ổn Định Thanh Cạnh
+
+- **Thanh cạnh không còn biến mất khi rê chuột vào ảnh bìa nhạc**: Vùng tương tác của thanh cạnh nay đủ cao để chứa toàn bộ thanh, nên khi mở bảng điều khiển âm thanh kiểu Dynamic Island thanh vẫn hiển thị.
+- **Kích thước cửa sổ thanh cạnh ổn định**: Cửa sổ thanh cạnh giữ kích thước cố định để vùng nhận chuột luôn khớp với những gì bạn nhìn thấy.
+
+---
+
 ## Phiên bản 2.16.1 (2026-11-12)
 
 ### Vuốt 2 Ngón Tua Nhạc, Chuẩn Hóa Cài Đặt & Khắc Phục Trùng Đè

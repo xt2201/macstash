@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.2] - 2026-11-12
+
+### Fixed
+- Edge Bar Disappearing on Audio Artwork Hover: Hovering the album artwork opened the Dynamic Island but dismissed the whole Edge Bar after a fraction of a second. The interactive panel (340x340pt) was shorter than the full bar layout, so the artwork fell outside the hit zone used by the auto-hide logic. The panel is now 340x440pt, defined once in `Defaults.EdgeSliders` and shared by the panel frame and the hit rect.
+- Edge Panel Auto-Resize: SwiftUI content can no longer resize the Edge Bar window (`sizingOptions = []`), keeping the hit zone and the visible bar permanently aligned.
+
+---
+
 ## [2.16.1] - 2026-11-12
 
 ### Added

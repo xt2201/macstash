@@ -1,5 +1,14 @@
 # Release Notes & Changelog
 
+## Version 2.16.2 (2026-11-12)
+
+### Edge Bar Stability Fix
+
+- **Edge Bar no longer disappears when hovering the audio artwork**: The interactive area of the Edge Bar is now tall enough to contain the full bar, so opening the Dynamic Island audio controls keeps the bar on screen.
+- **Stable Edge Bar window size**: The Edge Bar window keeps a fixed size so its hit zone always matches what you see.
+
+---
+
 ## Version 2.16.1 (2026-11-12)
 
 ### Two-Finger Trackpad Audio Scrubbing, Settings Polish & Dial Clearance

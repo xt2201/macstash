@@ -230,10 +230,10 @@ public final class ScreenOverlayInstance {
     public func sliderRect(for edge: EdgePosition, in frame: NSRect) -> NSRect {
         let isLeft = edge == .left
         let sameEdge = (appState.settings.drawerEdgePosition == .left) == isLeft && appState.hasDrawerFeatureActive
-        let panelWidth: CGFloat = 340
-        let panelHeight: CGFloat = 340
+        let panelWidth = Defaults.EdgeSliders.panelWidthPoints
+        let panelHeight = Defaults.EdgeSliders.panelHeightPoints
         let panelY = sameEdge
-            ? min(frame.maxY - panelHeight - 10, frame.midY - 40)
+            ? min(frame.maxY - panelHeight - Defaults.EdgeSliders.drawerClearancePoints, frame.midY - 40)
             : frame.minY + (frame.height - panelHeight) / 2
         let panelX = isLeft ? frame.minX : (frame.maxX - panelWidth)
         return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)

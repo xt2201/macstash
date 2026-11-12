@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.3] - 2026-11-12
+
+### Changed
+- Vertical Two-Finger Trackpad Scrubbing in Dynamic Island: Swiping vertically up or down with two fingers while hovering over the expanded Dynamic Island audio panel now scrubs playback smoothly (matching Edge Bar volume up/down ergonomics) and completely isolates audio scrubbing from master volume so swiping up never accidentally alters system volume. Volume adjusts only when explicitly moving the pointer onto the dropped-down vertical volume column.
+- Smooth Hover Bridge for Dynamic Island Volume Bar: Added a 0.28s grace bridge between the outer-edge Volume button and the dropped-down vertical volume slider, plus explicit L-shaped transparent hit pass-through in `EdgeSliderHostingView`.
+
+### Fixed
+- MediaRemote `SeekToPlaybackPosition` Command ID (`48` -> `24`): Fixed `NowPlayingAdapter` sending unrecognized MediaRemote command `48` instead of `24` (`SeekToPlaybackPosition`), added PID targeting, `kMRMediaRemoteOptionPlaybackPosition` / `kMRMediaRemoteOptionSkipInterval` symbol lookup, `hasElapsedTime` presence tracking, post-seek elapsed grace protection against stale snapshots, and AppleScript desktop fallback for Spotify and Apple Music.
+- Scrubber Thumb Position Alignment: Fixed `.scaleEffect(...)` applied after `.offset(x:)` in `EdgeMediaIslandView` (which multiplied X translation by 1.25x during scrubbing); thumb scaling now executes prior to exact `.position(x:y:)` centering, locking the dot and progress fill cleanly to the track center from 0% to 100%.
+- AppKit `hitTest` Coordinate Conversion Across All Overlays: Fixed unflipped-to-flipped coordinate conversion (`convert(point, from: superview)`) inside `PassThroughHostingView`, `EdgeSliderHostingView`, `StashShelfHostingView`, and `SideDockHostingView`, resolving missed corner-dial arc/satellite clicks and stabilizing Edge Bar coordinates.
+- Multi-Edge Symmetry, Hardware Sync & Escape Dismiss: Added missing Escape key handling for Left Edge Slider and active Corner Dials, symmetric reactive visualizer gating for Left Edge Slider and `.mediaPlayback` mode, non-overlapping Left Drawer vs Left Edge Slider vertical placement, keyboard backlight hardware sync, smooth `.mediaPlayback` dial drag preview, and Conditional CoreAudio Mute fallback without spurious AppleScript invocations.
+
+---
+
 ## [2.16.2] - 2026-11-12
 
 ### Fixed

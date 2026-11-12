@@ -9,7 +9,8 @@ public final class SideDockHostingView<Content: View>: NSHostingView<Content> {
     }
 
     public override func hitTest(_ point: NSPoint) -> NSView? {
-        guard bounds.contains(point) else {
+        let localPoint = superview != nil ? convert(point, from: superview) : point
+        guard bounds.contains(localPoint) else {
             return nil
         }
         return super.hitTest(point)

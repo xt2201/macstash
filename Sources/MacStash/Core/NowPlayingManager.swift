@@ -34,6 +34,8 @@ public final class NowPlayingManager: ObservableObject {
 
     private var scrubCommitDebounceWorkItem: DispatchWorkItem?
     private var lastHapticDetentSecond: Int = -1
+    private var ignoreElapsedUpdatesUntil: TimeInterval = 0
+    private var lastScrubDeltaDirection: Double = 0.0
 
     private var helperProcess: Process?
     private var stdinPipe: Pipe?
@@ -193,6 +195,7 @@ public final class NowPlayingManager: ObservableObject {
         let newPID = (dict["pid"] as? NSNumber)?.int32Value ?? 0
         let newDuration = (dict["kMRMediaRemoteNowPlayingInfoDuration"] as? NSNumber)?.doubleValue ?? 0.0
         let newElapsed = (dict["kMRMediaRemoteNowPlayingInfoElapsedTime"] as? NSNumber)?.doubleValue ?? 0.0
+        let hasElapsedField = (dict["hasElapsedTime"] as? Bool) ?? (dict["kMRMediaRemoteNowPlayingInfoElapsedTime"] != nil)
         let newPlaying = (dict["isPlaying"] as? Bool) ?? ((dict["isPlaying"] as? NSNumber)?.boolValue ?? false)
         let artworkUnchanged = (dict["artworkUnchanged"] as? Bool) ?? false
 
@@ -203,6 +206,12 @@ public final class NowPlayingManager: ObservableObject {
             hasher.combine(newArtist)
             let hashVal = abs(hasher.finalize())
             self.trackSeed = 0.85 + Double(hashVal % 35) / 100.0
+            self.ignoreElapsedUpdatesUntil = 0
+            if self.isInteractiveScrubbing {
+                self.scrubCommitDebounceWorkItem?.cancel()
+                self.scrubCommitDebounceWorkItem = nil
+                self.isInteractiveScrubbing = false
+            }
         }
 
         self.title = newTitle
@@ -217,12 +226,17 @@ public final class NowPlayingManager: ObservableObject {
             self.duration = 0.0
         }
 
-        if newElapsed > 0.01 {
-            self.elapsedTime = newElapsed
-            self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
-        } else if trackChanged || !newPlaying {
-            self.elapsedTime = newElapsed
-            self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
+        let nowUptime = ProcessInfo.processInfo.systemUptime
+        let isWithinSeekGrace = self.isInteractiveScrubbing || (nowUptime < self.ignoreElapsedUpdatesUntil)
+        if trackChanged || !isWithinSeekGrace {
+            let clampedNewElapsed = newDuration > 0.0 ? max(0.0, min(newDuration, newElapsed)) : max(0.0, newElapsed)
+            if clampedNewElapsed > 0.01 {
+                self.elapsedTime = clampedNewElapsed
+                self.lastElapsedUpdateTime = nowUptime
+            } else if trackChanged || !newPlaying || (hasElapsedField && self.elapsedTime < 2.0) {
+                self.elapsedTime = clampedNewElapsed
+                self.lastElapsedUpdateTime = nowUptime
+            }
         }
 
         self.isPlaying = newPlaying
@@ -436,11 +450,15 @@ public final class NowPlayingManager: ObservableObject {
         let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self = self, self.isPlaying, self.duration > 0 else { return }
+                let now = ProcessInfo.processInfo.systemUptime
+                if self.isInteractiveScrubbing || now < self.ignoreElapsedUpdatesUntil {
+                    self.lastElapsedUpdateTime = now
+                    return
+                }
                 self.progressTicksCount += 1
                 if self.progressTicksCount % 4 == 0 {
                     self.pollLivePlaybackPosition()
                 }
-                let now = ProcessInfo.processInfo.systemUptime
                 if self.lastElapsedUpdateTime > 0 {
                     let dt = now - self.lastElapsedUpdateTime
                     if dt > 0 && dt < 2.5 {
@@ -527,7 +545,8 @@ public final class NowPlayingManager: ObservableObject {
     }
 
     public func pollLivePlaybackPosition() {
-        guard isPlaying else { return }
+        let nowUptime = ProcessInfo.processInfo.systemUptime
+        guard isPlaying, !isInteractiveScrubbing, nowUptime >= ignoreElapsedUpdatesUntil else { return }
         let bundle = appBundleID.lowercased()
         let appName: String?
         if bundle.contains("spotify") {
@@ -548,8 +567,11 @@ public final class NowPlayingManager: ObservableObject {
                     let pos = result.doubleValue
                     if pos >= 0 {
                         Task { @MainActor [weak self] in
-                            guard let self = self, self.isPlaying else { return }
-                            self.elapsedTime = pos
+                            guard let self = self,
+                                  self.isPlaying,
+                                  !self.isInteractiveScrubbing,
+                                  ProcessInfo.processInfo.systemUptime >= self.ignoreElapsedUpdatesUntil else { return }
+                            self.elapsedTime = self.duration > 0 ? min(self.duration, pos) : pos
                             self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
                         }
                     }
@@ -680,7 +702,18 @@ public final class NowPlayingManager: ObservableObject {
         let maxDur = duration > 0.0 ? duration : 3600.0
         let baseTime = isInteractiveScrubbing ? liveScrubTime : elapsedTime
         let newTime = max(0.0, min(maxDur, baseTime + deltaSeconds))
+        lastScrubDeltaDirection += deltaSeconds
 
+        applyInteractiveScrubPreview(toSeconds: newTime, commitDelay: 0.22)
+    }
+
+    public func previewInteractiveScrub(toFraction fraction: Double) {
+        guard duration > 0.0 else { return }
+        let clamped = max(0.0, min(1.0, fraction))
+        applyInteractiveScrubPreview(toSeconds: clamped * duration, commitDelay: nil)
+    }
+
+    private func applyInteractiveScrubPreview(toSeconds newTime: Double, commitDelay: TimeInterval?) {
         isInteractiveScrubbing = true
         liveScrubTime = newTime
         self.elapsedTime = newTime
@@ -690,44 +723,60 @@ public final class NowPlayingManager: ObservableObject {
         let currentDetent = Int(newTime / 5.0)
         if currentDetent != lastHapticDetentSecond {
             lastHapticDetentSecond = currentDetent
-            HapticManager.shared.performDetentTick()
+            HapticManager.shared.performDetentTick(intensity: AppState.shared.effectiveHapticIntensity)
         }
 
-        // Debounce commit to player
         scrubCommitDebounceWorkItem?.cancel()
-        let item = DispatchWorkItem { [weak self] in
-            self?.commitInteractiveScrub()
+        scrubCommitDebounceWorkItem = nil
+
+        if let delay = commitDelay {
+            let item = DispatchWorkItem { [weak self] in
+                Task { @MainActor [weak self] in
+                    self?.commitInteractiveScrub()
+                }
+            }
+            scrubCommitDebounceWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
         }
-        scrubCommitDebounceWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28, execute: item)
     }
 
     public func commitInteractiveScrub() {
         scrubCommitDebounceWorkItem?.cancel()
         scrubCommitDebounceWorkItem = nil
         guard isInteractiveScrubbing else { return }
+        let target = liveScrubTime
         isInteractiveScrubbing = false
-        seek(to: liveScrubTime)
+        lastScrubDeltaDirection = 0.0
+        seek(to: target)
     }
 
     public func seek(to seconds: Double) {
         let maxDuration = duration > 0 ? duration : 3600.0
         let clamped = max(0.0, min(maxDuration, seconds))
+        self.ignoreElapsedUpdatesUntil = ProcessInfo.processInfo.systemUptime + 0.85
         self.elapsedTime = clamped
         self.lastElapsedUpdateTime = ProcessInfo.processInfo.systemUptime
 
-        HapticManager.shared.performDetentTick()
-        SoundEffectManager.shared.playAccent()
+        HapticManager.shared.performDetentTick(intensity: AppState.shared.effectiveHapticIntensity)
+        SoundEffectManager.shared.playAccent(enabled: AppState.shared.isSoundEnabled)
 
-        if sendHelperCommand("seek \(String(format: "%.2f", clamped))") {
-            return
-        }
+        let seekCmd = playingPID > 0
+            ? "seek \(playingPID) \(String(format: "%.2f", clamped))"
+            : "seek \(String(format: "%.2f", clamped))"
+        let sentToHelper = sendHelperCommand(seekCmd)
 
-        if let setElapsed = setElapsedTimeFunc {
+        let lowerBundle = appBundleID.lowercased()
+        let isScriptableDesktopPlayer = lowerBundle.contains("spotify") || lowerBundle.contains("music")
+
+        if !sentToHelper, let setElapsed = setElapsedTimeFunc {
             setElapsed(clamped)
         }
 
-        seekViaAppleScript(targetSeconds: clamped)
+        // Desktop Spotify & Apple Music respond deterministically to AppleScript position updates
+        // even when MediaRemote ignores external SeekToPlaybackPosition calls.
+        if !sentToHelper || isScriptableDesktopPlayer {
+            seekViaAppleScript(targetSeconds: clamped)
+        }
     }
 
     public func seekToProgress(fraction: Double) {

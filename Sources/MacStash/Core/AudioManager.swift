@@ -295,12 +295,14 @@ public final class AudioManager: ObservableObject {
             }
         }
 
-        // Background AppleScript trigger as robust system-wide fallback
-        DispatchQueue.global(qos: .userInitiated).async {
-            let script = "set volume output muted \(mute ? "true" : "false")"
-            if let appleScript = NSAppleScript(source: script) {
-                var err: NSDictionary?
-                appleScript.executeAndReturnError(&err)
+        // Fallback AppleScript trigger only when CoreAudio mute property failed
+        if status != noErr {
+            DispatchQueue.global(qos: .userInitiated).async {
+                let script = "set volume output muted \(mute ? "true" : "false")"
+                if let appleScript = NSAppleScript(source: script) {
+                    var err: NSDictionary?
+                    appleScript.executeAndReturnError(&err)
+                }
             }
         }
     }

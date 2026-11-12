@@ -1,5 +1,16 @@
 # Release Notes & Changelog
 
+## Version 2.16.3 (2026-11-12)
+
+### Audio Scrubbing Mechanics, Scrubber Alignment & Hit-Testing Audit
+
+- **Vertical Two-Finger Audio Scrubbing in Dynamic Island**: Once hovered over audio to reveal the Dynamic Island panel, vertical two-finger swipes (up = forward, down = backward) scrub playback directly without accidentally changing system volume. System volume adjusts only when explicitly moving the pointer into the dropped-down volume bar.
+- **Exact Trackpad Seeking Engine**: Fixed the underlying MediaRemote `SeekToPlaybackPosition` command (`24`), added targeted player PID routing, Spotify/Apple Music AppleScript fallback, and seek-grace synchronization so scrubbed positions stick accurately.
+- **Sub-Pixel Scrubber Dot Alignment**: Fixed scrubber thumb scaling order so the circular indicator always stays aligned with the progress bar fill and current timestamp from 0% to 100%.
+- **Overlay Coordinate & Full-System Polish**: Unified coordinate conversion in `hitTest` across all corner dials, drawers, edge bars, and SideDock; added Escape key dismissal for Left Edge Slider and dials; prevented Left Drawer and Left Slider overlap; and added keyboard backlight hardware synchronization.
+
+---
+
 ## Version 2.16.2 (2026-11-12)
 
 ### Edge Bar Stability Fix

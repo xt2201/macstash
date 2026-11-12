@@ -7,6 +7,7 @@ import MacStashCore
 /// horizontally expanded Dynamic Island receive mouse events when active or dragging.
 public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
     private let appState: AppState
+    private let interactionState: EdgeSliderInteractionState
     public let displayID: CGDirectDisplayID
     private var scrollEndWorkItem: DispatchWorkItem?
 
@@ -17,10 +18,12 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
     public init(
         rootView: EdgeSliderView,
         appState: AppState,
-        displayID: CGDirectDisplayID = 0
+        displayID: CGDirectDisplayID = 0,
+        interactionState: EdgeSliderInteractionState = EdgeSliderInteractionState()
     ) {
         self.appState = appState
         self.displayID = displayID
+        self.interactionState = interactionState
         super.init(rootView: rootView)
         // The panel frame is the single source of truth for the interactive hit zone (ScreenManager hit rects).
         // SwiftUI content must never resize the window, otherwise the bar drifts outside the hit zone and gets dismissed.
@@ -67,18 +70,46 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return nil
         }
 
-        // When slider is active (expanded), intercept mouse events
+        // When slider is active (expanded), intercept only visible UI bounds so transparent outer space passes through
         let isActive = edge == .left ? appState.isLeftSliderActive : appState.isRightSliderActive
         if isActive {
             if appState.activeDisplayID != 0 && appState.activeDisplayID != displayID {
                 return nil
             }
-            return super.hitTest(point)
+            let localPoint = superview != nil ? convert(point, from: superview) : point
+            if isPointInsideVisibleSurface(localPoint) {
+                return super.hitTest(point)
+            }
+            return nil
         }
 
         // When collapsed, return nil completely so background application scrollbars,
         // window controls, and edge click targets remain 100% unobstructed.
         return nil
+    }
+
+    private func isPointInsideVisibleSurface(_ point: NSPoint) -> Bool {
+        guard bounds.contains(point) else { return false }
+        if interactionState.isSliderDragging || NowPlayingManager.shared.isInteractiveScrubbing {
+            return true
+        }
+        let isRight = (edge == .right)
+        let stripWidth: CGFloat = 88.0
+        let stripX = isRight ? (bounds.maxX - stripWidth) : bounds.minX
+        let edgeStripRect = NSRect(x: stripX, y: bounds.minY, width: stripWidth, height: bounds.height)
+
+        if interactionState.isMediaExpanded {
+            let bandH: CGFloat = 136.0
+            let bandY = isFlipped ? (bounds.maxY - bandH) : bounds.minY
+            let islandBandRect = NSRect(x: bounds.minX, y: bandY, width: bounds.width, height: bandH)
+            if islandBandRect.contains(point) {
+                return true
+            }
+            return (interactionState.isVolumeColumnVisible || interactionState.isVolumeButtonHovered || interactionState.isVolumeColumnHovered)
+                && edgeStripRect.contains(point)
+        }
+
+        return edgeStripRect.contains(point)
     }
 
     // MARK: - Mouse Exit & Tracking Area
@@ -119,7 +150,23 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             return
         }
 
-        // Filter out momentum events to prevent values from runaway changes after lifting fingers
+        // Commit active gestures immediately when fingers lift (delta on .ended is typically 0)
+        if event.phase == .ended || event.phase == .cancelled {
+            if NowPlayingManager.shared.isInteractiveScrubbing {
+                NowPlayingManager.shared.commitInteractiveScrub()
+            }
+            scrollEndWorkItem?.cancel()
+            if edge == .left {
+                appState.liveLeftSliderValue = nil
+            } else {
+                appState.liveRightSliderValue = nil
+            }
+            appState.saveSettings()
+            ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
+            return
+        }
+
+        // Filter out momentum events to prevent runaway changes after lifting fingers
         if event.hasPreciseScrollingDeltas && !event.momentumPhase.isEmpty {
             return
         }
@@ -132,25 +179,36 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         let physicalY: Double = event.isDirectionInvertedFromDevice ? -Double(rawDeltaY) : Double(rawDeltaY)
 
         let loc = convert(event.locationInWindow, from: nil)
-        let isOverBottomMedia = loc.y < 160.0
-        let hasMedia = NowPlayingManager.shared.hasMedia
+        let boundaryY = isFlipped ? (bounds.maxY - 110.0) : (bounds.minY + 110.0)
+        let isInUpperColumnY = isFlipped ? (loc.y < boundaryY) : (loc.y > boundaryY)
+        let isCursorInVolumeColumn = interactionState.isVolumeColumnHovered
+            || (interactionState.isVolumeColumnVisible && isInUpperColumnY)
 
-        // Horizontal audio scrubbing: when cursor is over media island OR when swiping horizontally with active media
-        let isHorizontalScrub = hasMedia && (isOverBottomMedia || abs(physicalX) > abs(physicalY) * 1.25) && abs(physicalX) > 0.05
+        // When Dynamic Island media UI is expanded:
+        // - Vertical swipe on the island scrubs audio ONLY (never modifies volume).
+        // - Volume adjusts ONLY when the user explicitly moves into the popped-up vertical volume column.
+        let isAudioScrubMode: Bool
+        if interactionState.isMediaExpanded {
+            isAudioScrubMode = !isCursorInVolumeColumn
+        } else if action == .mediaPlayback {
+            isAudioScrubMode = true
+        } else {
+            isAudioScrubMode = false
+        }
 
-        if isHorizontalScrub {
+        if isAudioScrubMode {
+            // Vertical-first scrub motion matching Edge Bar volume physics (up = forward, down = backward),
+            // while also honoring explicit horizontal swipes when X motion dominates.
+            let scrubMotion = abs(physicalY) >= abs(physicalX) ? physicalY : physicalX
+            guard abs(scrubMotion) > 0.001 else { return }
+
             ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
 
             let dur = NowPlayingManager.shared.duration
-            let durFactor = dur > 0 ? max(0.6, min(2.5, dur / 240.0)) : 1.0
-            let deltaSeconds = physicalX * 0.22 * durFactor
+            let durFactor = dur > 0 ? max(0.35, min(2.5, dur / 240.0)) : 1.0
+            let deltaSeconds = scrubMotion * 0.22 * durFactor
 
             NowPlayingManager.shared.updateInteractiveScrub(deltaSeconds: deltaSeconds)
-
-            if event.phase == .ended || event.phase == .cancelled {
-                NowPlayingManager.shared.commitInteractiveScrub()
-                ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
-            }
             return
         }
 
@@ -158,29 +216,30 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
 
         ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
 
+        let targetAction: ControlAction = interactionState.isMediaExpanded ? .volume : action
         let sensitivity: Float = 0.005
         let step = Float(physicalY) * sensitivity
-        let current = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue) ?? Float(appState.getValue(for: action, displayID: rootView.displayID))
+        let current: Float
+        if targetAction == action {
+            current = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue)
+                ?? Float(appState.getValue(for: targetAction, displayID: rootView.displayID))
+        } else {
+            current = Float(appState.getValue(for: targetAction, displayID: rootView.displayID))
+        }
         let clamped = max(0.0, min(1.0, current + step))
 
-        if edge == .left {
-            appState.liveLeftSliderValue = clamped
-        } else {
-            appState.liveRightSliderValue = clamped
+        if targetAction == action {
+            if edge == .left {
+                appState.liveLeftSliderValue = clamped
+            } else {
+                appState.liveRightSliderValue = clamped
+            }
         }
-        appState.setValue(for: action, value: Double(clamped), displayID: rootView.displayID)
+        appState.setValue(for: targetAction, value: Double(clamped), displayID: rootView.displayID)
 
         scrollEndWorkItem?.cancel()
-        if event.phase == .ended || event.phase == .cancelled {
-            if edge == .left {
-                appState.liveLeftSliderValue = nil
-            } else {
-                appState.liveRightSliderValue = nil
-            }
-            appState.saveSettings()
-            ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
-        } else {
-            let item = DispatchWorkItem { [weak self] in
+        let item = DispatchWorkItem { [weak self] in
+            Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 if self.edge == .left {
                     self.appState.liveLeftSliderValue = nil
@@ -188,8 +247,8 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
                     self.appState.liveRightSliderValue = nil
                 }
             }
-            scrollEndWorkItem = item
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
         }
+        scrollEndWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
     }
 }

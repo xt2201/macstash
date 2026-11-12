@@ -119,7 +119,10 @@ public struct CornerDialView: View {
                             formattedKeepAwake: appState.keepAwake.formattedRemaining,
                             stashItemCount: appState.stashShelf.items.count,
                             tint: actionColors.first ?? .clear,
-                            mediaTimeText: appState.nowPlaying.hasMedia ? appState.nowPlaying.formattedElapsedTime : nil
+                            mediaTimeText: (action == .mediaPlayback && appState.nowPlaying.hasMedia)
+                                || (action == .volume && appState.nowPlaying.hasMedia && appState.nowPlaying.isPlaying && !isDragging)
+                                ? appState.nowPlaying.formattedElapsedTime
+                                : nil
                         )
                     }
                     .buttonStyle(.plain)
@@ -535,6 +538,9 @@ public struct CornerDialView: View {
                                 }
                                 dragValue = snapped
                                 appState.setValue(for: action, value: snapped, displayID: displayID)
+                            } else if action == .mediaPlayback {
+                                dragValue = norm
+                                appState.nowPlaying.previewInteractiveScrub(toFraction: norm)
                             } else {
                                 dragValue = norm
                                 appState.setValue(for: action, value: norm, displayID: displayID)
@@ -543,7 +549,12 @@ public struct CornerDialView: View {
                         .onEnded { _ in
                             if isDragging {
                                 isDragging = false
-                                appState.setValue(for: action, value: dragValue, displayID: displayID)
+                                if action == .mediaPlayback {
+                                    appState.nowPlaying.previewInteractiveScrub(toFraction: dragValue)
+                                    appState.nowPlaying.commitInteractiveScrub()
+                                } else {
+                                    appState.setValue(for: action, value: dragValue, displayID: displayID)
+                                }
                                 appState.saveSettings()
                             }
                         }

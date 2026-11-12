@@ -82,6 +82,9 @@ Các đường dẫn trọng yếu (lưu ý `Scripts/` viết hoa chữ `S`):
 - **Toán học Tránh Trùng đè Hình học (Geometric Non-Overlap & Polar Clearance Invariants)**:
   - Mọi bố cục vòng tròn / hướng tâm (Radial Dials, Center Action Badge, Satellites, Arc Track) phải quy về cùng một hệ tọa độ cực (`RadialDialGeometry`).
   - Cấm dùng offset điểm cố định khi kích thước co giãn theo thiết lập người dùng (`dialRadiusPoints`). Bán kính vệ tinh (`satelliteRadius`) phải luôn nằm tại tâm kênh (`(badgeOuterBoundary + trackInnerBoundary) * 0.5`) và chứng minh khoảng cách an toàn bằng unit test (`clearance >= 8.0pt` ở kích thước mặc định, `>= 3.0pt` ở kích thước tối thiểu, bảo đảm không chạm khi hover scale 1.15x và đổ bóng 6pt).
+- **Quy chuẩn Tọa độ AppKit / SwiftUI & Modifier Order**:
+  - Mọi `NSHostingView` subclass trên macOS có `isFlipped == true`, trong khi `NSView.hitTest(_ point:)` nhận tọa độ theo `superview` (`isFlipped == false`). Luôn chuyển đổi qua `let localPoint = superview != nil ? convert(point, from: superview) : point` trước khi đối chiếu với `bounds`, và đặt `sizingOptions = []` trên các panel cố định để nội dung SwiftUI không tự resize lệch khỏi vùng hit-test của `ScreenManager`.
+  - Khi định vị chấm chỉ báo động (scrubber thumb), bắt buộc đặt `.scaleEffect(...)` **trước** `.position(x:y:)` hoặc `.offset(...)`; cấm đặt `.scaleEffect` sau `.offset` làm nhân sai khoảng dịch chuyển trục.
 - **Bố cục Cài đặt Chống Tràn viền & Cắt chữ (Settings Responsive Form Standards)**:
   - Trong `SettingsCard`, tuyệt đối **cấm đặt `Picker` segmented nằm ngang (`HStack`) cạnh nhãn dài** gây tràn thẻ và cắt chữ khi dịch sang tiếng Việt hoặc ngôn ngữ dài.
   - Mọi Segmented Picker từ 3 lựa chọn trở lên hoặc có nhãn đa ngữ dài phải đặt trong `VStack(alignment: .leading, spacing: 6)` với `.labelsHidden()` để tự động giãn đều 100% chiều rộng thẻ.

@@ -9,16 +9,16 @@ import MacStashCore
 public struct EdgeSliderView: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var nowPlaying = NowPlayingManager.shared
+    @ObservedObject public var interactionState: EdgeSliderInteractionState
     public let edge: EdgePosition
     public let displayID: CGDirectDisplayID
 
     @State private var isDragging: Bool = false
     @State private var dragValue: Float = 0.5
     @State private var isTopHovered: Bool = false
-    @State private var isMediaExpanded: Bool = false
-    @State private var isVolumeHovered: Bool = false
-    @State private var isSliderHovered: Bool = false
+    @State private var isVolumeColumnShowing: Bool = false
     @State private var collapseWorkItem: DispatchWorkItem?
+    @State private var volumeCloseWorkItem: DispatchWorkItem?
 
     @State private var isPrevHovered: Bool = false
     @State private var isRewindHovered: Bool = false
@@ -28,10 +28,16 @@ public struct EdgeSliderView: View {
 
     private let sliderWidth: CGFloat = 56
 
-    public init(appState: AppState, edge: EdgePosition = .right, displayID: CGDirectDisplayID = 0) {
+    public init(
+        appState: AppState,
+        edge: EdgePosition = .right,
+        displayID: CGDirectDisplayID = 0,
+        interactionState: EdgeSliderInteractionState = EdgeSliderInteractionState()
+    ) {
         self.appState = appState
         self.edge = edge
         self.displayID = displayID
+        self.interactionState = interactionState
     }
 
     private var action: ControlAction {
@@ -42,17 +48,17 @@ public struct EdgeSliderView: View {
         (action == .volume && appState.settings.edgeBarShowMediaControls) || action == .mediaPlayback
     }
 
-    private var currentValue: Float {
+    private func currentValue(for targetAction: ControlAction) -> Float {
         if isDragging {
             return dragValue
         }
-        if action == .volume && appState.audio.isMuted {
+        if targetAction == .volume && appState.audio.isMuted {
             return 0.0
         }
-        if let live = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue) {
+        if targetAction == action, let live = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue) {
             return live
         }
-        return Float(appState.getValue(for: action, displayID: displayID))
+        return Float(appState.getValue(for: targetAction, displayID: displayID))
     }
 
     private var isExpanded: Bool {
@@ -81,12 +87,12 @@ public struct EdgeSliderView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .bottomTrailing : .bottomLeading)
-        .onHover { hovering in
-            if hovering {
+        .onChange(of: isExpanded) { _, newValue in
+            if !newValue {
                 cancelCollapse()
-            } else if !isDragging && isExpanded {
-                ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
-                scheduleCollapse()
+                cancelVolumeClose()
+                isVolumeColumnShowing = false
+                interactionState.reset()
             }
         }
         .macStashTheme(appState.resolvedColorScheme)
@@ -101,40 +107,83 @@ public struct EdgeSliderView: View {
         let effectiveTint: Color = isVolumeWithMedia ? nowPlaying.artworkTint : (isMuted ? Color.red : (action.accentColors.first ?? .clear))
         let secondaryTint: Color = isVolumeWithMedia ? nowPlaying.artworkSecondaryTint : (action.accentColors.last ?? .blue)
 
-        if isMediaExpanded && shouldShowMediaIsland {
+        let showVolumeColumn = isVolumeColumnShowing || interactionState.isVolumeButtonHovered || interactionState.isVolumeColumnHovered || isDragging
+        let volumeTint: Color = appState.audio.isMuted ? .red : (nowPlaying.hasMedia ? nowPlaying.artworkTint : (ControlAction.volume.accentColors.first ?? .blue))
+        let volumeSecondaryTint: Color = nowPlaying.hasMedia ? nowPlaying.artworkSecondaryTint : (ControlAction.volume.accentColors.last ?? .cyan)
+
+        if interactionState.isMediaExpanded && shouldShowMediaIsland {
             // Mode B: Expanded Dynamic Island Media Mode with Edge-most Volume Button & Dropped-in Volume Slider
-            VStack(alignment: edge == .right ? .trailing : .leading, spacing: 8) {
-                if isVolumeHovered || isDragging || isSliderHovered {
-                    verticalVolumeGlassColumn(tint: effectiveTint, secondaryTint: secondaryTint, isMuted: isMuted)
+            VStack(alignment: edge == .right ? .trailing : .leading, spacing: 6) {
+                if showVolumeColumn {
+                    verticalVolumeGlassColumn(tint: volumeTint, secondaryTint: volumeSecondaryTint, isMuted: appState.audio.isMuted)
                         .transition(.asymmetric(
-                            insertion: .move(edge: .top).combined(with: .opacity),
-                            removal: .move(edge: .top).combined(with: .opacity)
+                            insertion: .move(edge: .bottom).combined(with: .opacity),
+                            removal: .move(edge: .bottom).combined(with: .opacity)
                         ))
                         .onHover { hovering in
-                            isSliderHovered = hovering
-                            if hovering { cancelCollapse() } else { scheduleCollapse() }
+                            interactionState.isVolumeColumnHovered = hovering
+                            if hovering {
+                                cancelCollapse()
+                                cancelVolumeClose()
+                                isVolumeColumnShowing = true
+                                interactionState.isVolumeColumnVisible = true
+                            } else {
+                                scheduleVolumeClose()
+                                scheduleCollapse()
+                            }
                         }
                 }
 
                 EdgeMediaIslandView(
                     appState: appState,
                     edge: edge,
-                    isIslandExpanded: $isMediaExpanded,
-                    isVolumeHovered: $isVolumeHovered
+                    isVolumeHovered: volumeButtonHoveredBinding
                 )
                 .onHover { hovering in
-                    if hovering { cancelCollapse() } else { scheduleCollapse() }
+                    interactionState.isIslandHovered = hovering
+                    if hovering {
+                        cancelCollapse()
+                        ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
+                    } else if !isDragging && isExpanded {
+                        scheduleCollapse()
+                        ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
+                    }
                 }
             }
             .frame(width: 312, alignment: edge == .right ? .trailing : .leading)
-            .animation(.spring(response: 0.32, dampingFraction: 0.78), value: isMediaExpanded)
-            .animation(.spring(response: 0.26, dampingFraction: 0.80), value: isVolumeHovered || isSliderHovered || isDragging)
+            .animation(.spring(response: 0.32, dampingFraction: 0.78), value: interactionState.isMediaExpanded)
+            .animation(.spring(response: 0.24, dampingFraction: 0.80), value: showVolumeColumn)
         } else {
             // Mode A: Standard Baseline Vertical Edge Bar (Version 2.15.0 Experience)
             verticalBaselineColumn(tint: effectiveTint, secondaryTint: secondaryTint, isMuted: isMuted)
                 .frame(width: sliderWidth, alignment: edge == .right ? .trailing : .leading)
-                .animation(.spring(response: 0.32, dampingFraction: 0.78), value: isMediaExpanded)
+                .onHover { hovering in
+                    if hovering {
+                        cancelCollapse()
+                        ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
+                    } else if !isDragging && isExpanded {
+                        ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
+                    }
+                }
+                .animation(.spring(response: 0.32, dampingFraction: 0.78), value: interactionState.isMediaExpanded)
         }
+    }
+
+    private var volumeButtonHoveredBinding: Binding<Bool> {
+        Binding(
+            get: { interactionState.isVolumeButtonHovered },
+            set: { hovering in
+                interactionState.isVolumeButtonHovered = hovering
+                if hovering {
+                    cancelCollapse()
+                    cancelVolumeClose()
+                    isVolumeColumnShowing = true
+                    interactionState.isVolumeColumnVisible = true
+                } else {
+                    scheduleVolumeClose()
+                }
+            }
+        )
     }
 
     // MARK: - Mode A: Baseline Vertical Glass Column
@@ -143,24 +192,24 @@ public struct EdgeSliderView: View {
     private func verticalBaselineColumn(tint: Color, secondaryTint: Color, isMuted: Bool) -> some View {
         VStack(spacing: 8) {
             // Action Toggle Icon Button
-            topActionButton(tint: tint, isMuted: isMuted)
+            topActionButton(for: action, tint: tint, isMuted: isMuted)
                 .padding(.top, 8)
 
             // Slider Track / Drawer Card
             if action == .scratchpad {
                 scratchpadCard
                     .padding(.horizontal, 4)
-                readoutLabel(isMuted: isMuted, tint: tint)
+                readoutLabel(for: action, isMuted: isMuted, tint: tint)
                     .padding(.bottom, 10)
             } else if action == .stashShelf {
                 stashShelfCard
                     .padding(.horizontal, 4)
-                readoutLabel(isMuted: isMuted, tint: tint)
+                readoutLabel(for: action, isMuted: isMuted, tint: tint)
                     .padding(.bottom, 10)
             } else {
-                verticalSliderTrack(tint: tint, secondaryTint: secondaryTint, isMuted: isMuted, height: (shouldShowMediaIsland && nowPlaying.hasMedia) ? 112 : 138)
+                verticalSliderTrack(for: action, tint: tint, secondaryTint: secondaryTint, isMuted: isMuted, height: (shouldShowMediaIsland && nowPlaying.hasMedia) ? 112 : 138)
                     .padding(.horizontal, 4)
-                readoutLabel(isMuted: isMuted, tint: tint)
+                readoutLabel(for: action, isMuted: isMuted, tint: tint)
                     .padding(.bottom, (shouldShowMediaIsland && nowPlaying.hasMedia) ? 4 : 10)
             }
 
@@ -199,13 +248,13 @@ public struct EdgeSliderView: View {
     @ViewBuilder
     private func verticalVolumeGlassColumn(tint: Color, secondaryTint: Color, isMuted: Bool) -> some View {
         VStack(spacing: 8) {
-            topActionButton(tint: tint, isMuted: isMuted)
+            topActionButton(for: .volume, tint: tint, isMuted: isMuted)
                 .padding(.top, 8)
 
-            verticalSliderTrack(tint: tint, secondaryTint: secondaryTint, isMuted: isMuted, height: 120)
+            verticalSliderTrack(for: .volume, tint: tint, secondaryTint: secondaryTint, isMuted: isMuted, height: 120)
                 .padding(.horizontal, 4)
 
-            readoutLabel(isMuted: isMuted, tint: tint)
+            readoutLabel(for: .volume, isMuted: isMuted, tint: tint)
                 .padding(.bottom, 8)
         }
         .frame(width: sliderWidth)
@@ -222,16 +271,16 @@ public struct EdgeSliderView: View {
     // MARK: - Action Top Button
 
     @ViewBuilder
-    private func topActionButton(tint: Color, isMuted: Bool) -> some View {
+    private func topActionButton(for targetAction: ControlAction, tint: Color, isMuted: Bool) -> some View {
         Button(action: {
-            appState.toggleAction(action, displayID: displayID)
+            appState.toggleAction(targetAction, displayID: displayID)
         }) {
-            Image(systemName: iconName(isMuted: isMuted))
+            Image(systemName: iconName(for: targetAction, isMuted: isMuted))
                 .font(.system(size: 14.5, weight: .semibold))
                 .foregroundStyle(
                     isMuted
                         ? AnyShapeStyle(Color.red)
-                        : AnyShapeStyle(LinearGradient(colors: action == .volume && nowPlaying.hasMedia ? [nowPlaying.artworkTint, nowPlaying.artworkSecondaryTint] : action.accentColors, startPoint: .top, endPoint: .bottom))
+                        : AnyShapeStyle(LinearGradient(colors: targetAction == .volume && nowPlaying.hasMedia ? [nowPlaying.artworkTint, nowPlaying.artworkSecondaryTint] : targetAction.accentColors, startPoint: .top, endPoint: .bottom))
                 )
                 .frame(width: 32, height: 32)
                 .circularLiquidGlass(
@@ -245,19 +294,19 @@ public struct EdgeSliderView: View {
         }
         .buttonStyle(.plain)
         .onHover { isTopHovered = $0 }
-        .help(topHelpText(isMuted: isMuted))
+        .help(topHelpText(for: targetAction, isMuted: isMuted))
     }
 
     // MARK: - Vertical Slider Track
 
     @ViewBuilder
-    private func verticalSliderTrack(tint: Color, secondaryTint: Color, isMuted: Bool, height: CGFloat) -> some View {
+    private func verticalSliderTrack(for targetAction: ControlAction, tint: Color, secondaryTint: Color, isMuted: Bool, height: CGFloat) -> some View {
         GeometryReader { geo in
             let trackH = max(1, geo.size.height)
 
             ZStack {
                 LiquidVerticalTrack(
-                    progress: Double(currentValue),
+                    progress: Double(currentValue(for: targetAction)),
                     primaryTint: tint,
                     secondaryTint: secondaryTint,
                     trackWidth: 16,
@@ -272,9 +321,10 @@ public struct EdgeSliderView: View {
                 DragGesture(minimumDistance: 0)
                     .onChanged { gesture in
                         isDragging = true
+                        interactionState.isSliderDragging = true
                         let progress = 1.0 - (gesture.location.y / trackH)
                         let clamped: Float
-                        if action == .keepAwake {
+                        if targetAction == .keepAwake {
                             switch progress {
                             case ..<0.1: clamped = 0.0
                             case ..<0.3: clamped = 0.2
@@ -287,19 +337,32 @@ public struct EdgeSliderView: View {
                             clamped = max(0.0, min(1.0, Float(progress)))
                         }
                         dragValue = clamped
-                        if edge == .left {
-                            appState.liveLeftSliderValue = clamped
-                        } else {
-                            appState.liveRightSliderValue = clamped
+                        if targetAction == action {
+                            if edge == .left {
+                                appState.liveLeftSliderValue = clamped
+                            } else {
+                                appState.liveRightSliderValue = clamped
+                            }
                         }
-                        appState.setValue(for: action, value: Double(clamped), displayID: displayID)
+                        if targetAction == .mediaPlayback {
+                            nowPlaying.previewInteractiveScrub(toFraction: Double(clamped))
+                        } else {
+                            appState.setValue(for: targetAction, value: Double(clamped), displayID: displayID)
+                        }
                     }
                     .onEnded { _ in
                         isDragging = false
-                        if edge == .left {
-                            appState.liveLeftSliderValue = nil
-                        } else {
-                            appState.liveRightSliderValue = nil
+                        interactionState.isSliderDragging = false
+                        if targetAction == action {
+                            if edge == .left {
+                                appState.liveLeftSliderValue = nil
+                            } else {
+                                appState.liveRightSliderValue = nil
+                            }
+                        }
+                        if targetAction == .mediaPlayback {
+                            nowPlaying.previewInteractiveScrub(toFraction: Double(dragValue))
+                            nowPlaying.commitInteractiveScrub()
                         }
                         appState.saveSettings()
                     }
@@ -418,19 +481,19 @@ public struct EdgeSliderView: View {
             if hovering {
                 cancelCollapse()
                 withAnimation(.spring(response: 0.32, dampingFraction: 0.78)) {
-                    isMediaExpanded = true
+                    interactionState.isMediaExpanded = true
                 }
             }
         }
         .onTapGesture {
             withAnimation(.spring(response: 0.32, dampingFraction: 0.78)) {
-                isMediaExpanded.toggle()
+                interactionState.isMediaExpanded.toggle()
             }
         }
         .help(nowPlaying.hasMedia ? "\(nowPlaying.title) • \(nowPlaying.artist)" : appState.localized("edge.noMedia"))
     }
 
-    // MARK: - Collapse Timer Helpers
+    // MARK: - Collapse & Volume Grace Timer Helpers
 
     private func cancelCollapse() {
         collapseWorkItem?.cancel()
@@ -440,14 +503,38 @@ public struct EdgeSliderView: View {
     private func scheduleCollapse() {
         cancelCollapse()
         let item = DispatchWorkItem {
-            if !isDragging && !isSliderHovered && !isVolumeHovered {
-                withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-                    isMediaExpanded = false
+            Task { @MainActor in
+                let activeScrub = nowPlaying.isInteractiveScrubbing
+                if !isDragging && !interactionState.isVolumeColumnHovered && !interactionState.isVolumeButtonHovered && !interactionState.isIslandHovered && !activeScrub {
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                        interactionState.isMediaExpanded = false
+                        isVolumeColumnShowing = false
+                        interactionState.isVolumeColumnVisible = false
+                    }
                 }
             }
         }
         collapseWorkItem = item
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.40, execute: item)
+    }
+
+    private func cancelVolumeClose() {
+        volumeCloseWorkItem?.cancel()
+        volumeCloseWorkItem = nil
+    }
+
+    private func scheduleVolumeClose() {
+        cancelVolumeClose()
+        let item = DispatchWorkItem {
+            Task { @MainActor in
+                if !isDragging && !interactionState.isVolumeButtonHovered && !interactionState.isVolumeColumnHovered {
+                    isVolumeColumnShowing = false
+                    interactionState.isVolumeColumnVisible = false
+                }
+            }
+        }
+        volumeCloseWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28, execute: item)
     }
 
     // MARK: - Utility Drawer Cards
@@ -503,63 +590,63 @@ public struct EdgeSliderView: View {
     // MARK: - Readout & Metadata Helpers
 
     @ViewBuilder
-    private func readoutLabel(isMuted: Bool, tint: Color = .primary) -> some View {
-        if isMuted {
+    private func readoutLabel(for targetAction: ControlAction, isMuted: Bool, tint: Color = .primary) -> some View {
+        if isMuted && targetAction == .volume {
             Text(appState.localized("dial.mute"))
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .foregroundColor(.red)
-        } else if action == .timer {
+        } else if targetAction == .timer {
             Text(appState.formattedTimerTime)
                 .font(.system(size: 10.5, weight: .bold, design: .monospaced))
                 .monospacedDigit()
                 .foregroundColor(.primary)
-        } else if action == .keepAwake {
+        } else if targetAction == .keepAwake {
             Text(appState.keepAwake.formattedRemaining)
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .foregroundColor(appState.keepAwake.isActive ? .orange : .secondary)
-        } else if action == .stashShelf {
+        } else if targetAction == .stashShelf {
             Text("\(appState.stashShelf.items.count)")
                 .font(.system(size: 11, weight: .bold, design: .monospaced))
                 .monospacedDigit()
                 .foregroundColor(.primary)
-        } else if action == .scratchpad {
+        } else if targetAction == .scratchpad {
             Text(appState.localized("dial.notes"))
                 .font(.system(size: 9.5, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
-        } else if action == .mediaPlayback {
+        } else if targetAction == .mediaPlayback {
             Text(nowPlaying.formattedElapsedTime)
                 .font(.system(size: 10, weight: .bold, design: .monospaced))
                 .monospacedDigit()
-                .foregroundColor(action == .volume && nowPlaying.hasMedia ? tint : .primary)
+                .foregroundColor(nowPlaying.hasMedia ? tint : .primary)
         } else {
-            Text("\(Int(round(currentValue * 100)))%")
+            Text("\(Int(round(currentValue(for: targetAction) * 100)))%")
                 .font(.system(size: 11, weight: .bold, design: .monospaced))
                 .monospacedDigit()
-                .foregroundColor(action == .volume && nowPlaying.hasMedia ? tint : .primary)
+                .foregroundColor(targetAction == .volume && nowPlaying.hasMedia ? tint : .primary)
         }
     }
 
-    private func iconName(isMuted: Bool) -> String {
-        if isMuted { return "speaker.slash.fill" }
-        if action == .timer {
+    private func iconName(for targetAction: ControlAction, isMuted: Bool) -> String {
+        if isMuted && targetAction == .volume { return "speaker.slash.fill" }
+        if targetAction == .timer {
             return appState.isPomodoroRunning ? "pause.fill" : "play.fill"
         }
-        if action == .mediaPlayback {
+        if targetAction == .mediaPlayback {
             return nowPlaying.isPlaying ? "pause.fill" : "play.fill"
         }
-        return action.systemImage
+        return targetAction.systemImage
     }
 
-    private func topHelpText(isMuted: Bool) -> String {
-        if action == .volume {
+    private func topHelpText(for targetAction: ControlAction, isMuted: Bool) -> String {
+        if targetAction == .volume {
             return isMuted ? appState.localized("menubar.unmute") : appState.localized("menubar.mute")
         }
-        if action == .timer {
+        if targetAction == .timer {
             return appState.isPomodoroRunning ? appState.localized("menubar.pause") : appState.localized("menubar.start")
         }
-        if action == .mediaPlayback {
+        if targetAction == .mediaPlayback {
             return nowPlaying.isPlaying ? appState.localized("corners.media.pause") : appState.localized("corners.media.play")
         }
-        return "\(action.localizedDisplayName(using: appState.effectiveLanguage)) — \(appState.localized("edge.toggleAction"))"
+        return "\(targetAction.localizedDisplayName(using: appState.effectiveLanguage)) — \(appState.localized("edge.toggleAction"))"
     }
 }

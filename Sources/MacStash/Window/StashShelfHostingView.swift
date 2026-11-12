@@ -13,6 +13,7 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
     public init(rootView: LeftEdgeContainerView, appState: AppState) {
         self.appState = appState
         super.init(rootView: rootView)
+        sizingOptions = []
         registerForDraggedTypes([
             .fileURL,
             .string,
@@ -58,6 +59,7 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
 
         // When shelf or scratchpad is actively open, route clicks within drawer bounds
         if shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen {
+            let localPoint = superview != nil ? convert(point, from: superview) : point
             let activeDrawerWidth: CGFloat = scratchpad.isScratchpadOpen
                 ? Defaults.LeftEdgeDrawer.scratchpadTotalWidthPoints
                 : Defaults.LeftEdgeDrawer.shelfTotalWidthPoints
@@ -68,7 +70,7 @@ public final class StashShelfHostingView: NSHostingView<LeftEdgeContainerView> {
             let isRight = appState.settings.drawerEdgePosition == .right
             let activeX = isRight ? (bounds.maxX - activeDrawerWidth) : bounds.minX
             let activeRect = NSRect(x: activeX, y: activeY, width: activeDrawerWidth, height: activeHeight)
-            if activeRect.contains(point) {
+            if activeRect.contains(localPoint) {
                 return super.hitTest(point)
             }
             return nil

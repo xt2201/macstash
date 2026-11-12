@@ -1,5 +1,16 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.3 (2026-11-12)
+
+### Tua Nhạc Vuốt Dọc 2 Ngón, Căn Chuẩn Chấm Tua & Đại Tu Hit-Test
+
+- **Vuốt Dọc 2 Ngón Tua Nhạc Trên Dynamic Island**: Khi đã di chuột qua audio và mở trình tua Dynamic Island, thao tác vuốt dọc 2 ngón lên/xuống sẽ tua nhạc mượt mà tương đồng với thanh trượt cạnh và hoàn toàn không làm thay đổi nhầm âm lượng hệ thống. Âm lượng chỉ thay đổi khi bạn chủ động đưa chuột vào thanh volume thả xuống.
+- **Động Cơ Tua Nhạc Chuẩn Xác**: Khắc phục mã lệnh MediaRemote `SeekToPlaybackPosition` (`24` thay vì `48`), định tuyến chuẩn PID trình phát và bổ sung dự phòng AppleScript cho Spotify / Apple Music cùng bộ đệm đồng bộ sau khi tua.
+- **Chấm Tròn Tua Khớp Chính Xác 100%**: Sửa thứ tự modifier `.scaleEffect` và `.position` trên thanh tua để chấm tròn và vạch tiến trình luôn khớp tâm từ 0% đến 100% không bị lệch.
+- **Đồng Bộ Toàn Hệ Thống**: Chuẩn hóa chuyển đổi toạ độ `hitTest` cho toàn bộ 4 góc nóng, ngăn kéo, thanh cạnh và Second Dock; hỗ trợ phím `Esc` đóng thanh cạnh trái và vòng xoay góc; tách vùng dọc chống đè giữa Ngăn kéo và Thanh cạnh trái; và đồng bộ trực tiếp đèn nền bàn phím phần cứng.
+
+---
+
 ## Phiên bản 2.16.2 (2026-11-12)
 
 ### Sửa Lỗi Ổn Định Thanh Cạnh

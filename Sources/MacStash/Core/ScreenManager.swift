@@ -92,11 +92,19 @@ public final class ScreenManager: ObservableObject {
                     let shouldBeInteractive = sliderActive && (self.appState.activeDisplayID == 0 || self.appState.activeDisplayID == id)
                     instance.setRightEdgeInteractive(shouldBeInteractive)
                 }
-                let visualizerOn = sliderActive
-                    && self.appState.settings.edgeBarShowMediaControls
-                    && self.appState.settings.edgeBarVisualizerEnabled
-                    && self.appState.activeProfile.rightEdgeAction == .volume
-                NowPlayingManager.shared.setVisualizerActive(visualizerOn)
+                self.updateEdgeVisualizerState()
+            }
+            .store(in: &cancellables)
+
+        appState.$isLeftSliderActive
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] sliderActive in
+                guard let self = self else { return }
+                for (id, instance) in self.instances {
+                    let shouldBeInteractive = sliderActive && (self.appState.activeDisplayID == 0 || self.appState.activeDisplayID == id)
+                    instance.setLeftSliderInteractive(shouldBeInteractive)
+                }
+                self.updateEdgeVisualizerState()
             }
             .store(in: &cancellables)
 
@@ -736,7 +744,7 @@ public final class ScreenManager: ObservableObject {
                     edge: edge
                 )
                 if matchesEdge {
-                    self.appState.syncHardwareState()
+                    self.appState.syncHardwareState(force: true)
                     self.appState.activeDisplayID = displayID
                     if edge == .left {
                         self.appState.isLeftSliderActive = true
@@ -1022,7 +1030,7 @@ public final class ScreenManager: ObservableObject {
 
     public func activateDial(corner: CornerPosition, displayID: CGDirectDisplayID) {
         AppLogger.hotcorner.info("Activating corner dial at \(corner.rawValue) on display \(displayID)")
-        appState.syncHardwareState()
+        appState.syncHardwareState(force: true)
         appState.activeCorner = corner
         appState.activeDisplayID = displayID
         instances[displayID]?.setMouseInteractive(true, for: corner)
@@ -1072,16 +1080,34 @@ public final class ScreenManager: ObservableObject {
         }
     }
 
+    private func updateEdgeVisualizerState() {
+        let rightHasMedia = appState.isRightSliderActive
+            && ((appState.activeProfile.rightEdgeAction == .volume && appState.settings.edgeBarShowMediaControls)
+                || appState.activeProfile.rightEdgeAction == .mediaPlayback)
+        let leftHasMedia = appState.isLeftSliderActive
+            && ((appState.activeProfile.leftEdgeAction == .volume && appState.settings.edgeBarShowMediaControls)
+                || appState.activeProfile.leftEdgeAction == .mediaPlayback)
+        let visualizerOn = appState.settings.edgeBarVisualizerEnabled && (rightHasMedia || leftHasMedia)
+        NowPlayingManager.shared.setVisualizerActive(visualizerOn)
+    }
+
     private func handleKeyEvent(_ event: NSEvent) {
         if event.keyCode == 53 { // Escape closes the topmost transient surface
             if appState.isCursorPalettePresented {
                 dismissCursorPalette()
+            } else if appState.activeCorner != nil {
+                dismissActiveDial()
             } else if appState.stashShelf.isShelfOpen {
                 appState.stashShelf.closeShelf()
             } else if appState.scratchpad.isScratchpadOpen {
                 appState.scratchpad.isScratchpadOpen = false
-            } else if appState.isRightSliderActive {
-                dismissRightSlider()
+            } else if appState.isRightSliderActive || appState.isLeftSliderActive {
+                if appState.isRightSliderActive {
+                    dismissEdgeSlider(edge: .right)
+                }
+                if appState.isLeftSliderActive {
+                    dismissEdgeSlider(edge: .left)
+                }
             }
             return
         }

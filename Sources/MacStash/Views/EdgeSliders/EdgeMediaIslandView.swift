@@ -3,18 +3,16 @@ import AppKit
 import MacStashCore
 
 /// Dynamic Island style horizontal expandable media controller for the Edge Bar.
-/// In collapsed state: compact 44x44 album artwork capsule with live dancing visualizer pulse.
-/// On hover: smoothly expands horizontally outward (Dynamic Island morph) revealing track details,
-/// an interactive audio scrubber, and complete 5-button transport controls.
+/// Morphs outward horizontally when hovering the artwork capsule, revealing track details,
+/// a live audio visualizer, an interactive scrubber bar (supports both drag and vertical two-finger swipe),
+/// and 5 transport controls plus an edge-most Volume Logo button.
 public struct EdgeMediaIslandView: View {
     @ObservedObject private var nowPlaying = NowPlayingManager.shared
     @ObservedObject private var audio = AudioManager.shared
     @ObservedObject var appState: AppState
     public let edge: EdgePosition
 
-    @Binding var isIslandExpanded: Bool
     @Binding var isVolumeHovered: Bool
-    @State private var collapseWorkItem: DispatchWorkItem?
 
     @State private var isPrevHovered: Bool = false
     @State private var isRewindHovered: Bool = false
@@ -29,12 +27,10 @@ public struct EdgeMediaIslandView: View {
     public init(
         appState: AppState,
         edge: EdgePosition = .right,
-        isIslandExpanded: Binding<Bool>,
         isVolumeHovered: Binding<Bool>
     ) {
         self.appState = appState
         self.edge = edge
-        self._isIslandExpanded = isIslandExpanded
         self._isVolumeHovered = isVolumeHovered
     }
 
@@ -52,111 +48,13 @@ public struct EdgeMediaIslandView: View {
     }
 
     public var body: some View {
-        let isExpanded = isIslandExpanded
-        let alignment: Alignment = edge == .left ? .leading : .trailing
-
-        ZStack(alignment: alignment) {
-            if isExpanded {
-                expandedIslandView
-                    .transition(.asymmetric(
-                        insertion: .scale(scale: 0.88, anchor: unitPoint(for: edge)).combined(with: .opacity),
-                        removal: .scale(scale: 0.88, anchor: unitPoint(for: edge)).combined(with: .opacity)
-                    ))
-            } else {
-                collapsedCapsuleView
-                    .transition(.opacity)
+        expandedIslandView
+            .onAppear {
+                nowPlaying.pollLivePlaybackPosition()
             }
-        }
-        .frame(width: isExpanded ? 312 : 44, height: isExpanded ? 98 : 44, alignment: alignment)
-        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: isExpanded)
-        .onAppear {
-            nowPlaying.pollLivePlaybackPosition()
-        }
     }
 
-    private func unitPoint(for edge: EdgePosition) -> UnitPoint {
-        edge == .left ? .leading : .trailing
-    }
-
-    private func scheduleCollapse() {
-        collapseWorkItem?.cancel()
-        let item = DispatchWorkItem {
-            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-                isIslandExpanded = false
-            }
-        }
-        collapseWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
-    }
-
-    // MARK: - Collapsed Capsule View (44x44)
-
-    @ViewBuilder
-    private var collapsedCapsuleView: some View {
-        ZStack {
-            if let artwork = nowPlaying.artworkImage {
-                Image(nsImage: artwork)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 40, height: 40)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(
-                                nowPlaying.isPlaying ? nowPlaying.artworkTint.opacity(0.65) : Color.white.opacity(0.20),
-                                lineWidth: 1.2
-                            )
-                    )
-                    .shadow(
-                        color: nowPlaying.isPlaying ? nowPlaying.artworkTint.opacity(0.40) : Color.black.opacity(0.30),
-                        radius: 6,
-                        x: 0,
-                        y: 2
-                    )
-            } else {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(red: 0.16, green: 0.18, blue: 0.24),
-                                Color(red: 0.08, green: 0.10, blue: 0.15)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 40, height: 40)
-                    .overlay(
-                        Image(systemName: "music.note")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.70))
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(Color.white.opacity(0.16), lineWidth: 1)
-                    )
-            }
-
-            // Subtle animated playback pulse indicator on corner
-            if nowPlaying.isPlaying {
-                Circle()
-                    .fill(nowPlaying.artworkTint)
-                    .frame(width: 7, height: 7)
-                    .shadow(color: nowPlaying.artworkTint, radius: 3)
-                    .offset(x: 14, y: -14)
-            }
-        }
-        .frame(width: 44, height: 44)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            withAnimation(.spring(response: 0.30, dampingFraction: 0.76)) {
-                isIslandExpanded.toggle()
-            }
-        }
-        .help(nowPlaying.hasMedia ? "\(nowPlaying.title) • \(nowPlaying.artist)" : appState.localized("edge.noMedia"))
-    }
-
-    // MARK: - Expanded Dynamic Island View (280x98)
+    // MARK: - Expanded Dynamic Island View (312x98)
 
     @ViewBuilder
     private var expandedIslandView: some View {
@@ -393,18 +291,26 @@ public struct EdgeMediaIslandView: View {
         HStack(spacing: 6) {
             Text(displayedElapsedText)
                 .font(.system(size: 8.5, weight: isScrubbingActive ? .heavy : .bold, design: .monospaced))
+                .monospacedDigit()
                 .foregroundColor(isScrubbingActive ? nowPlaying.artworkTint : .secondary)
                 .frame(width: 32, alignment: .leading)
 
             GeometryReader { geo in
                 let w = max(1, geo.size.width)
+                let h = geo.size.height
+                let thumbFrame: CGFloat = 10.0
+                let thumbRadius = thumbFrame * 0.5
+                let usableW = max(1.0, w - thumbFrame)
+                let thumbCenterX = thumbRadius + usableW * CGFloat(activeProgress)
+                let fillWidth = max(thumbRadius, thumbCenterX)
+
                 ZStack(alignment: .leading) {
                     // Track background
                     Capsule()
                         .fill(Color.primary.opacity(0.16))
-                        .frame(height: 5)
+                        .frame(width: w, height: 5)
 
-                    // Active progress fill
+                    // Active progress fill aligned cleanly to thumb center
                     Capsule()
                         .fill(
                             LinearGradient(
@@ -413,44 +319,56 @@ public struct EdgeMediaIslandView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .frame(width: max(4, w * CGFloat(activeProgress)), height: 5)
+                        .frame(width: fillWidth, height: 5)
 
-                    // Scrubber thumb with active glow on 2-finger swipe or drag
+                    // Scrubber thumb: scaleEffect precedes position so center coordinate is never scaled
                     Circle()
                         .fill(Color.white)
-                        .frame(width: isScrubbingActive ? 10 : 8, height: isScrubbingActive ? 10 : 8)
+                        .frame(width: thumbFrame, height: thumbFrame)
                         .overlay(
                             Circle()
-                                .stroke(nowPlaying.artworkTint.opacity(isScrubbingActive ? 0.85 : 0.0), lineWidth: 1.5)
+                                .stroke(nowPlaying.artworkTint.opacity(isScrubbingActive ? 0.90 : 0.0), lineWidth: 1.5)
                         )
-                        .shadow(color: isScrubbingActive ? nowPlaying.artworkTint.opacity(0.6) : Color.black.opacity(0.4), radius: isScrubbingActive ? 4 : 2, x: 0, y: 1)
-                        .offset(x: max(0, min(w - 8, (w * CGFloat(activeProgress)) - 4)))
-                        .scaleEffect(isScrubbingActive ? 1.25 : 1.0)
+                        .shadow(
+                            color: isScrubbingActive ? nowPlaying.artworkTint.opacity(0.65) : Color.black.opacity(0.40),
+                            radius: isScrubbingActive ? 4 : 2,
+                            x: 0,
+                            y: 1
+                        )
+                        .scaleEffect(isScrubbingActive ? 1.15 : 0.82)
                         .animation(.spring(response: 0.18, dampingFraction: 0.75), value: isScrubbingActive)
+                        .position(x: thumbCenterX, y: h * 0.5)
                 }
+                .frame(width: w, height: h, alignment: .leading)
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
                             isScrubbing = true
-                            let fraction = max(0.0, min(1.0, value.location.x / w))
+                            let fraction = max(0.0, min(1.0, (value.location.x - thumbRadius) / usableW))
                             scrubFraction = fraction
+                            nowPlaying.previewInteractiveScrub(toFraction: fraction)
                         }
                         .onEnded { value in
-                            let fraction = max(0.0, min(1.0, value.location.x / w))
-                            nowPlaying.seekToProgress(fraction: fraction)
+                            let fraction = max(0.0, min(1.0, (value.location.x - thumbRadius) / usableW))
+                            scrubFraction = fraction
                             isScrubbing = false
+                            if nowPlaying.duration > 0.0 {
+                                nowPlaying.previewInteractiveScrub(toFraction: fraction)
+                                nowPlaying.commitInteractiveScrub()
+                            }
                         }
                 )
             }
-            .frame(height: 8)
+            .frame(height: 14)
 
             Text(nowPlaying.duration > 0 ? nowPlaying.formattedDuration : "--:--")
                 .font(.system(size: 8.5, weight: .bold, design: .monospaced))
+                .monospacedDigit()
                 .foregroundColor(.secondary)
                 .frame(width: 32, alignment: .trailing)
         }
-        .frame(height: 12)
+        .frame(height: 16)
         .help(appState.localized("corners.media.scrubber"))
     }
 }

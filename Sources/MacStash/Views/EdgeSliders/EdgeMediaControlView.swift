@@ -158,11 +158,18 @@ public struct EdgeMediaControlView: View {
         VStack(spacing: 3) {
             GeometryReader { geo in
                 let w = max(1, geo.size.width)
+                let h = geo.size.height
+                let thumbFrame: CGFloat = 9.0
+                let thumbRadius = thumbFrame * 0.5
+                let usableW = max(1.0, w - thumbFrame)
+                let thumbCenterX = thumbRadius + usableW * CGFloat(activeProgress)
+                let fillWidth = max(thumbRadius, thumbCenterX)
+
                 ZStack(alignment: .leading) {
                     // Track background
                     Capsule()
                         .fill(Color.primary.opacity(0.14))
-                        .frame(height: 5)
+                        .frame(width: w, height: 5)
 
                     // Active progress fill
                     Capsule()
@@ -173,35 +180,44 @@ public struct EdgeMediaControlView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .frame(width: max(4, w * CGFloat(activeProgress)), height: 5)
+                        .frame(width: fillWidth, height: 5)
 
                     // Scrubber thumb
                     Circle()
                         .fill(Color.white)
-                        .frame(width: isScrubbing ? 9 : 7, height: isScrubbing ? 9 : 7)
+                        .frame(width: thumbFrame, height: thumbFrame)
                         .shadow(color: Color.black.opacity(0.35), radius: 2, x: 0, y: 1)
-                        .offset(x: max(0, min(w - 7, (w * CGFloat(activeProgress)) - 3.5)))
+                        .scaleEffect(isScrubbing ? 1.15 : 0.80)
+                        .animation(.spring(response: 0.18, dampingFraction: 0.75), value: isScrubbing)
+                        .position(x: thumbCenterX, y: h * 0.5)
                 }
+                .frame(width: w, height: h, alignment: .leading)
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
                             isScrubbing = true
-                            let fraction = max(0.0, min(1.0, value.location.x / w))
+                            let fraction = max(0.0, min(1.0, (value.location.x - thumbRadius) / usableW))
                             scrubFraction = fraction
+                            nowPlaying.previewInteractiveScrub(toFraction: fraction)
                         }
                         .onEnded { value in
-                            let fraction = max(0.0, min(1.0, value.location.x / w))
-                            nowPlaying.seekToProgress(fraction: fraction)
+                            let fraction = max(0.0, min(1.0, (value.location.x - thumbRadius) / usableW))
+                            scrubFraction = fraction
                             isScrubbing = false
+                            if nowPlaying.duration > 0.0 {
+                                nowPlaying.previewInteractiveScrub(toFraction: fraction)
+                                nowPlaying.commitInteractiveScrub()
+                            }
                         }
                 )
             }
-            .frame(width: 44, height: 8)
+            .frame(width: 44, height: 12)
 
             // Time readout
             Text(nowPlaying.duration > 0 ? "\(nowPlaying.formattedElapsedTime) / \(nowPlaying.formattedDuration)" : nowPlaying.formattedElapsedTime)
                 .font(.system(size: 7.5, weight: .bold, design: .monospaced))
+                .monospacedDigit()
                 .foregroundColor(.secondary)
                 .lineLimit(1)
         }

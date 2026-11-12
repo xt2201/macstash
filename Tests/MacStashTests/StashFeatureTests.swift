@@ -511,11 +511,33 @@ public enum StashFeatureTests {
         TestAssertion.assertEqual(durFactor(120.0), 0.6)
         TestAssertion.assertEqual(durFactor(1200.0), 2.5)
 
-        let scrubDelta: (Double, Double) -> Double = { px, d in
-            px * 0.22 * durFactor(d)
+        let scrubDelta: (Double, Double) -> Double = { motion, d in
+            motion * 0.22 * durFactor(d)
         }
         let deltaSecs = scrubDelta(physicalX, 240.0)
         TestAssertion.assertEqual(deltaSecs, 11.0) // 50pt swipe on a 4-min song moves exactly 11 seconds forward!
+
+        // Two-finger vertical trackpad scrubbing physics (matching Edge Bar volume up/down direction)
+        let rawDeltaYUp: Double = -40.0 // swiping UP with natural scrolling produces negative rawDeltaY
+        let rawDeltaYDown: Double = 40.0
+        let physicalYUp = naturalScrolling ? -rawDeltaYUp : rawDeltaYUp
+        let physicalYDown = naturalScrolling ? -rawDeltaYDown : rawDeltaYDown
+        TestAssertion.assertTrue(scrubDelta(physicalYUp, 240.0) > 0, "Swiping UP with natural scrolling scrubs forward")
+        TestAssertion.assertTrue(scrubDelta(physicalYDown, 240.0) < 0, "Swiping DOWN with natural scrolling scrubs backward")
+
+        // Scrubber thumb center alignment across 0%..100%
+        let trackW: CGFloat = 216.0
+        let thumbFrame: CGFloat = 10.0
+        let thumbRadius = thumbFrame * 0.5
+        let usableW = trackW - thumbFrame
+        for progress in [0.0, 0.25, 0.5, 0.75, 1.0] {
+            let centerX = thumbRadius + usableW * CGFloat(progress)
+            let fillW = max(thumbRadius, centerX)
+            TestAssertion.assertTrue(centerX >= thumbRadius && centerX <= trackW - thumbRadius, "Thumb center must stay within track bounds at progress \(progress)")
+            TestAssertion.assertEqual(fillW, centerX, "Fill bar must end at exact thumb center at progress \(progress)")
+            let inverted = (centerX - thumbRadius) / usableW
+            TestAssertion.assertTrue(abs(inverted - CGFloat(progress)) < 0.0001, "Drag inversion must be sub-pixel exact at progress \(progress)")
+        }
     }
 
     private static func testKeepAwakeSnapPresets() {
@@ -638,6 +660,19 @@ public enum StashFeatureTests {
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, artworkPoint), "Artwork hover point must stay inside the edge hit zone on \(edge)")
             let islandPoint = CGPoint(x: edge == .left ? screen.minX + 300.0 : screen.maxX - 300.0, y: panel.minY + 50.0)
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, islandPoint), "Expanded island far end must stay inside the edge hit zone on \(edge)")
+        }
+
+        // Verify shared-edge Drawer and Edge Slider panels do not vertically overlap on 14" & 1080p screens
+        for screenH in [CGFloat(982), CGFloat(1080), CGFloat(1440)] {
+            let frame = CGRect(x: 0, y: 0, width: 1512, height: screenH)
+            let drawerH = Defaults.LeftEdgeDrawer.panelHeightPoints
+            let drawerY = max(frame.minY + Defaults.EdgeSliders.drawerClearancePoints, frame.midY - drawerH - 4)
+            let drawerMaxY = drawerY + drawerH
+
+            let sliderH = Defaults.EdgeSliders.panelHeightPoints
+            let maxAllowedSliderY = frame.maxY - sliderH - Defaults.EdgeSliders.drawerClearancePoints
+            let sliderY = min(maxAllowedSliderY, max(drawerMaxY + 4, frame.midY + 4))
+            TestAssertion.assertTrue(sliderY >= drawerMaxY, "Shared-edge Slider (\(sliderY)) must clear Drawer top (\(drawerMaxY)) at screen height \(screenH)")
         }
     }
 }

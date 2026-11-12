@@ -44,6 +44,8 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
     var sendCommandToPlayer: SendCommandToPlayerFn?
     var artworkCopyImageData: ArtworkCopyImageDataFn?
     var setElapsedTime: SetElapsedTimeFn?
+    var optionPlaybackPositionKey: CFString = "kMRMediaRemoteOptionPlaybackPosition" as CFString
+    var optionSkipIntervalKey: CFString = "kMRMediaRemoteOptionSkipInterval" as CFString
 
     private var lastActivePlayerPath: AnyObject?
     private var lastPlayerPathsByPID: [Int32: AnyObject] = [:]
@@ -79,6 +81,15 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
         sendCommandToPlayer = sym("MRMediaRemoteSendCommandToPlayer", as: SendCommandToPlayerFn.self)
         artworkCopyImageData = sym("MRNowPlayingArtworkCopyImageData", as: ArtworkCopyImageDataFn.self)
         setElapsedTime = sym("MRMediaRemoteSetElapsedTime", as: SetElapsedTimeFn.self)
+
+        if let posPtr = dlsym(handle, "kMRMediaRemoteOptionPlaybackPosition"),
+           let key = posPtr.assumingMemoryBound(to: CFString?.self).pointee {
+            optionPlaybackPositionKey = key
+        }
+        if let skipPtr = dlsym(handle, "kMRMediaRemoteOptionSkipInterval"),
+           let key = skipPtr.assumingMemoryBound(to: CFString?.self).pointee {
+            optionSkipIntervalKey = key
+        }
     }
 
     struct CandidateSnapshot {
@@ -93,6 +104,7 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
         var album: String = ""
         var duration: Double = 0.0
         var elapsedTime: Double = 0.0
+        var hasElapsedTime: Bool = false
         var playbackRate: Double = 0.0
         var artworkData: Data? = nil
         var artworkMIMEType: String = ""
@@ -491,7 +503,13 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
                         computed += delta * rate
                     }
                 }
+                if snap.duration > 0 {
+                    computed = max(0.0, min(snap.duration, computed))
+                } else {
+                    computed = max(0.0, computed)
+                }
                 snap.elapsedTime = computed
+                snap.hasElapsedTime = true
             }
             if let rate = (dict["kMRMediaRemoteNowPlayingInfoPlaybackRate"] as? NSNumber)?.doubleValue {
                 snap.playbackRate = rate
@@ -537,6 +555,7 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
             "kMRMediaRemoteNowPlayingInfoAlbum": snap.album,
             "kMRMediaRemoteNowPlayingInfoDuration": snap.duration,
             "kMRMediaRemoteNowPlayingInfoElapsedTime": snap.elapsedTime,
+            "hasElapsedTime": snap.hasElapsedTime,
             "kMRMediaRemoteNowPlayingInfoPlaybackRate": snap.playbackRate
         ]
 
@@ -597,33 +616,40 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
         }
 
         if commandWord == "seek" || commandWord == "forward" || commandWord == "skip_forward" || commandWord == "backward" || commandWord == "skip_backward" {
-            let current = 0.0
-            let targetSeconds: Double
-            if commandWord == "forward" || commandWord == "skip_forward" {
-                let delta = seekParam ?? 10.0
-                targetSeconds = max(0.0, current + delta)
-            } else if commandWord == "backward" || commandWord == "skip_backward" {
-                let delta = seekParam ?? 10.0
-                targetSeconds = max(0.0, current - delta)
+            let isSkipForward = (commandWord == "forward" || commandWord == "skip_forward")
+            let isSkipBackward = (commandWord == "backward" || commandWord == "skip_backward")
+
+            let cmdID: Int32
+            let options: CFDictionary
+            if isSkipForward || isSkipBackward {
+                // kMRMediaRemoteCommandSkipForward = 17, kMRMediaRemoteCommandSkipBackward = 18
+                cmdID = isSkipForward ? 17 : 18
+                let delta = max(1.0, seekParam ?? 10.0)
+                options = [
+                    optionSkipIntervalKey: NSNumber(value: delta)
+                ] as CFDictionary
             } else {
-                targetSeconds = max(0.0, seekParam ?? 0.0)
+                // kMRMediaRemoteCommandSeekToPlaybackPosition = 24
+                cmdID = 24
+                let targetSeconds = max(0.0, seekParam ?? 0.0)
+                options = [
+                    optionPlaybackPositionKey: NSNumber(value: targetSeconds)
+                ] as CFDictionary
             }
 
             queue.async { [weak self] in
                 guard let self = self else { return }
-                self.setElapsedTime?(targetSeconds)
-
-                let options: CFDictionary = [
-                    "kMRMediaRemoteOptionPlaybackPosition" as CFString: NSNumber(value: targetSeconds)
-                ] as CFDictionary
-
                 let targetPlayerPath = (targetPID > 0 ? self.lastPlayerPathsByPID[targetPID] : nil) ?? self.lastActivePlayerPath
                 if let playerPath = targetPlayerPath, let sendToPlayer = self.sendCommandToPlayer {
-                    sendToPlayer(48, options, playerPath, 0, self.queue) { [weak self] _, _ in
-                        self?.schedulePostCommandEmit()
+                    sendToPlayer(cmdID, options, playerPath, 0, self.queue) { [weak self] status, _ in
+                        guard let self = self else { return }
+                        if status != 0, let sendGlobal = self.sendCommand {
+                            _ = sendGlobal(cmdID, options)
+                        }
+                        self.schedulePostCommandEmit()
                     }
                 } else if let sendGlobal = self.sendCommand {
-                    _ = sendGlobal(48, options)
+                    _ = sendGlobal(cmdID, options)
                     self.schedulePostCommandEmit()
                 }
             }
@@ -653,8 +679,12 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
             let targetPlayerPath = (targetPID > 0 ? self.lastPlayerPathsByPID[targetPID] : nil) ?? self.lastActivePlayerPath
 
             if let playerPath = targetPlayerPath, let sendToPlayer = self.sendCommandToPlayer {
-                sendToPlayer(commandID, nil, playerPath, 0, self.queue) { [weak self] _, _ in
-                    self?.schedulePostCommandEmit()
+                sendToPlayer(commandID, nil, playerPath, 0, self.queue) { [weak self] status, _ in
+                    guard let self = self else { return }
+                    if status != 0, let sendGlobal = self.sendCommand {
+                        _ = sendGlobal(commandID, nil)
+                    }
+                    self.schedulePostCommandEmit()
                 }
             } else if let sendGlobal = self.sendCommand {
                 _ = sendGlobal(commandID, nil)

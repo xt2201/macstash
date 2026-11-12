@@ -486,15 +486,16 @@ public final class AppState: ObservableObject {
         hardwareSyncTimer?.invalidate()
         let t = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
-                self?.syncHardwareState()
+                self?.syncHardwareState(force: false)
             }
         }
         RunLoop.main.add(t, forMode: .common)
         self.hardwareSyncTimer = t
     }
 
-    public func syncHardwareState() {
-        audio.updateVolumeFromHardware(force: true)
+    public func syncHardwareState(force: Bool = false) {
+        audio.updateVolumeFromHardware(force: force)
+        keyboard.updateBrightnessFromHardware()
         let displays = connectedDisplays()
         for d in displays {
             let old = brightnessService.profile(for: d.uuid)?.brightnessLevel
@@ -530,6 +531,7 @@ public final class AppState: ObservableObject {
             }
             return Double(Defaults.Brightness.defaultLevel)
         case .keyboardBrightness:
+            keyboard.updateBrightnessFromHardware()
             return Double(keyboard.brightness)
         case .timer:
             if pomodoroEngine.state.isRunning || isPomodoroPaused {

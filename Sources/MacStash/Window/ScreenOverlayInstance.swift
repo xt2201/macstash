@@ -14,9 +14,11 @@ public final class ScreenOverlayInstance {
 
     private var rightSliderPanel: MacStashInteractivePanel?
     private var rightSliderHostingView: EdgeSliderHostingView?
+    private let rightInteractionState = EdgeSliderInteractionState()
 
     private var leftSliderPanel: MacStashInteractivePanel?
     private var leftSliderHostingView: EdgeSliderHostingView?
+    private let leftInteractionState = EdgeSliderInteractionState()
 
     private var leftEdgePanel: MacStashInteractivePanel?
     private var stashHostingView: StashShelfHostingView?
@@ -85,6 +87,9 @@ public final class ScreenOverlayInstance {
     }
 
     public func setRightSliderInteractive(_ interactive: Bool) {
+        if !interactive {
+            rightInteractionState.reset()
+        }
         guard let panel = rightSliderPanel else { return }
         panel.ignoresMouseEvents = !interactive
         if interactive {
@@ -93,6 +98,9 @@ public final class ScreenOverlayInstance {
     }
 
     public func setLeftSliderInteractive(_ interactive: Bool) {
+        if !interactive {
+            leftInteractionState.reset()
+        }
         guard let panel = leftSliderPanel else { return }
         panel.ignoresMouseEvents = !interactive
         if interactive {
@@ -170,7 +178,7 @@ public final class ScreenOverlayInstance {
         let panelWidth: CGFloat = Defaults.LeftEdgeDrawer.panelWidthPoints
         let panelHeight: CGFloat = Defaults.LeftEdgeDrawer.panelHeightPoints
         let panelY = isSliderPresentOnDrawerEdge
-            ? max(frame.minY + 10, frame.midY - panelHeight + 40)
+            ? max(frame.minY + Defaults.EdgeSliders.drawerClearancePoints, frame.midY - panelHeight - 4)
             : frame.minY + (frame.height - panelHeight) / 2
         let panelX = isRight ? (frame.maxX - panelWidth) : frame.minX
         return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
@@ -196,8 +204,8 @@ public final class ScreenOverlayInstance {
         if rightAllowed && rightOuter {
             let edgeFrame = sliderRect(for: .right, in: screen.frame)
             let panel = makeEdgePanel(contentRect: edgeFrame)
-            let sliderView = EdgeSliderView(appState: appState, edge: .right, displayID: displayID)
-            let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID)
+            let sliderView = EdgeSliderView(appState: appState, edge: .right, displayID: displayID, interactionState: rightInteractionState)
+            let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID, interactionState: rightInteractionState)
 
             panel.contentView = hostingView
             panel.orderFrontRegardless()
@@ -214,8 +222,8 @@ public final class ScreenOverlayInstance {
         if leftAllowed && leftOuter {
             let edgeFrame = sliderRect(for: .left, in: screen.frame)
             let panel = makeEdgePanel(contentRect: edgeFrame)
-            let sliderView = EdgeSliderView(appState: appState, edge: .left, displayID: displayID)
-            let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID)
+            let sliderView = EdgeSliderView(appState: appState, edge: .left, displayID: displayID, interactionState: leftInteractionState)
+            let hostingView = EdgeSliderHostingView(rootView: sliderView, appState: appState, displayID: displayID, interactionState: leftInteractionState)
 
             panel.contentView = hostingView
             panel.orderFrontRegardless()
@@ -232,9 +240,15 @@ public final class ScreenOverlayInstance {
         let sameEdge = (appState.settings.drawerEdgePosition == .left) == isLeft && appState.hasDrawerFeatureActive
         let panelWidth = Defaults.EdgeSliders.panelWidthPoints
         let panelHeight = Defaults.EdgeSliders.panelHeightPoints
-        let panelY = sameEdge
-            ? min(frame.maxY - panelHeight - Defaults.EdgeSliders.drawerClearancePoints, frame.midY - 40)
-            : frame.minY + (frame.height - panelHeight) / 2
+        let panelY: CGFloat
+        if sameEdge {
+            let dRect = drawerRect(in: frame)
+            let maxAllowedY = frame.maxY - panelHeight - Defaults.EdgeSliders.drawerClearancePoints
+            let preferredY = max(dRect.maxY + 4, frame.midY + 4)
+            panelY = min(maxAllowedY, preferredY)
+        } else {
+            panelY = frame.minY + (frame.height - panelHeight) / 2
+        }
         let panelX = isLeft ? frame.minX : (frame.maxX - panelWidth)
         return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
     }

@@ -30,6 +30,7 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
             hideDelaySeconds: appState.settings.cornerHideDelaySeconds
         )
         super.init(rootView: rootView)
+        sizingOptions = []
     }
 
     @available(*, unavailable)
@@ -56,11 +57,12 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
             return nil
         }
 
+        let localPoint = superview != nil ? convert(point, from: superview) : point
         let vertex = localCornerVertex(in: bounds, corner: corner)
-        let dist = hypot(point.x - vertex.x, point.y - vertex.y)
+        let dist = hypot(localPoint.x - vertex.x, localPoint.y - vertex.y)
         let dialRadius = appState.settings.dialRadiusPoints
 
-        if dist <= dialRadius + 5 {
+        if dist <= dialRadius + 20 {
             return super.hitTest(point)
         }
 
@@ -97,6 +99,11 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
             return
         }
 
+        if action == .mediaPlayback && (event.phase == .ended || event.phase == .cancelled) {
+            NowPlayingManager.shared.commitInteractiveScrub()
+            return
+        }
+
         let rawDeltaX = event.hasPreciseScrollingDeltas ? event.scrollingDeltaX : (event.deltaX * 10.0)
         let rawDeltaY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
 
@@ -111,13 +118,10 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
 
         if action == .mediaPlayback {
             let dur = NowPlayingManager.shared.duration
-            let durFactor = dur > 0 ? max(0.6, min(2.5, dur / 240.0)) : 1.0
-            let effectiveStep = physicalY + physicalX
-            let deltaSeconds = effectiveStep * 0.25 * durFactor
+            let durFactor = dur > 0 ? max(0.35, min(2.5, dur / 240.0)) : 1.0
+            let primaryStep = abs(physicalY) >= abs(physicalX) ? physicalY : physicalX
+            let deltaSeconds = primaryStep * 0.25 * durFactor
             NowPlayingManager.shared.updateInteractiveScrub(deltaSeconds: deltaSeconds)
-            if event.phase == .ended || event.phase == .cancelled {
-                NowPlayingManager.shared.commitInteractiveScrub()
-            }
             return
         }
 

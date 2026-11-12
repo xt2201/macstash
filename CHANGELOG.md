@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.9] - 2026-11-12
+
+### Fixed
+- Dynamic Island Volume Icon Hover Hiding & Seamless Baseline Mode Return: Moving cursor away from the Dynamic Island volume icon now immediately hides the dropped-in vertical volume slider. Moving cursor upward from the volume icon into the vertical volume bar seamlessly collapses the audio scrubber island and returns to the initial baseline vertical volume bar (Mode A) directly under the cursor.
+
+---
+
 ## [2.16.8] - 2026-11-12
 
 ### Fixed

@@ -1,5 +1,14 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.9 (2026-11-12)
+
+### Ẩn Thanh Âm Lượng Khi Rời Icon & Tự Động Quay Lại Chỉnh Âm Lượng Ban Đầu
+
+- **Ẩn Thanh Âm Lượng Khi Rời Icon Loa**: Khi di chuyển trỏ chuột ra khỏi biểu tượng loa sang các phần khác trên đảo nhạc, thanh dọc chỉnh âm lượng sẽ tự động ẩn đi gọn gàng, trả lại không gian thoáng đãng cho phần tua nhạc.
+- **Tự Động Quay Lại Cột Chỉnh Âm Lượng Khi Di Lên**: Khi đang rê chuột ở icon loa mà di chuột lên phía thanh dọc chỉnh âm lượng, phần tua nhạc sẽ tự động thu gọn lại và đưa bạn quay trở về giao diện cột chỉnh âm lượng nguyên bản ban đầu (Mode A) ngay dưới đầu ngón tay.
+
+---
+
 ## Phiên bản 2.16.8 (2026-11-12)
 
 ### Khắc Phục Cắt Viền Thanh Cạnh Âm Thanh & Chống Nhảy Rung Icon Volume

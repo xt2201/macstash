@@ -129,17 +129,8 @@ public struct EdgeSliderView: View {
                             removal: .opacity.combined(with: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading))
                         ))
                         .onHover { hovering in
-                            interactionState.isVolumeColumnHovered = hovering
                             if hovering {
-                                cancelCollapse()
-                                cancelVolumeClose()
-                                withAnimation(.easeInOut(duration: 0.18)) {
-                                    isVolumeColumnShowing = true
-                                    interactionState.isVolumeColumnVisible = true
-                                }
-                            } else {
-                                scheduleVolumeClose()
-                                scheduleCollapse()
+                                returnToBaselineVolumeMode()
                             }
                         }
                 }
@@ -149,6 +140,18 @@ public struct EdgeSliderView: View {
                     edge: edge,
                     isVolumeHovered: volumeButtonHoveredBinding
                 )
+                .overlay(alignment: edge == .right ? .topTrailing : .topLeading) {
+                    if showVolumeColumn {
+                        Color.clear
+                            .frame(width: 44, height: 95)
+                            .contentShape(Rectangle())
+                            .onHover { hovering in
+                                if hovering {
+                                    returnToBaselineVolumeMode()
+                                }
+                            }
+                    }
+                }
                 .onHover { hovering in
                     interactionState.isIslandHovered = hovering
                     if hovering {
@@ -511,6 +514,17 @@ public struct EdgeSliderView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.40, execute: item)
     }
 
+    private func returnToBaselineVolumeMode() {
+        cancelCollapse()
+        cancelVolumeClose()
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
+            interactionState.isMediaExpanded = false
+            isVolumeColumnShowing = false
+            interactionState.isVolumeColumnVisible = false
+            interactionState.isVolumeColumnHovered = false
+        }
+    }
+
     private func cancelVolumeClose() {
         volumeCloseWorkItem?.cancel()
         volumeCloseWorkItem = nil
@@ -520,8 +534,8 @@ public struct EdgeSliderView: View {
         cancelVolumeClose()
         let item = DispatchWorkItem {
             Task { @MainActor in
-                if !isDragging && !interactionState.isVolumeButtonHovered && !interactionState.isVolumeColumnHovered && !interactionState.isIslandHovered {
-                    withAnimation(.easeInOut(duration: 0.18)) {
+                if !isDragging && !interactionState.isVolumeButtonHovered && !interactionState.isVolumeColumnHovered {
+                    withAnimation(.easeInOut(duration: 0.16)) {
                         isVolumeColumnShowing = false
                         interactionState.isVolumeColumnVisible = false
                     }
@@ -529,7 +543,7 @@ public struct EdgeSliderView: View {
             }
         }
         volumeCloseWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: item)
     }
 
     // MARK: - Utility Drawer Cards

@@ -1,5 +1,14 @@
 # Release Notes & Changelog
 
+## Version 2.16.9 (2026-11-12)
+
+### Dynamic Island Volume Dismissal & Seamless Mode A Return
+
+- **Immediate Volume Slider Dismissal**: Moving the cursor away from the volume icon (into the audio scrubber or transport buttons) now cleanly dismisses the vertical volume slider preview, leaving the Dynamic Island unobstructed.
+- **Natural Transition to Baseline Volume Bar**: Moving the cursor upward from the volume icon onto the vertical volume bar smoothly collapses the audio scrubber island and returns directly to the baseline vertical volume bar (Mode A) right under the pointer.
+
+---
+
 ## Version 2.16.8 (2026-11-12)
 
 ### Edge Bar Clipping Elimination & Dynamic Island Volume Stability

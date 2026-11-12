@@ -1,10 +1,23 @@
 # Release Notes & Changelog
 
+## Version 2.17.0 (2026-11-12)
+
+### Next-Gen Second Dock: Docky-Parity Overhaul
+
+- **Parabolic Magnification, Floating Pill Tooltips & Direct Drag-and-Drop**: Hovering across pinned apps or running apps produces a smooth 120Hz cosine magnification wave with directional edge lift, instant floating glass tooltips, launch bounce animations, Trash drop-to-recycle, Minimized Windows restore tiles, and direct on-dock drag reordering or Finder drop-to-pin.
+- **Smart Stacks, App Groups & Live App Widget Faces**: Stack multiple widgets into a single tile with two-finger scroll cycling (`SmartStackItem`), bundle apps into 2x2 `AppFolderItem` groups with combined notification badges, and flip supported app icons (Calendar, Weather, Music, Spotify, Clock, Reminders, Activity Monitor) into live widget faces.
+- **Live Window Previews & Global Window Switcher (`Option+Tab`)**: Hover any running app tile to see live `ScreenCaptureKit` window thumbnails with on-screen frame highlights and Focus/Minimize/Close controls, or press `Option+Tab` (with optional `Cmd+Tab` override) for a global live Window Switcher with modifier-release commit.
+- **Fullscreen Launchpad (`Control+Option+L`)**: Searchable app launcher with category filter chips, custom folders, keyboard arrow navigation, and inline grid sizing.
+- **18 Local Widgets, Expandable Popovers, Curated App Menus & Custom Icons**: Added **Batteries** (Mac + Bluetooth peripherals) and **Photo Frame** widgets, expandable floating popovers with full keyboard input, per-app curated context actions (New Window/Tab/Private Window/Xcode Run & Test), custom AppleScript/Shell/Menu-Click action tiles, custom app icons, and automatic profile triggers.
+
+---
+
 ## Version 2.16.12 (2026-11-12)
 
 ### Edge Bar Stale Artwork Fix for Tracks Without Cover Art
 
 - **Instant Placeholder Reset**: Fixed an issue in Music and other media players where switching from a song with album art to a song without cover art left the old album artwork and color tint stuck on the Volume Edge Bar and Dynamic Island. Tracks without artwork now immediately switch to the clean musical note placeholder and default accent tint.
+- **Cleaner Audio Thumbnail**: Removed the colored corner dot indicator from the Edge Bar artwork thumbnail for a distraction-free album cover appearance.
 
 ---
 

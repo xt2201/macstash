@@ -1,6 +1,11 @@
 import AppKit
 import SideDockWidgets
 
+public enum SystemDockPermission: Sendable {
+    case accessibility
+    case screenRecording
+}
+
 public final class LazyPermissionManager: @unchecked Sendable {
     public static let shared = LazyPermissionManager()
 
@@ -10,7 +15,27 @@ public final class LazyPermissionManager: @unchecked Sendable {
         completion: @Sendable @escaping (Bool) -> Void
     ) {
         let (title, message) = explanationContent(for: permission, feature: featureName)
+        presentModal(title: title, message: message, completion: completion)
+    }
 
+    public func explainAndRequestSystemPermission(
+        _ permission: SystemDockPermission,
+        completion: @Sendable @escaping (Bool) -> Void
+    ) {
+        let title: String
+        let message: String
+        switch permission {
+        case .accessibility:
+            title = "Accessibility Access Required"
+            message = "Second Dock uses Accessibility to read notification badges, arrange windows for Reserve Space, and run menu-click actions."
+        case .screenRecording:
+            title = "Screen Recording Access (Optional)"
+            message = "Second Dock uses Screen Recording strictly on-device via ScreenCaptureKit to render live window preview thumbnails. Everything stays local."
+        }
+        presentModal(title: title, message: message, completion: completion)
+    }
+
+    private func presentModal(title: String, message: String, completion: @Sendable @escaping (Bool) -> Void) {
         DispatchQueue.main.async {
             let alert = NSAlert()
             alert.messageText = title
@@ -20,11 +45,7 @@ public final class LazyPermissionManager: @unchecked Sendable {
             alert.addButton(withTitle: "Cancel")
 
             let response = alert.runModal()
-            if response == .alertFirstButtonReturn {
-                completion(true)
-            } else {
-                completion(false)
-            }
+            completion(response == .alertFirstButtonReturn)
         }
     }
 

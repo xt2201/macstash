@@ -23,41 +23,47 @@ public struct AppearanceTab: View {
                 accentColor: .purple,
                 trailingText: "\(Int(round(previewValue * 100)))%"
             ) {
-                HStack(spacing: 10) {
-                    Text(appState.localized("appearance.previewCorner"))
-                        .font(.system(size: 11.5, weight: .medium))
-                        .foregroundColor(.secondary)
+                VStack(spacing: 8) {
+                    HStack(spacing: 10) {
+                        Text(appState.localized("appearance.previewCorner"))
+                            .font(.system(size: 11.5, weight: .medium))
+                            .foregroundColor(.secondary)
 
-                    Picker("", selection: $previewCorner) {
-                        Text("TL").tag(CornerPosition.topLeft)
-                        Text("TR").tag(CornerPosition.topRight)
-                        Text("BL").tag(CornerPosition.bottomLeft)
-                        Text("BR").tag(CornerPosition.bottomRight)
+                        Picker("", selection: $previewCorner) {
+                            Text("TL").tag(CornerPosition.topLeft)
+                            Text("TR").tag(CornerPosition.topRight)
+                            Text("BL").tag(CornerPosition.bottomLeft)
+                            Text("BR").tag(CornerPosition.bottomRight)
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.segmented)
+                        .frame(width: 150)
+
+                        Picker("", selection: $previewAction) {
+                            Text(appState.localized("palette.volume")).tag(ControlAction.volume)
+                            Text(appState.localized("palette.brightness")).tag(ControlAction.brightness)
+                            Text(appState.localized("corners.action.backlight")).tag(ControlAction.keyboardBrightness)
+                            Text(appState.localized("palette.timer")).tag(ControlAction.timer)
+                            Text(appState.localized("corners.action.keepAwake")).tag(ControlAction.keepAwake)
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .frame(minWidth: 120, maxWidth: 160)
+
+                        Spacer()
                     }
-                    .labelsHidden()
-                    .pickerStyle(.segmented)
-                    .frame(width: 150)
 
-                    Picker("", selection: $previewAction) {
-                        Text(appState.localized("palette.volume")).tag(ControlAction.volume)
-                        Text(appState.localized("palette.brightness")).tag(ControlAction.brightness)
-                        Text(appState.localized("corners.action.backlight")).tag(ControlAction.keyboardBrightness)
-                        Text(appState.localized("palette.timer")).tag(ControlAction.timer)
-                        Text(appState.localized("corners.action.keepAwake")).tag(ControlAction.keepAwake)
+                    HStack(spacing: 10) {
+                        Picker("", selection: $isLightBackdrop) {
+                            Text(appState.localized("appearance.wallpaperDark")).tag(false)
+                            Text(appState.localized("appearance.wallpaperLight")).tag(true)
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.segmented)
+                        .frame(maxWidth: 240)
+
+                        Spacer()
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .frame(width: 135)
-
-                    Spacer()
-
-                    Picker("", selection: $isLightBackdrop) {
-                        Text(appState.localized("appearance.wallpaperDark")).tag(false)
-                        Text(appState.localized("appearance.wallpaperLight")).tag(true)
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.segmented)
-                    .frame(width: 145)
                 }
 
                 previewStageView

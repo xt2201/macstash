@@ -156,6 +156,24 @@ public final class WidgetRegistry: @unchecked Sendable {
                 description: "Quick links to your most frequent websites and developer docs.",
                 supportedSizes: [.small, .medium],
                 requiredPermissions: [.none]
+            ),
+            WidgetDescriptor(
+                id: "batteries",
+                displayName: "Batteries",
+                category: .system,
+                systemIconName: "battery.100.bolt",
+                description: "Live battery levels for Mac and connected Bluetooth peripherals.",
+                supportedSizes: [.small, .medium, .large],
+                requiredPermissions: [.none]
+            ),
+            WidgetDescriptor(
+                id: "photoFrame",
+                displayName: "Photo Frame",
+                category: .general,
+                systemIconName: "photo.on.rectangle.angled",
+                description: "Slideshow frame cycling through photos from a local folder.",
+                supportedSizes: [.small, .medium, .large],
+                requiredPermissions: [.none]
             )
         ]
     }
@@ -232,6 +250,12 @@ public final class WidgetRegistry: @unchecked Sendable {
         case "bookmarks":
             let config = (try? JSONDecoder().decode(BookmarksConfig.self, from: item.configurationData ?? Data())) ?? BookmarksConfig()
             BookmarksWidgetView(config: config, size: item.size)
+        case "batteries":
+            let config = (try? JSONDecoder().decode(BatteriesConfig.self, from: item.configurationData ?? Data())) ?? BatteriesConfig()
+            BatteriesWidgetView(config: config, size: item.size)
+        case "photoFrame":
+            let config = (try? JSONDecoder().decode(PhotoFrameConfig.self, from: item.configurationData ?? Data())) ?? PhotoFrameConfig()
+            PhotoFrameWidgetView(config: config, size: item.size)
         default:
             HStack {
                 Image(systemName: "exclamationmark.triangle")
@@ -240,5 +264,11 @@ public final class WidgetRegistry: @unchecked Sendable {
             .font(.system(size: 11))
             .padding(4)
         }
+    }
+
+    @MainActor
+    @ViewBuilder
+    public func makeExpandedView(for item: WidgetItem) -> some View {
+        WidgetExpandedDetailView(item: item)
     }
 }

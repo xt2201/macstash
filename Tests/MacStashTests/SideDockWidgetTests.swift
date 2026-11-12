@@ -19,16 +19,37 @@ public enum SideDockWidgetTests {
         let registry = WidgetRegistry.shared
         let descriptors = registry.allDescriptors()
 
-        TestAssertion.assertEqual(descriptors.count, 16, "WidgetRegistry registers all 16 widgets (10 P0 + 6 Phase 2)")
+        TestAssertion.assertEqual(descriptors.count, 18, "WidgetRegistry registers all 18 widgets (10 P0 + 6 Phase 2 + 2 Docky-parity)")
 
         let expectedIDs = [
             "clock", "date", "weather", "nowPlaying", "calendar",
             "reminders", "systemStats", "pomodoro", "search", "fileShelf",
-            "clipboard", "quickNote", "screenshot", "colorPicker", "unitConverter", "bookmarks"
+            "clipboard", "quickNote", "screenshot", "colorPicker", "unitConverter", "bookmarks",
+            "batteries", "photoFrame"
         ]
         for id in expectedIDs {
             TestAssertion.assertTrue(descriptors.contains(where: { $0.id == id }), "Widget '\(id)' is registered in registry")
         }
+
+        TestAssertion.assertEqual(AppWidgetFaceRegistry.defaultWidgetKind(forBundleID: "com.apple.iCal"), "date", "Calendar app maps to date widget face")
+        TestAssertion.assertEqual(AppWidgetFaceRegistry.defaultWidgetKind(forBundleID: "com.apple.Music"), "nowPlaying", "Music app maps to nowPlaying widget face")
+
+        let safariActions = CuratedMenuCatalog.actions(forBundleID: "com.apple.Safari")
+        TestAssertion.assertTrue(safariActions.count >= 3, "CuratedMenuCatalog provides Safari window/tab actions")
+        let xcodeActions = CuratedMenuCatalog.actions(forBundleID: "com.apple.dt.Xcode")
+        TestAssertion.assertTrue(xcodeActions.contains(where: { $0.id == "xcode.run" }), "CuratedMenuCatalog provides Xcode Run action")
+
+        let sampleIOReg = """
+        +-o AppleDeviceManagementHIDEventService
+            "Product" = "Magic Keyboard"
+            "BatteryPercent" = 87
+        +-o AppleDeviceManagementHIDEventService
+            "Product" = "AirPods Pro"
+            "BatteryPercent" = 64
+        """
+        let parsed = BatteriesReader.parseIORegBatteryOutput(sampleIOReg)
+        TestAssertion.assertEqual(parsed.count, 2, "IOReg battery parser detects Magic Keyboard and AirPods Pro")
+        TestAssertion.assertEqual(parsed.first?.percentage, 87, "Battery percentage parsed accurately")
     }
 
     private static func testWidgetSearchAndCategoryFilter() {

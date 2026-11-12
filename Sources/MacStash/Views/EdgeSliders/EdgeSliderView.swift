@@ -478,14 +478,6 @@ public struct EdgeSliderView: View {
                     .overlay(Image(systemName: "music.note").font(.system(size: 13, weight: .semibold)).foregroundColor(.white.opacity(0.70)))
                     .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Color.white.opacity(0.15), lineWidth: 1))
             }
-
-            if nowPlaying.isPlaying {
-                Circle()
-                    .fill(nowPlaying.artworkTint)
-                    .frame(width: 6, height: 6)
-                    .shadow(color: nowPlaying.artworkTint, radius: 2)
-                    .offset(x: 12, y: -12)
-            }
         }
         .contentShape(Rectangle())
         .onHover { hovering in

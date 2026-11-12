@@ -1,6 +1,8 @@
 import AppKit
 
 public final class SideDockPanel: NSPanel {
+    public var allowsKeyFocus: Bool = false
+
     public init(contentRect: NSRect) {
         super.init(
             contentRect: contentRect,
@@ -27,7 +29,7 @@ public final class SideDockPanel: NSPanel {
     }
 
     public override var canBecomeKey: Bool {
-        return false
+        return allowsKeyFocus
     }
 
     public override var canBecomeMain: Bool {

@@ -92,6 +92,7 @@ public struct WeatherWidgetView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(formattedTemp)
                     .font(.system(size: 13, weight: .bold))
+                    .monospacedDigit()
                     .foregroundColor(.primary)
 
                 if size != .small {

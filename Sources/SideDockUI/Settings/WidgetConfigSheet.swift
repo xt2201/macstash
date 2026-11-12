@@ -18,6 +18,8 @@ public struct WidgetConfigSheet: View {
     @State private var statsConfig: SystemStatsConfig
     @State private var pomodoroConfig: PomodoroConfig
     @State private var bookmarksConfig: BookmarksConfig
+    @State private var batteriesConfig: BatteriesConfig
+    @State private var photoFrameConfig: PhotoFrameConfig
 
     // Weather city search
     @State private var cityQuery: String = ""
@@ -43,6 +45,8 @@ public struct WidgetConfigSheet: View {
         _statsConfig = State(initialValue: (try? JSONDecoder().decode(SystemStatsConfig.self, from: data)) ?? SystemStatsConfig())
         _pomodoroConfig = State(initialValue: (try? JSONDecoder().decode(PomodoroConfig.self, from: data)) ?? PomodoroConfig())
         _bookmarksConfig = State(initialValue: (try? JSONDecoder().decode(BookmarksConfig.self, from: data)) ?? BookmarksConfig())
+        _batteriesConfig = State(initialValue: (try? JSONDecoder().decode(BatteriesConfig.self, from: data)) ?? BatteriesConfig())
+        _photoFrameConfig = State(initialValue: (try? JSONDecoder().decode(PhotoFrameConfig.self, from: data)) ?? PhotoFrameConfig())
     }
 
     private var descriptor: WidgetDescriptor? {
@@ -73,17 +77,16 @@ public struct WidgetConfigSheet: View {
 
             // Size selector
             if let supported = descriptor?.supportedSizes, supported.count > 1 {
-                HStack {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(localized("dock.widgetSize"))
                         .font(.system(size: 12, weight: .medium))
-                    Spacer()
-                    Picker("", selection: $selectedSize) {
+                    Picker(localized("dock.widgetSize"), selection: $selectedSize) {
                         ForEach(supported, id: \.self) { sz in
                             Text(sizeTitle(sz)).tag(sz)
                         }
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 200)
+                    .labelsHidden()
                 }
             }
 
@@ -119,17 +122,16 @@ public struct WidgetConfigSheet: View {
         switch widgetItem.widgetKind {
         case "clock":
             VStack(alignment: .leading, spacing: 12) {
-                HStack {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(localized("dock.clockStyle"))
                         .font(.system(size: 12, weight: .medium))
-                    Spacer()
-                    Picker("", selection: $clockConfig.style) {
+                    Picker(localized("dock.clockStyle"), selection: $clockConfig.style) {
                         Text(localized("dock.clockDigital")).tag(ClockStyle.digital)
                         Text(localized("dock.clockAnalog")).tag(ClockStyle.analog)
                         Text(localized("dock.clockFlip")).tag(ClockStyle.flip)
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 220)
+                    .labelsHidden()
                 }
 
                 Toggle(localized("dock.clock24h"), isOn: $clockConfig.is24Hour)
@@ -262,6 +264,19 @@ public struct WidgetConfigSheet: View {
                 }
             }
 
+        case "batteries":
+            VStack(alignment: .leading, spacing: 10) {
+                Toggle("Show Bluetooth peripherals", isOn: $batteriesConfig.showPeripherals)
+                Toggle("Show percentage label", isOn: $batteriesConfig.showPercentageLabel)
+            }
+
+        case "photoFrame":
+            VStack(alignment: .leading, spacing: 10) {
+                TextField("Folder path", text: $photoFrameConfig.folderPath)
+                    .textFieldStyle(.roundedBorder)
+                Stepper("Interval: \(Int(photoFrameConfig.intervalSeconds))s", value: $photoFrameConfig.intervalSeconds, in: 5...120, step: 5)
+            }
+
         default:
             if let desc = descriptor {
                 Text(desc.description)
@@ -344,6 +359,10 @@ public struct WidgetConfigSheet: View {
             updated.configurationData = try? encoder.encode(pomodoroConfig)
         case "bookmarks":
             updated.configurationData = try? encoder.encode(bookmarksConfig)
+        case "batteries":
+            updated.configurationData = try? encoder.encode(batteriesConfig)
+        case "photoFrame":
+            updated.configurationData = try? encoder.encode(photoFrameConfig)
         default:
             break
         }

@@ -20,6 +20,16 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.macstash.MacStashCore
 
+  MacStashDesignSystem:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/MacStashDesignSystem
+    dependencies:
+      - target: MacStashCore
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.macstash.MacStashDesignSystem
+
   MacStashNowPlaying:
     type: framework
     platform: macOS
@@ -44,6 +54,7 @@ targets:
     dependencies:
       - target: MacStashCore
       - target: SideDockCore
+      - target: MacStashDesignSystem
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockWidgets
 
@@ -56,6 +67,7 @@ targets:
       - target: MacStashCore
       - target: SideDockCore
       - target: SideDockWidgets
+      - target: MacStashDesignSystem
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.macstash.SideDockUI
 
@@ -65,6 +77,8 @@ targets:
     sources:
       - Sources/SideDockSystem
     dependencies:
+      - target: MacStashCore
+      - target: MacStashDesignSystem
       - target: SideDockCore
       - target: SideDockWidgets
       - target: SideDockUI
@@ -82,6 +96,7 @@ targets:
       - target: SideDockWidgets
       - target: SideDockUI
       - target: SideDockSystem
+      - target: MacStashDesignSystem
       - package: Sparkle
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.macstash.app

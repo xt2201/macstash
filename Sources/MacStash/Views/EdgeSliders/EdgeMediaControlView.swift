@@ -216,7 +216,7 @@ public struct EdgeMediaControlView: View {
 
             // Time readout
             Text(nowPlaying.duration > 0 ? "\(nowPlaying.formattedElapsedTime) / \(nowPlaying.formattedDuration)" : nowPlaying.formattedElapsedTime)
-                .font(.system(size: 7.5, weight: .bold, design: .monospaced))
+                .font(.system(size: 9.5, weight: .bold, design: .monospaced))
                 .monospacedDigit()
                 .foregroundColor(.secondary)
                 .lineLimit(1)

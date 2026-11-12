@@ -202,40 +202,13 @@ public struct EdgeMediaIslandView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .frame(width: 312, height: 98)
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(.ultraThinMaterial)
-
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                nowPlaying.artworkTint.opacity(0.20),
-                                Color.black.opacity(0.38)
-                            ],
-                            startPoint: edge == .right ? .trailing : .leading,
-                            endPoint: edge == .right ? .leading : .trailing
-                        )
-                    )
-            }
+        .liquidGlass(
+            cornerRadius: 18,
+            tint: nowPlaying.artworkTint,
+            specularIntensity: 1.1,
+            causticOpacity: 0.22,
+            shadowRadius: 14
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.45),
-                            nowPlaying.artworkTint.opacity(0.35),
-                            Color.white.opacity(0.12)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.1
-                )
-        )
-        .shadow(color: Color.black.opacity(0.40), radius: 14, x: 0, y: 6)
     }
 
     // MARK: - Edge Volume Logo Button
@@ -293,10 +266,10 @@ public struct EdgeMediaIslandView: View {
 
         HStack(spacing: 6) {
             Text(displayedElapsedText)
-                .font(.system(size: 8.5, weight: isScrubbingActive ? .heavy : .bold, design: .monospaced))
+                .font(.system(size: 10, weight: isScrubbingActive ? .heavy : .bold, design: .monospaced))
                 .monospacedDigit()
                 .foregroundColor(isScrubbingActive ? nowPlaying.artworkTint : .secondary)
-                .frame(width: 32, alignment: .leading)
+                .frame(width: 36, alignment: .leading)
 
             GeometryReader { geo in
                 let w = max(1, geo.size.width)
@@ -366,10 +339,10 @@ public struct EdgeMediaIslandView: View {
             .frame(height: 14)
 
             Text(nowPlaying.duration > 0 ? nowPlaying.formattedDuration : "--:--")
-                .font(.system(size: 8.5, weight: .bold, design: .monospaced))
+                .font(.system(size: 10, weight: .bold, design: .monospaced))
                 .monospacedDigit()
                 .foregroundColor(.secondary)
-                .frame(width: 32, alignment: .trailing)
+                .frame(width: 36, alignment: .trailing)
         }
         .frame(height: 16)
         .help(appState.localized("corners.media.scrubber"))

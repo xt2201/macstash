@@ -20,7 +20,10 @@ public struct ScratchpadView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 0) {
+        let screenHeight = NSScreen.main?.visibleFrame.height ?? 800
+        let targetHeight = max(280, min(drawerHeight, screenHeight * 0.72))
+
+        return VStack(spacing: 0) {
             // 1. Liquid Glass Header Bar
             headerBar
 
@@ -39,7 +42,7 @@ public struct ScratchpadView: View {
             // 3. Subtle Footer Hint & Live Metrics
             footerBar
         }
-        .frame(width: drawerWidth, height: drawerHeight)
+        .frame(width: drawerWidth, height: targetHeight)
         .liquidGlass(
             cornerRadius: 20,
             tint: .green,

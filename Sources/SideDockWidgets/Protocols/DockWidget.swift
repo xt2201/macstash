@@ -1,5 +1,6 @@
 import SwiftUI
 import SideDockCore
+import MacStashCore
 
 public enum WidgetCategory: String, Codable, Sendable, CaseIterable {
     case general = "General"
@@ -7,6 +8,21 @@ public enum WidgetCategory: String, Codable, Sendable, CaseIterable {
     case system = "System & Hardware"
     case media = "Media & Audio"
     case utility = "Utility & Tools"
+
+    public var localizedTitle: String {
+        switch self {
+        case .general:
+            return LocalizationService.shared.localized("gallery.categoryGeneral")
+        case .productivity:
+            return LocalizationService.shared.localized("gallery.categoryProductivity")
+        case .system:
+            return LocalizationService.shared.localized("gallery.categorySystem")
+        case .media:
+            return LocalizationService.shared.localized("gallery.categoryMedia")
+        case .utility:
+            return LocalizationService.shared.localized("gallery.categoryUtility")
+        }
+    }
 }
 
 public enum WidgetPermission: String, Codable, Sendable, CaseIterable {

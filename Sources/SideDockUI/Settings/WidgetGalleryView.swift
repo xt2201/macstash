@@ -63,7 +63,7 @@ public struct WidgetGalleryView: View {
                             selectedCategory = nil
                         }
                         ForEach(WidgetCategory.allCases, id: \.self) { cat in
-                            CategoryChip(title: cat.rawValue, isSelected: selectedCategory == cat) {
+                            CategoryChip(title: cat.localizedTitle, isSelected: selectedCategory == cat) {
                                 selectedCategory = cat
                             }
                         }
@@ -159,6 +159,17 @@ private struct WidgetCardView: View {
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
             }
+
+            // Live miniature widget preview
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color.primary.opacity(0.06))
+                WidgetRegistry.shared.makeWidgetView(for: WidgetItem(widgetKind: descriptor.id, size: selectedSize))
+                    .allowsHitTesting(false)
+                    .scaleEffect(0.92)
+            }
+            .frame(height: 54)
+            .clipped()
 
             Text(descriptor.description)
                 .font(.system(size: 11))

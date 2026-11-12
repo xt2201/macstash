@@ -29,6 +29,16 @@ public struct RadialDialGeometry {
         }
     }
 
+    /// Whether the arc sweeps in the clockwise direction in SwiftUI coordinates
+    public var isClockwise: Bool {
+        switch corner {
+        case .topLeft, .bottomLeft:
+            return true
+        case .topRight, .bottomRight:
+            return false
+        }
+    }
+
     /// Angle in degrees for a given normalized value (0.0 ... 1.0)
     public func angle(for value: Double) -> Double {
         let clamped = max(0.0, min(1.0, value))

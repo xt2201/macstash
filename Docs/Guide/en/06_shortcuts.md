@@ -16,6 +16,8 @@ You can record custom global hotkeys in Settings (`Command+,`) > **Shortcuts**:
 | Shortcut | Action |
 | --- | --- |
 | `Control+Option+D` | Show or hide the Second Dock |
+| `Control+Option+L` | Open or dismiss the Fullscreen Launchpad |
+| `Option+Tab` | Open Live Window Switcher (configurable in Second Dock settings) |
 | `Command+1` .. `Command+8` | Switch active Second Dock profile |
 | `Command+,` | Open MacStash Settings window |
 | `Command+?` | Open MacStash User Guide window |

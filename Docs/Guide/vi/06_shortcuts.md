@@ -16,6 +16,8 @@ Bạn có thể nhấp để ghi tổ hợp phím mới trong Cài đặt (`Comm
 | Phím Tắt | Chức Năng |
 | --- | --- |
 | `Control+Option+D` | Ẩn hoặc hiện Thanh Dock thứ hai (Second Dock) |
+| `Control+Option+L` | Mở hoặc đóng Launchpad toàn màn hình |
+| `Option+Tab` | Mở Trình chuyển cửa sổ trực tiếp (tùy chỉnh trong cài đặt Second Dock) |
 | `Command+1` .. `Command+8` | Chuyển nhanh giữa các hồ sơ Second Dock |
 | `Command+,` | Mở cửa sổ Cài đặt (`Command+,`) |
 | `Command+?` | Mở cửa sổ Hướng dẫn sử dụng (`Command+?`) |

@@ -2,6 +2,7 @@ import Foundation
 
 public struct RunningAppInfo: Identifiable, Equatable, Sendable {
     public let id: pid_t
+    public var processIdentifier: pid_t { id }
     public let bundleIdentifier: String?
     public let localizedName: String
     public let bundleURL: URL?

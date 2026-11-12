@@ -17,6 +17,10 @@ let package = Package(
             targets: ["MacStashCore"]
         ),
         .library(
+            name: "MacStashDesignSystem",
+            targets: ["MacStashDesignSystem"]
+        ),
+        .library(
             name: "MacStashNowPlaying",
             type: .dynamic,
             targets: ["MacStashNowPlaying"]
@@ -54,6 +58,16 @@ let package = Package(
             ]
         ),
         .target(
+            name: "MacStashDesignSystem",
+            dependencies: [
+                "MacStashCore"
+            ],
+            path: "Sources/MacStashDesignSystem",
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]
+        ),
+        .target(
             name: "SideDockCore",
             path: "Sources/SideDockCore",
             swiftSettings: [
@@ -64,7 +78,8 @@ let package = Package(
             name: "SideDockWidgets",
             dependencies: [
                 "MacStashCore",
-                "SideDockCore"
+                "SideDockCore",
+                "MacStashDesignSystem"
             ],
             path: "Sources/SideDockWidgets",
             swiftSettings: [
@@ -76,7 +91,8 @@ let package = Package(
             dependencies: [
                 "MacStashCore",
                 "SideDockCore",
-                "SideDockWidgets"
+                "SideDockWidgets",
+                "MacStashDesignSystem"
             ],
             path: "Sources/SideDockUI",
             swiftSettings: [
@@ -86,6 +102,8 @@ let package = Package(
         .target(
             name: "SideDockSystem",
             dependencies: [
+                "MacStashCore",
+                "MacStashDesignSystem",
                 "SideDockCore",
                 "SideDockWidgets",
                 "SideDockUI"
@@ -103,6 +121,7 @@ let package = Package(
                 "SideDockWidgets",
                 "SideDockUI",
                 "SideDockSystem",
+                "MacStashDesignSystem",
                 .product(name: "Sparkle", package: "Sparkle")
             ],
             path: "Sources/MacStash",
@@ -120,7 +139,8 @@ let package = Package(
                 "SideDockCore",
                 "SideDockWidgets",
                 "SideDockUI",
-                "SideDockSystem"
+                "SideDockSystem",
+                "MacStashDesignSystem"
             ],
             path: "Tests/MacStashTests"
         )

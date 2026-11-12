@@ -47,6 +47,7 @@ public struct PomodoroWidgetView: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(formattedTime)
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .monospacedDigit()
 
                 if size != .small {
                     Text(isBreak ? "Break" : "Focus")

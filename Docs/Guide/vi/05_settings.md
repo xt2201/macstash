@@ -16,9 +16,9 @@ Cửa sổ Cài đặt MacStash (`Command+,`) sử dụng bố cục thanh bên 
 - **Độ nhạy, Cử chỉ, Quy tắc tạm ẩn & Loại trừ ứng dụng**: Tinh chỉnh vùng kích hoạt, độ trễ xuất hiện/ẩn, cuộn hai ngón, ẩn khi kéo chuột hoặc chạy toàn màn hình, chỉ góc ngoài biên, chọn màn hình áp dụng và danh sách loại trừ ứng dụng.
 
 ## 3. Second Dock (Thanh Dock Thứ Hai)
-- **Hồ sơ & Vị trí**: Tạo, chuyển đổi, xuất/nhập hoặc xóa hồ sơ; chọn vị trí Cố định đáy, Cửa sổ nổi tự do, Cố định trên, Cạnh trái hoặc Cạnh phải; chỉnh Tỷ lệ kích thước, Khoảng cách ô và Khoảng cách mép.
-- **Hành vi & Chất liệu Kính**: Cấu hình Tự động ẩn, Độ trễ hiện thanh, Vùng mép kích hoạt, ẩn khi toàn màn hình/đè cửa sổ, Dành riêng không gian, Hiện ứng dụng đang chạy, phong cách Liquid/Light/Dark/Clear Glass và Giảm chuyển động.
-- **Danh sách mục & Thư viện Tiện ích**: Sắp xếp ứng dụng, thư mục, thanh phân cách và 16 tiện ích trực tiếp; mở bảng cấu hình riêng cho từng tiện ích (Thời tiết, Đồng hồ, Hiệu năng hệ thống, Pomodoro, Dấu trang).
+- **Hồ sơ & Vị trí**: Tạo, chuyển đổi, xuất/nhập, xóa hoặc cấu hình tự động chuyển hồ sơ theo ứng dụng/màn hình; chọn vị trí Cố định đáy, Cửa sổ nổi tự do, Cố định trên, Cạnh trái hoặc Cạnh phải; chỉnh Kích thước ô, Tỷ lệ, Khoảng cách ô và Khoảng cách mép.
+- **Hành vi, Vật lý & Giao diện**: Cấu hình Phóng đại gợn sóng, Nhãn nổi, Huy hiệu thông báo, Xem trước cửa sổ khi rê chuột, Cửa sổ thu nhỏ, Trình chuyển cửa sổ (`Option+Tab` hoặc thay thế `Cmd+Tab`), Nảy biểu tượng, Rung & âm thanh, Tự động ẩn, Dành riêng không gian, Tự ẩn Dock gốc macOS, Ẩn ứng dụng đang chạy, 6 giao diện mẫu, kiểu chấm báo, cỡ chữ tiện ích và Giảm chuyển động.
+- **Danh sách mục, Smart Stack, Nhóm ứng dụng & Thư viện Tiện ích**: Sắp xếp ứng dụng, thư mục (Grid/List/Fan + Quick Look), Nhóm ứng dụng, Smart Stack, Tác vụ tự động, Launchpad, Thùng rác, thanh phân cách và toàn bộ 18 tiện ích có xem trước trực tiếp cùng phần cài đặt Launchpad và quyền hệ thống.
 
 ## 4. Appearance (Giao Diện)
 - **Studio Liquid Glass Tương Tác**: Thử nghiệm kéo trực tiếp trên vòng xoay mẫu với 4 góc (`TL`/`TR`/`BL`/`BR`), chuyển nền Sáng/Tối mô phỏng, tùy chỉnh Bán kính, Độ mờ nền kính và Chủ đề Giao diện (`Theo hệ thống`, `Sáng`, `Tối`).

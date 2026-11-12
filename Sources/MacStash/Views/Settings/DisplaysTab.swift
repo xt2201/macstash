@@ -26,7 +26,7 @@ public struct DisplaysTab: View {
                     Button {
                         refreshDisplays(force: true)
                     } label: {
-                        Label("Refresh", systemImage: "arrow.clockwise")
+                        Label(appState.localized("displays.refresh"), systemImage: "arrow.clockwise")
                             .font(.system(size: 11, weight: .medium))
                     }
                     .buttonStyle(.bordered)

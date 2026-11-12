@@ -3,12 +3,14 @@ import AppKit
 import SideDockUI
 import SideDockSystem
 import MacStashCore
+import MacStashDesignSystem
 
 public struct SettingsView: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var permissions = SystemPermissionService.shared
     @ObservedObject private var sideDock = SideDockManager.shared
     @State private var selectedTab: SettingsTab
+    @State private var searchQuery: String = ""
 
     public enum SettingsTab: String, CaseIterable, Identifiable {
         case general = "General"
@@ -157,26 +159,60 @@ public struct SettingsView: View {
             Divider()
                 .padding(.horizontal, 12)
 
+            // Search Bar
+            SearchInputField(
+                placeholder: appState.localized("settings.searchPlaceholder"),
+                text: $searchQuery
+            )
+            .padding(.horizontal, 10)
+            .padding(.top, 10)
+            .padding(.bottom, 4)
+
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 14) {
-                    ForEach(SidebarSection.allCases, id: \.titleKey) { section in
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(appState.localized(section.titleKey).uppercased())
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.secondary.opacity(0.85))
-                                .tracking(0.6)
-                                .padding(.horizontal, 10)
-                                .padding(.bottom, 2)
+                    if searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        ForEach(SidebarSection.allCases, id: \.titleKey) { section in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(appState.localized(section.titleKey).uppercased())
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.secondary.opacity(0.85))
+                                    .tracking(0.6)
+                                    .padding(.horizontal, 10)
+                                    .padding(.bottom, 2)
 
-                            ForEach(section.tabs) { tab in
+                                ForEach(section.tabs) { tab in
+                                    sidebarRow(for: tab)
+                                }
+                            }
+                        }
+                    } else {
+                        let filtered = matchingTabs
+                        if filtered.isEmpty {
+                            Text(appState.localized("folder.empty"))
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 12)
+                                .padding(.top, 8)
+                        } else {
+                            ForEach(filtered) { tab in
                                 sidebarRow(for: tab)
                             }
                         }
                     }
                 }
                 .padding(.horizontal, 10)
-                .padding(.vertical, 12)
+                .padding(.vertical, 8)
             }
+        }
+    }
+
+    private var matchingTabs: [SettingsTab] {
+        let q = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !q.isEmpty else { return SettingsTab.allCases }
+        return SettingsTab.allCases.filter { tab in
+            let title = appState.localized(tab.localizationKey).lowercased()
+            let raw = tab.rawValue.lowercased()
+            return title.contains(q) || raw.contains(q)
         }
     }
 

@@ -5,10 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.17.0] - 2026-11-12
+
+### Added
+- **Docky-Parity Second Dock Physics & Direct Manipulation (`SideDockCore` + `SideDockUI`)**: Implemented continuous parabolic cosine magnification across pinned and unpinned running apps, directional edge lift for all 4 screen edges, zero-clipping magnification headroom, launch bounce spring animations, floating Liquid Glass pill tooltips with debounced hover switching, Trash tile with live item counter (`TrashMonitor`) and drop-to-recycle, Minimized Windows restore strip, and direct drag-and-drop tile reordering / Finder app & folder pinning.
+- **Smart Stacks, App Groups & Live Widget Faces**: Added `SmartStackItem` (trackpad scroll-wheel cycling, pagination dots, auto-rotate intervals, `SmartStackEditorSheet`), `AppFolderItem` (2x2 mini-icon grid, combined notification badges, inline running workspace, `AppFolderEditorSheet`), and `AppWidgetFaceRegistry` allowing Calendar, Weather, Music, Spotify, Clock, Reminders, and Activity Monitor icons to swap into live widget faces.
+- **Live Hover Window Previews & Global Window Switcher (`SideDockSystem`)**: Added `WindowRegistryService`, `WindowPreviewPanelController`, `WindowHighlightOverlay`, and `WindowSwitcherController` (`Option+Tab` default, optional `Cmd+Tab` override) powered by macOS 14 `ScreenCaptureKit` thumbnails, on-screen window frame highlights, modifier-release auto-commit, and quick Focus/Minimize/Close controls.
+- **Fullscreen Searchable Launchpad**: Added `LaunchpadService` and `LaunchpadOverlayController` (`Control+Option+L` or Launchpad tile) featuring instant search, category filter chips, custom folders, keyboard arrow navigation, and an inline grid inspector.
+- **Curated App Actions, Scripted Actions & Custom Icons**: Added `CuratedMenuCatalog` (browser/IDE/Xcode/Finder/terminal actions in tile context menus), `ActionExecutionService` (system commands, AppleScript, Shell, URL, and Accessibility menu-click sequences), `CustomIconStorage`, `DockBadgeMonitor` (Accessibility-based Dock badges), and `ProfileTriggerEngine` (automatic profile switching by active app or display count).
+- **2 New Native Widgets & Expandable Widget Popovers (`SideDockWidgets`)**: Added `BatteriesWidget` (Mac + Bluetooth peripherals) and `PhotoFrameWidget` (local folder slideshow), plus `WidgetExpandedDetailView` / `WidgetExpansionPanelController` with on-demand key focus for typing inside Search and Quick Note, and live miniature previews in `WidgetGalleryView`.
+
+### Changed
+- **Modular Second Dock Settings Refactor**: Split `DockSettingsTabView` into 6 focused sections (`DockPlacementSection`, `DockBehaviorSection`, `DockAppearanceSection`, `DockProfilesSection`, `DockItemsEditorSection`, `DockShortcutsAndPermissionsSection`) plus `AppFolderEditorSheet`, `SmartStackEditorSheet`, and `ActionEditorSheet`.
+- **Rich Folder Popovers & Dock Themes**: Added Grid, List, and curved Fan presentation modes with Quick Look (`QLPreviewPanel`) and file drag-out in `FolderPopoverView`, plus 6 theme presets (`liquidGlass`, `macosGlass`, `classicShelf`, `floatingPill`, `highContrast`, `clear`) and 4 running indicator styles (`dot`, `pill`, `glow`, `none`) in `SideDockGlassBackdrop`.
+- **Schema v2 Persistence Migration**: Upgraded `DockConfigStore` (`SideDockFileConfig` version 2) with automatic v1-to-v2 migration and unit tests in `SideDockLayoutEngineTests`, `SideDockConfigStoreTests`, and `SideDockWidgetTests`.
+
+---
+
 ## [2.16.12] - 2026-11-12
 
 ### Fixed
 - Stale Album Artwork on Volume Edge Bar (`NowPlayingArtworkPolicy` + `NowPlayingManager` + `NowPlayingAdapter`): Fixed an issue when playing tracks without embedded artwork in Apple Music (`com.apple.Music`) or other media players where the Volume Edge Bar (`EdgeSliderView` and `EdgeMediaIslandView`) continued displaying the previous track's album cover and extracted accent tint. Removed the overly restrictive `newTitle.isEmpty && !newPlaying` guard, extracted pure transition logic into `MacStashCore/Domain/NowPlayingArtworkPolicy.swift`, emitted explicit `hasArtwork` / `artworkUnchanged` flags from `NowPlayingAdapter`, cleared stale artwork in both helper and fallback paths, and added unit tests in `NowPlayingArtworkTests`.
+- Cleaner Edge Bar Artwork Capsule (`EdgeSliderView`): Removed the colored playback status dot overlay from the corner of the Edge Bar audio artwork thumbnail for a cleaner cover presentation.
 
 ---
 

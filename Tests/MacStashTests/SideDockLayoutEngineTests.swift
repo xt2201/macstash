@@ -10,6 +10,8 @@ public enum SideDockLayoutEngineTests {
         testEdgeTriggerDetection()
         testAutoFitScreenWidthConstraint()
         testReserveSpacePolicy()
+        testMagnificationEngineCurve()
+        testAnchoredPopoverGeometry()
     }
 
     private static func testFloatingDockClamping() {
@@ -123,5 +125,51 @@ public enum SideDockLayoutEngineTests {
         let window2 = CGRect(x: 200, y: 200, width: 1000, height: 500)
         let adjusted2 = policy.adjustWindowFrame(windowFrame: window2, dockFrame: dockFrame, placement: .fixedBottom, screenVisibleFrame: screenVisible)
         TestAssertion.assertEqual(adjusted2, window2, "Non-overlapping window frame is preserved")
+    }
+
+    private static func testMagnificationEngineCurve() {
+        let engine = DockMagnificationEngine()
+
+        // Rest state when cursor is nil
+        let rest = engine.scaleFactor(tileCenter: 100, cursorAxisPosition: nil, baseTileSize: 48, maxMagnification: 1.5)
+        TestAssertion.assertEqual(rest, 1.0, "Magnification returns 1.0 at rest")
+
+        // Peak at exact center
+        let peak = engine.scaleFactor(tileCenter: 100, cursorAxisPosition: 100, baseTileSize: 48, maxMagnification: 1.5)
+        TestAssertion.assertEqual(peak, 1.5, "Magnification peaks at maxMagnification when cursor is centered on tile")
+
+        // Symmetric falloff on neighbors
+        let left = engine.scaleFactor(tileCenter: 50, cursorAxisPosition: 100, baseTileSize: 48, maxMagnification: 1.5)
+        let right = engine.scaleFactor(tileCenter: 150, cursorAxisPosition: 100, baseTileSize: 48, maxMagnification: 1.5)
+        TestAssertion.assertEqual(left, right, "Magnification curve is symmetric around cursor")
+        TestAssertion.assertTrue(left > 1.0 && left < 1.5, "Adjacent neighbor receives partial magnification")
+
+        // Outside influence radius returns 1.0
+        let far = engine.scaleFactor(tileCenter: 500, cursorAxisPosition: 100, baseTileSize: 48, maxMagnification: 1.5)
+        TestAssertion.assertEqual(far, 1.0, "Tiles outside influence radius remain unscaled")
+    }
+
+    private static func testAnchoredPopoverGeometry() {
+        let engine = DockLayoutEngine()
+        let visible = CGRect(x: 0, y: 40, width: 1440, height: 830)
+        let anchorBottom = CGRect(x: 700, y: 48, width: 48, height: 48)
+        let popoverSize = CGSize(width: 240, height: 140)
+
+        let bottomOrigin = engine.calculateAnchoredPopoverOrigin(
+            anchorRect: anchorBottom,
+            popoverSize: popoverSize,
+            placement: .fixedBottom,
+            visibleFrame: visible
+        )
+        TestAssertion.assertTrue(bottomOrigin.y >= anchorBottom.maxY, "Bottom dock popover opens above the tile")
+
+        let anchorLeft = CGRect(x: 12, y: 400, width: 48, height: 48)
+        let leftOrigin = engine.calculateAnchoredPopoverOrigin(
+            anchorRect: anchorLeft,
+            popoverSize: popoverSize,
+            placement: .fixedLeft,
+            visibleFrame: visible
+        )
+        TestAssertion.assertTrue(leftOrigin.x >= anchorLeft.maxX, "Left dock popover opens to the right of the tile")
     }
 }

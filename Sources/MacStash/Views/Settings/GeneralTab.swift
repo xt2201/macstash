@@ -8,7 +8,6 @@ public struct GeneralTab: View {
     @ObservedObject var appState: AppState
     @ObservedObject private var permissions = SystemPermissionService.shared
     @ObservedObject private var sideDock = SideDockManager.shared
-    @State private var showResetConfirmation: Bool = false
 
     public init(appState: AppState) {
         self.appState = appState
@@ -205,41 +204,10 @@ public struct GeneralTab: View {
                     onOpenSettings: { permissions.openNotificationSettings() }
                 )
             }
-
-            // Section 5: Factory Reset
-            SettingsCard(
-                title: appState.localized("general.factoryReset"),
-                systemImage: "arrow.counterclockwise.circle.fill",
-                accentColor: .red
-            ) {
-                HStack(alignment: .center, spacing: 14) {
-                    Text(appState.localized("general.resetDesc"))
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-
-                    Spacer()
-
-                    Button(role: .destructive) {
-                        showResetConfirmation = true
-                    } label: {
-                        Text(appState.localized("general.resetButton"))
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.red)
-                }
-            }
         }
         .onAppear {
             permissions.checkAllPermissions()
             permissions.checkLaunchAtLogin()
-        }
-        .alert(appState.localized("general.resetAlertTitle"), isPresented: $showResetConfirmation) {
-            Button(appState.localized("general.cancel"), role: .cancel) {}
-            Button(appState.localized("general.resetConfirm"), role: .destructive) {
-                appState.resetToDefaults()
-            }
-        } message: {
-            Text(appState.localized("general.resetAlertMessage"))
         }
     }
 

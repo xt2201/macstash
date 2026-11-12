@@ -17,9 +17,9 @@ MacStash provides an 8-category split-sidebar Settings window (`Command+,`) desi
 - **Trigger Precision, Gestures, Suppression & Excluded Apps**: Tune Hit-Zone Sensitivity, Dwell Delay, Auto-Dismiss Delay, Two-Finger Scroll adjustment, Mouse-Pressed / Fullscreen / Outer-Corners suppression, Display Target (`Built-in`, `External`, `All`), and Excluded Applications picker.
 
 ## 3. Second Dock
-- **Profiles & Placement**: Create, switch, export, import, or delete Dock profiles; choose Fixed Bottom, Floating Window, Fixed Top, Fixed Left, or Fixed Right placement; tune Scale, Tile Spacing, and Screen Edge Offset.
-- **Behavior & Appearance**: Configure Auto-Hide, Reveal Delay, Edge Zone Thickness, Fullscreen / Window Hover hiding, Reserve Dock Space, Running Apps bar, Liquid/Light/Dark/Clear Glass backdrop styles, and Reduce Motion.
-- **Items & Widget Gallery**: Reorder apps, folders, separators, and widgets; browse all 16 widgets in the Widget Gallery; open individual Widget Configuration sheets (Weather city/units, Clock style/timezone, System Stats sensors, Pomodoro durations, Bookmarks).
+- **Profiles & Placement**: Create, switch, export, import, delete, or configure app/display auto-switch triggers for Dock profiles; choose Fixed Bottom, Floating Window, Fixed Top, Fixed Left, or Fixed Right placement; tune Base Tile Size, Scale, Tile Spacing, and Screen Edge Offset.
+- **Behavior, Physics & Appearance**: Configure Parabolic Magnification, Floating Pill Tooltips, Notification Badges, Live Window Previews on Hover, Minimized Windows strip, Global Window Switcher (`Option+Tab` or opt-in `Cmd+Tab`), Bounce on Launch, Sound & Haptics, Auto-Hide, Reserve Dock Space, Native Dock Auto-Hide coordination, Hidden Running Apps, 6 Theme Presets, Indicator Styles, Widget Text Scale, and Reduce Motion.
+- **Items, Stacks, Folders, Actions & Widget Gallery**: Drag or reorder apps, folders (Grid/List/Fan + Quick Look), App Groups, Smart Stacks, scripted actions, Launchpad, Trash, separators, and all 18 widgets with live miniature previews in the Widget Gallery plus per-widget configuration sheets and Launchpad grid/permission controls.
 
 ## 4. Appearance
 - **Interactive Liquid Glass Studio**: Test Dial Arc Radius, Background Glass Opacity, Appearance Theme (`Match System`, `Light`, `Dark`), corner selection (`TL`/`TR`/`BL`/`BR`), and control actions directly by scrubbing on a live Midnight/Daylight preview stage.

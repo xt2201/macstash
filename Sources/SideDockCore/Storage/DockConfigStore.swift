@@ -7,19 +7,57 @@ public struct SideDockFileConfig: Codable, Equatable, Sendable {
     public var profiles: [DockProfile]
     public var isDockVisible: Bool
     public var firstLaunchCompleted: Bool
+    public var launchpadLayout: LaunchpadLayoutConfig
+    public var launchpadShortcut: String
+    public var windowSwitcherEnabled: Bool
+    public var windowSwitcherShortcut: String
+    public var windowSwitcherInterceptCmdTab: Bool
 
     public init(
-        version: Int = 1,
+        version: Int = 2,
         activeProfileId: UUID? = nil,
         profiles: [DockProfile] = DockProfile.defaultProfiles(),
         isDockVisible: Bool = true,
-        firstLaunchCompleted: Bool = false
+        firstLaunchCompleted: Bool = false,
+        launchpadLayout: LaunchpadLayoutConfig = LaunchpadLayoutConfig(),
+        launchpadShortcut: String = "ctrl+opt+l",
+        windowSwitcherEnabled: Bool = true,
+        windowSwitcherShortcut: String = "opt+tab",
+        windowSwitcherInterceptCmdTab: Bool = false
     ) {
         self.version = version
         self.profiles = profiles.isEmpty ? DockProfile.defaultProfiles() : profiles
         self.activeProfileId = activeProfileId ?? self.profiles.first?.id ?? UUID()
         self.isDockVisible = isDockVisible
         self.firstLaunchCompleted = firstLaunchCompleted
+        self.launchpadLayout = launchpadLayout
+        self.launchpadShortcut = launchpadShortcut
+        self.windowSwitcherEnabled = windowSwitcherEnabled
+        self.windowSwitcherShortcut = windowSwitcherShortcut
+        self.windowSwitcherInterceptCmdTab = windowSwitcherInterceptCmdTab
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case version, activeProfileId, profiles, isDockVisible, firstLaunchCompleted
+        case launchpadLayout, launchpadShortcut, windowSwitcherEnabled
+        case windowSwitcherShortcut, windowSwitcherInterceptCmdTab
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let profiles = try c.decodeIfPresent([DockProfile].self, forKey: .profiles) ?? DockProfile.defaultProfiles()
+        self.init(
+            version: try c.decodeIfPresent(Int.self, forKey: .version) ?? 1,
+            activeProfileId: try c.decodeIfPresent(UUID.self, forKey: .activeProfileId),
+            profiles: profiles,
+            isDockVisible: try c.decodeIfPresent(Bool.self, forKey: .isDockVisible) ?? true,
+            firstLaunchCompleted: try c.decodeIfPresent(Bool.self, forKey: .firstLaunchCompleted) ?? false,
+            launchpadLayout: try c.decodeIfPresent(LaunchpadLayoutConfig.self, forKey: .launchpadLayout) ?? LaunchpadLayoutConfig(),
+            launchpadShortcut: try c.decodeIfPresent(String.self, forKey: .launchpadShortcut) ?? "ctrl+opt+l",
+            windowSwitcherEnabled: try c.decodeIfPresent(Bool.self, forKey: .windowSwitcherEnabled) ?? true,
+            windowSwitcherShortcut: try c.decodeIfPresent(String.self, forKey: .windowSwitcherShortcut) ?? "opt+tab",
+            windowSwitcherInterceptCmdTab: try c.decodeIfPresent(Bool.self, forKey: .windowSwitcherInterceptCmdTab) ?? false
+        )
     }
 }
 
@@ -40,11 +78,14 @@ public final class DockConfigStore: @unchecked Sendable {
             let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
                 ?? URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Library/Application Support")
             let dir = appSupport.appendingPathComponent("MacStash/SideDock", isDirectory: true)
-            try? fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
+            do {
+                try fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
+            } catch {
+                Self.logger.warning("Failed to create SideDock config directory: \(error.localizedDescription, privacy: .public)")
+            }
             self.fileURL = dir.appendingPathComponent("sidedock_config.json")
         }
 
-        // Initialize cache
         self.cachedConfig = SideDockFileConfig()
         self.cachedConfig = loadConfigFromDisk()
     }
@@ -86,9 +127,12 @@ public final class DockConfigStore: @unchecked Sendable {
                 cfg.profiles[i].layoutConfig.floatingX = 200.0
                 cfg.profiles[i].layoutConfig.floatingY = 100.0
                 cfg.profiles[i].layoutConfig.scale = 1.0
+                cfg.profiles[i].layoutConfig.baseTileSize = 46.0
                 cfg.profiles[i].layoutConfig.tileSpacing = 10.0
                 cfg.profiles[i].layoutConfig.bottomOffset = 8.0
                 cfg.profiles[i].layoutConfig.autoHide = false
+                cfg.profiles[i].layoutConfig.magnificationEnabled = true
+                cfg.profiles[i].layoutConfig.magnificationScale = 1.45
             }
         }
     }
@@ -136,10 +180,10 @@ public final class DockConfigStore: @unchecked Sendable {
             let decoder = JSONDecoder()
             var loaded = try decoder.decode(SideDockFileConfig.self, from: data)
 
-            // Perform schema migration if version mismatch
-            if loaded.version < 1 {
-                loaded.version = 1
+            if loaded.version < 2 {
+                loaded = migrateToV2(loaded)
                 writeToDiskAtomic(loaded)
+                Self.logger.info("Migrated SideDock config schema to v2")
             }
             return loaded
         } catch {
@@ -151,10 +195,26 @@ public final class DockConfigStore: @unchecked Sendable {
         }
     }
 
+    private func migrateToV2(_ old: SideDockFileConfig) -> SideDockFileConfig {
+        var migrated = old
+        migrated.version = 2
+        if migrated.launchpadShortcut.isEmpty {
+            migrated.launchpadShortcut = "ctrl+opt+l"
+        }
+        if migrated.windowSwitcherShortcut.isEmpty {
+            migrated.windowSwitcherShortcut = "opt+tab"
+        }
+        return migrated
+    }
+
     private func isolateCorruptedFile() {
         let timestamp = Int(Date().timeIntervalSince1970)
         let corruptedURL = fileURL.deletingLastPathComponent()
             .appendingPathComponent("sidedock_config.corrupted.\(timestamp).json")
-        try? fileManager.moveItem(at: fileURL, to: corruptedURL)
+        do {
+            try fileManager.moveItem(at: fileURL, to: corruptedURL)
+        } catch {
+            Self.logger.warning("Failed to isolate corrupted config: \(error.localizedDescription, privacy: .public)")
+        }
     }
 }

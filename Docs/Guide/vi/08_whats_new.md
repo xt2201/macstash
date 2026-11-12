@@ -1,10 +1,23 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.17.0 (2026-11-12)
+
+### Nâng Cấp Toàn Diện Second Dock Chuẩn Docky
+
+- **Hiệu Ứng Phóng Đại Gợn Sóng, Nhãn Nổi & Kéo Thả Trực Tiếp**: Rê chuột qua các ứng dụng ghim và đang chạy tạo sóng phóng đại cosin mượt mà 120Hz trên cả 4 cạnh màn hình, nhãn nổi Liquid Glass tức thì, hiệu ứng nảy khi mở app, ô Thùng rác kéo thả để xóa tệp, ô khôi phục cửa sổ thu nhỏ và kéo thả sắp xếp/ghim trực tiếp từ Finder.
+- **Smart Stack, Nhóm Ứng Dụng & Mặt Tiện Ích Trực Tiếp**: Gộp nhiều tiện ích vào một ô duy nhất với cuộn hai ngón để chuyển trang (`SmartStackItem`), tạo nhóm ứng dụng 2x2 kèm tổng huy hiệu thông báo, và chuyển đổi biểu tượng Calendar, Weather, Music, Spotify, Clock, Reminders, Activity Monitor sang mặt tiện ích sống.
+- **Xem Trước Cửa Sổ Trực Tiếp & Trình Chuyển Cửa Sổ (`Option+Tab`)**: Rê chuột vào app đang chạy để xem ảnh thu nhỏ trực tiếp qua `ScreenCaptureKit` kèm khung viền sáng cửa sổ thật trên màn hình và nút Tập trung/Thu nhỏ/Đóng, hoặc nhấn `Option+Tab` (tùy chọn thay `Cmd+Tab`) để chuyển cửa sổ toàn cục khi thả phím bổ trợ.
+- **Launchpad Toàn Màn Hình (`Control+Option+L`)**: Trình mở ứng dụng có tìm kiếm tức thì, lọc theo danh mục, tạo thư mục tùy chỉnh, điều hướng bàn phím và chỉnh số cột/kích thước ngay trong giao diện.
+- **18 Tiện Ích Cục Bộ, Mở Rộng Popover, Menu Ngữ Cảnh & Biểu Tượng Tùy Chỉnh**: Bổ sung tiện ích **Batteries** (pin Mac + thiết bị Bluetooth) và **Photo Frame**, thẻ mở rộng hỗ trợ nhập phím, menu hành động nhanh theo từng app (New Window/Tab/Xcode Run & Test), tác vụ AppleScript/Shell/Menu-Click, tùy chỉnh icon riêng và tự động chuyển hồ sơ theo ứng dụng đang dùng.
+
+---
+
 ## Phiên bản 2.16.12 (2026-11-12)
 
 ### Khắc Phục Lưu Ảnh Bìa Cũ Trên Thanh Cạnh Khi Phát Bài Không Có Ảnh
 
 - **Xóa Ảnh Bìa Cũ Tức Thì Khi Đổi Bài Không Có Ảnh**: Khắc phục lỗi khi phát nhạc trên Music hoặc các trình phát khác, nếu chuyển từ bài có ảnh bìa sang bài không có ảnh bìa, thanh cạnh âm lượng (Edge Bar) và Dynamic Island vẫn giữ lại ảnh bìa và màu sắc của bài cũ. Nay giao diện lập tức chuyển về biểu tượng nốt nhạc mặc định cùng tông màu chuẩn.
+- **Ảnh Bìa Audio Gọn Sạch Hơn**: Bỏ dấu chấm màu hiển thị đè trên góc ảnh bìa audio của thanh cạnh Edge Bar để phần hiển thị ảnh bìa gọn gàng hơn.
 
 ---
 

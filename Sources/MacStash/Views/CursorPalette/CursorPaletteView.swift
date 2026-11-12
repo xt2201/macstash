@@ -77,7 +77,7 @@ public struct CursorPaletteView: View {
                 label: appState.localized("palette.brightness"),
                 readout: "\(Int(round(appState.getValue(for: .brightness) * 100)))%",
                 progress: appState.getValue(for: .brightness),
-                colors: [Color(red: 1.0, green: 0.76, blue: 0.18), Color(red: 1.0, green: 0.48, blue: 0.0)],
+                colors: DSColor.actionGradient(for: .brightness),
                 offset: CGSize(width: 0, height: -68)
             ) {
                 appState.toggleAction(.brightness)
@@ -90,9 +90,7 @@ public struct CursorPaletteView: View {
                 label: appState.localized("palette.volume"),
                 readout: appState.audio.isMuted ? appState.localized("dial.mute") : "\(Int(round(appState.getValue(for: .volume) * 100)))%",
                 progress: appState.audio.isMuted ? 0.0 : appState.getValue(for: .volume),
-                colors: appState.audio.isMuted
-                    ? [Color.red, Color.red.opacity(0.7)]
-                    : [Color(red: 0.18, green: 0.62, blue: 1.0), Color(red: 0.05, green: 0.38, blue: 0.95)],
+                colors: DSColor.actionGradient(for: .volume, isMuted: appState.audio.isMuted),
                 offset: CGSize(width: 68, height: 0)
             ) {
                 appState.toggleAction(.volume)
@@ -105,7 +103,7 @@ public struct CursorPaletteView: View {
                 label: appState.localized("palette.keepAwake"),
                 readout: appState.keepAwake.formattedRemaining,
                 progress: appState.keepAwake.dialProgress,
-                colors: [Color(red: 1.0, green: 0.62, blue: 0.18), Color(red: 0.95, green: 0.34, blue: 0.08)],
+                colors: DSColor.actionGradient(for: .keepAwake),
                 offset: CGSize(width: 0, height: 68)
             ) {
                 appState.toggleAction(.keepAwake)
@@ -118,9 +116,7 @@ public struct CursorPaletteView: View {
                 label: appState.localized("palette.timer"),
                 readout: appState.formattedTimerTime,
                 progress: appState.getValue(for: .timer),
-                colors: appState.pomodoroMode == .focus
-                    ? [Color(red: 0.78, green: 0.42, blue: 1.0), Color(red: 0.48, green: 0.22, blue: 0.95)]
-                    : [Color(red: 0.25, green: 0.85, blue: 0.55), Color(red: 0.1, green: 0.65, blue: 0.38)],
+                colors: appState.pomodoroMode == .focus ? DSColor.timerFocusGradient : DSColor.timerBreakGradient,
                 offset: CGSize(width: -68, height: 0)
             ) {
                 appState.toggleAction(.timer)
@@ -204,16 +200,16 @@ public struct CursorPaletteView: View {
                 }
 
                 Text(readout)
-                    .font(.system(size: 9.5, weight: .bold, design: .monospaced))
+                    .font(.system(size: 10.5, weight: .bold, design: .monospaced))
                     .monospacedDigit()
                     .foregroundColor(.primary)
 
                 Text(label)
-                    .font(.system(size: 8, weight: .medium))
+                    .font(.system(size: 9.5, weight: .medium))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
             }
-            .frame(width: 68, height: 64)
+            .frame(width: 70, height: 64)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(isHovered ? primaryColor.opacity(0.14) : Color.clear)
@@ -225,12 +221,14 @@ public struct CursorPaletteView: View {
                         lineWidth: 1.0
                     )
             )
-            .scaleEffect(isHovered ? 1.08 : 1.0)
-            .animation(.spring(response: 0.2, dampingFraction: 0.72), value: isHovered)
+            .scaleEffect((isHovered && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion) ? 1.08 : 1.0)
+            .animation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .spring(response: 0.2, dampingFraction: 0.72), value: isHovered)
         }
         .buttonStyle(.plain)
         .offset(offset)
         .help(appState.localized("palette.scrollHint"))
+        .accessibilityLabel("\(label): \(readout)")
+        .accessibilityHint(appState.localized("palette.scrollHint"))
         .onHover { hovering in
             if hovering {
                 hoveredSector = sector

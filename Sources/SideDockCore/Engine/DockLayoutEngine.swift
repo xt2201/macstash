@@ -107,4 +107,36 @@ public struct DockLayoutEngine: Sendable {
 
         return CGPoint(x: clampedX, y: clampedY)
     }
+
+    /// Computes screen-clamped origin for a floating popover or tooltip anchored to a dock tile rect.
+    public func calculateAnchoredPopoverOrigin(
+        anchorRect: CGRect,
+        popoverSize: CGSize,
+        placement: DockPlacement,
+        visibleFrame: CGRect,
+        gap: CGFloat = 10.0
+    ) -> CGPoint {
+        var origin = CGPoint.zero
+        switch placement {
+        case .fixedBottom, .floating:
+            origin.x = anchorRect.midX - popoverSize.width * 0.5
+            origin.y = anchorRect.maxY + gap
+            if origin.y + popoverSize.height > visibleFrame.maxY {
+                origin.y = anchorRect.minY - popoverSize.height - gap
+            }
+        case .fixedTop:
+            origin.x = anchorRect.midX - popoverSize.width * 0.5
+            origin.y = anchorRect.minY - popoverSize.height - gap
+        case .fixedLeft:
+            origin.x = anchorRect.maxX + gap
+            origin.y = anchorRect.midY - popoverSize.height * 0.5
+        case .fixedRight:
+            origin.x = anchorRect.minX - popoverSize.width - gap
+            origin.y = anchorRect.midY - popoverSize.height * 0.5
+        }
+
+        let clampedX = max(visibleFrame.minX + 8.0, min(visibleFrame.maxX - popoverSize.width - 8.0, origin.x))
+        let clampedY = max(visibleFrame.minY + 8.0, min(visibleFrame.maxY - popoverSize.height - 8.0, origin.y))
+        return CGPoint(x: clampedX, y: clampedY)
+    }
 }

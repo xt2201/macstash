@@ -1,5 +1,14 @@
 # Release Notes & Changelog
 
+## Version 2.16.5 (2026-11-12)
+
+### Dynamic Island Two-Finger Scrub & Volume Hover Fixes
+
+- **Fixed Horizontal Two-Finger Scrub Direction**: Swiping right with two fingers on the expanded Dynamic Island audio scrubber (as well as Corner Dials and Cursor Palette) now seeks forward accurately under both Natural Scrolling ON and OFF, matching vertical up/down scrub ergonomics.
+- **Volume Icon Hover Mode Switching**: Moving the pointer onto the Dynamic Island's outer-edge Volume icon immediately switches two-finger swiping (both up/down and right/left) from audio scrubbing to system volume control, while moving back to the scrubber immediately restores audio seeking.
+
+---
+
 ## Version 2.16.4 (2026-11-12)
 
 ### Critical Launch Stability Hotfix

@@ -16,7 +16,7 @@ MacStash luôn ẩn gọn và tiết kiệm tài nguyên cho tới khi bạn g�
 Trên hệ thống nhiều màn hình, bạn có thể bật tùy chọn **Chỉ kích hoạt góc biên ngoài** để giữ chuyển động chuột mượt mà khi đi qua ranh giới giữa hai màn hình nối liền.
 
 ### Thanh Trượt Cạnh Trái/Phải & Trình Phát Nhạc
-Đưa con trỏ chuột chạm mép màn hình đã chọn (**Cạnh trái** hoặc **Cạnh phải**, cấu hình trong Cài đặt > Góc nóng) để trượt ra bảng điều khiển dọc kèm nút bật/tắt nhanh, ảnh bìa album, dải sóng nhạc nhấp nhô và nút điều khiển Trước / Phát-Tạm dừng / Kế tiếp. Khi rê chuột qua ảnh bìa nhạc, bảng tự động mở rộng thành Dynamic Island cho phép vuốt dọc 2 ngón để tua nhạc trực tiếp mà không làm thay đổi nhầm âm lượng; rê vào nút biểu tượng Âm lượng ở mép ngoài để thả xuống thanh chỉnh âm lượng riêng.
+Đưa con trỏ chuột chạm mép màn hình đã chọn (**Cạnh trái** hoặc **Cạnh phải**, cấu hình trong Cài đặt > Góc nóng) để trượt ra bảng điều khiển dọc kèm nút bật/tắt nhanh, ảnh bìa album, dải sóng nhạc nhấp nhô và nút điều khiển Trước / Phát-Tạm dừng / Kế tiếp. Khi rê chuột qua ảnh bìa nhạc, bảng tự động mở rộng thành Dynamic Island cho phép vuốt 2 ngón lên/xuống hoặc phải/trái để tua nhạc trực tiếp mà không làm thay đổi nhầm âm lượng; rê chuột vào biểu tượng Âm lượng ở mép ngoài (hoặc thanh trượt âm lượng thả xuống) để chuyển thao tác vuốt lên/xuống hoặc phải/trái sang chỉnh âm lượng.
 
 ### Kệ Thả Tệp (Stash Shelf), Ghi Chú Nhanh (Scratchpad) & Vòng Xoay Con Trỏ
 - **Kệ Thả Tệp (Stash Shelf)**: Lắc nhẹ chuột khi đang kéo tệp, nhấn `Control+Option+S` hoặc chạm mép ngăn kéo để lưu tạm tệp, hình ảnh, liên kết, lọc tìm kiếm hoặc dán nhanh từ clipboard.

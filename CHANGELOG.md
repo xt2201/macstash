@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.5] - 2026-11-12
+
+### Fixed
+- Horizontal Two-Finger Trackpad Scrubbing Polarity: Unified scroll-delta normalization in `ScrollInputPolicy` (`MacStashCore`) per AppKit `NSEvent` axis conventions (`+1` left / `-1` right un-inverted; inverted under macOS Natural Scrolling), fixing rightward two-finger swipes scrubbing audio backward across Dynamic Island (`EdgeSliderHostingView`), Corner Dials (`PassThroughHostingView`), and Cursor Palette (`CursorPaletteView`).
+- Dynamic Island Volume Icon Hover Routing: Included `isVolumeButtonHovered` plus a deterministic volume-button bounds fallback in `EdgeBarScrollPolicy` and `EdgeSliderHostingView`, so hovering over the Dynamic Island volume icon immediately commits any active audio scrub and switches both vertical (up/down) and horizontal (right/left) two-finger swipes to volume adjustment.
+
+---
+
 ## [2.16.4] - 2026-11-12
 
 ### Fixed

@@ -174,32 +174,35 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         let rawDeltaX = event.hasPreciseScrollingDeltas ? event.scrollingDeltaX : (event.deltaX * 10.0)
         let rawDeltaY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
 
-        // Physical finger movement vector accounting for macOS Natural Scrolling
-        let physicalX: Double = event.isDirectionInvertedFromDevice ? -Double(rawDeltaX) : Double(rawDeltaX)
-        let physicalY: Double = event.isDirectionInvertedFromDevice ? -Double(rawDeltaY) : Double(rawDeltaY)
+        let vector = ScrollInputPolicy.normalize(
+            rawDeltaX: Double(rawDeltaX),
+            rawDeltaY: Double(rawDeltaY),
+            isDirectionInvertedFromDevice: event.isDirectionInvertedFromDevice
+        )
 
         let loc = convert(event.locationInWindow, from: nil)
         let boundaryY = isFlipped ? (bounds.maxY - 110.0) : (bounds.minY + 110.0)
         let isInUpperColumnY = isFlipped ? (loc.y < boundaryY) : (loc.y > boundaryY)
-        let isCursorInVolumeColumn = interactionState.isVolumeColumnHovered
-            || (interactionState.isVolumeColumnVisible && isInUpperColumnY)
+        let isInVolumeBtnRect = EdgeBarScrollPolicy.isCursorInIslandVolumeButton(
+            localPoint: loc,
+            bounds: bounds,
+            edge: edge,
+            isFlipped: isFlipped
+        )
 
-        // When Dynamic Island media UI is expanded:
-        // - Vertical swipe on the island scrubs audio ONLY (never modifies volume).
-        // - Volume adjusts ONLY when the user explicitly moves into the popped-up vertical volume column.
-        let isAudioScrubMode: Bool
-        if interactionState.isMediaExpanded {
-            isAudioScrubMode = !isCursorInVolumeColumn
-        } else if action == .mediaPlayback {
-            isAudioScrubMode = true
-        } else {
-            isAudioScrubMode = false
-        }
+        let scrollTarget = EdgeBarScrollPolicy.resolveTarget(
+            action: action,
+            isMediaExpanded: interactionState.isMediaExpanded,
+            isVolumeButtonHovered: interactionState.isVolumeButtonHovered,
+            isVolumeColumnHovered: interactionState.isVolumeColumnHovered,
+            isVolumeColumnVisible: interactionState.isVolumeColumnVisible,
+            isCursorInUpperColumn: isInUpperColumnY,
+            isCursorInVolumeButtonRect: isInVolumeBtnRect
+        )
 
-        if isAudioScrubMode {
-            // Vertical-first scrub motion matching Edge Bar volume physics (up = forward, down = backward),
-            // while also honoring explicit horizontal swipes when X motion dominates.
-            let scrubMotion = abs(physicalY) >= abs(physicalX) ? physicalY : physicalX
+        switch scrollTarget {
+        case .audioScrub:
+            let scrubMotion = ScrollInputPolicy.dominantAxisStep(x: vector.x, y: vector.y)
             guard abs(scrubMotion) > 0.001 else { return }
 
             ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
@@ -209,46 +212,50 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
             let deltaSeconds = scrubMotion * 0.22 * durFactor
 
             NowPlayingManager.shared.updateInteractiveScrub(deltaSeconds: deltaSeconds)
-            return
-        }
 
-        guard abs(physicalY) > 0.001 else { return }
-
-        ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
-
-        let targetAction: ControlAction = interactionState.isMediaExpanded ? .volume : action
-        let sensitivity: Float = 0.005
-        let step = Float(physicalY) * sensitivity
-        let current: Float
-        if targetAction == action {
-            current = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue)
-                ?? Float(appState.getValue(for: targetAction, displayID: rootView.displayID))
-        } else {
-            current = Float(appState.getValue(for: targetAction, displayID: rootView.displayID))
-        }
-        let clamped = max(0.0, min(1.0, current + step))
-
-        if targetAction == action {
-            if edge == .left {
-                appState.liveLeftSliderValue = clamped
-            } else {
-                appState.liveRightSliderValue = clamped
+        case .control(let targetAction):
+            if NowPlayingManager.shared.isInteractiveScrubbing {
+                NowPlayingManager.shared.commitInteractiveScrub()
             }
-        }
-        appState.setValue(for: targetAction, value: Double(clamped), displayID: rootView.displayID)
 
-        scrollEndWorkItem?.cancel()
-        let item = DispatchWorkItem { [weak self] in
-            Task { @MainActor [weak self] in
-                guard let self = self else { return }
-                if self.edge == .left {
-                    self.appState.liveLeftSliderValue = nil
+            let sliderMotion = ScrollInputPolicy.dominantAxisStep(x: vector.x, y: vector.y)
+            guard abs(sliderMotion) > 0.001 else { return }
+
+            ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
+
+            let sensitivity: Float = 0.005
+            let step = Float(sliderMotion) * sensitivity
+            let current: Float
+            if targetAction == action {
+                current = (edge == .left ? appState.liveLeftSliderValue : appState.liveRightSliderValue)
+                    ?? Float(appState.getValue(for: targetAction, displayID: rootView.displayID))
+            } else {
+                current = Float(appState.getValue(for: targetAction, displayID: rootView.displayID))
+            }
+            let clamped = max(0.0, min(1.0, current + step))
+
+            if targetAction == action {
+                if edge == .left {
+                    appState.liveLeftSliderValue = clamped
                 } else {
-                    self.appState.liveRightSliderValue = nil
+                    appState.liveRightSliderValue = clamped
                 }
             }
+            appState.setValue(for: targetAction, value: Double(clamped), displayID: rootView.displayID)
+
+            scrollEndWorkItem?.cancel()
+            let item = DispatchWorkItem { [weak self] in
+                Task { @MainActor [weak self] in
+                    guard let self = self else { return }
+                    if self.edge == .left {
+                        self.appState.liveLeftSliderValue = nil
+                    } else {
+                        self.appState.liveRightSliderValue = nil
+                    }
+                }
+            }
+            scrollEndWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
         }
-        scrollEndWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
     }
 }

@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.16.4-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
+  <a href="https://github.com/xt2201/macstash/releases/latest"><img src="https://img.shields.io/badge/release-v2.16.5-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2014.0%2B-5856D6?style=flat-square" alt="macOS 14.0+">
   <img src="https://img.shields.io/badge/arch-Universal%202%20(Apple%20Silicon%20%26%20Intel)-34C759?style=flat-square" alt="Universal 2 Architecture">
   <img src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.0">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/xt2201/macstash/releases/latest">
-    <img src="https://img.shields.io/badge/Download-MacStash--v2.16.4.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
+    <img src="https://img.shields.io/badge/Download-MacStash--v2.16.5.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download MacStash DMG">
   </a>
 </p>
 
@@ -132,7 +132,7 @@ MacStash assigns high-frequency system controls to the four physical display ver
 - Rides flush against your screen border with configurable actions in Settings (`Volume`, `Brightness`, `Keyboard Backlight`, `Pomodoro Timer`, `Keep Awake`, `Stash Shelf`, `Scratchpad`, `Media Player & Audio Scrubber`) and 120Hz ProMotion vertical drag/scroll smoothness.
 - **Extreme Edge &amp; Dwell Triggering**: Requires moving cursor cleanly to the physical edge (`minX` or `maxX`) with an intentional dwell delay, preventing accidental triggers near app scrollbars.
 - **Universal Now Playing Media Controller**: When configured for Volume, reveals an integrated vertical media controller right below the slider with live album artwork, a 5-bar rhythm audio visualizer (automatically idle-gated when overlays are hidden), and vertical transport controls across browsers and native players.
-- **Two-Finger Edge Scrubbing**: Seamlessly tune volume, brightness, or your chosen action on the edge slider using natural two-finger vertical scrolling.
+- **Two-Finger Edge Scrubbing**: Seamlessly scrub audio playback (up/right = forward, down/left = backward) inside the expanded Dynamic Island, or hover the outer-edge Volume icon to switch both vertical and horizontal two-finger swipes to system volume adjustment.
 
 ### 9. Tactile Detents &amp; Mechanical Acoustics
 - **Trackpad Detents**: Emits crisp physical ticks via `NSHapticFeedbackManager` with configurable Light / Medium / Strong intensity as the rotary dial steps through values.

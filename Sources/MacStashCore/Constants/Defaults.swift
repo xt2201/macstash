@@ -17,7 +17,7 @@ public enum Defaults {
             }
             current = current.deletingLastPathComponent()
         }
-        return "2.16.4"
+        return "2.16.5"
     }
 
     public enum HotCorner {

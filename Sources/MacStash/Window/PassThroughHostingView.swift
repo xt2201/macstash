@@ -107,19 +107,18 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
         let rawDeltaX = event.hasPreciseScrollingDeltas ? event.scrollingDeltaX : (event.deltaX * 10.0)
         let rawDeltaY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
 
-        // When macOS Natural Scrolling is enabled, event.isDirectionInvertedFromDevice is true.
-        // In that mode, swiping fingers UP produces negative rawDeltaY, and swiping RIGHT produces negative rawDeltaX.
-        // Inverting gives physical finger movement: +physicalY = up, +physicalX = right.
-        let physicalX: Double = event.isDirectionInvertedFromDevice ? -Double(rawDeltaX) : Double(rawDeltaX)
-        let physicalY: Double = event.isDirectionInvertedFromDevice ? -Double(rawDeltaY) : Double(rawDeltaY)
+        let vector = ScrollInputPolicy.normalize(
+            rawDeltaX: Double(rawDeltaX),
+            rawDeltaY: Double(rawDeltaY),
+            isDirectionInvertedFromDevice: event.isDirectionInvertedFromDevice
+        )
 
-        let totalMotion = hypot(physicalX, physicalY)
-        guard totalMotion > 0.001 else { return }
+        guard vector.totalMotion > 0.001 else { return }
 
         if action == .mediaPlayback {
             let dur = NowPlayingManager.shared.duration
             let durFactor = dur > 0 ? max(0.35, min(2.5, dur / 240.0)) : 1.0
-            let primaryStep = abs(physicalY) >= abs(physicalX) ? physicalY : physicalX
+            let primaryStep = ScrollInputPolicy.dominantAxisStep(x: vector.x, y: vector.y)
             let deltaSeconds = primaryStep * 0.25 * durFactor
             NowPlayingManager.shared.updateInteractiveScrub(deltaSeconds: deltaSeconds)
             return
@@ -127,9 +126,9 @@ public final class PassThroughHostingView<Content: View>: NSHostingView<Content>
 
         // Unified natural swipe physics across all 4 corner dials:
         // 0% is aligned at the bottom/lower perimeter, 100% rises to the top/upper edge.
-        // Swiping fingers UP (+physicalY) or RIGHT (+physicalX) turns UP the value.
-        // Swiping fingers DOWN (-physicalY) or LEFT (-physicalX) turns DOWN the value.
-        let effectiveStep: Double = physicalY + physicalX
+        // Swiping fingers UP (+y) or RIGHT (+x) turns UP the value.
+        // Swiping fingers DOWN (-y) or LEFT (-x) turns DOWN the value.
+        let effectiveStep: Double = vector.y + vector.x
 
         let sensitivity: Double = 0.005
         let step = effectiveStep * sensitivity

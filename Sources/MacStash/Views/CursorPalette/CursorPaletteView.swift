@@ -266,9 +266,12 @@ private struct PaletteScrollInterceptor: NSViewRepresentable {
 
         let rawY = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : (event.deltaY * 10.0)
         let rawX = event.hasPreciseScrollingDeltas ? event.scrollingDeltaX : (event.deltaX * 10.0)
-        let physY = event.isDirectionInvertedFromDevice ? -Double(rawY) : Double(rawY)
-        let physX = event.isDirectionInvertedFromDevice ? -Double(rawX) : Double(rawX)
-        let delta = (physY + physX) * 0.005
+        let vector = ScrollInputPolicy.normalize(
+            rawDeltaX: Double(rawX),
+            rawDeltaY: Double(rawY),
+            isDirectionInvertedFromDevice: event.isDirectionInvertedFromDevice
+        )
+        let delta = (vector.y + vector.x) * 0.005
         guard abs(delta) > 0.0001 else { return }
 
         let action = sector.action

@@ -28,29 +28,43 @@ public enum StashFeatureTests {
         testDualEdgeBarsAndMediaPlaybackAction()
         testCornerDialSatelliteClearanceNoOverlap()
         testEdgeSliderPanelContainsExpandedMediaIsland()
+        testEdgeBarScrollModeRouting()
     }
 
     private static func testTrackpadDirectionalVectors() {
-        // Test Natural Scrolling Inversion (+physicalY = swipe up, +physicalX = swipe right)
-        let naturalInverted = true
-        let rawDeltaY: Double = -15.0 // swiping UP on trackpad with natural scrolling yields negative deltaY
-        let rawDeltaX: Double = -10.0 // swiping RIGHT yields negative deltaX
+        // Test Natural Scrolling ON (isDirectionInvertedFromDevice == true):
+        // Per AppKit NSEvent.h: un-inverted is +1 up / -1 down / +1 left / -1 right.
+        // Natural scrolling negates both axes, so swiping UP gives negative rawDeltaY and swiping RIGHT gives positive rawDeltaX.
+        let naturalVector = ScrollInputPolicy.normalize(
+            rawDeltaX: 10.0,
+            rawDeltaY: -15.0,
+            isDirectionInvertedFromDevice: true
+        )
 
-        let physicalX = naturalInverted ? -rawDeltaX : rawDeltaX
-        let physicalY = naturalInverted ? -rawDeltaY : rawDeltaY
+        TestAssertion.assertTrue(naturalVector.y > 0, "Swiping UP with natural scrolling should yield positive y")
+        TestAssertion.assertTrue(naturalVector.x > 0, "Swiping RIGHT with natural scrolling should yield positive x")
 
-        TestAssertion.assertTrue(physicalY > 0, "Swiping UP should yield positive physicalY")
-        TestAssertion.assertTrue(physicalX > 0, "Swiping RIGHT should yield positive physicalX")
+        let naturalLeft = ScrollInputPolicy.normalize(
+            rawDeltaX: -10.0,
+            rawDeltaY: 15.0,
+            isDirectionInvertedFromDevice: true
+        )
+        TestAssertion.assertTrue(naturalLeft.y < 0, "Swiping DOWN with natural scrolling should yield negative y")
+        TestAssertion.assertTrue(naturalLeft.x < 0, "Swiping LEFT with natural scrolling should yield negative x")
 
         // In .bottomRight (Volume corner), swiping UP or RIGHT must increase volume
-        let effectiveStep = physicalY + physicalX
+        let effectiveStep = naturalVector.y + naturalVector.x
         TestAssertion.assertTrue(effectiveStep > 0, "Swiping UP or RIGHT in bottomRight increases volume")
 
-        // Mouse Wheel without natural scrolling (wheel rolled UP yields positive deltaY)
-        let mouseInverted = false
-        let wheelDeltaY: Double = 12.0
-        let mousePhysicalY = mouseInverted ? -wheelDeltaY : wheelDeltaY
-        TestAssertion.assertTrue(mousePhysicalY > 0, "Rolling wheel UP should yield positive physicalY")
+        // Non-natural scrolling (isDirectionInvertedFromDevice == false):
+        // Rolling/swiping UP yields positive rawDeltaY; swiping/tilting RIGHT yields negative rawDeltaX.
+        let nonNaturalVector = ScrollInputPolicy.normalize(
+            rawDeltaX: -10.0,
+            rawDeltaY: 12.0,
+            isDirectionInvertedFromDevice: false
+        )
+        TestAssertion.assertTrue(nonNaturalVector.y > 0, "Rolling/swiping UP without natural scrolling yields positive y")
+        TestAssertion.assertTrue(nonNaturalVector.x > 0, "Swiping/tilting RIGHT without natural scrolling yields positive x")
     }
 
     private static func testEdgeHitZonePolicy() {
@@ -498,32 +512,39 @@ public enum StashFeatureTests {
         TestAssertion.assertEqual(skipBackward(60.0, 10.0), 50.0)
         TestAssertion.assertEqual(skipBackward(5.0, 10.0), 0.0)
 
-        // Two-finger horizontal trackpad scrubbing physics
-        let naturalScrolling = true
-        let rawDeltaX: Double = -50.0 // swiping RIGHT on trackpad with natural scrolling yields negative rawDeltaX
-        let physicalX = naturalScrolling ? -rawDeltaX : rawDeltaX
-        TestAssertion.assertTrue(physicalX > 0, "Swiping RIGHT on trackpad must yield positive physicalX (forward scrub)")
+        // Two-finger horizontal trackpad scrubbing physics (Natural Scrolling ON: swipe RIGHT -> positive rawDeltaX)
+        let rightSwipe = ScrollInputPolicy.normalize(
+            rawDeltaX: 50.0,
+            rawDeltaY: 0.0,
+            isDirectionInvertedFromDevice: true
+        )
+        let leftSwipe = ScrollInputPolicy.normalize(
+            rawDeltaX: -50.0,
+            rawDeltaY: 0.0,
+            isDirectionInvertedFromDevice: true
+        )
+        TestAssertion.assertTrue(rightSwipe.x > 0, "Swiping RIGHT on trackpad must yield positive x (forward scrub)")
+        TestAssertion.assertTrue(leftSwipe.x < 0, "Swiping LEFT on trackpad must yield negative x (backward scrub)")
 
         let durFactor: (Double) -> Double = { d in
-            d > 0 ? max(0.6, min(2.5, d / 240.0)) : 1.0
+            d > 0 ? max(0.35, min(2.5, d / 240.0)) : 1.0
         }
         TestAssertion.assertEqual(durFactor(240.0), 1.0)
-        TestAssertion.assertEqual(durFactor(120.0), 0.6)
+        TestAssertion.assertEqual(durFactor(120.0), 0.5)
         TestAssertion.assertEqual(durFactor(1200.0), 2.5)
 
         let scrubDelta: (Double, Double) -> Double = { motion, d in
             motion * 0.22 * durFactor(d)
         }
-        let deltaSecs = scrubDelta(physicalX, 240.0)
-        TestAssertion.assertEqual(deltaSecs, 11.0) // 50pt swipe on a 4-min song moves exactly 11 seconds forward!
+        let deltaSecs = scrubDelta(ScrollInputPolicy.dominantAxisStep(x: rightSwipe.x, y: rightSwipe.y), 240.0)
+        TestAssertion.assertEqual(deltaSecs, 11.0) // 50pt swipe RIGHT on a 4-min song moves exactly 11 seconds forward
+        TestAssertion.assertEqual(scrubDelta(ScrollInputPolicy.dominantAxisStep(x: leftSwipe.x, y: leftSwipe.y), 240.0), -11.0)
 
         // Two-finger vertical trackpad scrubbing physics (matching Edge Bar volume up/down direction)
-        let rawDeltaYUp: Double = -40.0 // swiping UP with natural scrolling produces negative rawDeltaY
-        let rawDeltaYDown: Double = 40.0
-        let physicalYUp = naturalScrolling ? -rawDeltaYUp : rawDeltaYUp
-        let physicalYDown = naturalScrolling ? -rawDeltaYDown : rawDeltaYDown
-        TestAssertion.assertTrue(scrubDelta(physicalYUp, 240.0) > 0, "Swiping UP with natural scrolling scrubs forward")
-        TestAssertion.assertTrue(scrubDelta(physicalYDown, 240.0) < 0, "Swiping DOWN with natural scrolling scrubs backward")
+        let upSwipe = ScrollInputPolicy.normalize(rawDeltaX: 0.0, rawDeltaY: -40.0, isDirectionInvertedFromDevice: true)
+        let downSwipe = ScrollInputPolicy.normalize(rawDeltaX: 0.0, rawDeltaY: 40.0, isDirectionInvertedFromDevice: true)
+        TestAssertion.assertTrue(scrubDelta(upSwipe.y, 240.0) > 0, "Swiping UP with natural scrolling scrubs forward")
+        TestAssertion.assertTrue(scrubDelta(downSwipe.y, 240.0) < 0, "Swiping DOWN with natural scrolling scrubs backward")
 
         // Scrubber thumb center alignment across 0%..100%
         let trackW: CGFloat = 216.0
@@ -601,36 +622,46 @@ public enum StashFeatureTests {
     }
 
     private static func testCornerDialSatelliteClearanceNoOverlap() {
-        let dialSizes: [CGFloat] = [110.0, 120.0, 135.0, 145.0, 160.0, 180.0, 200.0, 250.0]
+        let dialSizes: [CGFloat] = [100.0, 110.0, 120.0, 135.0, 145.0, 160.0, 180.0, 200.0, 225.0, 250.0]
         for dialSize in dialSizes {
-            let badgeSide = max(36.0, min(48.0, dialSize * 0.28))
-            let m = max(4.0, min(8.0, dialSize * 0.045))
-            let badgeOuterBoundary = m + badgeSide
+            let metrics = CornerDialMetrics(dialSize: dialSize)
 
-            let outerRadius = dialSize - 15.0
-            let trackRadius = outerRadius - 20.0
-            let trackInnerBoundary = trackRadius - 8.5
-            let channelCenter = (badgeOuterBoundary + trackInnerBoundary) * 0.5
-            let satSize = max(18.0, min(22.0, dialSize * 0.13))
-            let satRadius = satSize * 0.5
-            let satelliteRadius = channelCenter
+            // 1. Zero corner clipping: circular hub center-to-wall minus radius must match edgeWallMargin >= 5.5pt
+            let wallClearance = metrics.badgeCenterAxisDistance - metrics.badgeRadius
+            TestAssertion.assertTrue(wallClearance >= 5.5, "Center hub must float cleanly inside corner walls at dialSize \(dialSize) (got \(wallClearance))")
+            if dialSize >= 145.0 {
+                TestAssertion.assertTrue(wallClearance >= 8.5, "Default/large dial hubs must have >= 8.5pt corner wall air margin (got \(wallClearance))")
+            }
 
-            // Satellite inner edge must NEVER intersect Center Badge outer boundary
-            let badgeClearance = (satelliteRadius - satRadius) - badgeOuterBoundary
-            let minBadgeClearance: CGFloat = dialSize <= 110.0 ? 3.0 : 8.0
-            TestAssertion.assertTrue(badgeClearance >= minBadgeClearance, "Satellite must have >= \(minBadgeClearance)pt clearance from Center Badge at dial size \(dialSize) (got \(badgeClearance))")
+            // 2. Hero scale proportionality: uncapped ~37.5% ratio across all dial sizes
+            let ratio = metrics.badgeDiameter / dialSize
+            TestAssertion.assertTrue(ratio >= 0.365, "Center hub must remain proportional (>= 36.5% of dialSize) without hard-cap starvation at \(dialSize) (got \(ratio))")
 
-            // Satellite outer edge must NEVER intersect Track inner boundary
-            let trackClearance = trackInnerBoundary - (satelliteRadius + satRadius)
-            let minTrackClearance: CGFloat = dialSize <= 110.0 ? 3.0 : 8.0
-            TestAssertion.assertTrue(trackClearance >= minTrackClearance, "Satellite must have >= \(minTrackClearance)pt clearance from Track at dial size \(dialSize) (got \(trackClearance))")
+            // 3. Symmetry offset check across all 4 corners
+            let topLeftCenterX = (dialSize * 0.5) + metrics.badgeOffset(for: .topLeft).x
+            let topLeftCenterY = (dialSize * 0.5) + metrics.badgeOffset(for: .topLeft).y
+            TestAssertion.assertTrue(abs(topLeftCenterX - metrics.badgeCenterAxisDistance) < 0.001, "Top-left offset centers hub cleanly inside wall")
+            TestAssertion.assertTrue(abs(topLeftCenterY - metrics.badgeCenterAxisDistance) < 0.001, "Top-left offset centers hub cleanly below top wall")
 
-            // Even when satellite is scaled by 1.15 on hover:
+            // 4. Outer track thumb knob must never intersect inner tips of bezel ticks
+            TestAssertion.assertTrue((metrics.trackRadius + metrics.knobOuterRadius) <= metrics.tickInnerRadius + 0.01, "Thumb knob outer rim must stay clear of bezel ticks at dialSize \(dialSize)")
+
+            // 5. Satellite inner edge must NEVER intersect Center Hub outer boundary
+            let satRadius = metrics.satelliteDiameter * 0.5
+            let badgeClearance = (metrics.satelliteRadius - satRadius) - metrics.badgeOuterRadius
+            let minClearance: CGFloat = dialSize >= 145.0 ? 8.0 : (dialSize <= 110.0 ? 3.0 : 5.5)
+            TestAssertion.assertTrue(badgeClearance >= minClearance, "Satellite must have >= \(minClearance)pt clearance from Center Hub at dialSize \(dialSize) (got \(badgeClearance))")
+
+            // 6. Satellite outer edge must NEVER intersect Track inner boundary
+            let trackClearance = metrics.trackInnerBoundary - (metrics.satelliteRadius + satRadius)
+            TestAssertion.assertTrue(trackClearance >= minClearance, "Satellite must have >= \(minClearance)pt clearance from Track at dialSize \(dialSize) (got \(trackClearance))")
+
+            // 7. Even when satellite is scaled by 1.15 on hover:
             let hoveredSatRadius = satRadius * 1.15
-            let hoveredBadgeClearance = (satelliteRadius - hoveredSatRadius) - badgeOuterBoundary
-            TestAssertion.assertTrue(hoveredBadgeClearance >= 2.0, "Hovered satellite must maintain positive clearance from Center Badge at dial size \(dialSize)")
-            let hoveredTrackClearance = trackInnerBoundary - (satelliteRadius + hoveredSatRadius)
-            TestAssertion.assertTrue(hoveredTrackClearance >= 2.0, "Hovered satellite must maintain positive clearance from Track at dial size \(dialSize)")
+            let hoveredBadgeClearance = (metrics.satelliteRadius - hoveredSatRadius) - metrics.badgeOuterRadius
+            TestAssertion.assertTrue(hoveredBadgeClearance >= 2.0, "Hovered satellite must maintain >= 2.0pt clearance from Center Hub at dialSize \(dialSize) (got \(hoveredBadgeClearance))")
+            let hoveredTrackClearance = metrics.trackInnerBoundary - (metrics.satelliteRadius + hoveredSatRadius)
+            TestAssertion.assertTrue(hoveredTrackClearance >= 2.0, "Hovered satellite must maintain >= 2.0pt clearance from Track at dialSize \(dialSize) (got \(hoveredTrackClearance))")
         }
     }
 
@@ -674,5 +705,84 @@ public enum StashFeatureTests {
             let sliderY = min(maxAllowedSliderY, max(drawerMaxY + 4, frame.midY + 4))
             TestAssertion.assertTrue(sliderY >= drawerMaxY, "Shared-edge Slider (\(sliderY)) must clear Drawer top (\(drawerMaxY)) at screen height \(screenH)")
         }
+    }
+
+    private static func testEdgeBarScrollModeRouting() {
+        // 1. Expanded Dynamic Island defaults to audio scrub when cursor is on scrubber/transport controls
+        for edgeAction in [ControlAction.volume, ControlAction.mediaPlayback] {
+            let islandDefault = EdgeBarScrollPolicy.resolveTarget(
+                action: edgeAction,
+                isMediaExpanded: true,
+                isVolumeButtonHovered: false,
+                isVolumeColumnHovered: false,
+                isVolumeColumnVisible: false,
+                isCursorInUpperColumn: false
+            )
+            TestAssertion.assertEqual(islandDefault, .audioScrub, "Expanded Dynamic Island must scrub audio by default for \(edgeAction)")
+        }
+
+        // 2. Hovering the Dynamic Island volume icon immediately switches to volume adjustment
+        for edgeAction in [ControlAction.volume, ControlAction.mediaPlayback] {
+            let onVolIcon = EdgeBarScrollPolicy.resolveTarget(
+                action: edgeAction,
+                isMediaExpanded: true,
+                isVolumeButtonHovered: true,
+                isVolumeColumnHovered: false,
+                isVolumeColumnVisible: true,
+                isCursorInUpperColumn: false
+            )
+            TestAssertion.assertEqual(onVolIcon, .control(.volume), "Hovering volume icon switches scroll mode to volume for \(edgeAction)")
+        }
+
+        // 3. Moving off the volume icon back to the island scrubber immediately restores audio scrub even during the 0.28s grace window
+        let backToIsland = EdgeBarScrollPolicy.resolveTarget(
+            action: .volume,
+            isMediaExpanded: true,
+            isVolumeButtonHovered: false,
+            isVolumeColumnHovered: false,
+            isVolumeColumnVisible: true,
+            isCursorInUpperColumn: false
+        )
+        TestAssertion.assertEqual(backToIsland, .audioScrub, "Leaving volume icon onto island scrubber immediately returns to audio scrub")
+
+        // 4. Hovering the dropped-in volume column targets volume
+        let onVolColumn = EdgeBarScrollPolicy.resolveTarget(
+            action: .mediaPlayback,
+            isMediaExpanded: true,
+            isVolumeButtonHovered: false,
+            isVolumeColumnHovered: true,
+            isVolumeColumnVisible: true,
+            isCursorInUpperColumn: true
+        )
+        TestAssertion.assertEqual(onVolColumn, .control(.volume), "Hovering popped-up volume column targets volume")
+
+        // 5. Geometric fallback detects volume button slot on both left and right edges without overlapping scrubber row
+        let panelBounds = CGRect(x: 0, y: 0, width: Defaults.EdgeSliders.panelWidthPoints, height: Defaults.EdgeSliders.panelHeightPoints)
+        let rightVolIconPt = CGPoint(x: panelBounds.maxX - 32.0, y: panelBounds.maxY - 23.0) // flipped coordinates
+        let rightScrubberPt = CGPoint(x: panelBounds.midX, y: panelBounds.maxY - 56.0)
+        TestAssertion.assertTrue(
+            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: rightVolIconPt, bounds: panelBounds, edge: .right, isFlipped: true),
+            "Right-edge volume icon geometric fallback must match volumeButton center"
+        )
+        TestAssertion.assertFalse(
+            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: rightScrubberPt, bounds: panelBounds, edge: .right, isFlipped: true),
+            "Right-edge volume icon geometric fallback must NOT match scrubber bar"
+        )
+
+        let leftVolIconPt = CGPoint(x: panelBounds.minX + 32.0, y: panelBounds.maxY - 23.0)
+        TestAssertion.assertTrue(
+            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: leftVolIconPt, bounds: panelBounds, edge: .left, isFlipped: true),
+            "Left-edge volume icon geometric fallback must match volumeButton center"
+        )
+
+        // 6. Dominant axis supports both vertical (up/down) and horizontal (right/left) volume adjustments
+        let volUp = ScrollInputPolicy.normalize(rawDeltaX: 0, rawDeltaY: -20, isDirectionInvertedFromDevice: true)
+        let volDown = ScrollInputPolicy.normalize(rawDeltaX: 0, rawDeltaY: 20, isDirectionInvertedFromDevice: true)
+        let volRight = ScrollInputPolicy.normalize(rawDeltaX: 20, rawDeltaY: 0, isDirectionInvertedFromDevice: true)
+        let volLeft = ScrollInputPolicy.normalize(rawDeltaX: -20, rawDeltaY: 0, isDirectionInvertedFromDevice: true)
+        TestAssertion.assertTrue(ScrollInputPolicy.dominantAxisStep(x: volUp.x, y: volUp.y) > 0, "Upward swipe increases volume")
+        TestAssertion.assertTrue(ScrollInputPolicy.dominantAxisStep(x: volDown.x, y: volDown.y) < 0, "Downward swipe decreases volume")
+        TestAssertion.assertTrue(ScrollInputPolicy.dominantAxisStep(x: volRight.x, y: volRight.y) > 0, "Rightward swipe increases volume")
+        TestAssertion.assertTrue(ScrollInputPolicy.dominantAxisStep(x: volLeft.x, y: volLeft.y) < 0, "Leftward swipe decreases volume")
     }
 }

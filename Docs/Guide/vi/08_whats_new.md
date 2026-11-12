@@ -1,5 +1,14 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.5 (2026-11-12)
+
+### Sửa Lỗi Vuốt 2 Ngón Tua Nhạc & Chuyển Chế Độ Icon Âm Lượng
+
+- **Sửa Chiều Vuốt Ngang 2 Ngón Khi Tua Nhạc**: Chuẩn hóa hướng cuộn theo đúng quy ước trục `NSEvent` của macOS, khắc phục tình trạng vuốt 2 ngón sang phải bị tua lùi trên Dynamic Island thanh cạnh (cũng như Góc nóng và Vòng xoay con trỏ) ở cả hai chế độ bật/tắt Natural Scrolling.
+- **Chuyển Sang Chỉnh Âm Lượng Khi Rê Chuột Vào Icon Loa**: Khi đưa con trỏ lên biểu tượng Âm lượng ở mép ngoài Dynamic Island, thao tác vuốt 2 ngón (cả lên/xuống lẫn phải/trái) lập tức chuyển từ tua nhạc sang tăng/giảm âm lượng hệ thống và tự động quay lại tua nhạc ngay khi bạn rời chuột khỏi icon loa.
+
+---
+
 ## Phiên bản 2.16.4 (2026-11-12)
 
 ### Bản Vá Khẩn Cấp Khắc Phục Treo Ứng Dụng Sau Khi Cập Nhật

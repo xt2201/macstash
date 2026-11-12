@@ -259,6 +259,7 @@ public struct EdgeMediaIslandView: View {
                 .animation(.spring(response: 0.20, dampingFraction: 0.72), value: isVolBtnHovered || isVolumeHovered)
         }
         .buttonStyle(.plain)
+        .contentShape(Rectangle())
         .help(appState.audio.isMuted ? appState.localized("menubar.unmute") : appState.localized("menubar.mute"))
         .onHover { hovering in
             isVolBtnHovered = hovering

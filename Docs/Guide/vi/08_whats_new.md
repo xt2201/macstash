@@ -1,5 +1,15 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.8 (2026-11-12)
+
+### Khắc Phục Cắt Viền Thanh Cạnh Âm Thanh & Chống Nhảy Rung Icon Volume
+
+- **Triệt Tiêu Hoàn Toàn Lỗi Cắt Phần Trên Cột Âm Thanh**: Tinh giản cụm điều khiển phát nhạc trên thanh cạnh Mode A về 3 nút chuẩn (Lùi bài, Phát/Tạm dừng, Chuyển bài) kèm khoảng cách 6pt đồng nhất, tiết kiệm 54pt chiều cao. Kết hợp lề đáy 60pt mới, nút tác vụ trên đỉnh luôn nằm an toàn bên trong khung hiển thị với hơn 70pt khoảng trống phía trên.
+- **Giữ Cố Định Thanh Âm Lượng & Triệt Tiêu Hiệu Ứng Nhảy Rung**: Khi mở thanh trượt âm lượng từ Dynamic Island, thanh trượt được giữ cố định mượt mà trong suốt thời gian rê chuột trên đảo nhạc hoặc cột âm lượng. Thay thế chuyển động bắn từ đáy lên bằng hiệu ứng phóng to mờ dần gắn chặt tại chỗ, đồng thời cô lập animation giúp đảo nhạc không bị rung giật mỗi khi rê chuột qua lại icon loa.
+- **Đồng Bộ Tọa Độ Tương Tác**: Cập nhật vùng nhận chuột cho cử chỉ vuốt 2 ngón tua nhạc và nhận diện nút volume khớp chuẩn với lề 60pt mới.
+
+---
+
 ## Phiên bản 2.16.7 (2026-11-12)
 
 ### Mở Rộng Tua Nhạc Ngay Tại Chỗ & Triệt Tiêu Nhảy Vị Trí

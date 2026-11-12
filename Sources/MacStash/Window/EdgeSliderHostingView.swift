@@ -99,12 +99,12 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         let edgeStripRect = NSRect(x: stripX, y: bounds.minY, width: stripWidth, height: bounds.height)
 
         if interactionState.isMediaExpanded {
-            let bandH: CGFloat = 120.0
+            let bandH: CGFloat = 145.0
             let isVolumeShowing = interactionState.isVolumeColumnVisible
                 || interactionState.isVolumeButtonHovered
                 || interactionState.isVolumeColumnHovered
-            let islandBottom = bounds.height - 76.0
-            let bandY = isFlipped ? (islandBottom - bandH) : (76.0 - 10.0)
+            let islandBottom = bounds.height - 60.0
+            let bandY = isFlipped ? (islandBottom - bandH) : (60.0 - 10.0)
             let islandBandRect = NSRect(x: bounds.minX, y: bandY, width: bounds.width, height: bandH + 10.0)
             if islandBandRect.contains(point) {
                 return true
@@ -184,14 +184,14 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         )
 
         let loc = convert(event.locationInWindow, from: nil)
-        let boundaryY = isFlipped ? (bounds.maxY - 76.0 - 98.0) : (bounds.minY + 76.0 + 98.0)
+        let boundaryY = isFlipped ? (bounds.maxY - 60.0 - 145.0) : (bounds.minY + 60.0 + 145.0)
         let isInUpperColumnY = isFlipped ? (loc.y < boundaryY) : (loc.y > boundaryY)
         let isInVolumeBtnRect = EdgeBarScrollPolicy.isCursorInIslandVolumeButton(
             localPoint: loc,
             bounds: bounds,
             edge: edge,
             isFlipped: isFlipped,
-            bottomInset: 76.0
+            bottomInset: 60.0
         )
 
         let scrollTarget = EdgeBarScrollPolicy.resolveTarget(

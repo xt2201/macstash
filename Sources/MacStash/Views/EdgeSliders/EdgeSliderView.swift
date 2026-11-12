@@ -68,7 +68,7 @@ public struct EdgeSliderView: View {
 
     private var baselineBottomInset: CGFloat {
         if shouldShowMediaIsland && nowPlaying.hasMedia {
-            return 76.0
+            return 60.0
         }
         return 110.0
     }
@@ -125,16 +125,18 @@ public struct EdgeSliderView: View {
                 if showVolumeColumn {
                     verticalVolumeGlassColumn(tint: volumeTint, secondaryTint: volumeSecondaryTint, isMuted: appState.audio.isMuted)
                         .transition(.asymmetric(
-                            insertion: .move(edge: .bottom).combined(with: .opacity),
-                            removal: .move(edge: .bottom).combined(with: .opacity)
+                            insertion: .opacity.combined(with: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading)),
+                            removal: .opacity.combined(with: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading))
                         ))
                         .onHover { hovering in
                             interactionState.isVolumeColumnHovered = hovering
                             if hovering {
                                 cancelCollapse()
                                 cancelVolumeClose()
-                                isVolumeColumnShowing = true
-                                interactionState.isVolumeColumnVisible = true
+                                withAnimation(.easeInOut(duration: 0.18)) {
+                                    isVolumeColumnShowing = true
+                                    interactionState.isVolumeColumnVisible = true
+                                }
                             } else {
                                 scheduleVolumeClose()
                                 scheduleCollapse()
@@ -154,6 +156,7 @@ public struct EdgeSliderView: View {
                         ScreenManager.shared.cancelEdgeHideTimer(edge: edge)
                     } else if !isDragging && isExpanded {
                         scheduleCollapse()
+                        scheduleVolumeClose()
                         ScreenManager.shared.scheduleEdgeHideTimer(edge: edge)
                     }
                 }
@@ -164,7 +167,6 @@ public struct EdgeSliderView: View {
                 removal: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading).combined(with: .opacity)
             ))
             .animation(.spring(response: 0.30, dampingFraction: 0.80), value: interactionState.isMediaExpanded)
-            .animation(.spring(response: 0.24, dampingFraction: 0.80), value: showVolumeColumn)
         } else {
             // Mode A: Standard Baseline Vertical Edge Bar (Version 2.15.0 Experience)
             verticalBaselineColumn(tint: effectiveTint, secondaryTint: secondaryTint, isMuted: isMuted)
@@ -190,8 +192,10 @@ public struct EdgeSliderView: View {
                 if hovering {
                     cancelCollapse()
                     cancelVolumeClose()
-                    isVolumeColumnShowing = true
-                    interactionState.isVolumeColumnVisible = true
+                    withAnimation(.easeInOut(duration: 0.18)) {
+                        isVolumeColumnShowing = true
+                        interactionState.isVolumeColumnVisible = true
+                    }
                 } else {
                     scheduleVolumeClose()
                 }
@@ -203,27 +207,27 @@ public struct EdgeSliderView: View {
 
     @ViewBuilder
     private func verticalBaselineColumn(tint: Color, secondaryTint: Color, isMuted: Bool) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             // Action Toggle Icon Button
             topActionButton(for: action, tint: tint, isMuted: isMuted)
-                .padding(.top, 8)
+                .padding(.top, 6)
 
             // Slider Track / Drawer Card
             if action == .scratchpad {
                 scratchpadCard
                     .padding(.horizontal, 4)
                 readoutLabel(for: action, isMuted: isMuted, tint: tint)
-                    .padding(.bottom, 10)
+                    .padding(.bottom, 8)
             } else if action == .stashShelf {
                 stashShelfCard
                     .padding(.horizontal, 4)
                 readoutLabel(for: action, isMuted: isMuted, tint: tint)
-                    .padding(.bottom, 10)
+                    .padding(.bottom, 8)
             } else {
-                verticalSliderTrack(for: action, tint: tint, secondaryTint: secondaryTint, isMuted: isMuted, height: (shouldShowMediaIsland && nowPlaying.hasMedia) ? 112 : 138)
+                verticalSliderTrack(for: action, tint: tint, secondaryTint: secondaryTint, isMuted: isMuted, height: (shouldShowMediaIsland && nowPlaying.hasMedia) ? 110 : 138)
                     .padding(.horizontal, 4)
                 readoutLabel(for: action, isMuted: isMuted, tint: tint)
-                    .padding(.bottom, (shouldShowMediaIsland && nowPlaying.hasMedia) ? 4 : 10)
+                    .padding(.bottom, (shouldShowMediaIsland && nowPlaying.hasMedia) ? 2 : 8)
             }
 
             // Vertical Media Controls & Artwork (Shown when media is active)
@@ -242,7 +246,7 @@ public struct EdgeSliderView: View {
                 verticalMediaControls
 
                 artworkCapsuleThumbnail
-                    .padding(.bottom, 8)
+                    .padding(.bottom, 6)
             }
         }
         .frame(width: sliderWidth)
@@ -260,15 +264,15 @@ public struct EdgeSliderView: View {
 
     @ViewBuilder
     private func verticalVolumeGlassColumn(tint: Color, secondaryTint: Color, isMuted: Bool) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             topActionButton(for: .volume, tint: tint, isMuted: isMuted)
-                .padding(.top, 8)
+                .padding(.top, 6)
 
-            verticalSliderTrack(for: .volume, tint: tint, secondaryTint: secondaryTint, isMuted: isMuted, height: 120)
+            verticalSliderTrack(for: .volume, tint: tint, secondaryTint: secondaryTint, isMuted: isMuted, height: 110)
                 .padding(.horizontal, 4)
 
             readoutLabel(for: .volume, isMuted: isMuted, tint: tint)
-                .padding(.bottom, 8)
+                .padding(.bottom, 6)
         }
         .frame(width: sliderWidth)
         .liquidGlass(
@@ -388,30 +392,18 @@ public struct EdgeSliderView: View {
 
     @ViewBuilder
     private var verticalMediaControls: some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 6) {
             // Previous Track Button
             Button(action: { nowPlaying.previousTrack() }) {
                 Image(systemName: "backward.fill")
-                    .font(.system(size: 9.5, weight: .bold))
+                    .font(.system(size: 10, weight: .bold))
                     .foregroundColor(isPrevHovered ? .primary : .secondary)
-                    .frame(width: 24, height: 20)
+                    .frame(width: 26, height: 20)
                     .circularLiquidGlass(tint: .clear, specularIntensity: 0.8, causticOpacity: 0.15, isHighlighted: isPrevHovered)
             }
             .buttonStyle(.plain)
             .help(appState.localized("corners.media.previous"))
             .onHover { isPrevHovered = $0 }
-
-            // Skip Backward 10s Button
-            Button(action: { nowPlaying.skipBackward(seconds: 10) }) {
-                Image(systemName: "gobackward.10")
-                    .font(.system(size: 10.5, weight: .semibold))
-                    .foregroundColor(isRewindHovered ? nowPlaying.artworkTint : .secondary)
-                    .frame(width: 26, height: 22)
-                    .circularLiquidGlass(tint: isRewindHovered ? nowPlaying.artworkTint : .clear, specularIntensity: 0.9, causticOpacity: 0.20, isHighlighted: isRewindHovered)
-            }
-            .buttonStyle(.plain)
-            .help(appState.localized("corners.media.seekBackward"))
-            .onHover { isRewindHovered = $0 }
 
             // Play / Pause Toggle Button
             Button(action: { nowPlaying.togglePlayPause() }) {
@@ -419,7 +411,7 @@ public struct EdgeSliderView: View {
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.primary)
                     .offset(x: nowPlaying.isPlaying ? 0 : 0.8)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 30, height: 28)
                     .circularLiquidGlass(
                         tint: nowPlaying.isPlaying ? nowPlaying.artworkTint : .clear,
                         specularIntensity: 1.2,
@@ -431,24 +423,12 @@ public struct EdgeSliderView: View {
             .help(nowPlaying.isPlaying ? appState.localized("corners.media.pause") : appState.localized("corners.media.play"))
             .onHover { isPlayHovered = $0 }
 
-            // Skip Forward 10s Button
-            Button(action: { nowPlaying.skipForward(seconds: 10) }) {
-                Image(systemName: "goforward.10")
-                    .font(.system(size: 10.5, weight: .semibold))
-                    .foregroundColor(isForwardHovered ? nowPlaying.artworkTint : .secondary)
-                    .frame(width: 26, height: 22)
-                    .circularLiquidGlass(tint: isForwardHovered ? nowPlaying.artworkTint : .clear, specularIntensity: 0.9, causticOpacity: 0.20, isHighlighted: isForwardHovered)
-            }
-            .buttonStyle(.plain)
-            .help(appState.localized("corners.media.seekForward"))
-            .onHover { isForwardHovered = $0 }
-
             // Next Track Button
             Button(action: { nowPlaying.nextTrack() }) {
                 Image(systemName: "forward.fill")
-                    .font(.system(size: 9.5, weight: .bold))
+                    .font(.system(size: 10, weight: .bold))
                     .foregroundColor(isNextHovered ? .primary : .secondary)
-                    .frame(width: 24, height: 20)
+                    .frame(width: 26, height: 20)
                     .circularLiquidGlass(tint: .clear, specularIntensity: 0.8, causticOpacity: 0.15, isHighlighted: isNextHovered)
             }
             .buttonStyle(.plain)
@@ -540,14 +520,16 @@ public struct EdgeSliderView: View {
         cancelVolumeClose()
         let item = DispatchWorkItem {
             Task { @MainActor in
-                if !isDragging && !interactionState.isVolumeButtonHovered && !interactionState.isVolumeColumnHovered {
-                    isVolumeColumnShowing = false
-                    interactionState.isVolumeColumnVisible = false
+                if !isDragging && !interactionState.isVolumeButtonHovered && !interactionState.isVolumeColumnHovered && !interactionState.isIslandHovered {
+                    withAnimation(.easeInOut(duration: 0.18)) {
+                        isVolumeColumnShowing = false
+                        interactionState.isVolumeColumnVisible = false
+                    }
                 }
             }
         }
         volumeCloseWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28, execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
     }
 
     // MARK: - Utility Drawer Cards

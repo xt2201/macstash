@@ -83,7 +83,7 @@ public enum EdgeBarScrollPolicy {
         bounds: CGRect,
         edge: EdgePosition,
         isFlipped: Bool,
-        bottomInset: CGFloat = 76.0
+        bottomInset: CGFloat = 60.0
     ) -> Bool {
         let minX: CGFloat
         let maxX: CGFloat

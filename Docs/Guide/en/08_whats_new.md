@@ -1,5 +1,15 @@
 # Release Notes & Changelog
 
+## Version 2.16.8 (2026-11-12)
+
+### Edge Bar Clipping Elimination & Dynamic Island Volume Stability
+
+- **Eliminated Audio Edge Bar Top Clipping**: Streamlined the baseline audio bar controls to 3 compact transport buttons with optimized spacing, saving 54pt of vertical space. Combined with a 60pt baseline inset, the top action button now sits comfortably inside the panel with over 70pt of headroom, completely eliminating clipping.
+- **Rock-Solid Volume Slider Hover & Zero-Jitter Interaction**: Once revealed, the vertical volume slider stays open seamlessly while navigating inside the Dynamic Island or volume column. Replaced the jumpy entry motion with an anchored scale-and-fade animation and isolated animations so the island never shakes when adjusting volume.
+- **Aligned Interaction Hit Zones**: Updated geometric detection bounds for two-finger trackpad audio scrubbing and volume control to match the new 60pt baseline.
+
+---
+
 ## Version 2.16.7 (2026-11-12)
 
 ### In-Place Dynamic Island Audio Expansion & Zero-Jump Polish

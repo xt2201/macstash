@@ -255,8 +255,8 @@ public struct EdgeMediaIslandView: View {
                     causticOpacity: 0.30,
                     isHighlighted: isVolBtnHovered || isVolumeHovered
                 )
-                .scaleEffect((isVolBtnHovered || isVolumeHovered) ? 1.12 : 1.0)
-                .animation(.spring(response: 0.20, dampingFraction: 0.72), value: isVolBtnHovered || isVolumeHovered)
+                .scaleEffect((isVolBtnHovered || isVolumeHovered) ? 1.05 : 1.0)
+                .animation(.easeInOut(duration: 0.15), value: isVolBtnHovered || isVolumeHovered)
         }
         .buttonStyle(.plain)
         .contentShape(Rectangle())

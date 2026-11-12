@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.8] - 2026-11-12
+
+### Fixed
+- Audio Edge Bar Top Action Button Clipping: Streamlined vertical media transport controls in Mode A baseline bar to 3 compact controls (Previous, Play/Pause, Next) with unified 6pt spacing, reducing column height by 54pt. Adjusted baseline bottom inset to 60.0pt, giving generous 71pt headroom inside the 440pt panel and completely eliminating top button clipping.
+- Dynamic Island Volume Icon Hover Stability & Zero-Jitter Latching: Latched the dropped-in vertical volume slider to stay open as long as the cursor remains anywhere inside the expanded Dynamic Island or volume column. Replaced the jarring bottom-up entry animation with an anchored scale-and-fade transition, removed container-level spring animations that previously shook the island, and smoothed the volume icon hover scaling to eliminate flickering and jitter.
+- Synchronized Scroll & Hit Bounds: Aligned `islandBandRect` in `EdgeSliderHostingView` and `isCursorInIslandVolumeButton` in `ScrollInputPolicy` with the 60.0pt baseline inset and expanded island dimensions.
+
+---
+
 ## [2.16.7] - 2026-11-12
 
 ### Fixed

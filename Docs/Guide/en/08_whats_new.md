@@ -1,5 +1,14 @@
 # Release Notes & Changelog
 
+## Version 2.16.11 (2026-11-12)
+
+### Radial Dial Corner Balance & Polar Clearance Symmetry
+
+- **Balanced Center Action Hub Positioning**: Fixed the visual imbalance where the circular Center Action Hub appeared pushed too far from the screen corner and cramped right against the outer arc line. Refined screen wall air margin to a proportional 4.0pt - 8.0pt scale, nestling the circular hub closer to the physical corner vertex.
+- **Radial Symmetry Between Corner & Framing Arc**: Aligned the outer framing halo arc to maintain exact 1:1 radial clearance with the corner air margin (`badgeCornerInnerMargin`), giving the circular button balanced visual breathing room on both sides across all dial sizes (100pt - 250pt).
+
+---
+
 ## Version 2.16.10 (2026-11-12)
 
 ### Zero-Flicker Volume Icon & Tight Edge Bar Auto-Hide / Click Pass-Through

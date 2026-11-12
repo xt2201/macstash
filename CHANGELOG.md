@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.11] - 2026-11-12
+
+### Fixed
+- Radial Dial Corner Balance & Polar Clearance Symmetry (`CornerDialMetrics` + `CornerDialView`): Fixed the visual imbalance where the circular Center Action Hub appeared too far from the screen corner and too close to the outer framing arc line. Refined `edgeWallMargin` to `4.0pt - 8.0pt` proportional scaling (`dialSize * 0.035`), bringing the circular hub closer to the physical corner vertex with comfortable wall clearance, and aligned `hubHaloArcRadius` to be equidistant between the hub and the outer track (`badgeOuterRadius + badgeCornerInnerMargin`), achieving 1:1 radial symmetry between screen corner and framing arc across all dial sizes (100pt - 250pt).
+
+---
+
 ## [2.16.10] - 2026-11-12
 
 ### Fixed

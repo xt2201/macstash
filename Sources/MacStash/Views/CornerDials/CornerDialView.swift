@@ -1095,20 +1095,22 @@ public struct DialArcShape: View {
             let isClockwise = geometry.corner == .bottomLeft || geometry.corner == .topLeft
             let primaryColor = gradientColors.first ?? .cyan
 
-            // 0a. Concentric outer halo arc wrapping the Center Action Hub cleanly
-            var haloPath = Path()
-            haloPath.addArc(
-                center: geometry.center,
-                radius: metrics.hubHaloArcRadius,
-                startAngle: .degrees(startDeg),
-                endAngle: .degrees(fullDeg),
-                clockwise: isClockwise
-            )
-            context.stroke(
-                haloPath,
-                with: .color(primaryColor.opacity(isDark ? 0.16 : 0.14)),
-                style: StrokeStyle(lineWidth: 0.9)
-            )
+            // 0a. Concentric outer halo arc framing the Center Action Hub sector
+            if !showOrbitalTrack {
+                var haloPath = Path()
+                haloPath.addArc(
+                    center: geometry.center,
+                    radius: metrics.hubHaloArcRadius,
+                    startAngle: .degrees(startDeg),
+                    endAngle: .degrees(fullDeg),
+                    clockwise: isClockwise
+                )
+                context.stroke(
+                    haloPath,
+                    with: .color(primaryColor.opacity(isDark ? 0.16 : 0.14)),
+                    style: StrokeStyle(lineWidth: 0.9)
+                )
+            }
 
             // 0b. Whisper-subtle orbital constellation arc when satellites are deployed
             if showOrbitalTrack {

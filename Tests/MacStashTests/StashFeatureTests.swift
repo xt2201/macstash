@@ -626,11 +626,11 @@ public enum StashFeatureTests {
         for dialSize in dialSizes {
             let metrics = CornerDialMetrics(dialSize: dialSize)
 
-            // 1. Zero corner clipping: circular hub center-to-wall minus radius must match edgeWallMargin >= 5.5pt
+            // 1. Zero corner clipping: circular hub center-to-wall minus radius must match edgeWallMargin >= 4.0pt
             let wallClearance = metrics.badgeCenterAxisDistance - metrics.badgeRadius
-            TestAssertion.assertTrue(wallClearance >= 5.5, "Center hub must float cleanly inside corner walls at dialSize \(dialSize) (got \(wallClearance))")
+            TestAssertion.assertTrue(wallClearance >= 4.0, "Center hub must float cleanly inside corner walls at dialSize \(dialSize) (got \(wallClearance))")
             if dialSize >= 145.0 {
-                TestAssertion.assertTrue(wallClearance >= 8.5, "Default/large dial hubs must have >= 8.5pt corner wall air margin (got \(wallClearance))")
+                TestAssertion.assertTrue(wallClearance >= 5.0, "Default/large dial hubs must have >= 5.0pt corner wall air margin (got \(wallClearance))")
             }
 
             // 2. Hero scale proportionality: uncapped ~37.5% ratio across all dial sizes
@@ -662,6 +662,12 @@ public enum StashFeatureTests {
             TestAssertion.assertTrue(hoveredBadgeClearance >= 2.0, "Hovered satellite must maintain >= 2.0pt clearance from Center Hub at dialSize \(dialSize) (got \(hoveredBadgeClearance))")
             let hoveredTrackClearance = metrics.trackInnerBoundary - (metrics.satelliteRadius + hoveredSatRadius)
             TestAssertion.assertTrue(hoveredTrackClearance >= 2.0, "Hovered satellite must maintain >= 2.0pt clearance from Track at dialSize \(dialSize) (got \(hoveredTrackClearance))")
+
+            // 8. Visual symmetry: Hub must be centered between screen corner vertex and halo framing arc
+            let cornerInnerGap = metrics.badgeCornerInnerMargin
+            let haloOuterGap = metrics.hubHaloArcRadius - metrics.badgeOuterRadius
+            TestAssertion.assertTrue(abs(cornerInnerGap - haloOuterGap) < 0.001, "Hub must be equidistant between corner vertex and halo arc at \(dialSize)")
+            TestAssertion.assertTrue(metrics.hubHaloArcRadius < metrics.trackInnerBoundary, "Halo arc must remain comfortably inside track inner boundary at \(dialSize)")
         }
     }
 

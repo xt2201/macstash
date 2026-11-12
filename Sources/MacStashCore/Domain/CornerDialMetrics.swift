@@ -71,7 +71,7 @@ public struct CornerDialMetrics: Sendable, Equatable {
 
     /// Minimum floating air gap between the circular hub border and each screen edge.
     public var edgeWallMargin: CGFloat {
-        max(5.5, min(15.0, dialSize * 0.062))
+        max(4.0, min(8.0, dialSize * 0.035))
     }
 
     public var badgeDiameter: CGFloat {
@@ -107,15 +107,22 @@ public struct CornerDialMetrics: Sendable, Equatable {
         }
     }
 
+    /// Euclidean air margin from the physical corner vertex `(0, 0)` along the 45-degree symmetry axis
+    /// to the innermost rim of the circular Center Action Hub.
+    public var badgeCornerInnerMargin: CGFloat {
+        (badgeCenterAxisDistance * sqrt(2.0)) - badgeRadius
+    }
+
     /// True Euclidean distance from the physical corner vertex `(0, 0)` along the 45-degree symmetry axis
     /// to the outermost edge of the circular Center Action Hub.
     public var badgeOuterRadius: CGFloat {
         (badgeCenterAxisDistance * sqrt(2.0)) + badgeRadius
     }
 
-    /// Concentric luminous halo framing radius slightly outside the hub boundary.
+    /// Concentric luminous halo framing radius along the 45-degree axis,
+    /// placed symmetrically outside the hub with the same radial breathing room as the corner inner margin.
     public var hubHaloArcRadius: CGFloat {
-        badgeOuterRadius + max(3.5, min(6.5, dialSize * 0.032))
+        badgeOuterRadius + badgeCornerInnerMargin
     }
 
     // MARK: - Orbital Channel & Satellite Micro-Controls

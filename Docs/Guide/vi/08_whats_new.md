@@ -1,5 +1,14 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.11 (2026-11-12)
+
+### Cân Đối Hình Học Nút Tròn Góc Màn Hình & Đối Xứng Bán Kính
+
+- **Định Vị Cân Đối Nút Tròn Trung Tâm (Center Action Hub)**: Khắc phục triệt để lỗi mất cân đối thẩm mỹ khi hình tròn trung tâm nằm quá xa góc máy và bị dí sát đường kẻ cung tròn bên ngoài. Tinh chỉnh khoảng cách lề góc theo tỷ lệ chuẩn 4.0pt - 8.0pt, đưa nút tròn về vị trí ôm sát góc máy tự nhiên và gọn gàng.
+- **Đối Xứng Bán Kính Tuyệt Đối Giữa Góc Máy Và Đường Kẻ Màu**: Đồng bộ bán kính đường kẻ cung tròn bao ngoài (`hubHaloArcRadius`) luôn cách đều mép ngoài nút tròn một khoảng đúng bằng khoảng cách từ đỉnh góc máy tới mép trong nút tròn (`badgeCornerInnerMargin`), tạo tỷ lệ đối xứng 1:1 hoàn hảo và thoáng đãng trên mọi kích thước (100pt - 250pt).
+
+---
+
 ## Phiên bản 2.16.10 (2026-11-12)
 
 ### Triệt Tiêu Nhảy Nháy Icon Âm Lượng & Tự Ẩn Sát Viền Thanh Cạnh

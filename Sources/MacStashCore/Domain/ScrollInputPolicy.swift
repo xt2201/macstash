@@ -82,7 +82,8 @@ public enum EdgeBarScrollPolicy {
         localPoint: CGPoint,
         bounds: CGRect,
         edge: EdgePosition,
-        isFlipped: Bool
+        isFlipped: Bool,
+        bottomInset: CGFloat = 76.0
     ) -> Bool {
         let minX: CGFloat
         let maxX: CGFloat
@@ -97,8 +98,8 @@ public enum EdgeBarScrollPolicy {
             return false
         }
 
-        let minY = isFlipped ? (bounds.maxY - 42.0) : (bounds.minY + 4.0)
-        let maxY = isFlipped ? (bounds.maxY - 4.0) : (bounds.minY + 42.0)
+        let minY = isFlipped ? (bounds.maxY - bottomInset - 42.0) : (bounds.minY + bottomInset + 4.0)
+        let maxY = isFlipped ? (bounds.maxY - bottomInset - 4.0) : (bounds.minY + bottomInset + 42.0)
 
         return localPoint.x >= minX
             && localPoint.x <= maxX

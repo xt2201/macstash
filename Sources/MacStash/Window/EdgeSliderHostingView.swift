@@ -99,21 +99,13 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         let edgeStripRect = NSRect(x: stripX, y: bounds.minY, width: stripWidth, height: bounds.height)
 
         if interactionState.isMediaExpanded {
-            let bandH: CGFloat = 136.0
+            let bandH: CGFloat = 120.0
             let isVolumeShowing = interactionState.isVolumeColumnVisible
                 || interactionState.isVolumeButtonHovered
                 || interactionState.isVolumeColumnHovered
-            let bandY: CGFloat
-            if isVolumeShowing {
-                // When volume column is shown above the island, the composite stack (approx 330pt) is centered.
-                // The island sits in the lower portion of that centered stack.
-                let stackTop = (bounds.height - 330.0) / 2.0
-                bandY = isFlipped ? (stackTop + 330.0 - bandH) : stackTop
-            } else {
-                // Island alone is vertically centered in the panel.
-                bandY = (bounds.height - bandH) / 2.0
-            }
-            let islandBandRect = NSRect(x: bounds.minX, y: bandY, width: bounds.width, height: bandH)
+            let islandBottom = bounds.height - 76.0
+            let bandY = isFlipped ? (islandBottom - bandH) : (76.0 - 10.0)
+            let islandBandRect = NSRect(x: bounds.minX, y: bandY, width: bounds.width, height: bandH + 10.0)
             if islandBandRect.contains(point) {
                 return true
             }
@@ -192,13 +184,14 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
         )
 
         let loc = convert(event.locationInWindow, from: nil)
-        let boundaryY = isFlipped ? (bounds.maxY - 110.0) : (bounds.minY + 110.0)
+        let boundaryY = isFlipped ? (bounds.maxY - 76.0 - 98.0) : (bounds.minY + 76.0 + 98.0)
         let isInUpperColumnY = isFlipped ? (loc.y < boundaryY) : (loc.y > boundaryY)
         let isInVolumeBtnRect = EdgeBarScrollPolicy.isCursorInIslandVolumeButton(
             localPoint: loc,
             bounds: bounds,
             edge: edge,
-            isFlipped: isFlipped
+            isFlipped: isFlipped,
+            bottomInset: 76.0
         )
 
         let scrollTarget = EdgeBarScrollPolicy.resolveTarget(

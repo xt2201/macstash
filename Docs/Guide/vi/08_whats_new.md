@@ -1,5 +1,15 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.7 (2026-11-12)
+
+### Mở Rộng Tua Nhạc Ngay Tại Chỗ & Triệt Tiêu Nhảy Vị Trí
+
+- **Mở Rộng Tua Nhạc Sang Bên Ngay Tại Chỗ**: Khi rê chuột vào ảnh bìa bài hát để tua nhạc, thanh Dynamic Island mở rộng sang ngang mượt mà ngay tại đúng vị trí của ảnh bìa. Giao diện hoàn toàn không còn bị nhảy dịch lên giữa màn hình, giữ trỏ chuột nằm trọn vẹn trong thanh điều khiển.
+- **Thanh Volume Thả Xuống Cố Định Vững Chắc**: Khi di chuột sang biểu tượng loa, cột chỉnh âm lượng trượt ra phía trên đảo nhạc một cách tự nhiên trong khi đảo nhạc vẫn giữ nguyên vị trí cố định, không rung lắc.
+- **Khớp Vùng Nhận Chuột Vuốt Tua 2 Ngón**: Đồng bộ tọa độ nhận tương tác và kiểm tra nút âm lượng với vị trí đảo nhạc mới, giúp thao tác vuốt 2 ngón tua nhạc nhạy bén và không bị mất hover.
+
+---
+
 ## Phiên bản 2.16.6 (2026-11-12)
 
 ### Căn Giữa Hoàn Hảo & Đồng Bộ Vị Trí Thanh Trượt Cạnh Màn Hình

@@ -1,5 +1,15 @@
 # Release Notes & Changelog
 
+## Version 2.16.7 (2026-11-12)
+
+### In-Place Dynamic Island Audio Expansion & Zero-Jump Polish
+
+- **In-Place Horizontal Audio Expansion**: When hovering over the album artwork thumbnail to scrub audio, the Dynamic Island now smoothly expands horizontally right where the artwork capsule is. It no longer spontaneously shifts upward to the screen center, keeping your pointer directly inside the controls.
+- **Stable Volume Column Dropdown**: Moving to the volume button smoothly reveals the vertical volume slider above the island while the Dynamic Island remains solidly anchored in place.
+- **Accurate Trackpad Scrubbing Hit Zone**: Refined the interaction area and volume button detection coordinates, guaranteeing 100% reliable two-finger scrubbing without hover loss.
+
+---
+
 ## Version 2.16.6 (2026-11-12)
 
 ### Edge Bar Vertical Centering & Screen Placement Symmetries

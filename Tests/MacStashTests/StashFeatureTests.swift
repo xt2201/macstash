@@ -689,11 +689,11 @@ public enum StashFeatureTests {
             TestAssertion.assertTrue(abs(panel.midY - screen.midY) < 0.001, "Edge slider panel must be vertically centered on screen for \(edge)")
 
             let artworkX = edge == .left ? screen.minX + 30.0 : screen.maxX - 30.0
-            let artworkPoint = CGPoint(x: artworkX, y: panel.minY + 26.0)
+            let artworkPoint = CGPoint(x: artworkX, y: panel.minY + 76.0 + 26.0)
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, artworkPoint), "Artwork hover point must stay inside the edge hit zone on \(edge)")
             let centeredPoint = CGPoint(x: artworkX, y: panel.midY)
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, centeredPoint), "Centered slider point must stay inside the edge hit zone on \(edge)")
-            let islandPoint = CGPoint(x: edge == .left ? screen.minX + 300.0 : screen.maxX - 300.0, y: panel.midY)
+            let islandPoint = CGPoint(x: edge == .left ? screen.minX + 300.0 : screen.maxX - 300.0, y: panel.minY + 76.0 + 49.0)
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, islandPoint), "Expanded island far end must stay inside the edge hit zone on \(edge)")
         }
 
@@ -762,20 +762,20 @@ public enum StashFeatureTests {
 
         // 5. Geometric fallback detects volume button slot on both left and right edges without overlapping scrubber row
         let panelBounds = CGRect(x: 0, y: 0, width: Defaults.EdgeSliders.panelWidthPoints, height: Defaults.EdgeSliders.panelHeightPoints)
-        let rightVolIconPt = CGPoint(x: panelBounds.maxX - 32.0, y: panelBounds.maxY - 23.0) // flipped coordinates
-        let rightScrubberPt = CGPoint(x: panelBounds.midX, y: panelBounds.maxY - 56.0)
+        let rightVolIconPt = CGPoint(x: panelBounds.maxX - 32.0, y: panelBounds.maxY - 76.0 - 23.0) // flipped coordinates
+        let rightScrubberPt = CGPoint(x: panelBounds.midX, y: panelBounds.maxY - 76.0 - 56.0)
         TestAssertion.assertTrue(
-            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: rightVolIconPt, bounds: panelBounds, edge: .right, isFlipped: true),
+            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: rightVolIconPt, bounds: panelBounds, edge: .right, isFlipped: true, bottomInset: 76.0),
             "Right-edge volume icon geometric fallback must match volumeButton center"
         )
         TestAssertion.assertFalse(
-            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: rightScrubberPt, bounds: panelBounds, edge: .right, isFlipped: true),
+            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: rightScrubberPt, bounds: panelBounds, edge: .right, isFlipped: true, bottomInset: 76.0),
             "Right-edge volume icon geometric fallback must NOT match scrubber bar"
         )
 
-        let leftVolIconPt = CGPoint(x: panelBounds.minX + 32.0, y: panelBounds.maxY - 23.0)
+        let leftVolIconPt = CGPoint(x: panelBounds.minX + 32.0, y: panelBounds.maxY - 76.0 - 23.0)
         TestAssertion.assertTrue(
-            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: leftVolIconPt, bounds: panelBounds, edge: .left, isFlipped: true),
+            EdgeBarScrollPolicy.isCursorInIslandVolumeButton(localPoint: leftVolIconPt, bounds: panelBounds, edge: .left, isFlipped: true, bottomInset: 76.0),
             "Left-edge volume icon geometric fallback must match volumeButton center"
         )
 

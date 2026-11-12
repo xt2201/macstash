@@ -66,6 +66,13 @@ public struct EdgeSliderView: View {
         return isDragging || (active && (appState.activeDisplayID == displayID || appState.activeDisplayID == 0))
     }
 
+    private var baselineBottomInset: CGFloat {
+        if shouldShowMediaIsland && nowPlaying.hasMedia {
+            return 76.0
+        }
+        return 110.0
+    }
+
     public var body: some View {
         let isPlacementActive = appState.settings.edgeSliderPlacement == .both
             || (edge == .left && appState.settings.edgeSliderPlacement == .left)
@@ -73,7 +80,7 @@ public struct EdgeSliderView: View {
         let isVisible = appState.isEnabled && appState.isEdgeSlidersEnabled && isPlacementActive && action != .none
         let shouldReduceMotion = appState.settings.respectReduceMotion && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
-        ZStack(alignment: edge == .right ? .trailing : .leading) {
+        ZStack(alignment: edge == .right ? .bottomTrailing : .bottomLeading) {
             if isVisible {
                 sliderContent
                     .offset(x: isExpanded ? (edge == .right ? -8 : 8) : (edge == .right ? 88 : -88))
@@ -86,7 +93,8 @@ public struct EdgeSliderView: View {
                     )
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .trailing : .leading)
+        .padding(.bottom, baselineBottomInset)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .bottomTrailing : .bottomLeading)
         .onChange(of: isExpanded) { _, newValue in
             if !newValue {
                 cancelCollapse()
@@ -151,12 +159,17 @@ public struct EdgeSliderView: View {
                 }
             }
             .frame(width: 312, alignment: edge == .right ? .trailing : .leading)
-            .animation(.spring(response: 0.32, dampingFraction: 0.78), value: interactionState.isMediaExpanded)
+            .transition(.asymmetric(
+                insertion: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading).combined(with: .opacity),
+                removal: .scale(scale: 0.95, anchor: edge == .right ? .bottomTrailing : .bottomLeading).combined(with: .opacity)
+            ))
+            .animation(.spring(response: 0.30, dampingFraction: 0.80), value: interactionState.isMediaExpanded)
             .animation(.spring(response: 0.24, dampingFraction: 0.80), value: showVolumeColumn)
         } else {
             // Mode A: Standard Baseline Vertical Edge Bar (Version 2.15.0 Experience)
             verticalBaselineColumn(tint: effectiveTint, secondaryTint: secondaryTint, isMuted: isMuted)
                 .frame(width: sliderWidth, alignment: edge == .right ? .trailing : .leading)
+                .transition(.opacity)
                 .onHover { hovering in
                     if hovering {
                         cancelCollapse()

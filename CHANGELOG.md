@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.7] - 2026-11-12
+
+### Fixed
+- In-Place Dynamic Island Audio Expansion (Zero Vertical Jump): Anchored the expanded Dynamic Island (`EdgeMediaIslandView`) strictly to the baseline position of the album artwork thumbnail (`baselineBottomInset = 76.0pt`). When hovering the artwork capsule to scrub audio, the Dynamic Island now expands horizontally in-place directly under the cursor instead of shifting 115pt upward to the vertical center.
+- Seamless Hover Bridge & Volume Column Dropdown: Anchored the popped-up vertical volume slider above the in-place island, allowing users to move between audio scrubbing and volume adjustment without moving the island or causing jitter.
+- Synchronized Hit Zone & Geometric Detection: Re-aligned `islandBandRect` in `EdgeSliderHostingView` and `isCursorInIslandVolumeButton` in `ScrollInputPolicy` with the in-place island coordinates, preventing hover loss and ensuring precise two-finger trackpad audio scrubbing.
+
+---
+
 ## [2.16.6] - 2026-11-12
 
 ### Fixed

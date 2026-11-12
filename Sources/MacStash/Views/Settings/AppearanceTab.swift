@@ -219,11 +219,12 @@ public struct AppearanceTab: View {
         let previewDialSize = min(210.0, appState.settings.dialRadiusPoints)
         let tint = previewAction.accentColors.first ?? .accentColor
         let stageHeight = max(210.0, previewDialSize + 44.0)
+        let metrics = CornerDialMetrics(dialSize: previewDialSize)
         let geom = RadialDialGeometry(
             corner: previewCorner,
             size: CGSize(width: previewDialSize, height: previewDialSize),
-            outerRadius: previewDialSize - 15,
-            innerRadius: max(42, previewDialSize * 0.38)
+            outerRadius: metrics.tickOuterRadius,
+            innerRadius: metrics.badgeOuterRadius
         )
 
         return ZStack(alignment: stageAlignment(for: previewCorner)) {
@@ -293,7 +294,8 @@ public struct AppearanceTab: View {
                     isKeyboardSupported: true,
                     formattedKeepAwake: "30m",
                     stashItemCount: 3,
-                    tint: tint
+                    tint: tint,
+                    gradientColors: previewAction.accentColors
                 )
             }
             .frame(width: previewDialSize, height: previewDialSize)

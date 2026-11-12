@@ -1,4 +1,5 @@
 import SwiftUI
+import MacStashCore
 
 /// Draws delicate laser-etched radial tick marks around the dial arc that illuminate
 /// as luminous liquid fills the gauge. Formatted with strict mathematical symmetry across 4 quadrants.
@@ -17,6 +18,7 @@ public struct DialTicksView: View {
 
     public var body: some View {
         let isDark = colorScheme == .dark
+        let metrics = CornerDialMetrics(dialSize: geometry.size.width)
         Canvas { context, _ in
             for i in 0..<tickCount {
                 let frac = Double(i) / Double(tickCount - 1)
@@ -25,8 +27,8 @@ public struct DialTicksView: View {
                 let isMajor = (i % 5 == 0)
                 let isActive = frac <= (value + 0.005)
 
-                let rInner = geometry.outerRadius - (isMajor ? 13 : 8)
-                let rOuter = geometry.outerRadius
+                let rOuter = metrics.tickOuterRadius
+                let rInner = rOuter - (isMajor ? metrics.majorTickLength : metrics.minorTickLength)
 
                 let p1 = geometry.point(radius: rInner, angleDegrees: deg)
                 let p2 = geometry.point(radius: rOuter, angleDegrees: deg)

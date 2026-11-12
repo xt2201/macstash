@@ -59,20 +59,25 @@ public struct CornerDialView: View {
 
         ZStack(alignment: alignment(for: corner)) {
             if isVisible {
+                let metrics = CornerDialMetrics(dialSize: dialSize)
                 let geom = RadialDialGeometry(
                     corner: corner,
                     size: CGSize(width: dialSize, height: dialSize),
-                    outerRadius: dialSize - 15,
-                    innerRadius: max(42, dialSize * 0.38)
+                    outerRadius: metrics.tickOuterRadius,
+                    innerRadius: metrics.badgeOuterRadius
                 )
 
                 let isExpanded = isDragging || (appState.activeCorner == corner && appState.activeDisplayID == displayID)
-                let badgeOuterBoundary = CenterActionBadge.badgeOuterRadius(for: dialSize)
-                let trackRadius = geom.outerRadius - 20
-                let trackInnerBoundary = trackRadius - 8.5
-                let channelCenter = (badgeOuterBoundary + trackInnerBoundary) * 0.5
-                let satSize = max(18.0, min(22.0, dialSize * 0.13))
-                let satelliteRadius = channelCenter
+                let satelliteRadius = metrics.satelliteRadius
+                let satSize = metrics.satelliteDiameter
+                let hasVisibleSatellites = isExpanded && (
+                    action == .timer
+                    || action == .keepAwake
+                    || action == .stashShelf
+                    || action == .scratchpad
+                    || action == .mediaPlayback
+                    || (action == .volume && appState.nowPlaying.hasMedia)
+                )
                 let shouldReduceMotion = appState.settings.respectReduceMotion && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
                 ZStack {
@@ -91,14 +96,15 @@ public struct CornerDialView: View {
                         accentColor: actionColors.first ?? .accentColor
                     )
 
-                    // 3. Precision Luminous Fluid Arc with meniscus droplet
+                    // 3. Precision Luminous Fluid Arc with concentric orbital framing & meniscus knob
                     DialArcShape(
                         geometry: geom,
                         value: currentValue,
-                        gradientColors: actionColors
+                        gradientColors: actionColors,
+                        showOrbitalTrack: hasVisibleSatellites
                     )
 
-                    // 4. Floating Glass Jewel Center Action Badge
+                    // 4. Floating Glass Jewel Center Action Hub
                     Button(action: {
                         appState.toggleAction(action, displayID: displayID)
                     }) {
@@ -119,6 +125,7 @@ public struct CornerDialView: View {
                             formattedKeepAwake: appState.keepAwake.formattedRemaining,
                             stashItemCount: appState.stashShelf.items.count,
                             tint: actionColors.first ?? .clear,
+                            gradientColors: actionColors,
                             mediaTimeText: (action == .mediaPlayback && appState.nowPlaying.hasMedia)
                                 || (action == .volume && appState.nowPlaying.hasMedia && appState.nowPlaying.isPlaying && !isDragging)
                                 ? appState.nowPlaying.formattedElapsedTime
@@ -504,8 +511,8 @@ public struct CornerDialView: View {
                             let loc = gesture.location
                             let dist = hypot(loc.x - center.x, loc.y - center.y)
 
-                            // Ignore touches on center badge or outside dial perimeter
-                            let centerDeadRadius = badgeOuterBoundary
+                            // Ignore touches on center hub or outside dial perimeter
+                            let centerDeadRadius = metrics.badgeOuterRadius
                             guard dist >= centerDeadRadius && dist <= dialSize + 30 else {
                                 return
                             }
@@ -746,7 +753,10 @@ public struct CenterActionBadge: View {
     public let formattedKeepAwake: String
     public let stashItemCount: Int
     public let tint: Color
+    public let gradientColors: [Color]?
     public let mediaTimeText: String?
+
+    @State private var isHovered: Bool = false
 
     public init(
         action: ControlAction,
@@ -765,6 +775,7 @@ public struct CenterActionBadge: View {
         formattedKeepAwake: String,
         stashItemCount: Int,
         tint: Color,
+        gradientColors: [Color]? = nil,
         mediaTimeText: String? = nil
     ) {
         self.action = action
@@ -783,73 +794,119 @@ public struct CenterActionBadge: View {
         self.formattedKeepAwake = formattedKeepAwake
         self.stashItemCount = stashItemCount
         self.tint = tint
+        self.gradientColors = gradientColors
         self.mediaTimeText = mediaTimeText
     }
 
     public var body: some View {
-        let offset = CenterActionBadge.badgeOffset(for: corner, in: dialSize)
-        let badgeSide = CenterActionBadge.badgeSide(for: dialSize)
+        let metrics = CornerDialMetrics(dialSize: dialSize)
+        let offset = metrics.badgeOffset(for: corner)
+        let badgeSide = metrics.badgeDiameter
+        let scale = metrics.contentScale
         let isDark = colorScheme == .dark
+        let clampedValue = max(0.0, min(1.0, value))
+        let ringColors: [Color] = {
+            if action == .volume && isMuted {
+                return [Color.red, Color.red.opacity(0.65)]
+            }
+            if let explicit = gradientColors, !explicit.isEmpty {
+                return explicit
+            }
+            return tint == .clear ? [Color.accentColor, Color.accentColor.opacity(0.7)] : [tint, tint.opacity(0.72)]
+        }()
+        let ringWidth = max(1.8, 2.2 * scale)
+        let ringInset = max(2.8, 3.2 * scale)
+        let hoverScale: CGFloat = (isHovered && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion) ? 1.045 : 1.0
 
-        VStack(spacing: 1.5) {
-            actionIconView
+        VStack(spacing: 1.5 * scale) {
+            actionIconView(scale: scale)
 
-            actionReadoutView
+            actionReadoutView(scale: scale)
         }
         .frame(width: badgeSide, height: badgeSide)
         .contentShape(Circle())
         .background(
             ZStack {
                 Circle().fill(.ultraThinMaterial)
-                Circle().fill(isDark ? Color.black.opacity(0.38) : Color.white.opacity(0.62))
+                Circle().fill(isDark ? Color.black.opacity(0.36) : Color.white.opacity(0.64))
                 if tint != .clear {
                     Circle()
                         .fill(
                             RadialGradient(
-                                colors: [tint.opacity(isExpanded ? 0.32 : 0.18), Color.clear],
+                                colors: [tint.opacity(isHovered ? 0.38 : (isExpanded ? 0.30 : 0.18)), Color.clear],
                                 center: .center,
                                 startRadius: 2,
-                                endRadius: badgeSide * 0.5
+                                endRadius: badgeSide * 0.52
                             )
                         )
                 }
             }
         )
         .overlay(
-            Circle()
-                .strokeBorder(
-                    LinearGradient(
-                        stops: [
-                            .init(color: Color.white.opacity(isExpanded ? (isDark ? 0.85 : 0.95) : 0.65), location: 0.0),
-                            .init(color: Color.primary.opacity(0.16), location: 0.5),
-                            .init(color: (tint == .clear ? Color.primary : tint).opacity(0.40), location: 1.0)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: isExpanded ? 1.4 : 1.15
-                )
+            ZStack {
+                Circle()
+                    .inset(by: ringInset)
+                    .stroke(
+                        isDark ? Color.white.opacity(0.09) : Color.black.opacity(0.08),
+                        lineWidth: ringWidth
+                    )
+
+                if clampedValue > 0.01 {
+                    Circle()
+                        .inset(by: ringInset)
+                        .trim(from: 0, to: clampedValue)
+                        .stroke(
+                            LinearGradient(
+                                colors: ringColors,
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                }
+
+                Circle()
+                    .strokeBorder(
+                        LinearGradient(
+                            stops: [
+                                .init(color: Color.white.opacity(isHovered ? 0.95 : (isExpanded ? (isDark ? 0.82 : 0.94) : 0.65)), location: 0.0),
+                                .init(color: Color.primary.opacity(0.16), location: 0.5),
+                                .init(color: (tint == .clear ? Color.primary : tint).opacity(isHovered ? 0.60 : 0.42), location: 1.0)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: isHovered ? 1.55 : (isExpanded ? 1.35 : 1.15)
+                    )
+            }
         )
-        .shadow(color: Color.black.opacity(isDark ? 0.35 : 0.15), radius: 6, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(isDark ? 0.38 : 0.16), radius: max(5, 6 * scale), x: 0, y: 2.5)
+        .scaleEffect(hoverScale)
+        .animation(.spring(response: 0.22, dampingFraction: 0.76), value: isHovered)
         .offset(x: offset.x, y: offset.y)
+        .onHover { hovering in
+            isHovered = hovering
+        }
     }
 
     @ViewBuilder
-    private var actionIconView: some View {
+    private func actionIconView(scale: CGFloat) -> some View {
+        let iconSize = 16.5 * scale
         if action == .timer {
-            HStack(spacing: 2.5) {
+            HStack(spacing: 2.5 * scale) {
                 Image(systemName: isPomodoroRunning ? "pause.fill" : "play.fill")
-                    .font(.system(size: 7.5, weight: .bold))
+                    .font(.system(size: 7.5 * scale, weight: .bold))
                     .foregroundColor(pomodoroMode == .focus ? Color(red: 0.85, green: 0.45, blue: 1.0) : Color(red: 0.3, green: 0.9, blue: 0.55))
 
                 Image(systemName: pomodoroMode == .focus ? "brain.head.profile" : "cup.and.saucer.fill")
-                    .font(.system(size: 12.5, weight: .semibold))
+                    .font(.system(size: 13.0 * scale, weight: .semibold))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(pomodoroMode == .focus ? Color.purple : Color.green)
             }
         } else if action == .keepAwake {
             Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -860,7 +917,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .stashShelf {
             Image(systemName: "tray.2.fill")
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -871,7 +928,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .scratchpad {
             Image(systemName: "note.text")
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -882,7 +939,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .volume {
             Image(systemName: isMuted ? "speaker.slash.fill" : (value > 0.66 ? "speaker.wave.3.fill" : (value > 0.33 ? "speaker.wave.2.fill" : (value > 0.01 ? "speaker.wave.1.fill" : "speaker.fill"))))
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     isMuted
@@ -891,7 +948,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .brightness {
             Image(systemName: "sun.max.fill")
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -902,7 +959,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .keyboardBrightness {
             Image(systemName: isKeyboardSupported ? "keyboard.fill" : "keyboard.badge.ellipsis")
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     isKeyboardSupported
@@ -911,7 +968,7 @@ public struct CenterActionBadge: View {
                 )
         } else if action == .mediaPlayback {
             Image(systemName: "music.note")
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(
                     LinearGradient(
@@ -922,149 +979,153 @@ public struct CenterActionBadge: View {
                 )
         } else {
             Image(systemName: action.systemImage)
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundColor(action.accentColors.first ?? .accentColor)
         }
     }
 
     @ViewBuilder
-    private var actionReadoutView: some View {
+    private func actionReadoutView(scale: CGFloat) -> some View {
         if action == .timer {
-            VStack(spacing: 1.5) {
+            VStack(spacing: 1.5 * scale) {
                 Text(formattedTimer)
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .font(.system(size: 10.5 * scale, weight: .bold, design: .monospaced))
                     .foregroundColor(.primary)
 
                 if totalRounds > 0 {
-                    HStack(spacing: 2.5) {
+                    HStack(spacing: 2.5 * scale) {
                         ForEach(0..<min(totalRounds, 6), id: \.self) { roundIndex in
                             Circle()
                                 .fill(roundIndex < completedRounds ? (pomodoroMode == .focus ? Color.purple : Color.green) : Color.secondary.opacity(0.35))
-                                .frame(width: 3.0, height: 3.0)
+                                .frame(width: 3.0 * scale, height: 3.0 * scale)
                         }
                     }
                 }
             }
         } else if action == .keepAwake {
             Text(formattedKeepAwake)
-                .font(.system(size: 9.5, weight: .heavy, design: .rounded))
+                .font(.system(size: 10.0 * scale, weight: .heavy, design: .rounded))
                 .foregroundColor(value > 0 ? .primary : .secondary)
         } else if action == .stashShelf {
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 2 * scale) {
                 Text("\(stashItemCount)")
-                    .font(.system(size: 12, weight: .heavy, design: .rounded))
+                    .font(.system(size: 12.5 * scale, weight: .heavy, design: .rounded))
                     .monospacedDigit()
                     .foregroundColor(.primary)
                 Text(LocalizationService.shared.localized("dial.items"))
-                    .font(.system(size: 7.5, weight: .semibold, design: .rounded))
+                    .font(.system(size: 7.5 * scale, weight: .semibold, design: .rounded))
                     .foregroundColor(.secondary)
             }
         } else if action == .scratchpad {
             Text(LocalizationService.shared.localized("dial.notes"))
-                .font(.system(size: 9, weight: .heavy, design: .rounded))
+                .font(.system(size: 9.5 * scale, weight: .heavy, design: .rounded))
                 .foregroundColor(.primary)
         } else if action == .volume && isMuted {
             Text(LocalizationService.shared.localized("dial.mute"))
-                .font(.system(size: 9, weight: .heavy, design: .rounded))
+                .font(.system(size: 9.5 * scale, weight: .heavy, design: .rounded))
                 .foregroundColor(.red)
         } else if (action == .volume || action == .mediaPlayback), let time = mediaTimeText, !time.isEmpty {
             Text(time)
-                .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                .font(.system(size: 9.5 * scale, weight: .heavy, design: .monospaced))
                 .monospacedDigit()
                 .foregroundColor(.primary)
         } else if action == .keyboardBrightness && !isKeyboardSupported {
             Text(LocalizationService.shared.localized("dial.na"))
-                .font(.system(size: 9.5, weight: .heavy, design: .rounded))
+                .font(.system(size: 10.0 * scale, weight: .heavy, design: .rounded))
                 .foregroundColor(.secondary)
         } else {
-            HStack(alignment: .firstTextBaseline, spacing: 1) {
+            HStack(alignment: .firstTextBaseline, spacing: 1.0 * scale) {
                 Text("\(Int(round(value * 100)))")
-                    .font(.system(size: 12, weight: .heavy, design: .rounded))
+                    .font(.system(size: 13.0 * scale, weight: .heavy, design: .rounded))
                     .monospacedDigit()
                     .foregroundColor(.primary)
 
                 Text("%")
-                    .font(.system(size: 8, weight: .bold, design: .rounded))
+                    .font(.system(size: 8.2 * scale, weight: .bold, design: .rounded))
                     .foregroundColor(.secondary)
             }
         }
     }
 
     public static func badgeSide(for dialSize: CGFloat) -> CGFloat {
-        max(36.0, min(48.0, dialSize * 0.28))
+        CornerDialMetrics(dialSize: dialSize).badgeDiameter
     }
 
     public static func cornerMargin(for dialSize: CGFloat) -> CGFloat {
-        max(4.0, min(8.0, dialSize * 0.045))
+        CornerDialMetrics(dialSize: dialSize).edgeWallMargin
     }
 
     public static func offsetDist(for dialSize: CGFloat) -> CGFloat {
-        let side = badgeSide(for: dialSize)
-        let m = cornerMargin(for: dialSize)
-        let radius = side * 0.5
-        let centerDist = (m + radius) / sqrt(2.0)
-        return (dialSize * 0.5) - centerDist
+        CornerDialMetrics(dialSize: dialSize).badgeCenterOffsetDistance
     }
 
     public static func badgeOffset(for corner: CornerPosition, in size: CGFloat) -> CGPoint {
-        let dist = offsetDist(for: size)
-        switch corner {
-        case .topLeft:
-            return CGPoint(x: -dist, y: -dist)
-        case .topRight:
-            return CGPoint(x: dist, y: -dist)
-        case .bottomLeft:
-            return CGPoint(x: -dist, y: dist)
-        case .bottomRight:
-            return CGPoint(x: dist, y: dist)
-        }
+        CornerDialMetrics(dialSize: size).badgeOffset(for: corner)
     }
 
     public static func badgeOuterRadius(for dialSize: CGFloat) -> CGFloat {
-        let side = badgeSide(for: dialSize)
-        let m = cornerMargin(for: dialSize)
-        return m + side
+        CornerDialMetrics(dialSize: dialSize).badgeOuterRadius
     }
 }
 
-// MARK: - Luminous Fluid Arc Shape with Meniscus Droplet
+// MARK: - Luminous Fluid Arc Shape with Concentric Orbital Framing
 
 public struct DialArcShape: View {
     @Environment(\.colorScheme) private var colorScheme
     public let geometry: RadialDialGeometry
     public let value: Double
     public let gradientColors: [Color]
+    public let showOrbitalTrack: Bool
 
-    public init(geometry: RadialDialGeometry, value: Double, gradientColors: [Color]) {
+    public init(geometry: RadialDialGeometry, value: Double, gradientColors: [Color], showOrbitalTrack: Bool = false) {
         self.geometry = geometry
         self.value = value
         self.gradientColors = gradientColors
+        self.showOrbitalTrack = showOrbitalTrack
     }
 
     public var body: some View {
         let isDark = colorScheme == .dark
+        let metrics = CornerDialMetrics(dialSize: geometry.size.width)
         Canvas { context, _ in
-            let trackRadius = geometry.outerRadius - 20
-            let guideRadius = max(56, geometry.size.width * (106.0 / 145.0))
+            let trackRadius = metrics.trackRadius
             let startDeg = geometry.angle(for: 0.0)
             let fullDeg = geometry.angle(for: 1.0)
             let isClockwise = geometry.corner == .bottomLeft || geometry.corner == .topLeft
+            let primaryColor = gradientColors.first ?? .cyan
 
-            // 0. Inner concentric guide arc (framing the central hub into the dial)
-            var guidePath = Path()
-            guidePath.addArc(
+            // 0a. Concentric outer halo arc wrapping the Center Action Hub cleanly
+            var haloPath = Path()
+            haloPath.addArc(
                 center: geometry.center,
-                radius: guideRadius,
+                radius: metrics.hubHaloArcRadius,
                 startAngle: .degrees(startDeg),
                 endAngle: .degrees(fullDeg),
                 clockwise: isClockwise
             )
             context.stroke(
-                guidePath,
-                with: .color(isDark ? Color.white.opacity(0.08) : Color.black.opacity(0.08)),
-                style: StrokeStyle(lineWidth: 1.0)
+                haloPath,
+                with: .color(primaryColor.opacity(isDark ? 0.16 : 0.14)),
+                style: StrokeStyle(lineWidth: 0.9)
             )
+
+            // 0b. Whisper-subtle orbital constellation arc when satellites are deployed
+            if showOrbitalTrack {
+                var orbitPath = Path()
+                orbitPath.addArc(
+                    center: geometry.center,
+                    radius: metrics.satelliteRadius,
+                    startAngle: .degrees(startDeg),
+                    endAngle: .degrees(fullDeg),
+                    clockwise: isClockwise
+                )
+                context.stroke(
+                    orbitPath,
+                    with: .color(isDark ? Color.white.opacity(0.09) : Color.black.opacity(0.08)),
+                    style: StrokeStyle(lineWidth: 0.8, dash: [3.0, 4.5])
+                )
+            }
 
             // 1. Concave glass trench groove (the channel where liquid flows)
             var trenchPath = Path()
@@ -1078,7 +1139,7 @@ public struct DialArcShape: View {
             context.stroke(
                 trenchPath,
                 with: .color(isDark ? Color.white.opacity(0.10) : Color.black.opacity(0.10)),
-                style: StrokeStyle(lineWidth: 9, lineCap: .round)
+                style: StrokeStyle(lineWidth: metrics.trackTrenchWidth, lineCap: .round)
             )
 
             guard value > 0.01 else { return }
@@ -1094,11 +1155,10 @@ public struct DialArcShape: View {
             )
 
             // 2. Soft luminous fluid bloom (glow under-layer)
-            let primaryColor = gradientColors.first ?? .cyan
             context.stroke(
                 liquidPath,
                 with: .color(primaryColor.opacity(0.32)),
-                style: StrokeStyle(lineWidth: 13, lineCap: .round)
+                style: StrokeStyle(lineWidth: metrics.trackBloomWidth, lineCap: .round)
             )
 
             // 3. Vibrant liquid core
@@ -1109,16 +1169,18 @@ public struct DialArcShape: View {
                     startPoint: geometry.point(radius: trackRadius, angleDegrees: startDeg),
                     endPoint: geometry.point(radius: trackRadius, angleDegrees: endDeg)
                 ),
-                style: StrokeStyle(lineWidth: 7.0, lineCap: .round)
+                style: StrokeStyle(lineWidth: metrics.trackStrokeWidth, lineCap: .round)
             )
 
             // 4. Precision tactile thumb knob (Apple concentric ring indicator)
             let tipPoint = geometry.point(radius: trackRadius, angleDegrees: endDeg)
-            let outerKnob = Path(ellipseIn: CGRect(x: tipPoint.x - 7.5, y: tipPoint.y - 7.5, width: 15, height: 15))
+            let outerR = metrics.knobOuterRadius
+            let innerR = metrics.knobInnerRadius
+            let outerKnob = Path(ellipseIn: CGRect(x: tipPoint.x - outerR, y: tipPoint.y - outerR, width: outerR * 2, height: outerR * 2))
             context.fill(outerKnob, with: .color(primaryColor))
             context.stroke(outerKnob, with: .color(Color.white.opacity(0.92)), lineWidth: 1.25)
 
-            let innerCore = Path(ellipseIn: CGRect(x: tipPoint.x - 3.5, y: tipPoint.y - 3.5, width: 7, height: 7))
+            let innerCore = Path(ellipseIn: CGRect(x: tipPoint.x - innerR, y: tipPoint.y - innerR, width: innerR * 2, height: innerR * 2))
             context.fill(innerCore, with: .color(Color.white))
         }
     }

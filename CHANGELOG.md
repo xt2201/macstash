@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.6] - 2026-11-12
+
+### Fixed
+- Edge Bar Vertical Centering & Screen Placement: Symmetrically centered both Left and Right Edge Sliders at the exact vertical center of the screen (`(frame.height - panelHeight) / 2.0`) in `ScreenOverlayInstance`. Aligned `EdgeSliderView` content to vertical center (`.trailing` / `.leading`) inside its interactive panel, eliminating the downward offset where the bar previously appeared ~110pt below screen center.
+- Edge Slider & Drawer Interaction Coordination: Resolved dwell timer competition between Edge Sliders and Left Edge Drawer (`StashShelf`) when both share the same edge in `ScreenManager`. Extreme-edge cursor dwell now activates the Edge Slider cleanly at the vertical center, while file drag-and-drop seamlessly opens Stash Shelf, and Edge Sliders are paused while the drawer is open.
+- Symmetrical Dynamic Island Hit Zone: Re-anchored `islandBandRect` in `EdgeSliderHostingView` to match the centered Mode B layout and centered volume stack geometry.
+
+---
+
 ## [2.16.5] - 2026-11-12
 
 ### Fixed

@@ -1,5 +1,15 @@
 # Release Notes & Changelog
 
+## Version 2.16.6 (2026-11-12)
+
+### Edge Bar Vertical Centering & Screen Placement Symmetries
+
+- **Symmetrical Vertical Centering for Edge Sliders**: Both Left and Right Edge Sliders are now positioned at the exact vertical center of the screen. Inside the panel, the slider content is vertically centered instead of anchored to the bottom, ensuring the slider appears right at the cursor position without any vertical displacement.
+- **Harmonious Edge Slider and Drawer Coexistence**: Resolved dwell timer overlap between Edge Sliders and Left Edge Drawer when sharing an edge. Normal cursor dwell now reveals the Edge Slider at the vertical center, dragging files from Finder smoothly opens Stash Shelf to receive drops, and Edge Sliders stay hidden while the drawer is open.
+- **Symmetrical Dynamic Island Hit Zone**: Updated the hit testing area for the expanded Dynamic Island and dropped-in volume slider to match the vertically centered layout.
+
+---
+
 ## Version 2.16.5 (2026-11-12)
 
 ### Dynamic Island Two-Finger Scrub & Volume Hover Fixes

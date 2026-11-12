@@ -171,15 +171,9 @@ public final class ScreenOverlayInstance {
 
     public func drawerRect(in frame: NSRect) -> NSRect {
         let isRight = appState.settings.drawerEdgePosition == .right
-        let placement = appState.settings.edgeSliderPlacement
-        let isSliderPresentOnDrawerEdge = appState.settings.isEdgeSlidersEnabled && (
-            isRight ? (placement == .both || placement == .right) : (placement == .both || placement == .left)
-        )
         let panelWidth: CGFloat = Defaults.LeftEdgeDrawer.panelWidthPoints
         let panelHeight: CGFloat = Defaults.LeftEdgeDrawer.panelHeightPoints
-        let panelY = isSliderPresentOnDrawerEdge
-            ? max(frame.minY + Defaults.EdgeSliders.drawerClearancePoints, frame.midY - panelHeight - 4)
-            : frame.minY + (frame.height - panelHeight) / 2
+        let panelY = frame.minY + (frame.height - panelHeight) / 2.0
         let panelX = isRight ? (frame.maxX - panelWidth) : frame.minX
         return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
     }
@@ -237,18 +231,9 @@ public final class ScreenOverlayInstance {
 
     public func sliderRect(for edge: EdgePosition, in frame: NSRect) -> NSRect {
         let isLeft = edge == .left
-        let sameEdge = (appState.settings.drawerEdgePosition == .left) == isLeft && appState.hasDrawerFeatureActive
         let panelWidth = Defaults.EdgeSliders.panelWidthPoints
         let panelHeight = Defaults.EdgeSliders.panelHeightPoints
-        let panelY: CGFloat
-        if sameEdge {
-            let dRect = drawerRect(in: frame)
-            let maxAllowedY = frame.maxY - panelHeight - Defaults.EdgeSliders.drawerClearancePoints
-            let preferredY = max(dRect.maxY + 4, frame.midY + 4)
-            panelY = min(maxAllowedY, preferredY)
-        } else {
-            panelY = frame.minY + (frame.height - panelHeight) / 2
-        }
+        let panelY = frame.minY + (frame.height - panelHeight) / 2.0
         let panelX = isLeft ? frame.minX : (frame.maxX - panelWidth)
         return NSRect(x: panelX, y: panelY, width: panelWidth, height: panelHeight)
     }

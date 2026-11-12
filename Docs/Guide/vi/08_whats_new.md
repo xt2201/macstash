@@ -1,5 +1,15 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.6 (2026-11-12)
+
+### Căn Giữa Hoàn Hảo & Đồng Bộ Vị Trí Thanh Trượt Cạnh Màn Hình
+
+- **Căn Giữa Trục Dọc Cho Cả Hai Thanh Cạnh**: Cả Thanh trượt cạnh trái và cạnh phải nay được đặt tại chính giữa màn hình theo phương thẳng đứng. Nội dung thanh trượt bên trong cửa sổ hiển thị được căn giữa thay vì bị kéo xuống đáy, giúp thanh trượt xuất hiện ngay tại vị trí trỏ chuột thay vì bị lệch xuống dưới.
+- **Phối Hợp Tương Tác Nhịp Nhàng Giữa Thanh Cạnh & Ngăn Kéo**: Giải quyết triệt để tình trạng cạnh tranh kích hoạt rê chuột giữa Thanh cạnh và Ngăn kéo Stash Shelf khi nằm cùng một mép màn hình. Thao tác rê chuột thông thường mở thanh trượt cạnh tại vị trí giữa, kéo thả tệp từ Finder sẽ mở Stash Shelf để nhận file, và thanh trượt cạnh tạm ẩn khi ngăn kéo đang mở.
+- **Đồng Bộ Vùng Nhận Chuột Dynamic Island**: Cập nhật vùng nhận chuột cho Dynamic Island và thanh volume thả xuống khớp hoàn hảo với bố cục căn giữa mới.
+
+---
+
 ## Phiên bản 2.16.5 (2026-11-12)
 
 ### Sửa Lỗi Vuốt 2 Ngón Tua Nhạc & Chuyển Chế Độ Icon Âm Lượng

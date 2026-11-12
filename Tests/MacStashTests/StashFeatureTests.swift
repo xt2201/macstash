@@ -685,11 +685,15 @@ public enum StashFeatureTests {
                 height: panelH
             )
             let hit = CornerGeometry.edgeSliderHitRect(screenFrame: screen, sliderPanelRect: panel, edge: edge)
-            // Artwork capsule sits at the very bottom of the bar, flush with the panel bottom padding.
+            // Vertical centering verification: panel midY must strictly equal screen midY
+            TestAssertion.assertTrue(abs(panel.midY - screen.midY) < 0.001, "Edge slider panel must be vertically centered on screen for \(edge)")
+
             let artworkX = edge == .left ? screen.minX + 30.0 : screen.maxX - 30.0
             let artworkPoint = CGPoint(x: artworkX, y: panel.minY + 26.0)
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, artworkPoint), "Artwork hover point must stay inside the edge hit zone on \(edge)")
-            let islandPoint = CGPoint(x: edge == .left ? screen.minX + 300.0 : screen.maxX - 300.0, y: panel.minY + 50.0)
+            let centeredPoint = CGPoint(x: artworkX, y: panel.midY)
+            TestAssertion.assertTrue(CornerGeometry.rectContains(hit, centeredPoint), "Centered slider point must stay inside the edge hit zone on \(edge)")
+            let islandPoint = CGPoint(x: edge == .left ? screen.minX + 300.0 : screen.maxX - 300.0, y: panel.midY)
             TestAssertion.assertTrue(CornerGeometry.rectContains(hit, islandPoint), "Expanded island far end must stay inside the edge hit zone on \(edge)")
         }
 

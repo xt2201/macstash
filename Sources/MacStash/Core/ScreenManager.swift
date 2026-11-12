@@ -568,46 +568,61 @@ public final class ScreenManager: ObservableObject {
                 }
             } else {
                 // Extreme edge (<= 2.5pt) requirement with intentional dwell delay across candidate displays
-                var candidateInstance: ScreenOverlayInstance?
-                var candidateFrame: NSRect = .zero
-                var candidateDrawerRect: NSRect = .zero
+                let isSliderActiveOnDrawerEdge = appState.isEdgeSlidersEnabled && (
+                    isDrawerRight
+                        ? (appState.settings.edgeSliderPlacement == .both || appState.settings.edgeSliderPlacement == .right) && appState.activeProfile.rightEdgeAction != .none
+                        : (appState.settings.edgeSliderPlacement == .both || appState.settings.edgeSliderPlacement == .left) && appState.activeProfile.leftEdgeAction != .none
+                )
 
-                for instance in instances.values {
-                    let frame = instance.screen.frame
-                    let isOuterEdge: Bool
-                    if appState.settings.onlyOuterCorners {
-                        isOuterEdge = isDrawerRight
-                            ? CornerGeometry.isOuterRightEdge(screen: frame, in: allFrames)
-                            : CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames)
-                    } else {
-                        isOuterEdge = true
-                    }
-
-                    guard isOuterEdge else {
-                        instance.setLeftEdgeInteractive(false, allowsKey: false)
-                        continue
-                    }
-
-                    let dRect = instance.drawerRect(in: frame)
-                    let isAtEdgeX = isDrawerRight
-                        ? (mouseLoc.x >= (frame.maxX - 2.5) && mouseLoc.x <= (frame.maxX + 1.0))
-                        : (mouseLoc.x <= (frame.minX + 2.5) && mouseLoc.x >= (frame.minX - 1.0))
-                    let isWithinEdgeY = mouseLoc.y >= dRect.minY && mouseLoc.y <= dRect.maxY
-
-                    if isAtEdgeX && isWithinEdgeY {
-                        candidateInstance = instance
-                        candidateFrame = frame
-                        candidateDrawerRect = dRect
-                        break
-                    } else {
-                        instance.setLeftEdgeInteractive(false, allowsKey: false)
-                    }
-                }
-
-                if let candidate = candidateInstance {
-                    scheduleLeftEdgeDwellTimer(displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateDrawerRect)
-                } else {
+                if isSliderActiveOnDrawerEdge {
+                    // When an Edge Slider is configured on this edge, normal cursor dwell is owned by the Edge Slider.
+                    // Drawer remains fully accessible via file-drag, keyboard shortcuts, menu bar, and hot corners.
                     cancelPendingLeftEdgeDwell()
+                    for instance in instances.values {
+                        instance.setLeftEdgeInteractive(false, allowsKey: false)
+                    }
+                } else {
+                    var candidateInstance: ScreenOverlayInstance?
+                    var candidateFrame: NSRect = .zero
+                    var candidateDrawerRect: NSRect = .zero
+
+                    for instance in instances.values {
+                        let frame = instance.screen.frame
+                        let isOuterEdge: Bool
+                        if appState.settings.onlyOuterCorners {
+                            isOuterEdge = isDrawerRight
+                                ? CornerGeometry.isOuterRightEdge(screen: frame, in: allFrames)
+                                : CornerGeometry.isOuterLeftEdge(screen: frame, in: allFrames)
+                        } else {
+                            isOuterEdge = true
+                        }
+
+                        guard isOuterEdge else {
+                            instance.setLeftEdgeInteractive(false, allowsKey: false)
+                            continue
+                        }
+
+                        let dRect = instance.drawerRect(in: frame)
+                        let isAtEdgeX = isDrawerRight
+                            ? (mouseLoc.x >= (frame.maxX - 2.5) && mouseLoc.x <= (frame.maxX + 1.0))
+                            : (mouseLoc.x <= (frame.minX + 2.5) && mouseLoc.x >= (frame.minX - 1.0))
+                        let isWithinEdgeY = mouseLoc.y >= dRect.minY && mouseLoc.y <= dRect.maxY
+
+                        if isAtEdgeX && isWithinEdgeY {
+                            candidateInstance = instance
+                            candidateFrame = frame
+                            candidateDrawerRect = dRect
+                            break
+                        } else {
+                            instance.setLeftEdgeInteractive(false, allowsKey: false)
+                        }
+                    }
+
+                    if let candidate = candidateInstance {
+                        scheduleLeftEdgeDwellTimer(displayID: candidate.displayID, screenFrame: candidateFrame, verticalRange: candidateDrawerRect)
+                    } else {
+                        cancelPendingLeftEdgeDwell()
+                    }
                 }
             }
         } else {
@@ -628,7 +643,10 @@ public final class ScreenManager: ObservableObject {
                     || (targetEdge == .right && placement == .right)
                 let action = targetEdge == .left ? appState.activeProfile.leftEdgeAction : appState.activeProfile.rightEdgeAction
 
-                guard isAllowed && action != .none else {
+                let isDrawerOpenOnThisEdge = (shelf.isShelfOpen || shelf.isDropTargetActive || scratchpad.isScratchpadOpen)
+                    && (targetEdge == appState.settings.drawerEdgePosition)
+
+                guard isAllowed && action != .none && !isDrawerOpenOnThisEdge else {
                     cancelPendingEdgeDwell(edge: targetEdge)
                     for instance in instances.values {
                         instance.setEdgeInteractive(false, for: targetEdge)

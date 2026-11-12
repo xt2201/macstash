@@ -73,7 +73,7 @@ public struct EdgeSliderView: View {
         let isVisible = appState.isEnabled && appState.isEdgeSlidersEnabled && isPlacementActive && action != .none
         let shouldReduceMotion = appState.settings.respectReduceMotion && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
-        ZStack(alignment: edge == .right ? .bottomTrailing : .bottomLeading) {
+        ZStack(alignment: edge == .right ? .trailing : .leading) {
             if isVisible {
                 sliderContent
                     .offset(x: isExpanded ? (edge == .right ? -8 : 8) : (edge == .right ? 88 : -88))
@@ -86,7 +86,7 @@ public struct EdgeSliderView: View {
                     )
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .bottomTrailing : .bottomLeading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: edge == .right ? .trailing : .leading)
         .onChange(of: isExpanded) { _, newValue in
             if !newValue {
                 cancelCollapse()

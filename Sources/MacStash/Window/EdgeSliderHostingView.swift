@@ -100,13 +100,24 @@ public final class EdgeSliderHostingView: NSHostingView<EdgeSliderView> {
 
         if interactionState.isMediaExpanded {
             let bandH: CGFloat = 136.0
-            let bandY = isFlipped ? (bounds.maxY - bandH) : bounds.minY
+            let isVolumeShowing = interactionState.isVolumeColumnVisible
+                || interactionState.isVolumeButtonHovered
+                || interactionState.isVolumeColumnHovered
+            let bandY: CGFloat
+            if isVolumeShowing {
+                // When volume column is shown above the island, the composite stack (approx 330pt) is centered.
+                // The island sits in the lower portion of that centered stack.
+                let stackTop = (bounds.height - 330.0) / 2.0
+                bandY = isFlipped ? (stackTop + 330.0 - bandH) : stackTop
+            } else {
+                // Island alone is vertically centered in the panel.
+                bandY = (bounds.height - bandH) / 2.0
+            }
             let islandBandRect = NSRect(x: bounds.minX, y: bandY, width: bounds.width, height: bandH)
             if islandBandRect.contains(point) {
                 return true
             }
-            return (interactionState.isVolumeColumnVisible || interactionState.isVolumeButtonHovered || interactionState.isVolumeColumnHovered)
-                && edgeStripRect.contains(point)
+            return isVolumeShowing && edgeStripRect.contains(point)
         }
 
         return edgeStripRect.contains(point)

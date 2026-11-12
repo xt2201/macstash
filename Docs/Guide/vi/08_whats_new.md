@@ -1,5 +1,13 @@
 # Lịch Sử Phiên Bản & Tính Năng Mới
 
+## Phiên bản 2.16.12 (2026-11-12)
+
+### Khắc Phục Lưu Ảnh Bìa Cũ Trên Thanh Cạnh Khi Phát Bài Không Có Ảnh
+
+- **Xóa Ảnh Bìa Cũ Tức Thì Khi Đổi Bài Không Có Ảnh**: Khắc phục lỗi khi phát nhạc trên Music hoặc các trình phát khác, nếu chuyển từ bài có ảnh bìa sang bài không có ảnh bìa, thanh cạnh âm lượng (Edge Bar) và Dynamic Island vẫn giữ lại ảnh bìa và màu sắc của bài cũ. Nay giao diện lập tức chuyển về biểu tượng nốt nhạc mặc định cùng tông màu chuẩn.
+
+---
+
 ## Phiên bản 2.16.11 (2026-11-12)
 
 ### Cân Đối Hình Học Nút Tròn Góc Màn Hình & Đối Xứng Bán Kính

@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.16.12] - 2026-11-12
+
+### Fixed
+- Stale Album Artwork on Volume Edge Bar (`NowPlayingArtworkPolicy` + `NowPlayingManager` + `NowPlayingAdapter`): Fixed an issue when playing tracks without embedded artwork in Apple Music (`com.apple.Music`) or other media players where the Volume Edge Bar (`EdgeSliderView` and `EdgeMediaIslandView`) continued displaying the previous track's album cover and extracted accent tint. Removed the overly restrictive `newTitle.isEmpty && !newPlaying` guard, extracted pure transition logic into `MacStashCore/Domain/NowPlayingArtworkPolicy.swift`, emitted explicit `hasArtwork` / `artworkUnchanged` flags from `NowPlayingAdapter`, cleared stale artwork in both helper and fallback paths, and added unit tests in `NowPlayingArtworkTests`.
+
+---
+
 ## [2.16.11] - 2026-11-12
 
 ### Fixed

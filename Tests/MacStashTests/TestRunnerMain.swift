@@ -46,6 +46,9 @@ enum TestRunnerMain {
         print("[TEST] Running CodeHygieneTests...")
         CodeHygieneTests.run()
 
+        print("[TEST] Running NowPlayingArtworkTests...")
+        NowPlayingArtworkTests.run()
+
         let elapsed = ProcessInfo.processInfo.systemUptime - startTime
         let total = TestAssertion.passCount + TestAssertion.failCount
 

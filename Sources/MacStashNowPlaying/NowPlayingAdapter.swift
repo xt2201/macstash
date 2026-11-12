@@ -561,10 +561,12 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
 
         let sig = computeArtworkSignature(snap.artworkData)
         if let artData = snap.artworkData {
+            payload["hasArtwork"] = true
             if deduplicateArtwork && sig != 0 && sig == lastArtworkSignature {
                 payload["artworkUnchanged"] = true
             } else {
                 lastArtworkSignature = sig
+                payload["artworkUnchanged"] = false
                 payload["artworkBase64"] = artData.base64EncodedString()
                 if !snap.artworkMIMEType.isEmpty {
                     payload["artworkMIMEType"] = snap.artworkMIMEType
@@ -572,6 +574,8 @@ private final class MediaRemoteAdapter: @unchecked Sendable {
             }
         } else {
             lastArtworkSignature = 0
+            payload["hasArtwork"] = false
+            payload["artworkUnchanged"] = false
         }
 
         guard let jsonData = try? JSONSerialization.data(withJSONObject: payload, options: []),

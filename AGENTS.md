@@ -110,10 +110,10 @@ Các đường dẫn trọng yếu (lưu ý `Scripts/` viết hoa chữ `S`):
 3. **Kiểm chứng bắt buộc sau chỉnh sửa cuối**:
    - `make test` (toàn bộ assertion pass 100%)
    - `swift build` (không thêm compiler warning mới)
-4. **Commit nhỏ theo Conventional Commits**: Chỉ bump `VERSION`, chạy `Scripts/build_dmg.sh` hay tạo tag khi thực hiện **Chế độ B**.
+4. **Commit nhỏ theo Conventional Commits**: Chỉ bump `VERSION`, chạy `Scripts/build_dmg.sh` hay tạo tag khi thực hiện **Chế độ B**. Khi hoàn tất bản phát hành hoặc người dùng yêu cầu áp dụng thay đổi lên app đang chạy, luôn thực hiện đầy đủ **Chế độ B** (bao gồm cập nhật & mở lại `/Applications/Stash.app`).
 
 ### Chế độ B — Release & Ship Pipeline (Khi hoàn tất phiên bản hoặc người dùng yêu cầu release / DMG / tag)
-Một bản phát hành chỉ hoàn thành khi đủ **9 bước** (chi tiết kiểm tra tại `Docs/Agent/ARCHITECTURE_AND_RELEASE.md`):
+Một bản phát hành chỉ hoàn thành khi đủ **10 bước** (chi tiết kiểm tra tại `Docs/Agent/ARCHITECTURE_AND_RELEASE.md`):
 1. Đảm bảo working tree sạch các thay đổi hợp lệ thuộc bản release và không để lại file thừa/bí mật.
 2. **Đồng bộ 6 vị trí Versioning** theo SSOT `VERSION` (semver `X.Y.Z`):
    - `VERSION`
@@ -124,18 +124,19 @@ Một bản phát hành chỉ hoàn thành khi đủ **9 bước** (chi tiết k
    - `appcast.xml` (tự cập nhật qua `./Scripts/build_dmg.sh` với chữ ký Ed25519 từ `Scripts/sign_sparkle_update.swift`)
 3. Cập nhật `Docs/Guide/{en,vi}/*.md` nếu đổi tính năng, Settings, phím tắt, hành vi hoặc quyền; cập nhật SVG + chạy `./Scripts/render_icons.sh` nếu đổi giao diện trực quan.
 4. Chạy `make test` (`VersionConsistencyTests`, `DocumentationIntegrityTests`, `LocalizationTests`, `CodeHygieneTests` và toàn bộ domain tests pass 100%) và `swift build -c release` sạch warning.
-5. Chạy `./Scripts/build_dmg.sh` tạo universal DMG (`arm64 + x86_64`) + update ZIP ký Ed25519; ghi lại đường dẫn artifact và SHA-256. Không build được phải báo rõ nguyên nhân. (Lưu ý: không dùng `Scripts/build_app.sh` cũ cho phát hành chính thức).
-6. Kịch bản build/render trong `Scripts/` tuyệt đối không phụ thuộc cứng vào package Python tùy chọn ngoài hệ thống (`weasyprint` phải bọc `try/except`) để CI runner `macos-latest` chạy thành công 100%.
-7. Commit theo Conventional Commits, tạo tag `v<version>` và push cả branch lẫn tag (`git push origin <branch> && git push origin v<version>`). Không giữ commit/tag release ở local.
-8. Kiểm chứng CI/Release sau khi push: `gh run list --limit 1` / `gh run view` thành công, `gh release view v<version>` tồn tại, file ZIP tải được (HTTP 200/302). Nếu CI lỗi phải khắc phục ngay.
-9. Báo cáo cuối bắt buộc có các mục: Test results, Docs/README đã cập nhật (hoặc "không cần đổi docs" nếu refactor thuần nội bộ), DMG/ZIP đã build + SHA-256, và Git commit/tag + trạng thái CI.
+5. Chạy `./Scripts/build_dmg.sh` tạo universal DMG (`arm64 + x86_64`) + update ZIP ký Ed25519 + bundle `.build/package_staging/Stash.app`; ghi lại đường dẫn artifact và SHA-256. Không build được phải báo rõ nguyên nhân. (Lưu ý: không dùng `Scripts/build_app.sh` cũ cho phát hành chính thức).
+6. **Cập nhật & Mở lại app cục bộ (`/Applications/Stash.app`)**: Dừng tiến trình đang chạy (`pkill -x Stash || true`), thay thế bundle mới (`rm -rf /Applications/Stash.app && ditto .build/package_staging/Stash.app /Applications/Stash.app`) và khởi chạy lại (`open /Applications/Stash.app`) để người dùng dùng ngay bản mới nhất mà không cần nhắc lại.
+7. Kịch bản build/render trong `Scripts/` tuyệt đối không phụ thuộc cứng vào package Python tùy chọn ngoài hệ thống (`weasyprint` phải bọc `try/except`) để CI runner `macos-latest` chạy thành công 100%.
+8. Commit theo Conventional Commits, tạo tag `v<version>` và push cả branch lẫn tag (`git push origin <branch> && git push origin v<version>`). Không giữ commit/tag release ở local.
+9. Kiểm chứng CI/Release sau khi push: `gh run list --limit 1` / `gh run view` thành công, `gh release view v<version>` tồn tại, file ZIP tải được (HTTP 200/302). Nếu CI lỗi phải khắc phục ngay.
+10. Báo cáo cuối bắt buộc có các mục: Test results, Docs/README đã cập nhật (hoặc "không cần đổi docs" nếu refactor thuần nội bộ), DMG/ZIP đã build + SHA-256, trạng thái cập nhật & mở `/Applications/Stash.app`, và Git commit/tag + trạng thái CI.
 
 ---
 
 ## 4. Cổng Kiểm thử Tự động (Automated Verification Gates)
 
 Lệnh chuẩn:
-- `make test`: chạy `MacStashTestRunner` gồm 13 bộ test (`CornerGeometryTests`, `OverlayStateMachineTests`, `PomodoroEngineTests`, `BrightnessPolicyTests`, `SettingsPersistenceTests`, `DocumentationIntegrityTests`, `LocalizationTests`, `StashFeatureTests`, `VersionConsistencyTests`, `SideDockLayoutEngineTests`, `SideDockConfigStoreTests`, `SideDockWidgetTests`, `CodeHygieneTests`).
+- `make test`: chạy `MacStashTestRunner` gồm 14 bộ test (`CornerGeometryTests`, `OverlayStateMachineTests`, `PomodoroEngineTests`, `BrightnessPolicyTests`, `SettingsPersistenceTests`, `DocumentationIntegrityTests`, `LocalizationTests`, `StashFeatureTests`, `VersionConsistencyTests`, `SideDockLayoutEngineTests`, `SideDockConfigStoreTests`, `SideDockWidgetTests`, `CodeHygieneTests`, `NowPlayingArtworkTests`).
 - `swift build` / `swift build -c release`: kiểm tra biên dịch toàn bộ target và không phát sinh compiler warning mới.
 - `./Scripts/render_icons.sh`: tái tạo toàn bộ brand & UI visual assets từ SVG nguồn.
 

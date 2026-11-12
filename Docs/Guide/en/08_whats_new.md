@@ -1,5 +1,13 @@
 # Release Notes & Changelog
 
+## Version 2.16.12 (2026-11-12)
+
+### Edge Bar Stale Artwork Fix for Tracks Without Cover Art
+
+- **Instant Placeholder Reset**: Fixed an issue in Music and other media players where switching from a song with album art to a song without cover art left the old album artwork and color tint stuck on the Volume Edge Bar and Dynamic Island. Tracks without artwork now immediately switch to the clean musical note placeholder and default accent tint.
+
+---
+
 ## Version 2.16.11 (2026-11-12)
 
 ### Radial Dial Corner Balance & Polar Clearance Symmetry

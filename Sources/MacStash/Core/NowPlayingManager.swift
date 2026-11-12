@@ -198,8 +198,9 @@ public final class NowPlayingManager: ObservableObject {
         let hasElapsedField = (dict["hasElapsedTime"] as? Bool) ?? (dict["kMRMediaRemoteNowPlayingInfoElapsedTime"] != nil)
         let newPlaying = (dict["isPlaying"] as? Bool) ?? ((dict["isPlaying"] as? NSNumber)?.boolValue ?? false)
         let artworkUnchanged = (dict["artworkUnchanged"] as? Bool) ?? false
+        let hasArtwork = dict["hasArtwork"] as? Bool
 
-        let trackChanged = newTitle != self.title || newArtist != self.artist
+        let trackChanged = newTitle != self.title || newArtist != self.artist || newBundleID != self.appBundleID
         if trackChanged {
             var hasher = Hasher()
             hasher.combine(newTitle)
@@ -243,21 +244,36 @@ public final class NowPlayingManager: ObservableObject {
         self.hasMedia = !newTitle.isEmpty || newPlaying
         updateRhythmEngineState()
 
-        if let b64 = dict["artworkBase64"] as? String,
-           !b64.isEmpty,
-           let imgData = Data(base64Encoded: b64, options: .ignoreUnknownCharacters),
-           let image = NSImage(data: imgData) {
-            self.artworkImage = image
-            let extracted = Self.extractDominantTint(from: image)
-            self.artworkTint = extracted.primary
-            self.artworkSecondaryTint = extracted.secondary
-        } else if !artworkUnchanged {
-            if newTitle.isEmpty && !newPlaying {
-                self.artworkImage = nil
-                self.artworkTint = Self.defaultPrimaryTint
-                self.artworkSecondaryTint = Self.defaultSecondaryTint
+        let transition = NowPlayingArtworkPolicy.resolveHelperTransition(
+            artworkBase64: dict["artworkBase64"] as? String,
+            artworkUnchanged: artworkUnchanged,
+            hasArtwork: hasArtwork
+        )
+        applyArtworkTransition(transition)
+    }
+
+    private func applyArtworkTransition(_ transition: NowPlayingArtworkTransition) {
+        switch transition {
+        case .set(let imgData):
+            if let image = NSImage(data: imgData) {
+                self.artworkImage = image
+                let extracted = Self.extractDominantTint(from: image)
+                self.artworkTint = extracted.primary
+                self.artworkSecondaryTint = extracted.secondary
+            } else {
+                clearArtwork()
             }
+        case .keepExisting:
+            break
+        case .clear:
+            clearArtwork()
         }
+    }
+
+    private func clearArtwork() {
+        self.artworkImage = nil
+        self.artworkTint = Self.defaultPrimaryTint
+        self.artworkSecondaryTint = Self.defaultSecondaryTint
     }
 
     private func sendHelperCommand(_ cmd: String) -> Bool {
@@ -613,12 +629,7 @@ public final class NowPlayingManager: ObservableObject {
                 self.title = trackTitle
                 self.artist = trackArtist
                 self.album = trackAlbum
-                if let data = artworkData, let img = NSImage(data: data) {
-                    self.artworkImage = img
-                    let tint = Self.extractDominantTint(from: img)
-                    self.artworkTint = tint.primary
-                    self.artworkSecondaryTint = tint.secondary
-                }
+                self.applyArtworkTransition(NowPlayingArtworkPolicy.resolveFallbackTransition(artworkData: artworkData))
                 self.hasMedia = !trackTitle.isEmpty
             }
         }

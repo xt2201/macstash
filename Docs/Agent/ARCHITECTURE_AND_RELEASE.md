@@ -59,11 +59,16 @@ swift build -c release
 # 3. Đóng gói Universal DMG + Sparkle ZIP ký Ed25519 + cập nhật appcast.xml
 ./Scripts/build_dmg.sh
 
-# 4. Commit, tag và push lên remote (chỉ chạy khi release tree sạch)
+# 4. Cập nhật /Applications/Stash.app và mở lại bản mới nhất trên máy cục bộ
+pkill -x Stash || true
+rm -rf /Applications/Stash.app && ditto .build/package_staging/Stash.app /Applications/Stash.app
+open /Applications/Stash.app
+
+# 5. Commit, tag và push lên remote (chỉ chạy khi release tree sạch)
 git tag v$(cat VERSION)
 git push origin main && git push origin v$(cat VERSION)
 
-# 5. Kiểm chứng GitHub Actions & Release
+# 6. Kiểm chứng GitHub Actions & Release
 gh run list --limit 1
 gh release view v$(cat VERSION)
 ```

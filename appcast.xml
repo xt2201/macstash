@@ -7,7 +7,7 @@
         <language>en</language>
         <item>
             <title>Version 2.18.0</title>
-            <pubDate>Thu, 12 Nov 2026 13:37:52 +0000</pubDate>
+            <pubDate>Fri, 13 Nov 2026 08:39:06 +0700</pubDate>
             <sparkle:version>2180</sparkle:version>
             <sparkle:shortVersionString>2.18.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
@@ -22,8 +22,8 @@
             ]]></description>
             <enclosure
                 url="https://github.com/xt2201/macstash/releases/download/v2.18.0/Stash-2.18.0.zip"
-                sparkle:edSignature="02CFC5c1D+L4pfIh3On1BSsdTGmjzJwjfXV5EJkc3LU/+C8plmqNN57N2r3x+hZOLopN98gBDadCWoYVzCONDQ=="
-                length="51581812"
+                sparkle:edSignature="qDSODkSe4bj3qMZORRqbTu9BU7yTTrU8We30bYapwa2SFAiLFsP261VjhUm/U3sRgKLViF1e6Dn46tgxPTn7CQ=="
+                length="53348370"
                 type="application/octet-stream" />
         </item>
         <item>
@@ -45,69 +45,6 @@
                 url="https://github.com/xt2201/macstash/releases/download/v2.17.0/Stash-2.17.0.zip"
                 sparkle:edSignature="GGYB+ImFZXJCSkwo73ybCBunnhyETrNVmoUkpp7FuQg0poBjO18A0qCqQX+ceAEQDhcX4lFmd29eDSzXyN7qBw=="
                 length="9868563"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 2.16.12</title>
-            <pubDate>Thu, 12 Nov 2026 15:55:13 +0700</pubDate>
-            <sparkle:version>21612</sparkle:version>
-            <sparkle:shortVersionString>2.16.12</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[
-<h2>What's New in Stash 2.16.12</h2>
-<ul>
-    <li>Industry standard 1-click in-place background auto-updates via Sparkle 2.</li>
-    <li>Ed25519 cryptographic update signing and verification.</li>
-    <li>Screen corner responsiveness and dynamic display tracking improvements.</li>
-    <li>Menu bar icon and native macOS visual polish.</li>
-</ul>
-            ]]></description>
-            <enclosure
-                url="https://github.com/xt2201/macstash/releases/download/v2.16.12/Stash-2.16.12.zip"
-                sparkle:edSignature="Lzpr+lppftwaEgRo3jH26dhty8GTHK9N4iNYPUJ6VC2OHWOo3jB4/sAZCowLky36ADpwj2D4RshmPh5NkbGjBQ=="
-                length="9707148"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 2.16.11</title>
-            <pubDate>Thu, 12 Nov 2026 08:20:24 +0000</pubDate>
-            <sparkle:version>21611</sparkle:version>
-            <sparkle:shortVersionString>2.16.11</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[
-<h2>What's New in Stash 2.16.11</h2>
-<ul>
-    <li>Industry standard 1-click in-place background auto-updates via Sparkle 2.</li>
-    <li>Ed25519 cryptographic update signing and verification.</li>
-    <li>Screen corner responsiveness and dynamic display tracking improvements.</li>
-    <li>Menu bar icon and native macOS visual polish.</li>
-</ul>
-            ]]></description>
-            <enclosure
-                url="https://github.com/xt2201/macstash/releases/download/v2.16.11/Stash-2.16.11.zip"
-                sparkle:edSignature="+xC5otI7+nYrRftJPYjR2U04dtenVFShX2YpjhMSpwGezhlNOQyWe5zE1tBmHdoOjCgumYVfQIQYnrStoW/EDw=="
-                length="8018022"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 2.16.10</title>
-            <pubDate>Thu, 12 Nov 2026 08:01:23 +0000</pubDate>
-            <sparkle:version>21610</sparkle:version>
-            <sparkle:shortVersionString>2.16.10</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[
-<h2>What's New in Stash 2.16.10</h2>
-<ul>
-    <li>Industry standard 1-click in-place background auto-updates via Sparkle 2.</li>
-    <li>Ed25519 cryptographic update signing and verification.</li>
-    <li>Screen corner responsiveness and dynamic display tracking improvements.</li>
-    <li>Menu bar icon and native macOS visual polish.</li>
-</ul>
-            ]]></description>
-            <enclosure
-                url="https://github.com/xt2201/macstash/releases/download/v2.16.10/Stash-2.16.10.zip"
-                sparkle:edSignature="gtBEJ3o/zoZBgthwlFm/cLlukq7sl691r6jGH4EtQe6zwOo64rekeiVlSUgMr0fmDor9x4T/GaJQEHfPkkklAg=="
-                length="8018094"
                 type="application/octet-stream" />
         </item>
         <item>

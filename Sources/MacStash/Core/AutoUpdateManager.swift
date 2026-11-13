@@ -85,6 +85,19 @@ public final class AutoUpdateManager: NSObject, ObservableObject, SPUUpdaterDele
         AppLogger.updates.info("Found valid update version \(item.displayVersionString, privacy: .public).")
     }
 
+    public func updater(_ updater: SPUUpdater, shouldProceedWithUpdate updateItem: SUAppcastItem, updateCheck: SPUUpdateCheck) throws {
+        let comparator = SUStandardVersionComparator.default
+        let comparison = comparator.compareVersion(updateItem.displayVersionString, toVersion: currentVersion)
+        if comparison != .orderedDescending {
+            AppLogger.updates.warning("Rejecting update candidate \(updateItem.displayVersionString, privacy: .public) because it is not newer than current \(self.currentVersion, privacy: .public).")
+            throw NSError(
+                domain: "SUSparkleErrorDomain",
+                code: 1001,
+                userInfo: [NSLocalizedDescriptionKey: "App is already running version \(self.currentVersion)."]
+            )
+        }
+    }
+
     public func updaterDidNotFindUpdate(_ updater: SPUUpdater) {
         updateAvailable = false
         AppLogger.updates.info("No updates found. Running latest version.")

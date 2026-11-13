@@ -1,12 +1,12 @@
 //
 //  StartMenuSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI
 
 struct StartMenuSettingsView: View {
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         Form {

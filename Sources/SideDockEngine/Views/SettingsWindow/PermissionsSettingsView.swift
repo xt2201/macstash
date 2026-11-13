@@ -1,6 +1,6 @@
 //
 //  PermissionsSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI

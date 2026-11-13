@@ -1,6 +1,6 @@
 //
 //  LaunchServicesPrivate.swift
-//  Docky
+//  MacStash
 //
 //  LaunchServices SPI, the same calls `lsappinfo` uses. Not for App Store submission without review.
 //

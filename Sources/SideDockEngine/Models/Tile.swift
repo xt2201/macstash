@@ -1,9 +1,10 @@
 //
 //  Tile.swift
-//  Docky
+//  MacStash
 //
 
 import Foundation
+import MacStashCore
 
 struct Tile: Identifiable, Equatable {
     let id: String
@@ -84,12 +85,9 @@ struct LaunchpadTile: Equatable {
     }
 }
 
-/// Tile that, when clicked, toggles Docky's Start menu overlay. Renders
-/// as a regular AppTileView pointed at Docky's own bundle id so the icon
-/// pipeline resolves to the running app icon (and the user can swap it
-/// out via the App Icons settings pane like the Launchpad tile).
+/// Tile that toggles an application launcher.
 struct StartMenuTile: Equatable {
-    nonisolated static let iconBundleIdentifier = "gt.quintero.Docky"
+    nonisolated static let iconBundleIdentifier = "com.macstash.app"
 
     let identifier: String
     let title: String
@@ -146,7 +144,7 @@ enum WidgetKind: Codable, Identifiable, Hashable {
         .stashBookmarks,
     ]
 
-    /// Round-trips through DockyPreferences / persistence as a single
+    /// Round-trips through SideDockPreferences / persistence as a single
     /// string. External widgets use an `external:<identifier>` prefix
     /// so existing values stay valid and unknown values can be
     /// detected by inspecting the prefix.
@@ -226,41 +224,41 @@ enum WidgetKind: Codable, Identifiable, Hashable {
     nonisolated var title: String {
         switch self {
         case .calendar:
-            String(localized: "Calendar")
+            LocalizationService.shared.localized("Calendar")
         case .calendarDate:
-            String(localized: "Date")
+            LocalizationService.shared.localized("Date")
         case .reminders:
-            String(localized: "Reminders")
+            LocalizationService.shared.localized("Reminders")
         case .batteries:
-            String(localized: "Batteries")
+            LocalizationService.shared.localized("Batteries")
         case .systemStatus:
-            String(localized: "System Status")
+            LocalizationService.shared.localized("System Status")
         case .nowPlaying:
-            String(localized: "Now Playing")
+            LocalizationService.shared.localized("Now Playing")
         case .weather:
-            String(localized: "Weather")
+            LocalizationService.shared.localized("Weather")
         case .search:
-            String(localized: "Search")
+            LocalizationService.shared.localized("Search")
         case .photoFrame:
-            String(localized: "Photo Frame")
+            LocalizationService.shared.localized("Photo Frame")
         case .stashClock:
-            String(localized: "Clock")
+            LocalizationService.shared.localized("Clock")
         case .stashPomodoro:
-            String(localized: "Pomodoro")
+            LocalizationService.shared.localized("Pomodoro")
         case .stashFileShelf:
-            String(localized: "File Shelf")
+            LocalizationService.shared.localized("File Shelf")
         case .stashClipboard:
-            String(localized: "Clipboard History")
+            LocalizationService.shared.localized("Clipboard History")
         case .stashQuickNote:
-            String(localized: "Quick Note")
+            LocalizationService.shared.localized("Quick Note")
         case .stashScreenshot:
-            String(localized: "Screenshot")
+            LocalizationService.shared.localized("Screenshot")
         case .stashColorPicker:
-            String(localized: "Color Picker")
+            LocalizationService.shared.localized("Color Picker")
         case .stashUnitConverter:
-            String(localized: "Unit Converter")
+            LocalizationService.shared.localized("Unit Converter")
         case .stashBookmarks:
-            String(localized: "Bookmarks")
+            LocalizationService.shared.localized("Bookmarks")
         case .external(let identifier):
             ExternalWidgetRegistry.shared.metadata(for: identifier)?.displayName ?? identifier
         }

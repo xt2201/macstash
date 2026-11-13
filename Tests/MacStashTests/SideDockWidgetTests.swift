@@ -19,7 +19,7 @@ public enum SideDockWidgetTests {
         let registry = WidgetRegistry.shared
         let descriptors = registry.allDescriptors()
 
-        TestAssertion.assertEqual(descriptors.count, 18, "WidgetRegistry registers all 18 widgets (10 P0 + 6 Phase 2 + 2 Docky-parity)")
+        TestAssertion.assertEqual(descriptors.count, 18, "WidgetRegistry registers all 18 widgets (10 P0 + 6 Phase 2 + 2 Pro widgets)")
 
         let expectedIDs = [
             "clock", "date", "weather", "nowPlaying", "calendar",

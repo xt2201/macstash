@@ -1,13 +1,13 @@
 //
 //  DockBadgeService.swift
-//  Docky
+//  MacStash
 //
 //  Reads notification badges (the red number on Mail, Messages, etc.) for
 //  running apps and republishes them keyed by bundle identifier so tiles can
 //  draw their own badge.
 //
 //  Source of truth: LaunchServices. The system Dock's accessibility tree has
-//  the badge too, but Docky restarts the Dock to hide it, and the new Dock
+//  the badge too, but MacStash restarts the Dock to hide it, and the new Dock
 //  shows no badge until the app sets it again.
 //
 

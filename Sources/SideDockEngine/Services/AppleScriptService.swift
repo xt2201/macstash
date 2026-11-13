@@ -1,6 +1,6 @@
 //
 //  AppleScriptService.swift
-//  Docky
+//  MacStash
 //
 //  Finder-backed actions that are awkward or unavailable via NSWorkspace
 //  alone. Scripts are executed directly from source at runtime.
@@ -10,7 +10,7 @@
 //  TCC consent prompt is answered (or the event times out after ~2 minutes).
 //  On the main thread that freezes the entire dock — observed on the first
 //  ever Trash-tile click, where "open trash" stalled behind the pending
-//  "Docky wants to control Finder" prompt. All executions go through one
+//  "MacStash wants to control Finder" prompt. All executions go through one
 //  serial queue: each call builds a fresh NSAppleScript instance, and the
 //  queue keeps executions from overlapping since NSAppleScript makes no
 //  thread-safety guarantees.
@@ -18,11 +18,12 @@
 
 import AppKit
 import Foundation
+import MacStashCore
 
 final class AppleScriptService {
     static let shared = AppleScriptService()
 
-    private let scriptQueue = DispatchQueue(label: "gt.quintero.Docky.applescript", qos: .userInitiated)
+    private let scriptQueue = DispatchQueue(label: "com.macstash.sidedock.applescript", qos: .userInitiated)
     /// Marks `scriptQueue` so a synchronous call made from it runs inline
     /// instead of deadlocking.
     private let scriptQueueKey = DispatchSpecificKey<Void>()
@@ -201,14 +202,14 @@ final class AppleScriptService {
             PermissionsService.shared.updateFinderAutomation(status: .denied)
             presentAlert(
                 title: "Finder automation wasn’t allowed",
-                body: "Allow Docky to control Finder in Privacy & Security > Automation, or use the Automation (Finder) row in Docky Settings to request access again."
+                body: "Allow MacStash to control Finder in Privacy & Security > Automation, or use the Automation (Finder) row in Second Dock Settings to request access again."
             )
         case .accessibilityDenied:
             PermissionsService.shared.presentPermissionAlert(for: .accessibility, actionTitle: "Finder action")
         case .compilationFailed:
             presentAlert(
                 title: "Finder action failed",
-                body: "Docky couldn't prepare the AppleScript needed for this Finder action."
+                body: "MacStash couldn't prepare the AppleScript needed for this Finder action."
             )
         case .executionFailed(let message):
             presentAlert(
@@ -262,7 +263,7 @@ final class AppleScriptService {
         case .compilationFailed:
             presentAlert(
                 title: "Script action failed",
-                body: "Docky couldn't prepare the AppleScript needed for \(actionTitle.lowercased())."
+                body: "MacStash couldn't prepare the AppleScript needed for \(actionTitle.lowercased())."
             )
         case .executionFailed(let message):
             presentAlert(
@@ -313,24 +314,24 @@ final class AppleScriptService {
             return
         }
         let alert = NSAlert()
-        alert.messageText = String(localized: "Automation wasn’t allowed")
+        alert.messageText = LocalizationService.shared.localized("Automation wasn’t allowed")
         let appName = displayName(for: targetApp)
         if includesSystemEvents {
             alert.informativeText = String(
-                format: String(localized: "Allow Docky to control System Events and %1$@ in Privacy & Security > Automation, then try %2$@ again."),
+                format: LocalizationService.shared.localized("Allow MacStash to control System Events and %1$@ in Privacy & Security > Automation, then try %2$@ again."),
                 appName,
                 actionTitle.lowercased()
             )
         } else {
             alert.informativeText = String(
-                format: String(localized: "Allow Docky to control %1$@ in Privacy & Security > Automation, then try %2$@ again."),
+                format: LocalizationService.shared.localized("Allow MacStash to control %1$@ in Privacy & Security > Automation, then try %2$@ again."),
                 appName,
                 actionTitle.lowercased()
             )
         }
         alert.alertStyle = .warning
-        alert.addButton(withTitle: String(localized: "Open System Settings"))
-        alert.addButton(withTitle: String(localized: "Cancel"))
+        alert.addButton(withTitle: LocalizationService.shared.localized("Open System Settings"))
+        alert.addButton(withTitle: LocalizationService.shared.localized("Cancel"))
         if alert.runModal() == .alertFirstButtonReturn {
             PermissionsService.shared.openSystemSettings(for: .finderAutomation)
         }
@@ -342,14 +343,14 @@ final class AppleScriptService {
             PermissionsService.shared.updateSystemEventsAutomation(status: .denied)
             presentAlert(
                 title: "System Events automation wasn’t allowed",
-                body: "Allow Docky to control System Events in Privacy & Security > Automation, or use the Automation (System Events) row in Docky Settings to request access again."
+                body: "Allow MacStash to control System Events in Privacy & Security > Automation, or use the Automation (System Events) row in Second Dock Settings to request access again."
             )
         case .accessibilityDenied:
             PermissionsService.shared.presentPermissionAlert(for: .accessibility, actionTitle: "Request System Events Access")
         case .compilationFailed:
             presentAlert(
                 title: "System Events action failed",
-                body: "Docky couldn't prepare the AppleScript needed to request System Events automation."
+                body: "MacStash couldn't prepare the AppleScript needed to request System Events automation."
             )
         case .executionFailed(let message):
             presentAlert(

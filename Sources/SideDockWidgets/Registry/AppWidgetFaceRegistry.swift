@@ -1,7 +1,7 @@
 import SwiftUI
 import SideDockCore
 
-/// Maps supported macOS applications to live Dock widget faces (Docky-style app icon replacement).
+/// Maps supported macOS applications to live Dock widget faces (dynamic app icon replacement).
 public enum AppWidgetFaceRegistry {
     public static func defaultWidgetKind(forBundleID bundleID: String) -> String? {
         switch bundleID {

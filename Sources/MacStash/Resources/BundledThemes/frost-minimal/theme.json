@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "frost-minimal",
+  "name": "Frost Minimal",
+  "author": "MacStash",
+  "version": "1.0.0",
+  "description": "Ultra-clean translucent ice glass with razor-thin hairline border for a distraction-free desktop.",
+  "appearance": {
+    "disablesGlassLook": false,
+    "tile": {
+      "clipShape": "rounded",
+      "spacing": 8,
+      "verticalPadding": 4
+    },
+    "window": {
+      "clipShape": "rounded",
+      "cornerRadius": 20,
+      "tintOpacity": 0.05,
+      "borderWidth": 0.75,
+      "borderColor": { "r": 1, "g": 1, "b": 1, "opacity": 0.25 }
+    },
+    "indicators": {
+      "shape": "dot",
+      "scale": 0.85,
+      "offset": -4
+    }
+  }
+}

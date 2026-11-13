@@ -1,27 +1,27 @@
 //
 //  ThemeManager.swift
-//  Docky
+//  MacStash
 //
-//  Owns installed `.dockytheme` bundles and the active selection.
+//  Owns installed `.stashtheme` bundles and the active selection.
 //  Themes are installed bundles on disk under Application Support;
 //  the user activates one at a time (WordPress-style install/activate
 //  — installed themes persist regardless of which is active so the
 //  user can cycle through them).
 //
-//  Activation never writes appearance values into `DockyPreferences`.
+//  Activation never writes appearance values into `SideDockPreferences`.
 //  Instead, the manager exposes `activeManifest` / `activeBundleURL`
-//  and the `effective<X>` accessors in `DockyPreferences` fall through
+//  and the `effective<X>` accessors in `SideDockPreferences` fall through
 //  to those values when the user hasn't set an explicit override.
 //  That keeps "try a theme, revert, restore my customizations" trivial
 //  — your overrides are never overwritten.
 //
 //  Install location:
 //
-//      ~/Library/Application Support/Docky/Themes/<theme-id>/
+//      ~/Library/Application Support/MacStash/SideDock/Themes/<theme-id>/
 //          theme.json
 //          assets/...
 //
-//  Importing a `.dockytheme` zip (UI flow) belongs to a later commit.
+//  Importing a `.stashtheme` zip (UI flow) belongs to a later commit.
 //  For now installed themes are picked up by scanning the directory —
 //  drop an unzipped bundle in there to test.
 //
@@ -48,7 +48,7 @@ import Observation
     private let fileManager = FileManager.default
 
     private enum Keys {
-        static let activeThemeID = "docky.activeThemeID"
+        static let activeThemeID = "com.macstash.sidedock.activeThemeID"
     }
 
     private init() {
@@ -59,7 +59,7 @@ import Observation
     }
 
     /// Read-only directory inside the app bundle holding themes
-    /// shipped with Docky. Populated by the "Copy Bundled Themes"
+    /// shipped with MacStash. Populated by the "Copy Bundled Themes"
     /// build phase from `BundledThemes/` at the repo root. Returns
     /// `nil` when the directory doesn't exist (e.g. running from a
     /// debug build without bundled themes staged).
@@ -215,7 +215,7 @@ import Observation
         refreshInstalled()
     }
 
-    /// Imports a `.dockytheme` (zip) bundle from disk. The zip is
+    /// Imports a `.stashtheme` (zip) bundle from disk. The zip is
     /// extracted to a temp directory via `/usr/bin/ditto -xk`, the
     /// manifest is parsed and validated, then the bundle is moved
     /// atomically into `Themes/<manifest.id>/`.
@@ -229,7 +229,7 @@ import Observation
     @discardableResult
     func importTheme(from zipURL: URL) throws -> ThemeManifest {
         let tempRoot = fileManager.temporaryDirectory
-            .appending(path: "docky-theme-import-\(UUID().uuidString)", directoryHint: .isDirectory)
+            .appending(path: "macstash-theme-import-\(UUID().uuidString)", directoryHint: .isDirectory)
         try fileManager.createDirectory(at: tempRoot, withIntermediateDirectories: true)
         defer { try? fileManager.removeItem(at: tempRoot) }
 
@@ -363,7 +363,7 @@ import Observation
     // MARK: - Export
 
     /// Exports the user's current effective appearance to a
-    /// `.dockytheme` zip at `destinationURL`. The on-disk archive
+    /// `.stashtheme` zip at `destinationURL`. The on-disk archive
     /// contains a `theme.json` manifest plus every referenced image
     /// asset, with manifest paths rewritten to relative `assets/...`
     /// references so the bundle is portable.
@@ -381,7 +381,7 @@ import Observation
         }
 
         let staging = fileManager.temporaryDirectory
-            .appending(path: "docky-theme-export-\(UUID().uuidString)", directoryHint: .isDirectory)
+            .appending(path: "macstash-theme-export-\(UUID().uuidString)", directoryHint: .isDirectory)
         try fileManager.createDirectory(at: staging, withIntermediateDirectories: true)
         defer { try? fileManager.removeItem(at: staging) }
 
@@ -401,7 +401,7 @@ import Observation
             options: .atomic
         )
 
-        let stagedZip = staging.appending(path: "\(id).dockytheme", directoryHint: .notDirectory)
+        let stagedZip = staging.appending(path: "\(id).stashtheme", directoryHint: .notDirectory)
         try Self.createZip(of: bundleDir, at: stagedZip)
 
         if fileManager.fileExists(atPath: destinationURL.path) {
@@ -416,7 +416,7 @@ import Observation
         name: String,
         copier: AssetCopier
     ) -> ThemeManifest {
-        let prefs = DockyPreferences.shared
+        let prefs = SideDockPreferences.shared
 
         let backgroundAsset = copier.copyIfPresent(prefs.effectiveWindowBackgroundImageURL)
         let indicatorAsset = copier.copyIfPresent(prefs.effectiveActiveIndicatorImageURL)
@@ -497,7 +497,7 @@ import Observation
     /// `<bundle-id>.<ext>`. Convention-named, so the recipient picks
     /// them up automatically when the exported theme is activated.
     private static func copyPerAppIcons(into copier: AssetCopier) {
-        let prefs = DockyPreferences.shared
+        let prefs = SideDockPreferences.shared
         var bundleIdentifiers = Set<String>()
         bundleIdentifiers.formUnion(prefs.appIconOverrides.map(\.bundleIdentifier))
         bundleIdentifiers.formUnion(ThemeManager.shared.activeAppIconBundleIDs())
@@ -547,7 +547,7 @@ import Observation
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? URL(fileURLWithPath: NSHomeDirectory()).appending(path: "Library/Application Support", directoryHint: .isDirectory)
         return base
-            .appending(path: "Docky", directoryHint: .isDirectory)
+            .appending(path: "MacStash", directoryHint: .isDirectory)
             .appending(path: "Themes", directoryHint: .isDirectory)
     }
 

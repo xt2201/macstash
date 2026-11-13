@@ -1,6 +1,6 @@
 //
 //  WindowRegistry.swift
-//  Docky
+//  MacStash
 //
 //  Single source of truth for "what windows exist right now" across all
 //  running apps. Subscribes per-app to AX notifications and maintains a
@@ -107,7 +107,7 @@ struct AppWindow: Identifiable, Hashable {
 
 final class WindowRegistry: ObservableObject {
     static let shared = WindowRegistry()
-    private static let logger = Logger(subsystem: "gt.quintero.Docky", category: "WindowRegistry")
+    private static let logger = Logger(subsystem: "com.macstash.app", category: "WindowRegistry")
 
     /// Observed-order window list across all tracked apps. Order is stable:
     /// new windows are appended; updates land in place; removals leave a
@@ -575,7 +575,7 @@ final class WindowRegistry: ObservableObject {
         guard app.activationPolicy == .regular else { return false }
         if let bundleId = app.bundleIdentifier {
             if filteredBundleIdentifiers.contains(bundleId) { return false }
-            // Docky itself is invisible to every Docky-owned surface
+            // MacStash itself is invisible to every MacStash-owned surface
             // (dock tiles, window switcher). Excluded by bundle ID so
             // running the app as a debug helper from Xcode is filtered
             // out too.

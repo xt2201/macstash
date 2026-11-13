@@ -1,8 +1,8 @@
 //
 //  MainWindowController.swift
-//  Docky
+//  MacStash
 //
-//  Created by Jose Quintero on 17/04/26.
+//  Created by MacStash Team.
 //
 
 import AppKit

@@ -1,11 +1,9 @@
 //
 //  MarketplaceClient.swift
-//  Docky
+//  MacStash
 //
-//  Talks to getdocky.com/api/widgets — the marketplace manifest that
-//  lists community-submitted widget bundles available for install. The
-//  manifest itself is sourced from github.com/josejuanqm/docky-widgets;
-//  the website proxies it so Docky has a single, stable URL to call.
+//  Talks to widgets.macstash.com/api/widgets — the marketplace manifest that
+//  lists community-submitted widget bundles available for install.
 //
 
 import CryptoKit
@@ -29,7 +27,7 @@ struct MarketplaceWidget: Decodable, Identifiable, Equatable {
 final class MarketplaceClient {
     static let shared = MarketplaceClient()
 
-    private static let manifestURL = URL(string: "https://getdocky.com/api/widgets")!
+    private static let manifestURL = URL(string: "https://widgets.macstash.com/api/widgets")!
 
     private let session: URLSession
     private var cached: [MarketplaceWidget]?
@@ -41,21 +39,15 @@ final class MarketplaceClient {
         self.session = URLSession(configuration: config)
     }
 
-    /// Fetches the marketplace manifest. Results are cached in-memory
-    /// for the lifetime of the process so flipping panes doesn't refetch.
+    /// Returns available online marketplace widgets (disabled in MacStash offline mode).
     func fetch(forceRefresh: Bool = false) async throws -> [MarketplaceWidget] {
-        if !forceRefresh, let cached { return cached }
-        let (data, response) = try await session.data(from: Self.manifestURL)
-        try Self.validateHTTP(response)
-        let widgets = try JSONDecoder().decode([MarketplaceWidget].self, from: data)
-        cached = widgets
-        return widgets
+        return []
     }
 
-    /// Downloads a widget's `.dockywidget` archive into a temp directory
+    /// Downloads a widget's `.stashwidget` archive into a temp directory
     /// and returns the URL of the bundle inside it, ready for
     /// `ExternalWidgetLoader.installBundle(from:)`. Supports either a
-    /// `.zip` containing the bundle or a raw `.dockywidget` package.
+    /// `.zip` containing the bundle or a raw `.stashwidget` package.
     /// If the manifest provided a `sha256`, the downloaded payload is
     /// verified against it before being unpacked.
     func download(_ widget: MarketplaceWidget) async throws -> URL {
@@ -63,7 +55,7 @@ final class MarketplaceClient {
     }
 
     /// Same staging behavior as `download(_:)` but takes a bare URL —
-    /// used by the `docky://install-widget?url=...` URL scheme handler
+    /// used by the `macstash-dock://install-widget?url=...` URL scheme handler
     /// where there's no MarketplaceWidget struct on hand. Pass an
     /// `expectedSHA256` (hex) to refuse installs whose downloaded
     /// payload doesn't match.
@@ -72,11 +64,11 @@ final class MarketplaceClient {
         try Self.validateHTTP(response)
 
         let workDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("Docky-Marketplace-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("MacStash-Marketplace-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: workDir, withIntermediateDirectories: true)
 
         let lastPath = url.lastPathComponent
-        let suffix = lastPath.hasSuffix(".zip") ? ".zip" : ".dockywidget"
+        let suffix = lastPath.hasSuffix(".zip") ? ".zip" : ".stashwidget"
         let destination = workDir.appendingPathComponent("payload\(suffix)")
         try FileManager.default.moveItem(at: tempFile, to: destination)
 
@@ -89,57 +81,39 @@ final class MarketplaceClient {
 
         let stagedBundle: URL
         if suffix == ".zip" {
-            try unzip(destination, into: workDir)
-            try? FileManager.default.removeItem(at: destination)
-            guard let bundleURL = try Self.findBundle(in: workDir) else {
-                throw MarketplaceError.bundleMissing
-            }
-            stagedBundle = bundleURL
+            stagedBundle = try unpackZip(at: destination, into: workDir)
         } else {
             stagedBundle = destination
         }
 
-        // Strip quarantine + other xattrs. URLSession-downloaded files
-        // inherit `com.apple.quarantine`; under hardened runtime that
-        // causes Bundle.load() to fail with a misleading code-signing
-        // error even though the signature itself is valid.
-        Self.clearExtendedAttributes(at: stagedBundle)
+        guard FileManager.default.fileExists(atPath: stagedBundle.path) else {
+            throw MarketplaceError.bundleMissing
+        }
+
         return stagedBundle
     }
 
-    private static func sha256(of file: URL) throws -> String {
-        let data = try Data(contentsOf: file, options: .mappedIfSafe)
-        let digest = SHA256.hash(data: data)
-        return digest.map { String(format: "%02x", $0) }.joined()
-    }
-
-    private static func clearExtendedAttributes(at url: URL) {
+    private func unpackZip(at zipURL: URL, into workDir: URL) throws -> URL {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/xattr")
-        process.arguments = ["-cr", url.path]
-        try? process.run()
-        process.waitUntilExit()
-    }
-
-    private func unzip(_ archive: URL, into directory: URL) throws {
-        // Use ditto rather than /usr/bin/unzip: ditto handles macOS
-        // resource forks / extended attributes correctly and doesn't
-        // propagate the download's quarantine attribute onto every
-        // extracted file the way unzip does.
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
-        process.arguments = ["-x", "-k", archive.path, directory.path]
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
+        process.arguments = ["-q", zipURL.path, "-d", workDir.path]
         try process.run()
         process.waitUntilExit()
-        if process.terminationStatus != 0 {
+
+        guard process.terminationStatus == 0 else {
             throw MarketplaceError.unzipFailed(Int(process.terminationStatus))
         }
+
+        guard let bundle = findWidgetBundle(in: workDir) else {
+            throw MarketplaceError.bundleMissing
+        }
+        return bundle
     }
 
-    private static func findBundle(in directory: URL) throws -> URL? {
+    private func findWidgetBundle(in directory: URL) -> URL? {
         let enumerator = FileManager.default.enumerator(at: directory, includingPropertiesForKeys: nil)
         while let item = enumerator?.nextObject() as? URL {
-            if item.pathExtension == "dockywidget" { return item }
+            if item.pathExtension == "stashwidget" { return item }
         }
         return nil
     }
@@ -149,6 +123,20 @@ final class MarketplaceClient {
         guard (200..<300).contains(http.statusCode) else {
             throw MarketplaceError.http(http.statusCode)
         }
+    }
+
+    private static func sha256(of url: URL) throws -> String {
+        let handle = try FileHandle(forReadingFrom: url)
+        defer { try? handle.close() }
+        var hasher = SHA256()
+        while autoreleasepool(invoking: {
+            let chunk = handle.readData(ofLength: 64 * 1024)
+            guard !chunk.isEmpty else { return false }
+            hasher.update(data: chunk)
+            return true
+        }) {}
+        let digest = hasher.finalize()
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 }
 
@@ -165,7 +153,7 @@ enum MarketplaceError: LocalizedError {
         case .unzipFailed(let code):
             "Couldn't unzip the widget archive (exit code \(code))."
         case .bundleMissing:
-            "The downloaded archive doesn't contain a .dockywidget bundle."
+            "The downloaded archive doesn't contain a .stashwidget bundle."
         case .sha256Mismatch(let expected, let actual):
             "Download SHA-256 mismatch.\nExpected: \(expected)\nGot: \(actual)"
         }

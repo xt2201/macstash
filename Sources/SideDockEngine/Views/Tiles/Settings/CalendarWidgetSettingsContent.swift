@@ -1,6 +1,6 @@
 //
 //  CalendarWidgetSettingsContent.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

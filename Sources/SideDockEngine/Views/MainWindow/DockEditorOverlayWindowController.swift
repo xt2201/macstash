@@ -1,6 +1,7 @@
+import MacStashCore
 //
 //  DockEditorOverlayWindowController.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -17,11 +18,11 @@ private enum DockEditorGalleryCategory: String, CaseIterable, Identifiable {
     nonisolated var title: String {
         switch self {
         case .all:
-            String(localized: "All")
+            L("All")
         case .widgets:
-            String(localized: "Widgets")
+            L("Widgets")
         case .utility:
-            String(localized: "Utility")
+            L("Utility")
         }
     }
 }
@@ -174,8 +175,8 @@ private struct DockEditorGalleryItem: Equatable, Identifiable {
 
     nonisolated private static func makeSmartStackItem() -> Self {
         let paletteItem = DockEditPaletteItem.smartStack
-        let localizedTitle = String(localized: "Smart Stack")
-        let localizedSubtitle = String(localized: "Stacks available widgets into a single tile you can scroll through.")
+        let localizedTitle = L("Smart Stack")
+        let localizedSubtitle = L("Stacks available widgets into a single tile you can scroll through.")
         return Self(
             paletteItem: paletteItem,
             title: localizedTitle,
@@ -214,81 +215,81 @@ private struct DockEditorGalleryItem: Equatable, Identifiable {
     nonisolated private static func title(for item: DockEditPaletteItem) -> String {
         switch item {
         case .launchpad:
-            String(localized: "Launchpad")
+            L("Launchpad")
         case .startMenu:
-            String(localized: "Start Menu")
+            L("Start Menu")
         case .spacer:
-            String(localized: "Spacer")
+            L("Spacer")
         case .flexibleSpacer:
-            String(localized: "Flexible Spacer")
+            L("Flexible Spacer")
         case .divider:
-            String(localized: "Divider")
+            L("Divider")
         case .widget(_, let kind):
             kind.title
         case .smartStack:
-            String(localized: "Smart Stack")
+            L("Smart Stack")
         }
     }
 
     nonisolated private static func subtitle(for item: DockEditPaletteItem) -> String {
         switch item {
         case .launchpad:
-            String(localized: "Shows a fullscreen launcher with all installed apps on a blurred backdrop.")
+            L("Shows a fullscreen launcher with all installed apps on a blurred backdrop.")
         case .startMenu:
-            String(localized: "Opens a compact menu with recent files, all apps, and power options pinned next to the dock.")
+            L("Opens a compact menu with recent files, all apps, and power options pinned next to the dock.")
         case .spacer:
-            String(localized: "Adds breathing room between pinned tiles or folders.")
+            L("Adds breathing room between pinned tiles or folders.")
         case .flexibleSpacer:
-            String(localized: "Stretches to absorb leftover space when the dock spans the full screen axis.")
+            L("Stretches to absorb leftover space when the dock spans the full screen axis.")
         case .divider:
-            String(localized: "Adds a visual separator to break up sections in the dock.")
+            L("Adds a visual separator to break up sections in the dock.")
         case .widget(_, let kind):
             subtitle(for: kind)
         case .smartStack:
-            String(localized: "Stacks available widgets into a single tile you can scroll through.")
+            L("Stacks available widgets into a single tile you can scroll through.")
         }
     }
 
     nonisolated private static func subtitle(for kind: WidgetKind) -> String {
         switch kind {
         case .calendar:
-            String(localized: "Shows the current date and month at a glance.")
+            L("Shows the current date and month at a glance.")
         case .calendarDate:
-            String(localized: "Shows the weekday and date number at a glance.")
+            L("Shows the weekday and date number at a glance.")
         case .reminders:
-            String(localized: "Shows your open tasks and what needs attention next.")
+            L("Shows your open tasks and what needs attention next.")
         case .batteries:
-            String(localized: "Shows Mac and accessory battery levels at a glance.")
+            L("Shows Mac and accessory battery levels at a glance.")
         case .systemStatus:
-            String(localized: "Shows CPU, memory, and network activity at a glance.")
+            L("Shows CPU, memory, and network activity at a glance.")
         case .nowPlaying:
-            String(localized: "Shows the currently playing media with quick playback control.")
+            L("Shows the currently playing media with quick playback control.")
         case .weather:
-            String(localized: "Shows current weather for your location.")
+            L("Shows current weather for your location.")
         case .search:
-            String(localized: "Search the web, click to open Google in your default browser.")
+            L("Search the web, click to open Google in your default browser.")
         case .photoFrame:
-            String(localized: "Shows your own photos, cycling through them as a slideshow.")
+            L("Shows your own photos, cycling through them as a slideshow.")
         case .stashClock:
-            String(localized: "Digital, analog, or flip clock with multi-timezone support.")
+            L("Digital, analog, or flip clock with multi-timezone support.")
         case .stashPomodoro:
-            String(localized: "Focus sprints and break cycles right in the dock.")
+            L("Focus sprints and break cycles right in the dock.")
         case .stashFileShelf:
-            String(localized: "Drop temporary files onto the dock to hold and reuse across apps.")
+            L("Drop temporary files onto the dock to hold and reuse across apps.")
         case .stashClipboard:
-            String(localized: "Local clipboard history monitor with quick click-to-copy.")
+            L("Local clipboard history monitor with quick click-to-copy.")
         case .stashQuickNote:
-            String(localized: "Lightweight scratchpad for instant notes on your dock.")
+            L("Lightweight scratchpad for instant notes on your dock.")
         case .stashScreenshot:
-            String(localized: "One-click interactive capture, fullscreen, and recording.")
+            L("One-click interactive capture, fullscreen, and recording.")
         case .stashColorPicker:
-            String(localized: "Sample any pixel color on screen and copy its HEX code.")
+            L("Sample any pixel color on screen and copy its HEX code.")
         case .stashUnitConverter:
-            String(localized: "Offline converter for length, temperature, weight, and currency.")
+            L("Offline converter for length, temperature, weight, and currency.")
         case .stashBookmarks:
-            String(localized: "Quick links to your frequent websites and documentation.")
+            L("Quick links to your frequent websites and documentation.")
         case .external:
-            String(localized: "Community widget loaded from an external bundle.")
+            L("Community widget loaded from an external bundle.")
         }
     }
 
@@ -364,7 +365,7 @@ final class DockEditorOverlayWindowController: NSWindowController {
     private weak var mainWindow: MainWindow?
     private var cancellables: Set<AnyCancellable> = []
     private let overlayState = DockEditorOverlayState()
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
 
     init(mainWindow: MainWindow) {
         self.mainWindow = mainWindow
@@ -412,7 +413,7 @@ final class DockEditorOverlayWindowController: NSWindowController {
 
     private func observeSpaceBehavior() {
         observeChanges { [weak self] in
-            let behavior = DockyPreferences.shared.windowSpaceBehavior
+            let behavior = SideDockPreferences.shared.windowSpaceBehavior
             self?.window?.collectionBehavior = behavior.collectionBehavior(includesFullScreenAuxiliary: false)
         }
         .store(in: &cancellables)
@@ -556,7 +557,7 @@ private struct DockEditorOverlayView: View {
     @ObservedObject var state: DockEditorOverlayState
     @ObservedObject private var editMode = DockEditModeService.shared
     private let dockSettings = DockSettingsService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         GeometryReader { proxy in
@@ -886,7 +887,7 @@ private struct DockEditorItemPreview: View {
     let selectedSpan: TileSpan?
     let scale: DockEditorPreviewScale
 
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         let previewSize = size
@@ -1034,4 +1035,10 @@ private struct DockEditorUtilityPreview: View {
                     .strokeBorder(.primary.opacity(0.08), lineWidth: 1)
             }
     }
+}
+
+
+@inline(__always)
+private func L(_ key: String) -> String {
+    LocalizationService.shared.localized(key)
 }

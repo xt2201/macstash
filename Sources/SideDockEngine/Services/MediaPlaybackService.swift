@@ -1,6 +1,6 @@
 //
 //  MediaPlaybackService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -384,7 +384,7 @@ final class MediaPlaybackService: ObservableObject {
     nonisolated private static func fetchDecodable<T: Decodable>(from url: URL?) async -> T? {
         guard let url else { return nil }
         var request = URLRequest(url: url)
-        request.setValue("Docky/1.0 (lyrics fetcher)", forHTTPHeaderField: "User-Agent")
+        request.setValue("MacStash/1.0 (lyrics fetcher)", forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 8
 
         guard let (data, response) = try? await URLSession.shared.data(for: request),
@@ -796,7 +796,7 @@ private final class MediaRemoteBridge {
 }
 
 private final class MediaRemoteHelperProcess {
-    private static let logger = Logger(subsystem: "gt.quintero.Docky", category: "MediaRemoteHelper")
+    private static let logger = Logger(subsystem: "com.macstash.app", category: "MediaRemoteHelper")
 
     var onSnapshot: ((MediaRemoteSnapshot?) -> Void)?
 

@@ -1,12 +1,9 @@
 //
 //  WidgetsSettingsView.swift
-//  Docky
+//  MacStash
 //
-//  Widget Store pane: browse the marketplace (community-submitted
-//  widgets fetched from getdocky.com/api/widgets), install
-//  `*.dockywidget` bundles from disk, and manage what's already
-//  installed. Also owns the toggle that lets `docky://install-widget`
-//  links install a widget (off by default).
+//  Widget pane: manage installed widgets and install `*.stashwidget`
+//  bundles from disk.
 //
 
 import AppKit
@@ -14,7 +11,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct WidgetsSettingsView: View {
-    @Bindable private var prefs = DockyPreferences.shared
+    @Bindable private var prefs = SideDockPreferences.shared
     @State private var entries: [WidgetEntry] = []
     @State private var marketplaceState: MarketplaceState = .loading
     @State private var hasPendingChanges = false
@@ -45,7 +42,7 @@ struct WidgetsSettingsView: View {
                 bundleURLPendingDeletion = nil
             }
         } message: { url in
-            Text("\(url.lastPathComponent) will be removed from disk. It will keep running until you restart Docky.")
+            Text("\(url.lastPathComponent) will be removed from disk. It will keep running until you restart MacStash.")
         }
         .alert(
             "Could not install widget",
@@ -67,14 +64,14 @@ struct WidgetsSettingsView: View {
                         .foregroundStyle(.tint)
                         .font(.title3)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Restart Docky to apply changes")
+                        Text("Restart MacStash to apply changes")
                             .font(.callout.weight(.medium))
                         Text("Widget bundles are loaded once per launch. New installs and removals take effect after a restart.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 12)
-                    Button("Quit Docky") {
+                    Button("Quit MacStash") {
                         NSApp.terminate(nil)
                     }
                 }
@@ -83,7 +80,7 @@ struct WidgetsSettingsView: View {
 
         Section("Security") {
             Toggle("Allow installing widgets from links", isOn: $prefs.allowsWidgetLinkInstalls)
-            Text("Links like `docky://install-widget` let a web page install a widget. Off by default. Widgets are native plugins that run inside Docky with the same access Docky has — Accessibility, Automation, files, and more — and Docky doesn't sandbox or verify them, so only install widgets you trust. Installing a `.dockywidget` file yourself always works.")
+            Text("Links like `macstash-dock://install-widget` let a web page install a widget. Off by default. Widgets are native plugins that run inside MacStash with the same access MacStash has — Accessibility, Automation, files, and more — and MacStash doesn't sandbox or verify them, so only install widgets you trust. Installing a `.stashwidget` file yourself always works.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -97,7 +94,7 @@ struct WidgetsSettingsView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("No widgets installed yet.")
                         .font(.callout)
-                    Text("Pick one from the Marketplace above or install a `.dockywidget` file manually.")
+                    Text("Pick one from the Marketplace above or install a `.stashwidget` file manually.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -398,7 +395,11 @@ struct WidgetsSettingsView: View {
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
         panel.treatsFilePackagesAsDirectories = false
-        panel.allowedContentTypes = [UTType(exportedAs: "com.docky.widget")]
+        let types = [
+            UTType(exportedAs: "com.macstash.sidedock.widget"),
+            UTType(filenameExtension: "stashwidget")
+        ].compactMap { $0 }
+        panel.allowedContentTypes = types.isEmpty ? [.bundle] : types
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {

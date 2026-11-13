@@ -1,6 +1,6 @@
 //
 //  WidgetCatalog.swift
-//  Docky
+//  MacStash
 //
 
 import Foundation
@@ -8,12 +8,12 @@ import Foundation
 enum WidgetOwnerBundleIdentifiers {
     static let calendar = "com.apple.iCal"
     static let reminders = "com.apple.reminders"
-    static let batteries = "gt.quintero.Docky.batteries"
-    static let systemStatus = "gt.quintero.Docky.system-status"
-    static let weather = "gt.quintero.Docky.weather"
-    static let genericNowPlaying = "gt.quintero.Docky.now-playing"
-    static let search = "gt.quintero.Docky.search"
-    static let photoFrame = "gt.quintero.Docky.photo-frame"
+    static let batteries = "com.macstash.widget.batteries"
+    static let systemStatus = "com.macstash.widget.system-status"
+    static let weather = "com.macstash.widget.weather"
+    static let genericNowPlaying = "com.macstash.widget.now-playing"
+    static let search = "com.macstash.widget.search"
+    static let photoFrame = "com.macstash.widget.photo-frame"
     static let stashClock = "com.macstash.widget.clock"
     static let stashPomodoro = "com.macstash.widget.pomodoro"
     static let stashFileShelf = "com.macstash.widget.file-shelf"

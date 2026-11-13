@@ -1,6 +1,6 @@
 //
 //  FolderAccessService.swift
-//  Docky
+//  MacStash
 //
 //  Reads folder contents for preview tiles. Relies on the .userFolders
 //  permission granted via Full Disk Access. Silent no-op when access isn't

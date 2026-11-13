@@ -1,6 +1,6 @@
 //
 //  SmartOrganizeProgressChipWindowController.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -13,7 +13,7 @@ final class SmartOrganizeProgressChipWindowController: NSWindowController {
     private var isInterruptingMainWindow = false
     private let animationDuration: TimeInterval = 0.16
     private let chipGap: CGFloat = 10
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
     private let dockSettings = DockSettingsService.shared
     private let hostingController = NSHostingController(rootView: SmartOrganizeProgressChipView())
 
@@ -78,7 +78,7 @@ final class SmartOrganizeProgressChipWindowController: NSWindowController {
 
     private func observeSpaceBehavior() {
         observeChanges { [weak self] in
-            let behavior = DockyPreferences.shared.windowSpaceBehavior
+            let behavior = SideDockPreferences.shared.windowSpaceBehavior
             self?.window?.collectionBehavior = behavior.collectionBehavior(includesFullScreenAuxiliary: true)
         }
         .store(in: &cancellables)

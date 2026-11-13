@@ -1,6 +1,6 @@
 //
 //  CalendarService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -55,7 +55,7 @@ final class CalendarService: ObservableObject {
             .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
 
-    /// Docky's tri-state view of calendar access. `.writeOnly` counts as
+    /// MacStash's tri-state view of calendar access. `.writeOnly` counts as
     /// not-granted because the widget needs read access to show events.
     var permissionStatus: PermissionStatus {
         switch authorizationStatus {
@@ -206,7 +206,7 @@ final class CalendarService: ObservableObject {
         let endDate = calendar.date(byAdding: .minute, value: 63, to: now) ?? now.addingTimeInterval(3_780)
 
         let next = CalendarEventSnapshot(
-            title: "Docky demo review",
+            title: "MacStash Review",
             startDate: startDate,
             endDate: endDate,
             isAllDay: false,

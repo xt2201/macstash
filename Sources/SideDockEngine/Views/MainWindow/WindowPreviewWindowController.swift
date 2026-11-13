@@ -1,6 +1,7 @@
+import MacStashCore
 //
 //  WindowPreviewWindowController.swift
-//  Docky
+//  MacStash
 //
 //  Hover-driven per-tile counterpart to WindowSwitcherOverlayWindowController.
 //  Mirrors WidgetExpansionWindowController's mechanics: a singleton custom
@@ -555,7 +556,7 @@ private struct WindowPreviewCard: View {
     private func contextActions(modifierFlags: NSEvent.ModifierFlags) -> [ContextAction] {
         let dismiss = { WindowPreviewWindowController.shared.dismissCurrent() }
         var actions: [ContextAction] = [
-            .action(String(localized: "Focus Window")) {
+            .action(L("Focus Window")) {
                 dismiss()
                 _ = workspace.focus(window: window)
             },
@@ -564,21 +565,21 @@ private struct WindowPreviewCard: View {
         actions.append(contentsOf: windowMenuContextActions(for: window, dismiss: dismiss))
         actions.append(contentsOf: [
             .divider,
-            .action(String(localized: "Close Window"), isDestructive: true) {
+            .action(L("Close Window"), isDestructive: true) {
                 if workspace.close(window: window) {
                     preview.removeWindow(withIdentifier: window.windowIdentifier)
                 }
             },
             .divider,
-            .action(String(localized: "Focus App")) {
+            .action(L("Focus App")) {
                 dismiss()
                 workspace.focusApplication(bundleIdentifier: window.bundleIdentifier)
             },
-            .action(String(localized: "Hide App")) {
+            .action(L("Hide App")) {
                 dismiss()
                 workspace.hide(bundleIdentifier: window.bundleIdentifier)
             },
-            .action(String(localized: "Quit")) {
+            .action(L("Quit")) {
                 dismiss()
                 workspace.quit(bundleIdentifier: window.bundleIdentifier)
             },
@@ -724,7 +725,7 @@ private struct WindowPreviewListRow: View {
     private func contextActions(modifierFlags: NSEvent.ModifierFlags) -> [ContextAction] {
         let dismiss = { WindowPreviewWindowController.shared.dismissCurrent() }
         var actions: [ContextAction] = [
-            .action(String(localized: "Focus Window")) {
+            .action(L("Focus Window")) {
                 dismiss()
                 _ = workspace.focus(window: window)
             },
@@ -733,25 +734,31 @@ private struct WindowPreviewListRow: View {
         actions.append(contentsOf: windowMenuContextActions(for: window, dismiss: dismiss))
         actions.append(contentsOf: [
             .divider,
-            .action(String(localized: "Close Window"), isDestructive: true) {
+            .action(L("Close Window"), isDestructive: true) {
                 if workspace.close(window: window) {
                     preview.removeWindow(withIdentifier: window.windowIdentifier)
                 }
             },
             .divider,
-            .action(String(localized: "Focus App")) {
+            .action(L("Focus App")) {
                 dismiss()
                 workspace.focusApplication(bundleIdentifier: window.bundleIdentifier)
             },
-            .action(String(localized: "Hide App")) {
+            .action(L("Hide App")) {
                 dismiss()
                 workspace.hide(bundleIdentifier: window.bundleIdentifier)
             },
-            .action(String(localized: "Quit")) {
+            .action(L("Quit")) {
                 dismiss()
                 workspace.quit(bundleIdentifier: window.bundleIdentifier)
             },
         ])
         return actions
     }
+}
+
+
+@inline(__always)
+private func L(_ key: String) -> String {
+    LocalizationService.shared.localized(key)
 }

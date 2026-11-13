@@ -1,6 +1,6 @@
 //
 //  ProfileTriggerEngine.swift
-//  Docky
+//  MacStash
 //
 //  Watches the signals that profile triggers care about — frontmost app,
 //  Mission Control space, and clock minute boundaries — and switches the
@@ -53,7 +53,7 @@ final class ProfileTriggerEngine {
         }
         var result: Set<String> = []
         for window in windows {
-            // Skip Docky's own windows so they don't poison matches.
+            // Skip MacStash's own windows so they don't poison matches.
             guard let pid = window[kCGWindowOwnerPID as String] as? Int32,
                   let app = NSRunningApplication(processIdentifier: pid),
                   let bundleID = app.bundleIdentifier,

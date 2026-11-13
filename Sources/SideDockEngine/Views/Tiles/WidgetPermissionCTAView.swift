@@ -1,6 +1,6 @@
 //
 //  WidgetPermissionCTAView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI

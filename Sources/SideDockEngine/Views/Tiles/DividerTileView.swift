@@ -1,16 +1,17 @@
 //
 //  DividerTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
 import SwiftUI
+import MacStashCore
 
 struct DividerTileView: View {
     let tileID: String
     private let dockSettings = DockSettingsService.shared
     @ObservedObject private var layout = DockLayoutService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         GeometryReader { proxy in
@@ -46,30 +47,29 @@ struct DividerTileView: View {
             .action(dockSettings.magnification ? "Turn Magnification Off" : "Turn Magnification On") {
                 dockSettings.setMagnification(!dockSettings.magnification)
             },
-            .submenu(String(localized: "Position on Screen"), children: positionActions),
+            .submenu(LocalizationService.shared.localized("dock.positionOnScreen"), children: positionActions),
             .divider,
 //            .action("Smart Organize Pinned Items") {
 //                TileStore.shared.smartOrganizePinnedItems()
 //            },
             .divider,
-            .action(String(localized: "Edit Dock...")) {
+            .action(LocalizationService.shared.localized("dock.menu.editDock")) {
                 DockEditModeService.shared.enter()
             },
             .divider,
-            .submenu(String(localized: "Troubleshoot"), children: troubleshootActions),
-            .action(String(localized: "Send Feedback...")) {
+            .submenu(LocalizationService.shared.localized("dock.menu.troubleshoot"), children: troubleshootActions),
+            .action(LocalizationService.shared.localized("dock.menu.sendFeedback")) {
                 SettingsNavigator.shared.requestPane(id: "feedback")
             },
             .divider,
-            .action(String(localized: "About MacStash")) {
-                NSApp.activate(ignoringOtherApps: true)
-                NSApp.orderFrontStandardAboutPanel(nil)
+            .action(LocalizationService.shared.localized("dock.menu.aboutMacStash")) {
+                SideDockEngineCoordinator.shared.onOpenSettingsRequested?()
             },
-            .action(String(localized: "Settings...")) {
+            .action(LocalizationService.shared.localized("dock.menu.settings")) {
                 SideDockEngineCoordinator.shared.onOpenSettingsRequested?()
             },
             .divider,
-            .action(String(localized: "Hide Second Dock"), isDestructive: true) {
+            .action(LocalizationService.shared.localized("dock.menu.hideSecondDock"), isDestructive: true) {
                 SideDockEngineCoordinator.shared.setVisible(false)
             }
         ]
@@ -85,7 +85,7 @@ struct DividerTileView: View {
 
     private var troubleshootActions: [ContextAction] {
         [
-            .action(String(localized: "Sync Dock")) {
+            .action(LocalizationService.shared.localized("dock.menu.syncDock")) {
                 DockSettingsService.shared.refresh()
                 TileStore.shared.refresh()
             }

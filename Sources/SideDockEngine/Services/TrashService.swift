@@ -1,6 +1,6 @@
 //
 //  TrashService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

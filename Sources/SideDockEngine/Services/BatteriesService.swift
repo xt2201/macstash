@@ -1,6 +1,6 @@
 //
 //  BatteriesService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

@@ -1,6 +1,6 @@
 //
 //  CGSPrivate.swift
-//  Docky
+//  MacStash
 //
 //  SkyLight (CoreGraphics Services) SPI. Not for App Store submission without review.
 //

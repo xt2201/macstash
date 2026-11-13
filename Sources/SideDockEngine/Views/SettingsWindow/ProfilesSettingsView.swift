@@ -1,6 +1,6 @@
 //
 //  ProfilesSettingsView.swift
-//  Docky
+//  MacStash
 //
 //  Manages dock profiles — create / rename / duplicate / delete / switch.
 //  Each profile owns its own tile-store (pinned, trailing, widgets, app
@@ -12,7 +12,7 @@ import SwiftUI
 
 struct ProfilesSettingsView: View {
     @Bindable private var profileService = ProfileService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         Form {

@@ -1,15 +1,15 @@
 //
 //  ProfileService.swift
-//  Docky
+//  MacStash
 //
 //  Owns the list of dock profiles and which one is active. Each profile
 //  holds its own copy of the dock's tile-store fields (pinned items,
 //  trailing items, widget placements, app widget displays, hidden-app
-//  list). The active profile's data is mirrored into `DockyPreferences`'
+//  list). The active profile's data is mirrored into `SideDockPreferences`'
 //  legacy top-level keys so the rest of the app keeps working unchanged.
 //
 //  On first launch with this feature enabled, `migrateFromLegacyTileStore`
-//  reads the existing top-level data straight off `DockyPreferences` and
+//  reads the existing top-level data straight off `SideDockPreferences` and
 //  wraps it in a "Default" profile. Subsequent launches load profiles
 //  from `Keys.profiles` and skip migration.
 //
@@ -25,7 +25,7 @@ final class ProfileService {
     private(set) var profiles: [DockProfile] = []
 
     /// Identifier of the currently-active profile. Mutations to the
-    /// `DockyPreferences` tile-store fields are mirrored here.
+    /// `SideDockPreferences` tile-store fields are mirrored here.
     private(set) var activeProfileID: String = ""
 
     var activeProfile: DockProfile? {
@@ -37,8 +37,8 @@ final class ProfileService {
     private let decoder = JSONDecoder()
 
     private enum Keys {
-        static let profiles = "docky.profiles"
-        static let activeProfileID = "docky.activeProfileID"
+        static let profiles = "com.macstash.sidedock.profiles"
+        static let activeProfileID = "com.macstash.sidedock.activeProfileID"
     }
 
     private init() {
@@ -56,7 +56,7 @@ final class ProfileService {
     }
 
     private func migrateFromLegacyTileStore() {
-        let prefs = DockyPreferences.shared
+        let prefs = SideDockPreferences.shared
         let initial = DockProfile(
             name: "Default",
             symbolName: "house.fill",
@@ -77,11 +77,11 @@ final class ProfileService {
         else { return }
         activeProfileID = id
         defaults.set(id, forKey: Keys.activeProfileID)
-        DockyPreferences.shared.applyProfile(profile)
+        SideDockPreferences.shared.applyProfile(profile)
     }
 
     /// Apply a mutation to the active profile and persist. Used by
-    /// `DockyPreferences` to mirror tile-store edits into the profile.
+    /// `SideDockPreferences` to mirror tile-store edits into the profile.
     func updateActiveProfile(_ mutate: (inout DockProfile) -> Void) {
         guard let idx = profiles.firstIndex(where: { $0.id == activeProfileID }) else { return }
         mutate(&profiles[idx])

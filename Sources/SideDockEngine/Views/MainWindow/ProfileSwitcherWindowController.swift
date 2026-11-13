@@ -1,6 +1,6 @@
 //
 //  ProfileSwitcherWindowController.swift
-//  Docky
+//  MacStash
 //
 //  Hosts the profile-switcher ball in its own borderless companion window
 //  that floats just outside the dock chrome, on the chrome's interior
@@ -19,7 +19,7 @@ final class ProfileSwitcherWindowController: NSWindowController {
     private weak var mainWindow: MainWindow?
     private var cancellables: Set<AnyCancellable> = []
     private var alphaObservation: NSKeyValueObservation?
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
     private let profileService = ProfileService.shared
     private let dockSettings = DockSettingsService.shared
     private let hostingController: NSHostingController<ProfileSwitcherButtonView>
@@ -129,7 +129,7 @@ final class ProfileSwitcherWindowController: NSWindowController {
 
     private func observeStripVisibility() {
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.hidesProfileStrip
+            _ = SideDockPreferences.shared.hidesProfileStrip
             _ = ProfileService.shared.profiles.count
             self?.applyStripVisibility()
         }
@@ -161,7 +161,7 @@ final class ProfileSwitcherWindowController: NSWindowController {
 
     private func observePositionChanges() {
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.windowPosition
+            _ = SideDockPreferences.shared.windowPosition
             self?.updateRootViewAndFrame()
         }
         .store(in: &cancellables)
@@ -169,7 +169,7 @@ final class ProfileSwitcherWindowController: NSWindowController {
 
     private func observeSpaceBehavior() {
         observeChanges { [weak self] in
-            let behavior = DockyPreferences.shared.windowSpaceBehavior
+            let behavior = SideDockPreferences.shared.windowSpaceBehavior
             self?.window?.collectionBehavior = behavior.collectionBehavior(includesFullScreenAuxiliary: true)
         }
         .store(in: &cancellables)

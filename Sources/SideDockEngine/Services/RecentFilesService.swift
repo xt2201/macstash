@@ -1,6 +1,6 @@
 //
 //  RecentFilesService.swift
-//  Docky
+//  MacStash
 //
 //  Live "Recents" list backed by Spotlight, mirroring Finder's sidebar
 //  Recents canned search at:
@@ -20,7 +20,7 @@ import OSLog
 @MainActor
 final class RecentFilesService: ObservableObject {
     static let shared = RecentFilesService()
-    private static let logger = Logger(subsystem: "gt.quintero.Docky", category: "RecentFiles")
+    private static let logger = Logger(subsystem: "com.macstash.app", category: "RecentFiles")
 
     @Published private(set) var recentURLs: [URL] = []
 

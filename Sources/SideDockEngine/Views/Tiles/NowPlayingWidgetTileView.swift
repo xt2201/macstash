@@ -1,6 +1,6 @@
 //
 //  NowPlayingWidgetTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -31,7 +31,7 @@ struct NowPlayingWidgetTileView: View {
 
             ZStack {
                 Color(nsColor: prominentTintColor)
-                    .dockyGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                    .sideDockGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 
                 if !isWithinStack {
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)

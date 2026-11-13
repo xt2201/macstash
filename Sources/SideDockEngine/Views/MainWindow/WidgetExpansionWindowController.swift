@@ -1,6 +1,6 @@
 //
 //  WidgetExpansionWindowController.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -256,7 +256,7 @@ final class WidgetExpansionWindowController: NSWindowController, ObservableObjec
     }
 
     private var dockEdge: NSRectEdge {
-        let prefs = DockyPreferences.shared
+        let prefs = SideDockPreferences.shared
         let settings = DockSettingsService.shared
         switch prefs.windowPosition.resolved(systemOrientation: settings.orientation) {
         case .top: return .minY

@@ -1,6 +1,6 @@
 //
 //  MenuClickService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -74,7 +74,7 @@ final class MenuClickService {
     private func presentUnavailableAlert(targetApp: String, actionTitle: String) {
         let alert = NSAlert()
         alert.messageText = "Menu action unavailable"
-        alert.informativeText = "Docky couldn't find a running process for \(targetApp) to perform \(actionTitle.lowercased())."
+        alert.informativeText = "MacStash couldn't find a running process for \(targetApp) to perform \(actionTitle.lowercased())."
         alert.alertStyle = .warning
         alert.runModal()
     }

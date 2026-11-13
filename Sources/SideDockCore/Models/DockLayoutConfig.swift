@@ -31,7 +31,7 @@ public struct DockLayoutConfig: Codable, Equatable, Sendable {
     public var showProfileSwitcher: Bool
     public var showRunningApps: Bool
 
-    // Docky-parity physics, previews, badges, and behavior flags
+    // Fluid dock physics, previews, badges, and behavior flags
     public var magnificationEnabled: Bool
     public var magnificationScale: Double
     public var showTooltips: Bool

@@ -1,6 +1,6 @@
 //
 //  LaunchpadSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -14,7 +14,7 @@ struct LaunchpadSettingsView: View {
     /// would hide the very surface they're standing on.
     var hidesAvailabilitySection: Bool = false
 
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @State private var isRecordingShortcut = false
 
     var body: some View {
@@ -25,7 +25,7 @@ struct LaunchpadSettingsView: View {
                         Toggle("Enable Launchpad", isOn: $preferences.enablesLaunchpadOverlay)
                             .font(.headline)
 
-                        Text("Turn Docky's Launchpad overlay on or off without removing its shortcut or layout preferences.")
+                        Text("Turn MacStash's Launchpad overlay on or off without removing its shortcut or layout preferences.")
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -40,7 +40,7 @@ struct LaunchpadSettingsView: View {
                             Text("Global Shortcut")
                                 .font(.headline)
 
-                            Text("Optionally assign a global shortcut that toggles Docky's Launchpad overlay from anywhere.")
+                            Text("Optionally assign a global shortcut that toggles MacStash's Launchpad overlay from anywhere.")
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -57,7 +57,7 @@ struct LaunchpadSettingsView: View {
                         .disabled(!preferences.enablesLaunchpadOverlay)
                     }
 
-                    Text("Leave this unset if you only want to open Launchpad from the Docky tile or context menu.")
+                    Text("Leave this unset if you only want to open Launchpad from the dock tile or context menu.")
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -114,7 +114,7 @@ struct LaunchpadSettingsView: View {
                                       || preferences.launchpadLayoutAxis == .vertical)
                     }
 
-                    Text("Sets the Launchpad grid dimensions. Docky uses these counts when the icons fit on screen, defaulting to 7 columns × 5 rows. Row count is ignored when scroll direction is continuous.")
+                    Text("Sets the Launchpad grid dimensions. MacStash uses these counts when the icons fit on screen, defaulting to 7 columns × 5 rows. Row count is ignored when scroll direction is continuous.")
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
 
@@ -213,7 +213,7 @@ struct LaunchpadSettingsView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    Text("Pick an image to render behind the Launchpad grid. When unset, Docky uses the current desktop wallpaper. Combined with the transparency slider for the dim overlay above it.")
+                    Text("Pick an image to render behind the Launchpad grid. When unset, MacStash uses the current desktop wallpaper. Combined with the transparency slider for the dim overlay above it.")
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
 

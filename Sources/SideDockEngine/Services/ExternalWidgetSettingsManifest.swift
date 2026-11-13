@@ -1,6 +1,6 @@
 //
 //  ExternalWidgetSettingsManifest.swift
-//  Docky
+//  MacStash
 //
 
 import Foundation

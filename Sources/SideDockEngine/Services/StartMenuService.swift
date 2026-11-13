@@ -1,6 +1,6 @@
 //
 //  StartMenuService.swift
-//  Docky
+//  MacStash
 //
 //  Prototype: a "Start menu" panel attached to the dock via
 //  `addChildWindow`. Toggled with ⌃⌥S.
@@ -22,7 +22,7 @@ final class StartMenuService: ObservableObject {
     private var hotKeyRef: EventHotKeyRef?
     private var hotKeyHandlerRef: EventHandlerRef?
     /// 'STMN' as four ASCII bytes — disambiguates this hotkey from
-    /// LaunchpadHotKeyService's 'DKYL'.
+    /// LaunchpadHotKeyService's 'MSLP'.
     private let hotKeyID = EventHotKeyID(signature: OSType(0x53544D4E), id: 1)
 
     private init() {
@@ -96,7 +96,7 @@ final class StartMenuService: ObservableObject {
 
     private func registerHotKey() {
         // ⌃⌥S — picked because it's unlikely to collide with system
-        // shortcuts and isn't already bound by Docky preferences.
+        // shortcuts and isn't already bound by MacStash preferences.
         let keyCode = UInt32(kVK_ANSI_S)
         let modifiers = UInt32(controlKey | optionKey)
         RegisterEventHotKey(

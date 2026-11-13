@@ -1,6 +1,6 @@
 //
 //  LaunchpadLayout.swift
-//  Docky
+//  MacStash
 //
 //  Persisted user-defined ordering and virtual folders for the
 //  Launchpad overlay. Stored as JSON in UserDefaults; the layout is

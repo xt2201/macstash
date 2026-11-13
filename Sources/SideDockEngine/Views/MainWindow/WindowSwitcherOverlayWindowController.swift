@@ -1,6 +1,7 @@
+import MacStashCore
 //
 //  WindowSwitcherOverlayWindowController.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -11,7 +12,7 @@ final class WindowSwitcherOverlayWindowController: NSWindowController {
     private weak var mainWindow: MainWindow?
     private var cancellables: Set<AnyCancellable> = []
     private let animationDuration: TimeInterval = 0.18
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
 
     private var showsOverlayUI: Bool {
         // Empty state — there's nothing to focus-preview, so we need the
@@ -119,7 +120,7 @@ final class WindowSwitcherOverlayWindowController: NSWindowController {
 
     private func observeSpaceBehavior() {
         observeChanges { [weak self] in
-            let behavior = DockyPreferences.shared.windowSpaceBehavior
+            let behavior = SideDockPreferences.shared.windowSpaceBehavior
             self?.window?.collectionBehavior = behavior.collectionBehavior(includesFullScreenAuxiliary: true)
         }
         .store(in: &cancellables)
@@ -127,14 +128,14 @@ final class WindowSwitcherOverlayWindowController: NSWindowController {
 
     private func observePreviewMode() {
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.showsWindowSwitcherFocusPreview
-            _ = DockyPreferences.shared.windowSwitcherPreviewMode
+            _ = SideDockPreferences.shared.showsWindowSwitcherFocusPreview
+            _ = SideDockPreferences.shared.windowSwitcherPreviewMode
             self?.refreshOverlayPresentation()
         }
         .store(in: &cancellables)
 
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.windowSwitcherLayout
+            _ = SideDockPreferences.shared.windowSwitcherLayout
             self?.refreshOverlayPresentation()
         }
         .store(in: &cancellables)
@@ -208,7 +209,7 @@ private final class WindowSwitcherOverlayWindow: NSWindow {
 
 private struct WindowSwitcherOverlayView: View {
     @ObservedObject private var switcher = WindowSwitcherService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var permissions = PermissionsService.shared
 
     private let innerPreviewCornerRadius: CGFloat = 16
@@ -438,7 +439,7 @@ private struct WindowSwitcherListRow: View {
 
     private var displayTitle: String {
         window.isMinimized
-            ? "\(window.windowTitle) \(String(localized: "(minimized)"))"
+            ? "\(window.windowTitle) \(L("(minimized)"))"
             : window.windowTitle
     }
 
@@ -498,7 +499,7 @@ private struct WindowSwitcherListRow: View {
     private func contextActions(modifierFlags: NSEvent.ModifierFlags) -> [ContextAction] {
         let dismiss = { switcher.dismiss() }
         var actions: [ContextAction] = [
-            .action(String(localized: "Focus Window")) {
+            .action(L("Focus Window")) {
                 dismiss()
                 _ = workspace.focus(window: window)
             },
@@ -507,21 +508,21 @@ private struct WindowSwitcherListRow: View {
         actions.append(contentsOf: windowMenuContextActions(for: window, dismiss: dismiss))
         actions.append(contentsOf: [
             .divider,
-            .action(String(localized: "Close Window"), isDestructive: true) {
+            .action(L("Close Window"), isDestructive: true) {
                 if workspace.close(window: window) {
                     switcher.removeWindow(withIdentifier: window.windowIdentifier)
                 }
             },
             .divider,
-            .action(String(localized: "Focus App")) {
+            .action(L("Focus App")) {
                 dismiss()
                 workspace.focusApplication(bundleIdentifier: window.bundleIdentifier)
             },
-            .action(String(localized: "Hide App")) {
+            .action(L("Hide App")) {
                 dismiss()
                 workspace.hide(bundleIdentifier: window.bundleIdentifier)
             },
-            .action(String(localized: "Quit")) {
+            .action(L("Quit")) {
                 dismiss()
                 workspace.quit(bundleIdentifier: window.bundleIdentifier)
             },
@@ -587,7 +588,7 @@ private struct WindowSwitcherCard: View {
 
     private var displayTitle: String {
         window.isMinimized
-            ? "\(window.windowTitle) \(String(localized: "(minimized)"))"
+            ? "\(window.windowTitle) \(L("(minimized)"))"
             : window.windowTitle
     }
 
@@ -691,7 +692,7 @@ private struct WindowSwitcherCard: View {
     private func contextActions(modifierFlags: NSEvent.ModifierFlags) -> [ContextAction] {
         let dismiss = { switcher.dismiss() }
         var actions: [ContextAction] = [
-            .action(String(localized: "Focus Window")) {
+            .action(L("Focus Window")) {
                 dismiss()
                 _ = workspace.focus(window: window)
             },
@@ -700,25 +701,31 @@ private struct WindowSwitcherCard: View {
         actions.append(contentsOf: windowMenuContextActions(for: window, dismiss: dismiss))
         actions.append(contentsOf: [
             .divider,
-            .action(String(localized: "Close Window"), isDestructive: true) {
+            .action(L("Close Window"), isDestructive: true) {
                 if workspace.close(window: window) {
                     switcher.removeWindow(withIdentifier: window.windowIdentifier)
                 }
             },
             .divider,
-            .action(String(localized: "Focus App")) {
+            .action(L("Focus App")) {
                 dismiss()
                 workspace.focusApplication(bundleIdentifier: window.bundleIdentifier)
             },
-            .action(String(localized: "Hide App")) {
+            .action(L("Hide App")) {
                 dismiss()
                 workspace.hide(bundleIdentifier: window.bundleIdentifier)
             },
-            .action(String(localized: "Quit")) {
+            .action(L("Quit")) {
                 dismiss()
                 workspace.quit(bundleIdentifier: window.bundleIdentifier)
             },
         ])
         return actions
     }
+}
+
+
+@inline(__always)
+private func L(_ key: String) -> String {
+    LocalizationService.shared.localized(key)
 }

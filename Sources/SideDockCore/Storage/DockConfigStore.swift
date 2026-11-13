@@ -120,6 +120,10 @@ public final class DockConfigStore: @unchecked Sendable {
         }
     }
 
+    public func saveConfig(_ newConfig: SideDockFileConfig, immediate: Bool = false) {
+        updateConfig(immediate: immediate) { $0 = newConfig }
+    }
+
     public func resetLayout() {
         updateConfig(immediate: true) { cfg in
             for i in 0..<cfg.profiles.count {

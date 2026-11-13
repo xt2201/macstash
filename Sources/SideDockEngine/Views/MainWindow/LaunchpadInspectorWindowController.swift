@@ -1,11 +1,11 @@
 //
 //  LaunchpadInspectorWindowController.swift
-//  Docky
+//  MacStash
 //
 //  Floating utility panel that hosts `LaunchpadSettingsView` over the
 //  Launchpad overlay so the user can tune grid columns, icon size, and
 //  transparency without dismissing the launchpad first. Edits flow
-//  through `DockyPreferences` and the launchpad re-renders against
+//  through `SideDockPreferences` and the launchpad re-renders against
 //  them in real time.
 //
 

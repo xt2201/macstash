@@ -1,6 +1,6 @@
 //
 //  SmartOrganizeProgressService.swift
-//  Docky
+//  MacStash
 //
 
 import Combine

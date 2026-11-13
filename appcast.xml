@@ -7,7 +7,7 @@
         <language>en</language>
         <item>
             <title>Version 2.18.0</title>
-            <pubDate>Fri, 13 Nov 2026 08:39:06 +0700</pubDate>
+            <pubDate>Fri, 13 Nov 2026 10:39:28 +0700</pubDate>
             <sparkle:version>2180</sparkle:version>
             <sparkle:shortVersionString>2.18.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
@@ -22,8 +22,8 @@
             ]]></description>
             <enclosure
                 url="https://github.com/xt2201/macstash/releases/download/v2.18.0/Stash-2.18.0.zip"
-                sparkle:edSignature="qDSODkSe4bj3qMZORRqbTu9BU7yTTrU8We30bYapwa2SFAiLFsP261VjhUm/U3sRgKLViF1e6Dn46tgxPTn7CQ=="
-                length="53348370"
+                sparkle:edSignature="7NBouXFOmG265ozeofazjGZ0Erf0nx3ByiI5+moKNb9HWi1EDRUBxl4JuLZtutOV+2KOBsRPLaeZPdLG+ciKCg=="
+                length="19315787"
                 type="application/octet-stream" />
         </item>
         <item>

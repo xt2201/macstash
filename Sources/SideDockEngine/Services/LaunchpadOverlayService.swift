@@ -1,6 +1,6 @@
 //
 //  LaunchpadOverlayService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -132,7 +132,7 @@ final class LaunchpadOverlayService: ObservableObject {
             .appendingPathComponent("Applications", isDirectory: true)
     ]
     private let scanQueue = DispatchQueue(
-        label: "gt.quintero.Docky.LaunchpadScan",
+        label: "com.macstash.sidedock.LaunchpadScan",
         qos: .utility
     )
     private var watchers: [DispatchSourceFileSystemObject] = []
@@ -157,7 +157,7 @@ final class LaunchpadOverlayService: ObservableObject {
     }
 
     func present() {
-        guard DockyPreferences.shared.enablesLaunchpadOverlay else {
+        guard SideDockPreferences.shared.enablesLaunchpadOverlay else {
             dismiss()
             return
         }

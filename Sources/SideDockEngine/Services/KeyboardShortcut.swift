@@ -1,6 +1,6 @@
 //
 //  KeyboardShortcut.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

@@ -1,6 +1,6 @@
 //
 //  ProfileSwitcherButtonView.swift
-//  Docky
+//  MacStash
 //
 //  Prototype: a small circular affordance at the leading edge of the dock
 //  that fades in on hover and opens a menu of dock profiles. No persistent
@@ -22,7 +22,7 @@ struct ProfileSwitcherButtonView: View {
     /// the dock doesn't autohide while the user is hovering the ball.
     var onActiveChange: (Bool) -> Void = { _ in }
 
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @Bindable private var profileService = ProfileService.shared
     private let dockSettings = DockSettingsService.shared
     @ObservedObject private var layoutService = DockLayoutService.shared
@@ -316,7 +316,7 @@ struct ProfileSwitcherButtonView: View {
                     )
                 }
             }
-            .dockyGlassBorder(in: Capsule(), lineWidth: 1)
+            .sideDockGlassBorder(in: Capsule(), lineWidth: 1)
     }
 }
 

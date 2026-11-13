@@ -2,17 +2,17 @@
 
 ## Phiên bản 2.18.0 (2026-11-12)
 
-### Tích Hợp Toàn Diện `SideDockEngine` (Docky) & 18 Tiện Ích Hợp Nhất
+### Tích Hợp Toàn Diện `SideDockEngine` & 18 Tiện Ích Hợp Nhất
 
-- **Kiến Trúc `SideDockEngine` Đầy Đủ**: Nâng cấp Second Dock lên trọn bộ động cơ cửa sổ, sóng phóng đại, kính thực thời (`LiveGlassBackdrop`), Start Menu (`MenuCatalog`), bộ giao diện tích hợp (`BundledThemes`), Launchpad (`Control+Option+L`), Live Window Switcher (`Option+Tab`), chừa không gian hệ thống và trình chỉnh sửa Dock trực quan.
-- **9 Tiện Ích Độc Quyền Của Stash Trong Thư Viện Docky**: Đưa `Clock`, `Pomodoro`, `File Shelf`, `Clipboard History`, `Quick Note`, `Screenshot`, `Color Picker`, `Unit Converter` và `Bookmarks` thành tiện ích chuẩn `WidgetKind` ngay trong bộ chọn Widget, Smart Stack, thẻ mở rộng khi rê chuột và cài đặt từng tiện ích.
-- **Đồng Bộ Now Playing & Cài Đặt Thống Nhất**: Kết nối `NowPlayingManager` hai chiều với widget Now Playing của Docky và nhúng trực tiếp toàn bộ trình cấu hình đa ngăn của Docky vào tab **Settings > Second Dock**.
+- **Kiến Trúc `SideDockEngine` Đầy Đủ**: Nâng cấp Second Dock lên trọn bộ động cơ cửa sổ, sóng phóng đại, kính thực thời (`LiveGlassBackdrop`), Menu Catalog, bộ giao diện tích hợp (`BundledThemes`), Launchpad (`Control+Option+L`), Live Window Switcher (`Option+Tab`), chừa không gian hệ thống và trình chỉnh sửa Dock trực quan.
+- **18 Tiện Ích Độc Quyền Của MacStash Hợp Nhất**: Đưa `Clock`, `Pomodoro`, `File Shelf`, `Clipboard History`, `Quick Note`, `Screenshot`, `Color Picker`, `Unit Converter`, `Bookmarks`, `Weather`, `Batteries`, `System Stats`, `Photo Frame`, `Search`, `Calendar` và `Now Playing` thành tiện ích chuẩn `WidgetKind` ngay trong bộ chọn Widget, Smart Stack, thẻ mở rộng khi rê chuột và cài đặt từng tiện ích.
+- **Đồng Bộ Now Playing & Cài Đặt Thống Nhất**: Kết nối `NowPlayingManager` hai chiều với widget Now Playing của Second Dock và hợp nhất toàn bộ cấu hình trực tiếp vào tab **Settings > Second Dock**.
 
 ---
 
 ## Phiên bản 2.17.0 (2026-11-12)
 
-### Nâng Cấp Toàn Diện Second Dock Chuẩn Docky
+### Nâng Cấp Toàn Diện Second Dock Chuẩn ProMotion
 
 - **Hiệu Ứng Phóng Đại Gợn Sóng, Nhãn Nổi & Kéo Thả Trực Tiếp**: Rê chuột qua các ứng dụng ghim và đang chạy tạo sóng phóng đại cosin mượt mà 120Hz trên cả 4 cạnh màn hình, nhãn nổi Liquid Glass tức thì, hiệu ứng nảy khi mở app, ô Thùng rác kéo thả để xóa tệp, ô khôi phục cửa sổ thu nhỏ và kéo thả sắp xếp/ghim trực tiếp từ Finder.
 - **Smart Stack, Nhóm Ứng Dụng & Mặt Tiện Ích Trực Tiếp**: Gộp nhiều tiện ích vào một ô duy nhất với cuộn hai ngón để chuyển trang (`SmartStackItem`), tạo nhóm ứng dụng 2x2 kèm tổng huy hiệu thông báo, và chuyển đổi biểu tượng Calendar, Weather, Music, Spotify, Clock, Reminders, Activity Monitor sang mặt tiện ích sống.

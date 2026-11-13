@@ -85,7 +85,7 @@ public final class SideDockEngineCoordinator: ObservableObject {
             WindowReservationService.shared.start()
             DockBadgeService.shared.start()
             ProfileTriggerEngine.shared.start()
-            DockyPreferences.shared.applySystemDockVisibilityPreference()
+            SideDockPreferences.shared.applySystemDockVisibilityPreference()
         } else {
             mainWindow?.orderOut(nil)
             DockBadgeService.shared.stop()
@@ -143,22 +143,9 @@ public final class SideDockEngineCoordinator: ObservableObject {
     }
 
     public func openDedicatedSettingsWindow() {
-        if standaloneSettingsWindow == nil {
-            let win = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 880, height: 620),
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                backing: .buffered,
-                defer: false
-            )
-            win.minSize = NSSize(width: 760, height: 520)
-            win.title = "Second Dock Settings"
-            win.isReleasedWhenClosed = false
-            win.contentView = NSHostingView(rootView: SettingsRootView())
-            win.center()
-            standaloneSettingsWindow = win
+        if let onOpenSettingsRequested {
+            onOpenSettingsRequested()
         }
-        standaloneSettingsWindow?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
     }
 
     public func resetLayoutToDefaults() {

@@ -1,6 +1,6 @@
 //
 //  WidgetSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI
@@ -25,8 +25,8 @@ struct WidgetSettingsView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .dockyGlass(.regular, in: .rect(cornerRadius: 14))
-        .dockyGlassBorder(in: .rect(cornerRadius: 14))
+        .sideDockGlass(.regular, in: .rect(cornerRadius: 14))
+        .sideDockGlassBorder(in: .rect(cornerRadius: 14))
         .clipShape(.rect(cornerRadius: 14))
     }
 

@@ -1,6 +1,6 @@
 //
 //  FolderTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -11,7 +11,7 @@ struct FolderTileView: View {
     let isOpen: Bool
     @ObservedObject private var permissions = PermissionsService.shared
     @ObservedObject private var folderAccess = FolderAccessService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @State private var preview: [URL] = []
 
     var body: some View {

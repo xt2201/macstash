@@ -1,6 +1,6 @@
 //
 //  TileStore.swift
-//  Docky
+//  MacStash
 //
 //  Composes the visible dock tile row from three sources:
 //    - `persistent-apps`   → pinned apps + spacers (left section)
@@ -19,13 +19,13 @@ private let sideDockEngineLogger = Logger(subsystem: "com.macstash.app", categor
 final class TileStore: ObservableObject {
     static let shared = TileStore()
 
-    private static let logger = Logger(subsystem: "gt.quintero.Docky", category: "TileStore")
+    private static let logger = Logger(subsystem: "com.macstash.app", category: "TileStore")
 
     @Published private(set) var tiles: [Tile] = []
 
     private static let changeNotification = Notification.Name("com.apple.dock.prefchanged")
-    private static let hasImportedSystemDockPreferencesKey = "docky.tileStore.hasImportedSystemDockPreferences"
-    private static let expandedInlineAppFolderIDsKey = "docky.tileStore.expandedInlineAppFolderIDs"
+    private static let hasImportedSystemDockPreferencesKey = "com.macstash.sidedock.tileStore.hasImportedSystemDockPreferences"
+    private static let expandedInlineAppFolderIDsKey = "com.macstash.sidedock.tileStore.expandedInlineAppFolderIDs"
     private static let demoDebugPinnedAppNames = [
         "Dia",
         "Notes",
@@ -58,7 +58,7 @@ final class TileStore: ObservableObject {
 
     private var notificationObserver: NSObjectProtocol?
     private var cancellables: Set<AnyCancellable> = []
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
     private let mediaPlayback = MediaPlaybackService.shared
     private let defaults = UserDefaults.standard
 
@@ -82,50 +82,50 @@ final class TileStore: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.rebuildTiles() }
             .store(in: &cancellables)
-        // `DockyPreferences` is `@Observable`. We observe each
+        // `SideDockPreferences` is `@Observable`. We observe each
         // property bundle through `observeChanges` so the same change
         // signal fires only when the relevant property mutates.
         // (`.dropFirst()` skipped the Combine initial emission; the
         // Observation closure runs once on install to register reads
         //, calling `rebuildTiles` etc. then is safe and idempotent.)
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.pinnedItems
+            _ = SideDockPreferences.shared.pinnedItems
             self?.synchronizeAppWidgetDisplaysWithFolders()
             self?.refreshPinnedTilesFromPreferences()
             self?.rebuildTiles()
         }
         .store(in: &cancellables)
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.widgetPlacements
+            _ = SideDockPreferences.shared.widgetPlacements
             self?.rebuildTiles()
         }
         .store(in: &cancellables)
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.appWidgetDisplays
+            _ = SideDockPreferences.shared.appWidgetDisplays
             self?.rebuildTiles()
         }
         .store(in: &cancellables)
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.hiddenAppBundleIdentifiers
+            _ = SideDockPreferences.shared.hiddenAppBundleIdentifiers
             self?.refreshPinnedTilesFromPreferences()
             self?.rebuildTiles()
         }
         .store(in: &cancellables)
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.trailingItems
+            _ = SideDockPreferences.shared.trailingItems
             self?.refreshTrailingTilesFromPreferences()
             self?.rebuildTiles()
         }
         .store(in: &cancellables)
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.showsGroupedOpenedAppsInDock
-            _ = DockyPreferences.shared.effectiveShowsActivePinnedSeparator
-            _ = DockyPreferences.shared.showsRunningApps
-            _ = DockyPreferences.shared.showsMinimizedWindows
-            _ = DockyPreferences.shared.enablesShelveMode
-            _ = DockyPreferences.shared.shelveHidesFinder
-            _ = DockyPreferences.shared.shelveHidesTrash
-            _ = DockyPreferences.shared.hidesRecentApps
+            _ = SideDockPreferences.shared.showsGroupedOpenedAppsInDock
+            _ = SideDockPreferences.shared.effectiveShowsActivePinnedSeparator
+            _ = SideDockPreferences.shared.showsRunningApps
+            _ = SideDockPreferences.shared.showsMinimizedWindows
+            _ = SideDockPreferences.shared.enablesShelveMode
+            _ = SideDockPreferences.shared.shelveHidesFinder
+            _ = SideDockPreferences.shared.shelveHidesTrash
+            _ = SideDockPreferences.shared.hidesRecentApps
             self?.rebuildTiles()
         }
         .store(in: &cancellables)
@@ -149,7 +149,7 @@ final class TileStore: ObservableObject {
         reloadSystemDockState(syncPreferencesFromSystemDock: false)
     }
 
-    func refreshAfterDockyEditedSystemDock() {
+    func refreshAfterMacStashEditedSystemDock() {
         reloadSystemDockState(syncPreferencesFromSystemDock: true)
     }
 
@@ -405,9 +405,9 @@ final class TileStore: ObservableObject {
         }
 
         // Dragging an app into the dock is an explicit "show this here"
-        // gesture, so reverse a prior "Hide in Docky" if one is in effect.
-        if preferences.isAppHiddenInDocky(bundleIdentifier: bundleIdentifier) {
-            preferences.setAppHiddenInDocky(bundleIdentifier: bundleIdentifier, isHidden: false)
+        // gesture, so reverse a prior "Hide in Dock" if one is in effect.
+        if preferences.isAppHiddenInMacStash(bundleIdentifier: bundleIdentifier) {
+            preferences.setAppHiddenInMacStash(bundleIdentifier: bundleIdentifier, isHidden: false)
         }
 
         // If the app currently lives inside a pinned app folder, lift it
@@ -2058,7 +2058,7 @@ final class TileStore: ObservableObject {
             guard let bundleIdentifier = item.bundleIdentifier else {
                 return nil
             }
-            guard !preferences.isAppHiddenInDocky(bundleIdentifier: bundleIdentifier) else {
+            guard !preferences.isAppHiddenInMacStash(bundleIdentifier: bundleIdentifier) else {
                 return nil
             }
             if let tile = dockPinnedTilesByBundleIdentifier[bundleIdentifier] {
@@ -2067,7 +2067,7 @@ final class TileStore: ObservableObject {
             return Self.makePinnedTile(bundleIdentifier: bundleIdentifier, item: item)
         case .appFolder:
             let apps = item.folderBundleIdentifiers
-                .filter { !preferences.isAppHiddenInDocky(bundleIdentifier: $0) }
+                .filter { !preferences.isAppHiddenInMacStash(bundleIdentifier: $0) }
                 .compactMap(Self.makeAppTile(bundleIdentifier:))
             guard !apps.isEmpty else {
                 return nil
@@ -2394,7 +2394,7 @@ final class TileStore: ObservableObject {
     }
 
     private func widgetTiles(for bundleIdentifier: String) -> [Tile] {
-        guard !preferences.isAppHiddenInDocky(bundleIdentifier: bundleIdentifier) else {
+        guard !preferences.isAppHiddenInMacStash(bundleIdentifier: bundleIdentifier) else {
             return []
         }
 

@@ -2,12 +2,12 @@
   "version": 1,
   "packages": [
     {
-      "id": "docky.core",
-      "title": "Docky Core Actions",
-      "author": "Docky",
+      "id": "macstash.core",
+      "title": "MacStash Core Actions",
+      "author": "MacStash",
       "version": "1.0.0",
       "reviewStatus": "curated",
-      "description": "Built-in Docky actions and reviewed scripted extensions.",
+      "description": "Built-in MacStash actions and reviewed scripted extensions.",
       "actions": [
         {
           "id": "app.open",
@@ -247,12 +247,12 @@
       ]
     },
     {
-      "id": "docky.curated-app-integrations",
+      "id": "macstash.curated-app-integrations",
       "title": "Curated App Integrations",
-      "author": "Docky",
+      "author": "MacStash",
       "version": "1.0.0",
       "reviewStatus": "curated",
-      "description": "Docky-reviewed actions for selected third-party apps and browsers.",
+      "description": "MacStash-reviewed actions for selected third-party apps and browsers.",
       "actions": [
         {
           "id": "ghostty.new-window",

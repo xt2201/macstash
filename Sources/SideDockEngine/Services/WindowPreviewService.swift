@@ -1,6 +1,6 @@
 //
 //  WindowPreviewService.swift
-//  Docky
+//  MacStash
 //
 //  State backing the per-tile hover window preview popover.
 //  WindowSwitcherService is the global Cmd-Tab-style switcher; this is the
@@ -27,7 +27,7 @@ final class WindowPreviewService: ObservableObject {
 
     var resolvedLayout: WindowSwitcherLayout {
         let canCapture = PermissionsService.shared.screenCapture == .granted
-        return DockyPreferences.shared.windowPreviewLayout
+        return SideDockPreferences.shared.windowPreviewLayout
             .resolved(canCaptureThumbnails: canCapture)
     }
 
@@ -54,7 +54,7 @@ final class WindowPreviewService: ObservableObject {
         var seen = Set<String>()
         var aggregated: [AppWindow] = []
         let registry = WindowRegistry.shared
-        let includesMinimized = DockyPreferences.shared.includesMinimizedWindows
+        let includesMinimized = SideDockPreferences.shared.includesMinimizedWindows
         for bundleID in bundleIDs where !bundleID.isEmpty {
             for window in WorkspaceService.shared.appWindows(bundleIdentifier: bundleID) {
                 // Minimized windows skip the strict capture check —

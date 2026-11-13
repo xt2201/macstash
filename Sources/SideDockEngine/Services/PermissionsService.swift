@@ -1,8 +1,8 @@
 //
 //  PermissionsService.swift
-//  Docky
+//  MacStash
 //
-//  Tracks the remaining macOS permissions Docky needs:
+//  Tracks the remaining macOS permissions MacStash needs:
 //    - .userFolders       → Full Disk Access for pinned folder previews
 //    - .finderAutomation       → Finder Apple Events for Finder-backed actions
 //    - .accessibility          → inspect and restore minimized windows
@@ -61,17 +61,17 @@ enum Permission: String, CaseIterable, Identifiable {
     var explanation: String {
         switch self {
         case .userFolders:
-            return "Grant Full Disk Access so Docky can preview recent items from folders pinned to the Dock, including protected locations like Downloads, Documents, and Desktop. No data leaves your Mac."
+            return "Grant Full Disk Access so MacStash can preview recent items from folders pinned to the Dock, including protected locations like Downloads, Documents, and Desktop. No data leaves your Mac."
         case .finderAutomation:
-            return "Docky uses Finder automation for reveal-in-Finder, open-folder, and Trash actions. macOS grants this separately from Full Disk Access, and you can request it here without waiting for the first Finder action to fail."
+            return "MacStash uses Finder automation for reveal-in-Finder, open-folder, and Trash actions. macOS grants this separately from Full Disk Access, and you can request it here without waiting for the first Finder action to fail."
         case .accessibility:
-            return "Accessibility access lets Docky click menu bar items for curated menuClick actions, inspect app windows for Dock-like reopen behavior and window menus, and restore minimized windows beside the Trash. These actions are slower and more fragile than built-in actions, so Docky requests this only when needed."
+            return "Accessibility access lets MacStash click menu bar items for curated menuClick actions, inspect app windows for Dock-like reopen behavior and window menus, and restore minimized windows beside the Trash. These actions are slower and more fragile than built-in actions, so MacStash requests this only when needed."
         case .systemEventsAutomation:
-            return "Docky uses System Events automation for curated menuClick actions. Requesting it here lets Docky click supported app menus without waiting for the first action to trigger a macOS prompt. Menu-click actions still require Accessibility too."
+            return "MacStash uses System Events automation for curated menuClick actions. Requesting it here lets MacStash click supported app menus without waiting for the first action to trigger a macOS prompt. Menu-click actions still require Accessibility too."
         case .screenCapture:
-            return "Grant Screen Recording so Docky can show thumbnail previews for minimized windows. Docky only captures the minimized window itself for its dock tile, and nothing leaves your Mac. macOS may require quitting and reopening Docky after you allow this."
+            return "Grant Screen Recording so MacStash can show thumbnail previews for minimized windows. MacStash only captures the minimized window itself for its dock tile, and nothing leaves your Mac. macOS may require quitting and reopening MacStash after you allow this."
         case .location:
-            return "Grant location access so Docky can show local weather in the Weather widget. Your location is used on-device to fetch the forecast and is not stored by Docky."
+            return "Grant location access so MacStash can show local weather in the Weather widget. Your location is used on-device to fetch the forecast and is not stored by MacStash."
         case .calendar:
             return "Grant Calendar access so the Calendar widget can show your upcoming events. Events are read on-device and never leave your Mac."
         case .reminders:
@@ -159,12 +159,12 @@ final class PermissionsService: ObservableObject {
     @Published private(set) var calendar: PermissionStatus = .notDetermined
     @Published private(set) var reminders: PermissionStatus = .notDetermined
 
-    private let dockBookmarkKey = "docky.dockPlistBookmark"
-    private let userFoldersBookmarkKey = "docky.userFoldersBookmark"
-    private let finderAutomationStatusKey = "docky.finderAutomationStatus"
-    private let systemEventsAutomationStatusKey = "docky.systemEventsAutomationStatus"
-    private let initialOnboardingCompletedKey = "docky.initialOnboardingCompleted"
-    private let skippedPermissionsKey = "docky.skippedPermissions"
+    private let dockBookmarkKey = "com.macstash.sidedock.dockPlistBookmark"
+    private let userFoldersBookmarkKey = "com.macstash.sidedock.userFoldersBookmark"
+    private let finderAutomationStatusKey = "com.macstash.sidedock.finderAutomationStatus"
+    private let systemEventsAutomationStatusKey = "com.macstash.sidedock.systemEventsAutomationStatus"
+    private let initialOnboardingCompletedKey = "com.macstash.sidedock.initialOnboardingCompleted"
+    private let skippedPermissionsKey = "com.macstash.sidedock.skippedPermissions"
 
     private init() {
         clearLegacyBookmarks()
@@ -321,7 +321,7 @@ final class PermissionsService: ObservableObject {
     func presentPermissionAlert(for permission: Permission, actionTitle: String) {
         let alert = NSAlert()
         alert.messageText = permission.title + " is required"
-        alert.informativeText = "Allow Docky in Privacy & Security so it can perform \(actionTitle.lowercased())."
+        alert.informativeText = "Allow MacStash in Privacy & Security so it can perform \(actionTitle.lowercased())."
         alert.addButton(withTitle: "Open System Settings")
         alert.addButton(withTitle: "Cancel")
         if alert.runModal() == .alertFirstButtonReturn {

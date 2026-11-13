@@ -1,6 +1,6 @@
 //
 //  WindowSwitcherService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -36,7 +36,7 @@ final class WindowSwitcherService: ObservableObject {
 
     var resolvedLayout: WindowSwitcherLayout {
         let canCapture = PermissionsService.shared.screenCapture == .granted
-        return DockyPreferences.shared.windowSwitcherLayout.resolved(canCaptureThumbnails: canCapture)
+        return SideDockPreferences.shared.windowSwitcherLayout.resolved(canCaptureThumbnails: canCapture)
     }
 
     private var activePreviewMode: WindowSwitcherPreviewMode? {
@@ -44,12 +44,12 @@ final class WindowSwitcherService: ObservableObject {
         // captured image to show behind the switcher, and instant-focus's
         // "see the real window come forward" UX fights with the list overlay.
         // In list mode the list itself is the preview substitute.
-        guard DockyPreferences.shared.showsWindowSwitcherFocusPreview,
+        guard SideDockPreferences.shared.showsWindowSwitcherFocusPreview,
               resolvedLayout == .thumbnails else {
             return nil
         }
 
-        return DockyPreferences.shared.windowSwitcherPreviewMode
+        return SideDockPreferences.shared.windowSwitcherPreviewMode
     }
 
     private var usesInPlacePreview: Bool {
@@ -62,7 +62,7 @@ final class WindowSwitcherService: ObservableObject {
 
     private init() {
         installHotKeyHandlerIfNeeded()
-        registerHotKey(shortcut: DockyPreferences.shared.windowSwitcherShortcut)
+        registerHotKey(shortcut: SideDockPreferences.shared.windowSwitcherShortcut)
         installEventMonitors()
         subscribeToPreferences()
         observeWindowPreviews()
@@ -87,7 +87,7 @@ final class WindowSwitcherService: ObservableObject {
     }
 
     func handleHotKeyPress(direction: Int) {
-        guard DockyPreferences.shared.enablesWindowSwitcher else {
+        guard SideDockPreferences.shared.enablesWindowSwitcher else {
             dismiss()
             return
         }
@@ -108,7 +108,7 @@ final class WindowSwitcherService: ObservableObject {
         }
 
         let latestWindows = WindowRegistry.shared.switchable(
-            includeMinimized: DockyPreferences.shared.includesMinimizedWindows
+            includeMinimized: SideDockPreferences.shared.includesMinimizedWindows
         )
 
         windows = latestWindows
@@ -255,15 +255,15 @@ final class WindowSwitcherService: ObservableObject {
 
     private func subscribeToPreferences() {
         observeChanges { [weak self] in
-            let shortcut = DockyPreferences.shared.windowSwitcherShortcut
+            let shortcut = SideDockPreferences.shared.windowSwitcherShortcut
             self?.registerHotKey(shortcut: shortcut)
         }
         .store(in: &cancellables)
 
         observeChanges { [weak self] in
-            let isEnabled = DockyPreferences.shared.enablesWindowSwitcher
+            let isEnabled = SideDockPreferences.shared.enablesWindowSwitcher
             guard let self else { return }
-            self.registerHotKey(shortcut: DockyPreferences.shared.windowSwitcherShortcut)
+            self.registerHotKey(shortcut: SideDockPreferences.shared.windowSwitcherShortcut)
             if !isEnabled {
                 self.dismiss()
             }
@@ -271,9 +271,9 @@ final class WindowSwitcherService: ObservableObject {
         .store(in: &cancellables)
 
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.showsWindowSwitcherFocusPreview
-            _ = DockyPreferences.shared.windowSwitcherPreviewMode
-            _ = DockyPreferences.shared.windowSwitcherLayout
+            _ = SideDockPreferences.shared.showsWindowSwitcherFocusPreview
+            _ = SideDockPreferences.shared.windowSwitcherPreviewMode
+            _ = SideDockPreferences.shared.windowSwitcherLayout
             self?.refreshSelectionPresentation()
         }
         .store(in: &cancellables)
@@ -330,7 +330,7 @@ final class WindowSwitcherService: ObservableObject {
             // User-configurable action keys. Navigation cases above take
             // precedence — if a user rebinds an action onto an arrow / Escape /
             // Return key, the built-in nav wins and the action never fires.
-            let prefs = DockyPreferences.shared
+            let prefs = SideDockPreferences.shared
             switch event.keyCode {
             case prefs.switcherMinimizeKeyCode:
                 self.minimizeSelectedWindow()
@@ -373,7 +373,7 @@ final class WindowSwitcherService: ObservableObject {
         guard isPresented else { return }
         guard !isContextMenuPresented else { return }
 
-        let requiredFlags = DockyPreferences.shared.windowSwitcherShortcut.modifierFlags
+        let requiredFlags = SideDockPreferences.shared.windowSwitcherShortcut.modifierFlags
         let activeFlags = flags.intersection(KeyboardShortcut.supportedModifierFlags)
         guard !requiredFlags.isEmpty, !activeFlags.isSuperset(of: requiredFlags) else {
             return
@@ -385,7 +385,7 @@ final class WindowSwitcherService: ObservableObject {
     private func dismissIfShortcutReleased(flags: NSEvent.ModifierFlags) {
         guard isPresented else { return }
 
-        let requiredFlags = DockyPreferences.shared.windowSwitcherShortcut.modifierFlags
+        let requiredFlags = SideDockPreferences.shared.windowSwitcherShortcut.modifierFlags
         let activeFlags = flags.intersection(KeyboardShortcut.supportedModifierFlags)
         guard !requiredFlags.isEmpty, !activeFlags.isSuperset(of: requiredFlags) else {
             return
@@ -599,7 +599,7 @@ final class WindowSwitcherService: ObservableObject {
     private func registerHotKey(shortcut: KeyboardShortcut) {
         unregisterHotKey()
 
-        guard DockyPreferences.shared.enablesWindowSwitcher,
+        guard SideDockPreferences.shared.enablesWindowSwitcher,
               shortcut.isValid else {
             return
         }

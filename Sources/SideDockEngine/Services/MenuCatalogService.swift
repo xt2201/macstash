@@ -1,7 +1,7 @@
 import os.log
 //
 //  MenuCatalogService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

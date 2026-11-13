@@ -325,6 +325,11 @@ public struct SettingsView: View {
                         text: appState.formattedTimerTime,
                         color: appState.pomodoroMode == .focus ? .red : .green
                     )
+                } else if selectedTab == .sideDock {
+                    StatusBadgePill(
+                        text: sideDock.config.isDockVisible ? appState.localized("settings.statusActive") : appState.localized("settings.statusHidden"),
+                        color: sideDock.config.isDockVisible ? .teal : .secondary
+                    )
                 }
             }
             .padding(.horizontal, 24)
@@ -332,81 +337,20 @@ public struct SettingsView: View {
 
             Divider()
 
-            if selectedTab == .sideDock {
-                VStack(spacing: 0) {
-                    sideDockHeaderControls
-                    Divider()
-                    SideDockEngineCoordinator.shared.makeEmbeddedSettingsView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+            ScrollView(.vertical, showsIndicators: true) {
+                VStack(alignment: .leading, spacing: 18) {
+                    activeTabContent
                 }
-            } else {
-                ScrollView(.vertical, showsIndicators: true) {
-                    VStack(alignment: .leading, spacing: 18) {
-                        activeTabContent
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 20)
-                    .frame(maxWidth: 680, alignment: .leading)
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                }
+                .padding(.horizontal, 24)
+                .padding(.vertical, 20)
+                .frame(maxWidth: 680, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
         }
         .background(Color(NSColor.windowBackgroundColor))
     }
 
-    private var sideDockHeaderControls: some View {
-        HStack(spacing: 12) {
-            Toggle(
-                isOn: Binding(
-                    get: { sideDock.config.isDockVisible },
-                    set: { sideDock.setDockVisible($0) }
-                )
-            ) {
-                Text(appState.localized("general.secondDock"))
-                    .font(.system(size: 13, weight: .semibold))
-            }
-            .toggleStyle(.switch)
 
-            Spacer()
-
-            Button {
-                if !sideDock.config.isDockVisible {
-                    sideDock.setDockVisible(true)
-                }
-                sideDock.toggleLaunchpad()
-            } label: {
-                Label("Launchpad", systemImage: "square.grid.3x3.fill")
-                    .font(.system(size: 11.5, weight: .medium))
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-
-            Button {
-                if !sideDock.config.isDockVisible {
-                    sideDock.setDockVisible(true)
-                }
-                sideDock.toggleEditMode()
-            } label: {
-                Label("Edit Dock", systemImage: "slider.horizontal.3")
-                    .font(.system(size: 11.5, weight: .medium))
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.small)
-
-            Button {
-                sideDock.openFullSettingsWindow()
-            } label: {
-                Image(systemName: "arrow.up.left.and.arrow.down.right")
-                    .font(.system(size: 11.5, weight: .medium))
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .help("Open Second Dock in dedicated window")
-        }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 10)
-        .background(Color(NSColor.controlBackgroundColor).opacity(0.45))
-    }
 
     @ViewBuilder
     private var activeTabContent: some View {
@@ -416,7 +360,25 @@ public struct SettingsView: View {
         case .hotCorners:
             HotCornersTab(appState: appState)
         case .sideDock:
-            EmptyView()
+            VStack(alignment: .leading, spacing: 18) {
+                SideDockSuperchargerCard(sideDock: sideDock, appState: appState)
+
+                DockSettingsTabView(
+                    config: Binding(
+                        get: { sideDock.config },
+                        set: { newConfig in
+                            sideDock.config = newConfig
+                            sideDock.configStore.saveConfig(newConfig)
+                        }
+                    ),
+                    onSave: { _ in
+                        sideDock.configStore.saveConfig(sideDock.config)
+                    },
+                    onResetLayout: {
+                        sideDock.resetLayoutToDefaults()
+                    }
+                )
+            }
         case .appearance:
             AppearanceTab(appState: appState)
         case .displays:
@@ -441,4 +403,67 @@ private struct SidebarVisualEffectBackground: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
+}
+
+private struct SideDockSuperchargerCard: View {
+    @ObservedObject var sideDock: SideDockManager
+    let appState: AppState
+
+    var body: some View {
+        SettingsCard(
+            title: appState.localized("dock.supercharger.title"),
+            systemImage: "dock.rectangle",
+            accentColor: .teal
+        ) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(appState.localized("dock.supercharger.subtitle"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                HStack(spacing: 12) {
+                    Button(action: {
+                        sideDock.toggleDock()
+                    }) {
+                        Label(
+                            appState.localized("dock.supercharger.toggle"),
+                            systemImage: sideDock.config.isDockVisible ? "eye.slash.fill" : "eye.fill"
+                        )
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(sideDock.config.isDockVisible ? .gray : .teal)
+
+                    Button(action: {
+                        sideDock.toggleEditMode()
+                    }) {
+                        Label(
+                            appState.localized("dock.supercharger.editMode"),
+                            systemImage: "slider.horizontal.2.square"
+                        )
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button(action: {
+                        sideDock.toggleLaunchpad()
+                    }) {
+                        Label(
+                            appState.localized("dock.supercharger.launchpad"),
+                            systemImage: "square.grid.3x3.fill"
+                        )
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button(action: {
+                        sideDock.toggleWindowSwitcher()
+                    }) {
+                        Label(
+                            appState.localized("dock.supercharger.windowSwitcher"),
+                            systemImage: "macwindow.on.rectangle"
+                        )
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .controlSize(.regular)
+            }
+        }
+    }
 }

@@ -1,9 +1,9 @@
 import os.log
 //
 //  MainWindowView.swift
-//  Docky
+//  MacStash
 //
-//  Created by Jose Quintero on 17/04/26.
+//  Created by MacStash Team.
 //
 
 import AppKit
@@ -17,7 +17,7 @@ struct MainWindowView: View {
     private let chromeResizeAnimation: Animation = .easeInOut(duration: 0.18)
 
     private let dockSettings = DockSettingsService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var layoutService = DockLayoutService.shared
     private let magnification = DockMagnificationService.shared
     @ObservedObject private var chromeMetrics = DockChromeMetricsService.shared
@@ -170,7 +170,7 @@ struct MainWindowView: View {
         }
     }
 
-    private var borderGradient: LinearGradient { dockyGlassBorderGradient }
+    private var borderGradient: LinearGradient { sideDockGlassBorderGradient }
 
     /// The uniform fallback radius, clamped to the chrome's max curve.
     /// Per-corner accessors fall back to this when the user/theme
@@ -333,7 +333,6 @@ final class ClickThroughHostingView: NSHostingView<MainWindowView> {
     override func draggingEntered(_ sender: any NSDraggingInfo) -> NSDragOperation {
         let location = convert(sender.draggingLocation, from: nil)
         let urls = readURLs(from: sender)
-        let pasteboardTypes = sender.draggingPasteboard.types?.map(\.rawValue) ?? []
         if let kind = DockDragService.resolvePreview(from: urls) {
             sideDockEngineLogger.debug("SideDockEngine event")
             DockDragService.shared.begin(kind: kind, at: location)

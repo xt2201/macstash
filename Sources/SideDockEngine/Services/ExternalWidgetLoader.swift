@@ -1,13 +1,13 @@
 //
 //  ExternalWidgetLoader.swift
-//  Docky
+//  MacStash
 //
 //  Discovers third-party widget bundles in
-//  ~/Library/Application Support/Docky/Widgets/ and pushes their
+//  ~/Library/Application Support/MacStash/SideDock/Widgets/ and pushes their
 //  principal classes into ExternalWidgetRegistry at app launch.
 //
 //  Bundle layout the loader expects:
-//      MyWidget.dockywidget/
+//      MyWidget.stashwidget/
 //          Contents/
 //              Info.plist      (NSPrincipalClass = "MyWidget.MyWidget")
 //              MacOS/MyWidget  (the compiled binary)
@@ -25,7 +25,7 @@ import os.log
 final class ExternalWidgetLoader {
     static let shared = ExternalWidgetLoader()
 
-    private let log = Logger(subsystem: "gt.quintero.Docky", category: "ExternalWidgetLoader")
+    private let log = Logger(subsystem: "com.macstash.app", category: "ExternalWidgetLoader")
     private(set) var hasDiscovered = false
 
     /// Reason the loader couldn't bring a bundle into the registry. Used
@@ -44,7 +44,7 @@ final class ExternalWidgetLoader {
             case .missingExecutable: "Bundle has no compiled binary in Contents/MacOS/."
             case .loadCallFailed: "Bundle.load() failed. Check code signing."
             case .missingPrincipalClass: "Info.plist is missing NSPrincipalClass."
-            case .notConformingToProtocol: "Principal class does not conform to DockyWidgetPlugin."
+            case .notConformingToProtocol: "Principal class does not conform to MacStashWidgetPlugin."
             }
         }
     }
@@ -54,10 +54,10 @@ final class ExternalWidgetLoader {
     /// badge instead of staying on "Needs Restart" forever.
     private(set) var loadFailures: [URL: LoadFailure] = [:]
 
-    /// File extension Docky recognizes as a widget bundle. Distinct from
+    /// File extension MacStash recognizes as a widget bundle. Distinct from
     /// `.bundle` so users can keep arbitrary loadable bundles in the
-    /// directory without Docky trying to instantiate them.
-    static let bundleExtension = "dockywidget"
+    /// directory without MacStash trying to instantiate them.
+    static let bundleExtension = "stashwidget"
 
     private init() {}
 
@@ -81,8 +81,8 @@ final class ExternalWidgetLoader {
         }
     }
 
-    /// Public for the settings pane: lists every `*.dockywidget` file on
-    /// disk, whether or not Docky has loaded it yet. Lets the UI surface
+    /// Public for the settings pane: lists every `*.stashwidget` file on
+    /// disk, whether or not MacStash has loaded it yet. Lets the UI surface
     /// bundles dropped in after launch (visible, marked as needing a
     /// restart).
     func installedBundleURLs() -> [URL] {
@@ -91,8 +91,8 @@ final class ExternalWidgetLoader {
         return bundleURLs(in: directory)
     }
 
-    /// Copies a `*.dockywidget` bundle into the Widgets directory. The
-    /// caller is responsible for prompting the user to restart Docky;
+    /// Copies a `*.stashwidget` bundle into the Widgets directory. The
+    /// caller is responsible for prompting the user to restart MacStash;
     /// Bundle.load() can only run once per launch.
     func installBundle(from sourceURL: URL) throws -> URL {
         let directory = widgetsDirectory
@@ -118,7 +118,7 @@ final class ExternalWidgetLoader {
         process.waitUntilExit()
     }
 
-    /// Removes a `*.dockywidget` bundle from disk. The in-memory plugin
+    /// Removes a `*.stashwidget` bundle from disk. The in-memory plugin
     /// stays registered until the next launch (Bundle.load() is
     /// one-way); the UI surfaces this with a restart-required notice.
     func uninstallBundle(at url: URL) throws {
@@ -126,7 +126,7 @@ final class ExternalWidgetLoader {
         log.info("Removed widget bundle at \(url.path, privacy: .public)")
     }
 
-    /// `~/Library/Application Support/Docky/Widgets/`. Public so the
+    /// `~/Library/Application Support/MacStash/SideDock/Widgets/`. Public so the
     /// settings pane can offer "Reveal in Finder" and the loader can
     /// share one source of truth for the directory location.
     var widgetsDirectory: URL {
@@ -141,7 +141,7 @@ final class ExternalWidgetLoader {
             .appendingPathComponent("Library/Application Support")
 
         return appSupport
-            .appendingPathComponent("Docky", isDirectory: true)
+            .appendingPathComponent("MacStash", isDirectory: true)
             .appendingPathComponent("Widgets", isDirectory: true)
     }
 
@@ -190,10 +190,10 @@ final class ExternalWidgetLoader {
             return
         }
 
-        guard let pluginType = principalClass as? DockyWidgetPlugin.Type else {
+        guard let pluginType = principalClass as? MacStashWidgetPlugin.Type else {
             let adopted = Self.adoptedProtocolNames(of: principalClass)
             let adoptedDescription = adopted.isEmpty ? "(none)" : adopted.joined(separator: ", ")
-            log.error("\(url.lastPathComponent, privacy: .public) principal class \(NSStringFromClass(principalClass), privacy: .public) does not conform to DockyWidgetPlugin. Adopts: \(adoptedDescription, privacy: .public). If you see a Swift-mangled name like _TtP...DockyWidgetPlugin_, the protocol declaration in the bundle is missing @objc.")
+            log.error("\(url.lastPathComponent, privacy: .public) principal class \(NSStringFromClass(principalClass), privacy: .public) does not conform to MacStashWidgetPlugin. Adopts: \(adoptedDescription, privacy: .public). If you see a Swift-mangled name like _TtP...MacStashWidgetPlugin_, the protocol declaration in the bundle is missing @objc.")
             loadFailures[standardized] = .notConformingToProtocol
             return
         }

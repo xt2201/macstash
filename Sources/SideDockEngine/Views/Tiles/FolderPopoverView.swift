@@ -1,6 +1,7 @@
+import MacStashCore
 //
 //  FolderPopoverView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -349,10 +350,10 @@ struct FolderPopoverView: View {
     private func contextActions(for itemURL: URL) -> [ContextAction] {
         var actions: [ContextAction] = []
         if isNavigableFolder(itemURL) {
-            actions.append(.action(String(localized: "Reveal in Finder"), image: contextMenuSymbol("rectangle.stack.badge.plus")) {
+            actions.append(.action(L("Reveal in Finder"), image: contextMenuSymbol("rectangle.stack.badge.plus")) {
                 revealInFinder(itemURL)
             })
-            actions.append(.action(String(localized: "Open in Finder"), image: contextMenuSymbol("folder")) {
+            actions.append(.action(L("Open in Finder"), image: contextMenuSymbol("folder")) {
                 openInFinder(itemURL)
             })
             return actions
@@ -360,7 +361,7 @@ struct FolderPopoverView: View {
 
         actions = fileContextActions(for: itemURL)
         actions.append(.divider)
-        actions.append(.action(String(localized: "Reveal in Finder"), image: contextMenuSymbol("rectangle.stack.badge.plus")) {
+        actions.append(.action(L("Reveal in Finder"), image: contextMenuSymbol("rectangle.stack.badge.plus")) {
             revealInFinder(itemURL)
         })
         return actions
@@ -413,7 +414,7 @@ struct FolderPopoverView: View {
         let typeID = UTType.fileURL.identifier
         let group = DispatchGroup()
         var collected: [URL] = []
-        let queue = DispatchQueue(label: "docky.folder.drop")
+        let queue = DispatchQueue(label: "com.macstash.sidedock.folder.drop")
 
         for provider in providers {
             guard provider.hasItemConformingToTypeIdentifier(typeID) else { continue }
@@ -731,4 +732,10 @@ final class FolderQuickLookController: NSObject, QLPreviewPanelDataSource, QLPre
     func previewPanel(_ panel: QLPreviewPanel!, previewItemAt index: Int) -> QLPreviewItem! {
         previewURL as NSURL?
     }
+}
+
+
+@inline(__always)
+private func L(_ key: String) -> String {
+    LocalizationService.shared.localized(key)
 }

@@ -1,10 +1,10 @@
 //
 //  ThemesSettingsView.swift
-//  Docky
+//  MacStash
 //
-//  Settings pane that lists installed `.dockytheme` bundles and lets
+//  Settings pane that lists installed `.stashtheme` bundles and lets
 //  the user activate, deactivate, and delete them. Installed themes
-//  persist on disk under `~/Library/Application Support/Docky/Themes/`
+//  persist on disk under `~/Library/Application Support/MacStash/SideDock/Themes/`
 //  regardless of which is active — WordPress-style install/activate.
 //
 //  Bundle import via zip is handled in a separate commit; for now the
@@ -18,7 +18,7 @@ import UniformTypeIdentifiers
 
 struct ThemesSettingsView: View {
     @Bindable private var manager = ThemeManager.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @State private var themeIDPendingDeletion: String?
     @State private var importErrorMessage: String?
 
@@ -57,7 +57,7 @@ struct ThemesSettingsView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("No themes installed yet.")
                             .font(.callout)
-                        Text("Drop an unzipped `.dockytheme` folder into the Themes directory, then refresh.")
+                        Text("Drop an unzipped `.stashtheme` folder into the Themes directory, then refresh.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -256,11 +256,11 @@ struct ThemesSettingsView: View {
 
     private func defaultExportName() -> String {
         if let active = manager.activeManifest {
-            return "\(active.name) Copy.dockytheme"
+            return "\(active.name) Copy.stashtheme"
         }
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        return "My Docky Theme \(formatter.string(from: Date())).dockytheme"
+        return "My MacStash Theme \(formatter.string(from: Date())).stashtheme"
     }
 
     private var deletionDialogBinding: Binding<Bool> {
@@ -282,11 +282,11 @@ struct ThemesSettingsView: View {
     }
 
     /// File types accepted by the import panel. Accept both the custom
-    /// `.dockytheme` extension and a plain `.zip` so users can grab
+    /// `.stashtheme` extension and a plain `.zip` so users can grab
     /// either flavor from a release archive.
     private static let importContentTypes: [UTType] = {
         var types: [UTType] = [.zip]
-        if let custom = UTType(filenameExtension: "dockytheme") {
+        if let custom = UTType(filenameExtension: "stashtheme") {
             types.insert(custom, at: 0)
         }
         return types

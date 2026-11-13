@@ -1,6 +1,6 @@
 //
 //  RecentAppsService.swift
-//  Docky
+//  MacStash
 //
 //  Tracks bundle identifiers of apps the user has recently activated.
 //  Driven by `NSWorkspace.didActivateApplicationNotification` so any
@@ -20,7 +20,7 @@ final class RecentAppsService: ObservableObject {
 
     @Published private(set) var recentBundleIdentifiers: [String] = []
 
-    private static let storageKey = "docky.recentAppBundleIdentifiers"
+    private static let storageKey = "com.macstash.sidedock.recentAppBundleIdentifiers"
     private static let maxCount = 32
 
     private var observer: NSObjectProtocol?
@@ -58,7 +58,7 @@ final class RecentAppsService: ObservableObject {
     }
 
     private func record(_ bundleID: String) {
-        // Skip Docky itself, the Finder activation churn that fires on
+        // Skip MacStash itself, the Finder activation churn that fires on
         // many incidental focus shifts, and anything bundleless.
         guard !bundleID.isEmpty, bundleID != Bundle.main.bundleIdentifier else { return }
 

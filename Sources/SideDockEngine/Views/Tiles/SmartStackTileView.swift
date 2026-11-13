@@ -1,6 +1,6 @@
 //
 //  SmartStackTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -89,7 +89,7 @@ struct SmartStackTileView: View {
                 }
                 .clipped()
                 .clipShape(.rect(cornerRadius: cornerRadius, style: .continuous))
-                .dockyGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .sideDockGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
                 .overlay(alignment: .trailing) {
                     if tile.widgets.count > 1 {
                         VStack(spacing: 5) {

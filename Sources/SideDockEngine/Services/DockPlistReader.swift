@@ -1,6 +1,6 @@
 //
 //  DockPlistReader.swift
-//  Docky
+//  MacStash
 //
 //  Shared read path for the com.apple.dock preferences. Stateless helper used
 //  by DockSettingsService and TileStore so the key list lives in exactly one

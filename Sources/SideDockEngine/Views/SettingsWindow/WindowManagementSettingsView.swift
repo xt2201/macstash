@@ -1,12 +1,12 @@
 //
 //  WindowManagementSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI
 
 struct WindowManagementSettingsView: View {
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var permissions = PermissionsService.shared
     @State private var isRecordingShortcut = false
     @State private var isRecordingMinimizeKey = false
@@ -41,7 +41,7 @@ struct WindowManagementSettingsView: View {
                     Toggle("Enable Window Switcher", isOn: $preferences.enablesWindowSwitcher)
                         .font(.headline)
 
-                    Text("Turn Docky's Cmd-Tab-style switcher on or off without clearing its shortcut or preview preference.")
+                    Text("Turn MacStash's Cmd-Tab-style switcher on or off without clearing its shortcut or preview preference.")
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -53,7 +53,7 @@ struct WindowManagementSettingsView: View {
                             Text("Shortcut")
                                 .font(.headline)
 
-                            Text("Choose the global shortcut that opens Docky's Cmd-Tab-style window switcher.")
+                            Text("Choose the global shortcut that opens MacStash's Cmd-Tab-style window switcher.")
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                         }

@@ -1,6 +1,6 @@
 //
 //  MinimizedWindowTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -8,7 +8,7 @@ import SwiftUI
 
 struct MinimizedWindowTileView: View {
     let tile: AppWindow
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var workspace = WorkspaceService.shared
 
     var body: some View {

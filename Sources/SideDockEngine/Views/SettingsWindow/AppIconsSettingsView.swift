@@ -1,6 +1,6 @@
 //
 //  AppIconsSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -8,7 +8,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct AppIconsSettingsView: View {
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var workspace = WorkspaceService.shared
     @State private var otherApps: [AppIconSettingsEntry] = []
     @State private var otherAppsLoaded = false
@@ -52,7 +52,7 @@ struct AppIconsSettingsView: View {
             }
 
             Section("Start Menu") {
-                Text("Pick a custom image for the Start Menu tile. Defaults to Docky's own app icon.")
+                Text("Pick a custom image for the Start Menu tile. Defaults to MacStash's own app icon.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
@@ -61,7 +61,7 @@ struct AppIconsSettingsView: View {
             }
 
             Section("Overrides") {
-                Text("Choose a custom image for any app Docky currently knows about. Custom app icons follow Docky's circle tile clipping when circle tiles are enabled.")
+                Text("Choose a custom image for any app MacStash currently knows about. Custom app icons follow MacStash's circle tile clipping when circle tiles are enabled.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
@@ -205,7 +205,7 @@ struct AppIconsSettingsView: View {
 private struct AppIconOverrideRow: View {
     let entry: AppIconSettingsEntry
 
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -357,7 +357,7 @@ private struct AppIconSettingsEntry: Identifiable, Sendable {
 
 /// Off-main scanner that walks the standard application directories
 /// and returns one `AppIconSettingsEntry` per discovered `.app`.
-/// Bundle ids are deduped (first occurrence wins). Skips Docky
+/// Bundle ids are deduped (first occurrence wins). Skips MacStash
 /// itself so users can't accidentally override the running app's
 /// own icon. Icons are *not* loaded here — preview rows fetch them
 /// lazily from `IconCacheService` so a 200-app scan stays cheap.
@@ -430,7 +430,7 @@ private enum AppIconsInstalledAppScanner {
 private struct TrashIconOverrideRow: View {
     let state: TrashIconState
 
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -553,7 +553,7 @@ private struct FolderIconSettingsEntry: Identifiable {
 private struct FolderIconOverrideRow: View {
     let entry: FolderIconSettingsEntry
 
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -666,7 +666,7 @@ private struct FolderIconOverrideRow: View {
 }
 
 private struct LaunchpadIconOverrideRow: View {
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -774,7 +774,7 @@ private struct LaunchpadIconOverrideRow: View {
 }
 
 private struct StartMenuIconOverrideRow: View {
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {

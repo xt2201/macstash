@@ -1,6 +1,7 @@
+import MacStashCore
 //
 //  AppFolderTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -14,7 +15,7 @@ struct AppFolderTileView: View {
     let suppressesGroupedOpenedBackdrop: Bool
     private let dockSettings = DockSettingsService.shared
     @ObservedObject private var layout = DockLayoutService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var store = TileStore.shared
     @ObservedObject private var workspace = WorkspaceService.shared
     @ObservedObject private var dockBadges = DockBadgeService.shared
@@ -28,7 +29,7 @@ struct AppFolderTileView: View {
         self.cornerRadius = cornerRadius
         self.suppressesGroupedOpenedBackdrop = suppressesGroupedOpenedBackdrop
         self._layout = ObservedObject(wrappedValue: DockLayoutService.shared)
-        self._preferences = Bindable(wrappedValue: DockyPreferences.shared)
+        self._preferences = Bindable(wrappedValue: SideDockPreferences.shared)
         self._store = ObservedObject(wrappedValue: TileStore.shared)
         self._workspace = ObservedObject(wrappedValue: WorkspaceService.shared)
         self._dockBadges = ObservedObject(wrappedValue: DockBadgeService.shared)
@@ -188,7 +189,7 @@ struct AppFolderTileView: View {
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                 }
-                .dockyGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .sideDockGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
                 .padding(.top, 1)
                 .padding(.bottom, 2)
 
@@ -275,7 +276,7 @@ struct AppFolderTileView: View {
         Group {
             if shouldApplyCircleClip(to: bundleIdentifier) {
                 baseGridIcon(forBundleIdentifier: bundleIdentifier, side: side)
-                    .dockyGlass(in: Circle())
+                    .sideDockGlass(in: Circle())
                     .clipShape(Circle())
             } else {
                 baseGridIcon(forBundleIdentifier: bundleIdentifier, side: side)
@@ -359,7 +360,7 @@ struct AppFolderPopoverView: View {
     let tileID: String
     @Binding var isPresented: Bool
     let onPopoverSizeChange: (CGSize) -> Void
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var dockBadges = DockBadgeService.shared
     @ObservedObject private var workspace = WorkspaceService.shared
     @State private var isEditingTitle = false
@@ -376,7 +377,7 @@ struct AppFolderPopoverView: View {
     @FocusState private var isTitleFieldFocused: Bool
 
     fileprivate static let columns = 3
-    fileprivate static var itemWidth: CGFloat { DockyPreferences.shared.appFolderIconSize }
+    fileprivate static var itemWidth: CGFloat { SideDockPreferences.shared.appFolderIconSize }
     fileprivate static var itemHeight: CGFloat { itemWidth }
     /// Spacing and padding scale with the icon so a small folder keeps the
     /// proportions of the default 96 pt layout.
@@ -730,8 +731,8 @@ struct AppFolderPopoverView: View {
     }
 
     /// Builds the same context menu a dock AppTile would show, scoped to the
-    /// catalog-defined actions plus the running-windows section. Docky-only
-    /// options ("Show as Widget", "Hide in Docky") are intentionally omitted —
+    /// catalog-defined actions plus the running-windows section. MacStash-only
+    /// options ("Show as Widget", "Hide in Dock") are intentionally omitted —
     /// they don't apply to apps surfaced from inside an app folder.
     private func appContextActions(
         for app: AppTile,
@@ -757,7 +758,7 @@ struct AppFolderPopoverView: View {
             result.append(.divider)
         }
         result.append(.action(
-            String(localized: "Remove from Folder"),
+            L("Remove from Folder"),
             image: NSImage(systemSymbolName: "folder.badge.minus", accessibilityDescription: nil)
         ) {
             TileStore.shared.removeAppFromFolder(
@@ -781,7 +782,7 @@ struct AppFolderPopoverView: View {
         let typeID = UTType.fileURL.identifier
         let group = DispatchGroup()
         var collected: [URL] = []
-        let queue = DispatchQueue(label: "docky.appfolder.drop")
+        let queue = DispatchQueue(label: "com.macstash.sidedock.appfolder.drop")
 
         for provider in providers {
             guard provider.hasItemConformingToTypeIdentifier(typeID) else { continue }
@@ -921,7 +922,7 @@ struct AppFolderListMenuPresenter: NSViewRepresentable {
         private func buildMenu() -> NSMenu {
             let menu = NSMenu(title: tile.displayName)
 
-            let showsBadges = DockyPreferences.shared.showsAppBadges
+            let showsBadges = SideDockPreferences.shared.showsAppBadges
             for app in tile.apps {
                 var title = app.displayName
                 // Surface each app's unread count inline, e.g. "Mail (5)".
@@ -949,12 +950,12 @@ struct AppFolderListMenuPresenter: NSViewRepresentable {
             if !tile.apps.isEmpty {
                 menu.addItem(.separator())
                 let removeRoot = NSMenuItem(
-                    title: String(localized: "Remove from Folder"),
+                    title: L("Remove from Folder"),
                     action: nil,
                     keyEquivalent: ""
                 )
                 removeRoot.image = NSImage(systemSymbolName: "folder.badge.minus", accessibilityDescription: nil)
-                let removeSubmenu = NSMenu(title: String(localized: "Remove from Folder"))
+                let removeSubmenu = NSMenu(title: L("Remove from Folder"))
                 for app in tile.apps {
                     let item = NSMenuItem(
                         title: app.displayName,
@@ -975,7 +976,7 @@ struct AppFolderListMenuPresenter: NSViewRepresentable {
 
         private func listMenuIcon(for bundleIdentifier: String) -> NSImage {
             let baseIcon: NSImage
-            if let overrideURL = DockyPreferences.shared.effectiveAppIconOverrideURL(forBundleIdentifier: bundleIdentifier),
+            if let overrideURL = SideDockPreferences.shared.effectiveAppIconOverrideURL(forBundleIdentifier: bundleIdentifier),
                let overrideImage = IconCacheService.shared.image(forImageFileURL: overrideURL) {
                 baseIcon = overrideImage
             } else {
@@ -1177,7 +1178,7 @@ struct AppFolderPopoverPresenter: NSViewRepresentable {
 
         /// NSPopover.behavior = .transient should auto-dismiss on outside
         /// clicks, but it's unreliable when the host window is non-activating
-        /// (Docky's dock window). Belt-and-suspenders: explicit monitors
+        /// (MacStash's dock window). Belt-and-suspenders: explicit monitors
         /// catch any mouse-down outside the popover and close it.
         private func installClickAwayMonitors() {
             removeClickAwayMonitors()
@@ -1308,4 +1309,10 @@ private struct AppFolderReorderGestureModifier: ViewModifier {
             content
         }
     }
+}
+
+
+@inline(__always)
+private func L(_ key: String) -> String {
+    LocalizationService.shared.localized(key)
 }

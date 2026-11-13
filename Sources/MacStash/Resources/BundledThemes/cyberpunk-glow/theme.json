@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "cyberpunk-glow",
+  "name": "Cyberpunk Glow",
+  "author": "MacStash",
+  "version": "1.0.0",
+  "description": "Futuristic dark glass with vibrant cyan active indicators and magenta edge glow.",
+  "appearance": {
+    "disablesGlassLook": false,
+    "tile": {
+      "clipShape": "rounded",
+      "spacing": 6,
+      "verticalPadding": 6
+    },
+    "window": {
+      "clipShape": "rounded",
+      "cornerRadius": 14,
+      "tintOpacity": 0.4,
+      "tintColor": { "r": 0.05, "g": 0.02, "b": 0.1 },
+      "borderWidth": 1.5,
+      "borderColor": { "r": 0, "g": 0.85, "b": 1, "opacity": 0.4 }
+    },
+    "indicators": {
+      "shape": "pill",
+      "color": { "r": 0, "g": 0.9, "b": 1 },
+      "scale": 1.1,
+      "offset": -3
+    }
+  }
+}

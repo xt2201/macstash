@@ -1,6 +1,6 @@
 //
 //  CalendarWidgetTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -55,7 +55,7 @@ struct CalendarWidgetTileView: View {
 
                 ZStack {
                     Color(nsColor: backgroundTintColor)
-                        .dockyGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                        .sideDockGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 
                     if !isWithinStack {
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)

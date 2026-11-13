@@ -1,6 +1,6 @@
 //
 //  DockSettingsService.swift
-//  Docky
+//  MacStash
 //
 //  Reads system Dock preferences (com.apple.dock) and republishes them.
 //
@@ -40,7 +40,7 @@ final class DockSettingsService {
     /// hasn't moved the size slider in this build; otherwise returns
     /// the user's value. Override marking happens in `setTileSize`.
     var displayTileSize: CGFloat {
-        if !DockyPreferences.shared.isAppearanceOverridden(Keys.tileSize),
+        if !SideDockPreferences.shared.isAppearanceOverridden(Keys.tileSize),
            let themed = ThemeManager.shared.activeManifest?.behavior?.tileSize,
            themed > 0 {
             return themed
@@ -70,19 +70,19 @@ final class DockSettingsService {
             largeSize = tileSize
         }
         persistValues()
-        DockyPreferences.shared.markAppearanceOverride(Keys.tileSize)
+        SideDockPreferences.shared.markAppearanceOverride(Keys.tileSize)
     }
 
     func setLargeSize(_ size: CGFloat) {
         largeSize = max(tileSize, size)
         persistValues()
-        DockyPreferences.shared.markAppearanceOverride(Keys.largeSize)
+        SideDockPreferences.shared.markAppearanceOverride(Keys.largeSize)
     }
 
     func setMagnification(_ isEnabled: Bool) {
         magnification = isEnabled
         persistValues()
-        DockyPreferences.shared.markAppearanceOverride(Keys.magnification)
+        SideDockPreferences.shared.markAppearanceOverride(Keys.magnification)
     }
 
     private func loadPersistedValues() {
@@ -186,18 +186,18 @@ final class DockSettingsService {
     }
 
     private enum Keys {
-        static let hasImportedSystemDockSettings = "docky.dockSettings.hasImportedSystemDockSettings"
-        static let orientation = "docky.dockSettings.orientation"
-        static let tileSize = "docky.dockSettings.tileSize"
-        static let largeSize = "docky.dockSettings.largeSize"
-        static let magnification = "docky.dockSettings.magnification"
-        static let autohide = "docky.dockSettings.autohide"
-        static let autohideDelay = "docky.dockSettings.autohideDelay"
-        static let autohideTimeModifier = "docky.dockSettings.autohideTimeModifier"
-        static let minimizeEffect = "docky.dockSettings.minimizeEffect"
-        static let minimizeToApplication = "docky.dockSettings.minimizeToApplication"
-        static let showRecents = "docky.dockSettings.showRecents"
-        static let showProcessIndicators = "docky.dockSettings.showProcessIndicators"
+        static let hasImportedSystemDockSettings = "com.macstash.sidedock.dockSettings.hasImportedSystemDockSettings"
+        static let orientation = "com.macstash.sidedock.dockSettings.orientation"
+        static let tileSize = "com.macstash.sidedock.dockSettings.tileSize"
+        static let largeSize = "com.macstash.sidedock.dockSettings.largeSize"
+        static let magnification = "com.macstash.sidedock.dockSettings.magnification"
+        static let autohide = "com.macstash.sidedock.dockSettings.autohide"
+        static let autohideDelay = "com.macstash.sidedock.dockSettings.autohideDelay"
+        static let autohideTimeModifier = "com.macstash.sidedock.dockSettings.autohideTimeModifier"
+        static let minimizeEffect = "com.macstash.sidedock.dockSettings.minimizeEffect"
+        static let minimizeToApplication = "com.macstash.sidedock.dockSettings.minimizeToApplication"
+        static let showRecents = "com.macstash.sidedock.dockSettings.showRecents"
+        static let showProcessIndicators = "com.macstash.sidedock.dockSettings.showProcessIndicators"
     }
 
 }

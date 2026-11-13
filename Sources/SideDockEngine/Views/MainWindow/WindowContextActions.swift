@@ -1,6 +1,6 @@
 //
 //  WindowContextActions.swift
-//  Docky
+//  MacStash
 //
 //  Shared builder for the per-window section of context menus shown in the
 //  hover preview popover and the Cmd-Tab switcher overlay. Mirrors the macOS
@@ -11,6 +11,7 @@
 //
 
 import AppKit
+import MacStashCore
 
 @MainActor
 func windowMenuContextActions(
@@ -18,6 +19,7 @@ func windowMenuContextActions(
     dismiss: @escaping () -> Void
 ) -> [ContextAction] {
     let workspace = WorkspaceService.shared
+    let loc = LocalizationService.shared
 
     func run(_ action: @escaping (AppWindow) -> Bool) -> () -> Void {
         return {
@@ -27,20 +29,20 @@ func windowMenuContextActions(
     }
 
     return [
-        .action(String(localized: "Minimize"), image: contextMenuSymbol("minus.circle"), handler: run(workspace.minimize(window:))),
-        .action(String(localized: "Zoom"), image: contextMenuSymbol("arrow.up.left.and.arrow.down.right"), handler: run(workspace.zoom(window:))),
-        .action(String(localized: "Fill"), image: contextMenuSymbol("rectangle.fill"), handler: run(workspace.fill(window:))),
-        .action(String(localized: "Center"), image: contextMenuSymbol("rectangle.center.inset.filled"), handler: run(workspace.center(window:))),
-        .submenu(String(localized: "Move & Resize"), children: [
-            .action(String(localized: "Left"), image: contextMenuSymbol("rectangle.lefthalf.filled"), handler: run(workspace.fillLeftHalf(window:))),
-            .action(String(localized: "Right"), image: contextMenuSymbol("rectangle.righthalf.filled"), handler: run(workspace.fillRightHalf(window:))),
-            .action(String(localized: "Top"), image: contextMenuSymbol("rectangle.tophalf.filled"), handler: run(workspace.fillTopHalf(window:))),
-            .action(String(localized: "Bottom"), image: contextMenuSymbol("rectangle.bottomhalf.filled"), handler: run(workspace.fillBottomHalf(window:))),
+        .action(loc.localized("dock.menu.minimize"), image: contextMenuSymbol("minus.circle"), handler: run(workspace.minimize(window:))),
+        .action(loc.localized("dock.menu.zoom"), image: contextMenuSymbol("arrow.up.left.and.arrow.down.right"), handler: run(workspace.zoom(window:))),
+        .action(loc.localized("dock.menu.fill"), image: contextMenuSymbol("rectangle.fill"), handler: run(workspace.fill(window:))),
+        .action(loc.localized("dock.menu.center"), image: contextMenuSymbol("rectangle.center.inset.filled"), handler: run(workspace.center(window:))),
+        .submenu(loc.localized("dock.menu.moveAndResize"), children: [
+            .action(loc.localized("dock.menu.left"), image: contextMenuSymbol("rectangle.lefthalf.filled"), handler: run(workspace.fillLeftHalf(window:))),
+            .action(loc.localized("dock.menu.right"), image: contextMenuSymbol("rectangle.righthalf.filled"), handler: run(workspace.fillRightHalf(window:))),
+            .action(loc.localized("dock.menu.top"), image: contextMenuSymbol("rectangle.tophalf.filled"), handler: run(workspace.fillTopHalf(window:))),
+            .action(loc.localized("dock.menu.bottom"), image: contextMenuSymbol("rectangle.bottomhalf.filled"), handler: run(workspace.fillBottomHalf(window:))),
             .divider,
-            .action(String(localized: "Top Left"), image: contextMenuSymbol("arrow.up.left"), handler: run(workspace.fillTopLeftQuarter(window:))),
-            .action(String(localized: "Top Right"), image: contextMenuSymbol("arrow.up.right"), handler: run(workspace.fillTopRightQuarter(window:))),
-            .action(String(localized: "Bottom Left"), image: contextMenuSymbol("arrow.down.left"), handler: run(workspace.fillBottomLeftQuarter(window:))),
-            .action(String(localized: "Bottom Right"), image: contextMenuSymbol("arrow.down.right"), handler: run(workspace.fillBottomRightQuarter(window:))),
+            .action(loc.localized("dock.menu.topLeft"), image: contextMenuSymbol("arrow.up.left"), handler: run(workspace.fillTopLeftQuarter(window:))),
+            .action(loc.localized("dock.menu.topRight"), image: contextMenuSymbol("arrow.up.right"), handler: run(workspace.fillTopRightQuarter(window:))),
+            .action(loc.localized("dock.menu.bottomLeft"), image: contextMenuSymbol("arrow.down.left"), handler: run(workspace.fillBottomLeftQuarter(window:))),
+            .action(loc.localized("dock.menu.bottomRight"), image: contextMenuSymbol("arrow.down.right"), handler: run(workspace.fillBottomRightQuarter(window:))),
         ]),
     ]
 }

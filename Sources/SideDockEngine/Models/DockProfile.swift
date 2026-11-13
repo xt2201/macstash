@@ -1,6 +1,6 @@
 //
 //  DockProfile.swift
-//  Docky
+//  MacStash
 //
 //  Persistent per-profile snapshot of the dock's tile-store fields. Each
 //  profile owns its own pinned/trailing items, widget placements, app

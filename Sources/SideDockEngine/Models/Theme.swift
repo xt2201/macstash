@@ -1,12 +1,12 @@
 //
 //  Theme.swift
-//  Docky
+//  MacStash
 //
-//  Codable representation of a `.dockytheme` bundle's `theme.json`
+//  Codable representation of a `.stashtheme` bundle's `theme.json`
 //  manifest. Every appearance field is optional so that partial
 //  themes overlay cleanly: a field that is `nil` falls through to
 //  the user's own preference (or the app default), per the layered
-//  read path in `DockyPreferences`.
+//  read path in `SideDockPreferences`.
 //
 //  Image fields are *relative* paths into the bundle's `assets/`
 //  directory. Absolute resolution happens at read time against
@@ -22,7 +22,7 @@
 //  Optional files inside `assets/` (also convention-only):
 //    - `<bundle-id>.png` (or `.jpg`/`.jpeg`): per-app icon override.
 //      When the theme is active, `effectiveAppIconOverrideURL` on
-//      `DockyPreferences` falls back to this asset for any app whose
+//      `SideDockPreferences` falls back to this asset for any app whose
 //      bundle identifier matches the filename, so a file named
 //      `com.apple.Safari.png` automatically replaces Safari's icon
 //      while the theme is in use.

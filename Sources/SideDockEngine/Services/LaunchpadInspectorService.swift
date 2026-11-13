@@ -1,6 +1,6 @@
 //
 //  LaunchpadInspectorService.swift
-//  Docky
+//  MacStash
 //
 //  Drives a detached settings panel that floats above the Launchpad
 //  overlay so the user can live-edit grid columns, icon size, etc. and

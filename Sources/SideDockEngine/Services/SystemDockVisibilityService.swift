@@ -1,13 +1,13 @@
 import os.log
 //
 //  SystemDockVisibilityService.swift
-//  Docky
+//  MacStash
 //
 //  Hides the macOS Dock by writing to com.apple.dock preferences
 //  (autohide on, large delay, instant animation, no bouncing, no launch
 //  animation). The user's previous values are snapshotted before the first
 //  overwrite so they can be restored when the preference is turned off or
-//  when Docky quits.
+//  when MacStash quits.
 //
 
 import AppKit
@@ -20,11 +20,11 @@ final class SystemDockVisibilityService {
     static let shared = SystemDockVisibilityService()
 
     private static let dockDomain = "com.apple.dock" as CFString
-    private static let snapshotKey = "docky.systemDockVisibilitySnapshot"
-    private static let snapshotNullMarker = "__docky_null__"
+    private static let snapshotKey = "com.macstash.sidedock.systemDockVisibilitySnapshot"
+    private static let snapshotNullMarker = "__macstash_null__"
     private static let stateFilename = "SystemDockVisibilityState.plist"
-    private static let fallbackBundleIdentifier = "gt.quintero.Docky"
-    private static let watchdogAppName = "DockyDockWatchdog.app"
+    private static let fallbackBundleIdentifier = "com.macstash.app"
+    private static let watchdogAppName = "MacStashDockWatchdog.app"
 
     private static let managedKeys: [String] = [
         "orientation",
@@ -150,7 +150,7 @@ final class SystemDockVisibilityService {
         FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)
             .first?
-            .appendingPathComponent("Docky", isDirectory: true)
+            .appendingPathComponent("MacStash", isDirectory: true)
             .appendingPathComponent(Self.stateFilename)
     }
 

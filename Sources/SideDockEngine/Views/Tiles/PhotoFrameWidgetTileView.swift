@@ -1,6 +1,6 @@
 //
 //  PhotoFrameWidgetTileView.swift
-//  Docky
+//  MacStash
 //
 //  Renders the Photo Frame widget: an empty-state "add photos" call to
 //  action when nothing is configured, otherwise the user's photos filling

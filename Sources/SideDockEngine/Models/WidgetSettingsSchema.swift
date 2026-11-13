@@ -1,6 +1,6 @@
 //
 //  WidgetSettingsSchema.swift
-//  Docky
+//  MacStash
 //
 
 import Foundation

@@ -1,6 +1,6 @@
 //
 //  SpacerTileView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI

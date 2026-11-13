@@ -1,6 +1,6 @@
 //
 //  FilePreviewImage.swift
-//  Docky
+//  MacStash
 //
 //  Preview image for a file shown in folder surfaces (tile pile, fan,
 //  grid popover). Image files render a downsampled thumbnail decoded off

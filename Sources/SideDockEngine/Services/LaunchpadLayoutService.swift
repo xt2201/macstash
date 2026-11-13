@@ -1,10 +1,10 @@
 //
 //  LaunchpadLayoutService.swift
-//  Docky
+//  MacStash
 //
 //  Owns the user's Launchpad layout — order of top-level items and
 //  the virtual folders they belong to. Persisted to UserDefaults
-//  under `docky.launchpadLayout`.
+//  under `com.macstash.sidedock.launchpadLayout`.
 //
 //  The service exposes mutation methods that maintain invariants
 //  (each app appears at most once across top level and folders;
@@ -26,7 +26,7 @@ import Observation
     private let decoder = JSONDecoder()
 
     private enum Keys {
-        static let layout = "docky.launchpadLayout"
+        static let layout = "com.macstash.sidedock.launchpadLayout"
     }
 
     private init() {

@@ -1,6 +1,6 @@
 //
 //  DockBadgeView.swift
-//  Docky
+//  MacStash
 //
 //  The red notification badge drawn over a running app's tile, mirroring the
 //  system Dock's badge. Sizes itself relative to the tile so it scales with

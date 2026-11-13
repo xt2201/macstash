@@ -1,6 +1,6 @@
 //
 //  ContextActionPopover.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -403,7 +403,7 @@ extension ContextActionMenuPresenter.Coordinator {
 /// users with trackpads (or anyone who didn't think to right-click) get
 /// the same actions on demand. Wraps an NSView anchor (used both for
 /// menu positioning and for hover detection) behind a SwiftUI label so
-/// the visual matches Docky's chrome — `.ultraThinMaterial` capsule
+/// the visual matches MacStash's chrome — `.ultraThinMaterial` capsule
 /// with a hairline border and a soft shadow against the desaturated
 /// thumbnail below it.
 struct MoreActionsButton: View {

@@ -1,8 +1,8 @@
 //
 //  MainWindow.swift
-//  Docky
+//  MacStash
 //
-//  Created by Jose Quintero on 17/04/26.
+//  Created by MacStash Team.
 //
 
 import AppKit
@@ -55,9 +55,9 @@ final class MainWindowContainerView: NSView {
     /// Re-applies the per-edge content padding. Full-axis mode forces
     /// every edge to 0 so the chrome bleeds to the panel border; in
     /// fit-content mode each edge picks up its own theme/user override
-    /// from `DockyPreferences`.
+    /// from `SideDockPreferences`.
     private func applyContentInsets() {
-        let prefs = DockyPreferences.shared
+        let prefs = SideDockPreferences.shared
         let fullAxis = prefs.effectiveWindowAxisSizing == .fullAxis
         let top = fullAxis ? 0 : prefs.effectiveWindowContentInsetTop
         let leading = fullAxis ? 0 : prefs.effectiveWindowContentInsetLeading
@@ -75,11 +75,11 @@ final class MainWindowContainerView: NSView {
     /// the project uses to bridge from `@Observable` into NSView land.
     private func observePreferencesForInsets() {
         withObservationTracking {
-            _ = DockyPreferences.shared.effectiveWindowAxisSizing
-            _ = DockyPreferences.shared.effectiveWindowContentInsetTop
-            _ = DockyPreferences.shared.effectiveWindowContentInsetLeading
-            _ = DockyPreferences.shared.effectiveWindowContentInsetBottom
-            _ = DockyPreferences.shared.effectiveWindowContentInsetTrailing
+            _ = SideDockPreferences.shared.effectiveWindowAxisSizing
+            _ = SideDockPreferences.shared.effectiveWindowContentInsetTop
+            _ = SideDockPreferences.shared.effectiveWindowContentInsetLeading
+            _ = SideDockPreferences.shared.effectiveWindowContentInsetBottom
+            _ = SideDockPreferences.shared.effectiveWindowContentInsetTrailing
         } onChange: { [weak self] in
             DispatchQueue.main.async {
                 guard let self else { return }
@@ -134,7 +134,7 @@ final class MainWindowContainerView: NSView {
     }
 
     /// An inactive app gets far fewer mouse-moved events, with gaps of up to
-    /// 200 ms, and the dock panel never activates Docky. So magnification also
+    /// 200 ms, and the dock panel never activates MacStash. So magnification also
     /// reads the pointer once per display frame. The poll stops while the
     /// pointer rests, and the next mouse-moved event starts it again.
     private func startPointerPolling() {
@@ -202,7 +202,7 @@ final class MainWindowContainerView: NSView {
     private func cursorIsAtChromeFringe(_ point: CGPoint, hostingSize: CGSize) -> Bool {
         let chromeSize = DockLayoutService.shared.chromeSize
         guard chromeSize.width > 0, chromeSize.height > 0 else { return true }
-        let position = DockyPreferences.shared.windowPosition
+        let position = SideDockPreferences.shared.windowPosition
             .resolved(systemOrientation: DockSettingsService.shared.orientation)
         switch position {
         case .bottom:
@@ -219,10 +219,10 @@ final class MainWindowContainerView: NSView {
 
 /// NSPanel (not NSWindow) so the `.nonactivatingPanel` style mask actually
 /// takes effect, that's the only way to keep clicks on the dock from
-/// activating Docky as a foreground app, which would otherwise break
+/// activating the dock as a foreground app, which would otherwise break
 /// frontmost-tracked behaviors (cycle windows on tile click, hide-on-second-click).
 final class MainWindow: NSPanel {
-    /// We default to `false` so tile clicks don't bring Docky to the
+    /// We default to `false` so tile clicks don't bring MacStash to the
     /// foreground (frontmost-tracked behaviors like cycle-on-click rely
     /// on the previously-frontmost app staying key). Embedded controls
     /// that need keyboard input, currently only the Search widget's
@@ -244,7 +244,7 @@ final class MainWindow: NSPanel {
     private let revealTriggerThickness: CGFloat = 2
     private let tileMutationAnimationDuration: TimeInterval = 0.18
     private let dockSettings = DockSettingsService.shared
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
     private let layout = DockLayoutService.shared
     private let tileStore = TileStore.shared
     private let editMode = DockEditModeService.shared
@@ -274,12 +274,12 @@ final class MainWindow: NSPanel {
     private var effectivelyAutohides: Bool {
         preferences.autohidesWindow
             || fullscreenHidingActive
-            || (isMaximizedActiveOnTargetScreen && preferences.maximizedWindowBehavior == .hideDocky)
+            || (isMaximizedActiveOnTargetScreen && preferences.maximizedWindowBehavior == .hideDock)
     }
 
     private var isContentOverlapActive: Bool {
         fullscreenHidingActive
-            || (isMaximizedActiveOnTargetScreen && preferences.maximizedWindowBehavior == .hideDocky)
+            || (isMaximizedActiveOnTargetScreen && preferences.maximizedWindowBehavior == .hideDock)
     }
 
     /// Window room added past the dock's resting frame along its axis, in
@@ -302,9 +302,9 @@ final class MainWindow: NSPanel {
         return f
     }
 
-    /// The frame Docky claims for content reservation, or nil when Docky is
+    /// The frame the dock claims for content reservation, or nil when the dock is
     /// hidden / off-screen / not currently rendering. Used by services that
-    /// keep other apps' windows out of Docky's way. Only the chrome's depth
+    /// keep other apps' windows out of the dock's way. Only the chrome's depth
     /// counts, so the magnification headroom does not push windows away.
     var currentReservationFrame: CGRect? {
         guard visibilityState == .visible else { return nil }
@@ -312,7 +312,7 @@ final class MainWindow: NSPanel {
         guard let chrome = chromeScreenFrame() else { return frame }
         // A window edge must not land on the chrome's border.
         let gap: CGFloat = 4
-        switch DockyPreferences.shared.windowPosition.resolved(systemOrientation: DockSettingsService.shared.orientation) {
+        switch SideDockPreferences.shared.windowPosition.resolved(systemOrientation: DockSettingsService.shared.orientation) {
         case .bottom:
             return CGRect(x: frame.minX, y: chrome.minY, width: frame.width, height: chrome.height.rounded(.up) + gap)
         case .top:
@@ -336,7 +336,7 @@ final class MainWindow: NSPanel {
     func chromeScreenFrame() -> CGRect? {
         let chromeSize = DockLayoutService.shared.chromeSize
         guard chromeSize.width > 0, chromeSize.height > 0 else { return nil }
-        let position = DockyPreferences.shared.windowPosition
+        let position = SideDockPreferences.shared.windowPosition
             .resolved(systemOrientation: DockSettingsService.shared.orientation)
         let f = restFrame
         let width = min(chromeSize.width, f.width)
@@ -354,9 +354,9 @@ final class MainWindow: NSPanel {
     }
 
     override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
-        visibilityState = DockyPreferences.shared.autohidesWindow ? .hidden : .visible
+        visibilityState = SideDockPreferences.shared.autohidesWindow ? .hidden : .visible
         // Force `.nonactivatingPanel` regardless of what the XIB hands us so
-        // tile clicks never bring Docky to the foreground. Other bits stay
+        // tile clicks never bring MacStash to the foreground. Other bits stay
         // intact (the XIB-supplied mask covers titled/resizable/etc.).
         super.init(
             contentRect: contentRect,
@@ -435,7 +435,7 @@ final class MainWindow: NSPanel {
     }
 
     private func observeFrameInputs() {
-        // DockyPreferences is now `@Observable` so we read its
+        // SideDockPreferences is now `@Observable` so we read its
         // properties through `observeChanges` (Observation framework
         // auto-tracks). DockSettingsService / DockDragService /
         // DockEditModeService are still ObservableObject; their
@@ -547,13 +547,13 @@ final class MainWindow: NSPanel {
 
     private func observeWindowPlacementInputs() {
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.windowSpaceBehavior
+            _ = SideDockPreferences.shared.windowSpaceBehavior
             self?.applyCollectionBehavior()
         }
         .store(in: &cancellables)
 
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.windowDisplayTarget
+            _ = SideDockPreferences.shared.windowDisplayTarget
             self?.lastPointerScreenFrame = nil
             self?.updatePointerScreenMonitoring()
             self?.updateFullscreenStateAndApply(animated: true)
@@ -583,14 +583,14 @@ final class MainWindow: NSPanel {
 
     private func observeVisibilityInputs() {
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.autohidesWindow
+            _ = SideDockPreferences.shared.autohidesWindow
             self?.applyEffectiveVisibility(animated: true)
         }
         .store(in: &cancellables)
 
         observeChanges { [weak self] in
-            _ = DockyPreferences.shared.maximizedWindowBehavior
-            _ = DockyPreferences.shared.hidesDuringFullscreen
+            _ = SideDockPreferences.shared.maximizedWindowBehavior
+            _ = SideDockPreferences.shared.hidesDuringFullscreen
             self?.updateFullscreenStateAndApply(animated: true)
         }
         .store(in: &cancellables)
@@ -627,7 +627,7 @@ final class MainWindow: NSPanel {
     /// A hidden panel sits off-screen, where its tracking area can't fire, so
     /// the reveal runs off monitored pointer movement instead. When autohide
     /// is inactive the panel is always visible and `syncPointerPresence`
-    /// early-returns, so a global `.mouseMoved` monitor would wake Docky on
+    /// early-returns, so a global `.mouseMoved` monitor would wake the dock on
     /// every system-wide pointer move for nothing — only keep it installed
     /// while autohide can actually hide us. Re-synced from
     /// `applyEffectiveVisibility` whenever that condition changes.
@@ -808,7 +808,7 @@ final class MainWindow: NSPanel {
         let visibleBounds = resolvedScreen?.visibleFrame ?? screenBounds
         // Window-frame math needs the *total* horizontal and vertical
         // padding the chrome view leaves around itself inside the panel.
-        // Per-edge insets live in `DockyPreferences`; full-axis mode
+        // Per-edge insets live in `SideDockPreferences`; full-axis mode
         // forces them to zero in `MainWindowContainerView` and we
         // mirror that here so the panel sizing stays in sync.
         let fullAxis = preferences.effectiveWindowAxisSizing == .fullAxis
@@ -1231,11 +1231,11 @@ final class MainWindow: NSPanel {
 
             // Fullscreen: window covers the entire NSScreen.frame (including
             // the menubar area). Maximized: window fills a full axis of the
-            // visibleFrame flush against Docky's edge, so it falls behind
-            // Docky. This catches a true maximize (all four edges flush) as
-            // well as a half tile that spans the full axis touching Docky
-            // (e.g. tiled right with Docky on the right, or tiled top with
-            // Docky on either side), which a strict visibleFrame match misses.
+            // visibleFrame flush against the dock's edge, so it falls behind
+            // the dock. This catches a true maximize (all four edges flush) as
+            // well as a half tile that spans the full axis touching the dock
+            // (e.g. tiled right with the dock on the right, or tiled top with
+            // the dock on either side), which a strict visibleFrame match misses.
             if Self.rect(nsBounds, matches: frame) {
                 fullscreenCandidate = true
                 if let ownerPID { fullscreenCandidatePIDs.insert(ownerPID) }
@@ -1288,8 +1288,8 @@ final class MainWindow: NSPanel {
 
     /// True when `rect` fills a full axis of `visibleFrame` (at least three
     /// edges flush, i.e. a half tile or full maximize) AND is flush against
-    /// the edge Docky occupies, meaning it extends into Docky's strip. A
-    /// window with a non-flush edge on Docky's side (e.g. tiled to the
+    /// the edge the dock occupies, meaning it extends into the dock's strip. A
+    /// window with a non-flush edge on the dock's side (e.g. tiled to the
     /// opposite half) stays clear and returns false.
     private static func fillsFullAxisBehindDock(
         _ rect: CGRect,

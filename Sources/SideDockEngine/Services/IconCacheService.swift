@@ -1,6 +1,6 @@
 //
 //  IconCacheService.swift
-//  Docky
+//  MacStash
 //
 //  In-memory cache for icons surfaced in tiles. Wraps NSCache so eviction
 //  under memory pressure is handled by the OS. `NSWorkspace.icon(forFile:)`
@@ -82,7 +82,7 @@ final class IconCacheService {
     /// the margin of a macOS app icon (100 px of 1024) so an edge-to-edge
     /// override sits at the same size as the system icons around it.
     func displayedIcon(forBundleIdentifier bundleIdentifier: String) -> NSImage {
-        let preferences = DockyPreferences.shared
+        let preferences = SideDockPreferences.shared
         guard let url = preferences.effectiveAppIconOverrideURL(forBundleIdentifier: bundleIdentifier),
               let override = image(forImageFileURL: url) else {
             return icon(forBundleIdentifier: bundleIdentifier)

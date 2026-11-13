@@ -1,6 +1,6 @@
 //
 //  LiveGlassBackdrop.swift
-//  Docky
+//  MacStash
 //
 //  Real-glass NSView backed by a private CABackdropLayer with CAFilter
 //  composition (gaussianBlur + saturation). Unlike SwiftUI's `.glassEffect`,

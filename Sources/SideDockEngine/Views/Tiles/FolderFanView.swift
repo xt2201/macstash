@@ -1,6 +1,6 @@
 //
 //  FolderFanView.swift
-//  Docky
+//  MacStash
 //
 //  Parabolic "fan" presentation of a folder's contents — the macOS
 //  Dock's classic fan view, recreated as a borderless overlay window.
@@ -159,12 +159,12 @@ struct FolderFanView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     // Use the same Liquid-Glass / SkyLight-fallback
-                    // chrome the rest of Docky uses for tile glass
+                    // chrome the rest of MacStash uses for tile glass
                     // surfaces. Falls back automatically when glass
                     // is unavailable so the chip stays readable.
                     .background(.thickMaterial)
                     .clipShape(.capsule)
-                    .dockyGlassBorder(in: Capsule())
+                    .sideDockGlassBorder(in: Capsule())
                     .frame(maxWidth: Self.labelMaxWidth, alignment: .trailing)
                     // Chip fades in alongside the position slide and
                     // reaches full opacity exactly when the icon

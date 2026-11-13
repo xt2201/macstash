@@ -1,6 +1,6 @@
 //
 //  SearchWidgetTileView.swift
-//  Docky
+//  MacStash
 //
 //  1x: static magnifying-glass affordance. Tap (handled in
 //  `TileView.handleWidgetTap`) opens `https://www.google.com`.
@@ -11,7 +11,7 @@
 //  accept key status while the field is focused; we toggle
 //  `MainWindow.allowsKeyWindow` on focus changes and ask the host
 //  window to (un)make-key in lockstep so SwiftUI can route keystrokes
-//  into the field without ever bringing Docky to the foreground (the
+//  into the field without ever bringing MacStash to the foreground (the
 //  `.nonactivatingPanel` style mask keeps app activation suppressed).
 //
 

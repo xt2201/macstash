@@ -1,6 +1,6 @@
 //
 //  DockLayoutService.swift
-//  Docky
+//  MacStash
 //
 
 import Combine

@@ -1,6 +1,6 @@
 //
 //  BatteriesWidgetTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -29,7 +29,7 @@ struct BatteriesWidgetTileView: View {
 
                 ZStack {
                     Color(nsColor: backgroundTintColor)
-                        .dockyGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                        .sideDockGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 
                     if !isWithinStack {
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)

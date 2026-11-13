@@ -1,6 +1,6 @@
 //
 //  LocationWeatherStore.swift
-//  Docky
+//  MacStash
 //
 
 import Combine

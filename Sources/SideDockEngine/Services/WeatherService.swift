@@ -1,6 +1,6 @@
 //
 //  WeatherService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -50,7 +50,7 @@ final class WeatherService: NSObject, ObservableObject {
         Self.isAuthorizedStatus(authorizationStatus)
     }
 
-    /// Docky's tri-state view of location access, used by the widget to
+    /// MacStash's tri-state view of location access, used by the widget to
     /// decide between real content and the call-to-action state.
     var permissionStatus: PermissionStatus {
         if Self.isAuthorizedStatus(authorizationStatus) {

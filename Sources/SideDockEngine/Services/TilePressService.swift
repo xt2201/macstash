@@ -1,6 +1,6 @@
 //
 //  TilePressService.swift
-//  Docky
+//  MacStash
 //
 //  Tracks which dock tile is currently being pressed (mouse-down before
 //  release) using a single NSEvent local monitor instead of a SwiftUI
@@ -25,7 +25,7 @@ import OSLog
 @MainActor
 final class TilePressService: ObservableObject {
     static let shared = TilePressService()
-    private static let logger = Logger(subsystem: "gt.quintero.Docky", category: "TilePress")
+    private static let logger = Logger(subsystem: "com.macstash.app", category: "TilePress")
 
     @Published private(set) var pressedTileID: String?
 

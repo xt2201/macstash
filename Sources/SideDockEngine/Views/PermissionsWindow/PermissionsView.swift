@@ -1,6 +1,6 @@
 //
 //  PermissionsView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -106,7 +106,7 @@ struct PermissionsView: View {
     private var bottomSection: some View {
         VStack(alignment: .leading, spacing: 24) {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Welcome to Docky")
+                Text("Welcome to MacStash")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.secondary)
 
@@ -153,14 +153,14 @@ struct PermissionsView: View {
             Color(nsColor: .controlBackgroundColor)
 
             HStack(alignment: .bottom, spacing: 18) {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: dockyAppURL.path))
+                Image(nsImage: NSWorkspace.shared.icon(forFile: appBundleURL.path))
                     .resizable()
                     .interpolation(.high)
                     .frame(width: 88, height: 88)
                     .shadow(color: Color.black.opacity(0.18), radius: 16, y: 10)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Label("Docky Setup", systemImage: "sparkles.rectangle.stack")
+                    Label("MacStash Setup", systemImage: "sparkles.rectangle.stack")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.secondary)
 
@@ -218,19 +218,19 @@ struct PermissionsView: View {
 
     private var draggableAppProxy: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Drag Docky into the list in System Settings to add it without searching.")
+            Text("Drag MacStash into the list in System Settings to add it without searching.")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             HStack(spacing: 12) {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: dockyAppURL.path))
+                Image(nsImage: NSWorkspace.shared.icon(forFile: appBundleURL.path))
                     .resizable()
                     .interpolation(.high)
                     .frame(width: 48, height: 48)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Docky.app")
+                    Text("MacStash.app")
                         .font(.headline)
                     Text("Drag this into the macOS privacy list")
                         .font(.subheadline)
@@ -250,13 +250,13 @@ struct PermissionsView: View {
                     .strokeBorder(Color.secondary.opacity(0.15))
             )
             .onDrag {
-                NSItemProvider(object: dockyAppURL as NSURL)
+                NSItemProvider(object: appBundleURL as NSURL)
             }
         }
         .padding(.top, 4)
     }
 
-    private var dockyAppURL: URL {
+    private var appBundleURL: URL {
         Bundle.main.bundleURL
     }
 
@@ -493,7 +493,7 @@ struct PermissionsView: View {
         case .denied:
             return "macOS has this disabled right now. Open System Settings, enable it, then come back and re-check."
         case .notDetermined:
-            return "Docky will guide you through the fastest way to enable this on your Mac."
+            return "MacStash will guide you through the fastest way to enable this on your Mac."
         }
     }
 
@@ -545,7 +545,7 @@ struct PermissionsView: View {
         }
 
         if step.isRequiredAtLaunch {
-            return "This permission unlocks a core Docky feature, but you can skip it for now and grant it later."
+            return "This permission unlocks a core MacStash feature, but you can skip it for now and grant it later."
         }
 
         return "This permission unlocks an optional feature and can be granted later from Settings."

@@ -1,6 +1,6 @@
 //
 //  DockMagnificationService.swift
-//  Docky
+//  MacStash
 //
 //  Drives the live "scale icons under the cursor" effect. Pointer state is
 //  pushed from a SwiftUI `.onContinuousHover` on the tile container; the

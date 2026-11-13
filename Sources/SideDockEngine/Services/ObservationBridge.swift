@@ -1,6 +1,6 @@
 //
 //  ObservationBridge.swift
-//  Docky
+//  MacStash
 //
 //  Bridge between the `Observation` framework's
 //  `withObservationTracking` and Combine's `AnyCancellable` /

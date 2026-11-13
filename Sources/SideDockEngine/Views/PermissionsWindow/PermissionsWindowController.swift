@@ -1,6 +1,6 @@
 //
 //  PermissionsWindowController.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

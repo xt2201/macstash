@@ -1,6 +1,6 @@
 //
 //  ActionExecutionService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

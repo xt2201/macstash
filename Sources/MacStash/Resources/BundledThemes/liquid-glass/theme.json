@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "liquid-glass",
+  "name": "Liquid Glass",
+  "author": "MacStash",
+  "version": "1.0.0",
+  "description": "MacStash signature Liquid Glass: dynamic caustics, subtle specular border, and luminous running indicators.",
+  "appearance": {
+    "disablesGlassLook": false,
+    "tile": {
+      "clipShape": "rounded",
+      "spacing": 6,
+      "verticalPadding": 6
+    },
+    "window": {
+      "clipShape": "rounded",
+      "cornerRadius": 18,
+      "tintOpacity": 0.12
+    },
+    "indicators": {
+      "shape": "dot",
+      "scale": 1.0,
+      "offset": -4
+    }
+  }
+}

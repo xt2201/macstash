@@ -1,6 +1,6 @@
 //
 //  SettingsWindowController.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -22,7 +22,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.toolbarStyle = .unified
-        window.toolbar = NSToolbar(identifier: "DockySettingsToolbar")
+        window.toolbar = NSToolbar(identifier: "MacStashDockSettingsToolbar")
         window.center()
         window.isReleasedWhenClosed = false
         self.init(window: window)

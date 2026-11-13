@@ -1,6 +1,6 @@
 //
 //  RemindersService.swift
-//  Docky
+//  MacStash
 //
 
 import Combine
@@ -42,7 +42,7 @@ final class RemindersService: ObservableObject {
         authorizationStatus = EKEventStore.authorizationStatus(for: .reminder)
     }
 
-    /// Docky's tri-state view of reminders access. `.writeOnly` counts as
+    /// MacStash's tri-state view of reminders access. `.writeOnly` counts as
     /// not-granted because the widget needs read access to show tasks.
     var permissionStatus: PermissionStatus {
         switch authorizationStatus {

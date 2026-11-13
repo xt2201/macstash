@@ -1,6 +1,6 @@
 //
 //  NowPlayingWidgetSettingsContent.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

@@ -1,6 +1,6 @@
 //
 //  TileMagnificationState.swift
-//  Docky
+//  MacStash
 //
 //  Resolved magnification for the dock, kept outside the view tree.
 //

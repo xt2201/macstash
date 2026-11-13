@@ -1,12 +1,12 @@
 //
 //  ExternalWidget.swift
-//  Docky
+//  MacStash
 //
 //  Plugin contract + in-process registry for community-supplied widget
 //  bundles. The protocol is intentionally @objc and Cocoa-only so third
-//  parties don't need to link against Docky's Swift module: they ship a
+//  parties don't need to link against MacStash's Swift module: they ship a
 //  principal class deriving from NSObject and conforming to
-//  DockyWidgetPlugin, and Docky finds it via Bundle.principalClass at
+//  MacStashWidgetPlugin, and MacStash finds it via Bundle.principalClass at
 //  load time.
 //
 
@@ -14,7 +14,7 @@ import AppKit
 import Foundation
 import SwiftUI
 
-@objc(DockyWidgetPlugin) public protocol DockyWidgetPlugin: AnyObject {
+@objc(MacStashWidgetPlugin) public protocol MacStashWidgetPlugin: AnyObject {
     @objc init()
 
     var identifier: String { get }
@@ -57,7 +57,7 @@ import SwiftUI
     ) -> NSView
 }
 
-/// Metadata extracted from a loaded plugin, normalized into Docky's
+/// Metadata extracted from a loaded plugin, normalized into MacStash's
 /// type system. Captured once at registration so subsequent reads don't
 /// re-cross the @objc boundary.
 struct ExternalWidgetMetadata: Equatable {
@@ -81,9 +81,9 @@ struct ExternalWidgetMetadata: Equatable {
 final class ExternalWidgetRegistration {
     let metadata: ExternalWidgetMetadata
     let bundleURL: URL
-    private let plugin: DockyWidgetPlugin
+    private let plugin: MacStashWidgetPlugin
 
-    init(plugin: DockyWidgetPlugin, bundleURL: URL, settingsSchema: [WidgetSettingsField] = []) {
+    init(plugin: MacStashWidgetPlugin, bundleURL: URL, settingsSchema: [WidgetSettingsField] = []) {
         self.bundleURL = bundleURL
         self.plugin = plugin
         self.metadata = ExternalWidgetMetadata(

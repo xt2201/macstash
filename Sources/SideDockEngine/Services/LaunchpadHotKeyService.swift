@@ -1,6 +1,6 @@
 //
 //  LaunchpadHotKeyService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -13,11 +13,11 @@ final class LaunchpadHotKeyService {
     private var hotKeyRef: EventHotKeyRef?
     private var hotKeyHandlerRef: EventHandlerRef?
     private var cancellables: Set<AnyCancellable> = []
-    private let hotKeyID = EventHotKeyID(signature: OSType(0x444B594C), id: 1)
+    private let hotKeyID = EventHotKeyID(signature: OSType(0x4D534C50), id: 1) // 'MSLP' (MacStash Launchpad)
 
     private init() {
         installHotKeyHandlerIfNeeded()
-        registerHotKey(shortcut: DockyPreferences.shared.launchpadShortcut)
+        registerHotKey(shortcut: SideDockPreferences.shared.launchpadShortcut)
         subscribeToPreferences()
     }
 
@@ -31,15 +31,15 @@ final class LaunchpadHotKeyService {
 
     private func subscribeToPreferences() {
         observeChanges { [weak self] in
-            let shortcut = DockyPreferences.shared.launchpadShortcut
+            let shortcut = SideDockPreferences.shared.launchpadShortcut
             self?.registerHotKey(shortcut: shortcut)
         }
         .store(in: &cancellables)
 
         observeChanges { [weak self] in
-            let isEnabled = DockyPreferences.shared.enablesLaunchpadOverlay
+            let isEnabled = SideDockPreferences.shared.enablesLaunchpadOverlay
             guard let self else { return }
-            self.registerHotKey(shortcut: DockyPreferences.shared.launchpadShortcut)
+            self.registerHotKey(shortcut: SideDockPreferences.shared.launchpadShortcut)
             if !isEnabled {
                 LaunchpadOverlayService.shared.dismiss()
             }
@@ -73,7 +73,7 @@ final class LaunchpadHotKeyService {
             }
 
             Task { @MainActor in
-                guard DockyPreferences.shared.enablesLaunchpadOverlay else {
+                guard SideDockPreferences.shared.enablesLaunchpadOverlay else {
                     return
                 }
                 LaunchpadOverlayService.shared.toggle()
@@ -94,7 +94,7 @@ final class LaunchpadHotKeyService {
     private func registerHotKey(shortcut: KeyboardShortcut) {
         unregisterHotKey()
 
-        guard DockyPreferences.shared.enablesLaunchpadOverlay, shortcut.isValid else {
+        guard SideDockPreferences.shared.enablesLaunchpadOverlay, shortcut.isValid else {
             return
         }
 

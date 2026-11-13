@@ -1,6 +1,6 @@
 //
 //  AppearanceSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -20,7 +20,7 @@ struct AppearanceSettingsView: View {
     let subsection: Subsection
 
     private let dockSettings = DockSettingsService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @State private var isShowingResetConfirmation = false
 
     var body: some View {
@@ -46,7 +46,7 @@ struct AppearanceSettingsView: View {
             isPresented: $isShowingResetConfirmation
         ) {
             Button("Reset Appearance", role: .destructive) {
-                DockyPreferences.shared.resetAppearanceToDefaults()
+                SideDockPreferences.shared.resetAppearanceToDefaults()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -346,7 +346,7 @@ struct AppearanceSettingsView: View {
                     .labelsHidden()
                 }
 
-                Text("Choose whether Docky tile chrome keeps the current rounded corners or uses a full circle or capsule clip.")
+                Text("Choose whether dock tile chrome keeps the current rounded corners or uses a full circle or capsule clip.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -756,7 +756,7 @@ struct AppearanceSettingsView: View {
                     }
                 }
 
-                Text("Override the chrome outline with a solid color. When off, Docky uses its default glass stroke (or no stroke when Glass is disabled).")
+                Text("Override the chrome outline with a solid color. When off, MacStash uses its default glass stroke (or no stroke when Glass is disabled).")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }

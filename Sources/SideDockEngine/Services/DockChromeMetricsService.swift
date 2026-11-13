@@ -1,6 +1,6 @@
 //
 //  DockChromeMetricsService.swift
-//  Docky
+//  MacStash
 //
 //  Live, magnification-aware totals used to size the dock chrome.
 //  `TileContainerView` writes these as a byproduct of the walk it already

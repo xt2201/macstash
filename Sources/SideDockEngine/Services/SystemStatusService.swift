@@ -1,6 +1,6 @@
 //
 //  SystemStatusService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

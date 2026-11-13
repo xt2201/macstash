@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "obsidian-studio",
+  "name": "Obsidian Studio",
+  "author": "MacStash",
+  "version": "1.0.0",
+  "description": "Pro matte-black glass with crisp specular edge and subtle neon accents for creative workspaces.",
+  "appearance": {
+    "disablesGlassLook": false,
+    "tile": {
+      "clipShape": "rounded",
+      "spacing": 5,
+      "verticalPadding": 5
+    },
+    "window": {
+      "clipShape": "rounded",
+      "cornerRadius": 16,
+      "tintOpacity": 0.35,
+      "tintColor": { "name": "black" },
+      "borderWidth": 1,
+      "borderColor": { "r": 1, "g": 1, "b": 1, "opacity": 0.15 }
+    },
+    "indicators": {
+      "shape": "pill",
+      "scale": 0.9,
+      "offset": -3
+    }
+  }
+}

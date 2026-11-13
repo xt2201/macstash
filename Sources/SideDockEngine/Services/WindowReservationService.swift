@@ -1,11 +1,11 @@
 //
 //  WindowReservationService.swift
-//  Docky
+//  MacStash
 //
 //  Watches for app windows that get maximized to a screen's visibleFrame
-//  and shrinks them via the Accessibility API to leave room for Docky.
+//  and shrinks them via the Accessibility API to leave room for MacStash.
 //  The macOS 26 system Dock no longer reserves screen space, so apps think
-//  visibleFrame is theirs to fill. This service makes Docky behave as if
+//  visibleFrame is theirs to fill. This service makes MacStash behave as if
 //  it reserved space — only when the user opts into resizeWindow mode.
 //
 //  Activation gates: maximizedWindowBehavior == .resizeWindow AND
@@ -21,7 +21,7 @@ import Foundation
 final class WindowReservationService {
     static let shared = WindowReservationService()
 
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
     private let permissions = PermissionsService.shared
     private let registry = WindowRegistry.shared
 
@@ -50,7 +50,7 @@ final class WindowReservationService {
         // re-runs the closure on its own changes; the Combine .sink
         // handles the permission side.
         observeChanges { [weak self] in
-            let mode = DockyPreferences.shared.maximizedWindowBehavior
+            let mode = SideDockPreferences.shared.maximizedWindowBehavior
             let status = PermissionsService.shared.accessibility
             self?.updateActivation(mode: mode, status: status)
         }
@@ -59,7 +59,7 @@ final class WindowReservationService {
         permissions.$accessibility
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
-                let mode = DockyPreferences.shared.maximizedWindowBehavior
+                let mode = SideDockPreferences.shared.maximizedWindowBehavior
                 self?.updateActivation(mode: mode, status: status)
             }
             .store(in: &cancellables)
@@ -93,13 +93,13 @@ final class WindowReservationService {
 
     private func scan(windows: [AppWindow]) {
         guard let mainWindow = NSApp.windows.compactMap({ $0 as? MainWindow }).first,
-              let dockyScreen = mainWindow.screen,
-              let dockyFrame = mainWindow.currentReservationFrame,
+              let dockScreen = mainWindow.screen,
+              let dockFrame = mainWindow.currentReservationFrame,
               let primaryScreenHeight = NSScreen.screens.first?.frame.height
         else { return }
 
-        let visibleFrame = dockyScreen.visibleFrame
-        guard let dockySide = side(of: dockyFrame, on: visibleFrame) else { return }
+        let visibleFrame = dockScreen.visibleFrame
+        guard let dockSide = side(of: dockFrame, on: visibleFrame) else { return }
 
         let ownPID = ProcessInfo.processInfo.processIdentifier
         let now = Date()
@@ -117,7 +117,7 @@ final class WindowReservationService {
             // A window that didn't take our last resize stays untouched until
             // its frame changes (e.g. the user maximizes it again). Without
             // this, pushAway would work from the partial result and shrink
-            // the window by Docky's width on every pass.
+            // the window by MacStash's width on every pass.
             if let stuck = stuckFrames[window.id] {
                 if rectsMatch(axFrame, stuck) { continue }
                 stuckFrames[window.id] = nil
@@ -132,18 +132,18 @@ final class WindowReservationService {
             // before any geometry comparison.
             let nsFrame = flipY(axFrame, primaryHeight: primaryScreenHeight)
 
-            // Only act on windows on the same screen as Docky.
-            guard let windowScreen = screenContaining(nsFrame), windowScreen == dockyScreen else { continue }
+            // Only act on windows on the same screen as MacStash.
+            guard let windowScreen = screenContaining(nsFrame), windowScreen == dockScreen else { continue }
 
-            // Tile/maximize signature: window intersects Docky AND is anchored
+            // Tile/maximize signature: window intersects MacStash AND is anchored
             // to ≥2 edges of the visible frame. This catches full maximize (4
             // flush edges), half tiles (3), and quarter tiles (2) without
-            // resizing free-floating windows that happen to overlap Docky.
-            guard nsFrame.intersects(dockyFrame) else { continue }
+            // resizing free-floating windows that happen to overlap MacStash.
+            guard nsFrame.intersects(dockFrame) else { continue }
             guard flushEdgeCount(of: nsFrame, against: visibleFrame) >= 2 else { continue }
 
-            // Push the window off Docky's strip.
-            let nsTarget = pushAway(nsFrame, from: dockyFrame, on: dockySide)
+            // Push the window off MacStash's strip.
+            let nsTarget = pushAway(nsFrame, from: dockFrame, on: dockSide)
             // Don't issue redundant resizes.
             guard !rectsMatch(nsFrame, nsTarget) else { continue }
             // Don't shrink a window that has nothing left in the relevant axis.
@@ -185,8 +185,8 @@ final class WindowReservationService {
         return best?.screen
     }
 
-    /// Identifies which edge of the visible frame Docky is flush against.
-    /// Returns nil when Docky isn't anchored to any edge (corner-floating or
+    /// Identifies which edge of the visible frame MacStash is flush against.
+    /// Returns nil when MacStash isn't anchored to any edge (corner-floating or
     /// inset by more than the edge tolerance), in which case there's no clean
     /// reservation strip to subtract.
     private func side(of dock: CGRect, on visible: CGRect) -> DockSide? {
@@ -218,8 +218,8 @@ final class WindowReservationService {
         return count
     }
 
-    /// Shrinks `frame` so it no longer overlaps Docky, by advancing the side
-    /// of the frame that touches Docky's strip. Other edges are preserved so
+    /// Shrinks `frame` so it no longer overlaps MacStash, by advancing the side
+    /// of the frame that touches MacStash's strip. Other edges are preserved so
     /// half/quarter tiles keep their cross-axis anchoring.
     private func pushAway(_ frame: CGRect, from dock: CGRect, on side: DockSide) -> CGRect {
         var result = frame

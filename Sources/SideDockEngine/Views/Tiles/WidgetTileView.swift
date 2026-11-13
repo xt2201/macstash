@@ -1,6 +1,6 @@
 //
 //  WidgetTileView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI
@@ -21,7 +21,7 @@ struct WidgetTileView: View {
         Group {
             kindView
         }
-        .environment(\.widgetTextScale, DockyPreferences.shared.widgetTextScale)
+        .environment(\.widgetTextScale, SideDockPreferences.shared.widgetTextScale)
     }
 
     @ViewBuilder
@@ -108,8 +108,8 @@ struct WidgetTileView: View {
                 isWithinStack: isWithinStack,
                 isExpanded: isExpanded
             )
-            .dockyGlass(.regular, in: .rect(cornerRadius: cornerRadius))
-            .dockyGlassBorder(in: .rect(cornerRadius: cornerRadius))
+            .sideDockGlass(.regular, in: .rect(cornerRadius: cornerRadius))
+            .sideDockGlassBorder(in: .rect(cornerRadius: cornerRadius))
         case .external(let identifier):
             ExternalWidgetTileView(
                 identifier: identifier,
@@ -120,8 +120,8 @@ struct WidgetTileView: View {
                 isExpandedPreviewOpen: isExpandedPreviewOpen,
                 settings: tile.settings
             )
-            .dockyGlass(.regular, in: .rect(cornerRadius: cornerRadius))
-            .dockyGlassBorder(in: .rect(cornerRadius: cornerRadius))
+            .sideDockGlass(.regular, in: .rect(cornerRadius: cornerRadius))
+            .sideDockGlassBorder(in: .rect(cornerRadius: cornerRadius))
         }
     }
 }

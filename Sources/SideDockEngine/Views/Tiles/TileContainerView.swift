@@ -1,6 +1,6 @@
 //
 //  TileContainerView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI
@@ -10,12 +10,12 @@ import OSLog
 struct TileContainerView: View {
     static let edgePadding: CGFloat = 8
     private let tileMutationAnimation: Animation = .easeInOut(duration: 0.18)
-    private static let logger = Logger(subsystem: "gt.quintero.Docky", category: "TileDrag")
+    private static let logger = Logger(subsystem: "com.macstash.app", category: "TileDrag")
 
     @ObservedObject private var store = TileStore.shared
     private let dockSettings = DockSettingsService.shared
     @ObservedObject private var layout = DockLayoutService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var editMode = DockEditModeService.shared
     @ObservedObject private var dockDrag = DockDragService.shared
     private let magnificationState = TileMagnificationState.shared

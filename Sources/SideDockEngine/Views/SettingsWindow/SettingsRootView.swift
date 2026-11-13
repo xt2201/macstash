@@ -1,6 +1,6 @@
 //
 //  SettingsRootView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI

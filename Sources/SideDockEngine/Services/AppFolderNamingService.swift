@@ -1,6 +1,6 @@
 //
 //  AppFolderNamingService.swift
-//  Docky
+//  MacStash
 //
 
 import Foundation
@@ -16,7 +16,7 @@ private struct AppFolderNameSuggestion {
 }
 #endif
 
-/// Deterministic folder seed name. Available on every macOS Docky supports
+/// Deterministic folder seed name. Available on every macOS MacStash supports
 /// — `AppFolderNamingService` (which wraps the FoundationModels-powered
 /// suggester) is macOS 26+ only, but the seed is needed even on older
 /// systems when a folder is first created.

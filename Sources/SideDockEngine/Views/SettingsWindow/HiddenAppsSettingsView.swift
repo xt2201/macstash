@@ -1,23 +1,23 @@
 //
 //  HiddenAppsSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
 import SwiftUI
 
 struct HiddenAppsSettingsView: View {
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         Form {
             Section("Restore") {
-                Text("Apps hidden with \"Hide in Docky\" stay out of Docky's pinned and running app surfaces until you restore them here.")
+                Text("Apps hidden with \"Hide in Dock\" stay out of MacStash's pinned and running app surfaces until you restore them here.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 if hiddenApps.isEmpty {
-                    Text("No apps are currently hidden from Docky.")
+                    Text("No apps are currently hidden from the dock.")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(hiddenApps) { app in
@@ -31,9 +31,9 @@ struct HiddenAppsSettingsView: View {
     }
 
     private var hiddenApps: [HiddenAppSettingsEntry] {
-        let dockyBundleID = Bundle.main.bundleIdentifier
+        let appBundleID = Bundle.main.bundleIdentifier
         return preferences.hiddenAppBundleIdentifiers
-            .filter { $0 != dockyBundleID }
+            .filter { $0 != appBundleID }
             .compactMap { bundleIdentifier in
             let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
             let displayName = appURL.map { FileManager.default.displayName(atPath: $0.path) } ?? bundleIdentifier
@@ -61,7 +61,7 @@ struct HiddenAppsSettingsView: View {
 private struct HiddenAppRow: View {
     let app: HiddenAppSettingsEntry
 
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -82,8 +82,8 @@ private struct HiddenAppRow: View {
 
             Spacer()
 
-            Button("Show in Docky") {
-                preferences.setAppHiddenInDocky(bundleIdentifier: app.bundleIdentifier, isHidden: false)
+            Button("Show in Dock") {
+                preferences.setAppHiddenInMacStash(bundleIdentifier: app.bundleIdentifier, isHidden: false)
             }
         }
     }

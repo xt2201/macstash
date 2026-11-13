@@ -1,6 +1,6 @@
 //
 //  MenuCatalog.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit

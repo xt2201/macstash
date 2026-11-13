@@ -1,6 +1,6 @@
 //
 //  ProfileTrigger.swift
-//  Docky
+//  MacStash
 //
 //  Per-profile rules that switch the active dock profile automatically
 //  based on system signals. Phase 1: time-of-day, frontmost app, and

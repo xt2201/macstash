@@ -1,6 +1,6 @@
 //
 //  AppTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -16,7 +16,7 @@ struct AppTileView: View {
     /// pass their own padding here, since per-bundle override padding
     /// only applies to real app overrides.
     var iconOverridePaddingFraction: CGFloat? = nil
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @ObservedObject private var workspace = WorkspaceService.shared
     @ObservedObject private var windowRegistry = WindowRegistry.shared
 
@@ -55,7 +55,7 @@ struct AppTileView: View {
                 baseIconView(in: size)
                     .clipShape(Circle())
             }
-            .dockyGlass()
+            .sideDockGlass()
             .padding(transparencyCompensationInset)
         } else {
             baseIconView(in: size)

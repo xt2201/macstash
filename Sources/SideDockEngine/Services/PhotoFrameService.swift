@@ -1,15 +1,15 @@
 //
 //  PhotoFrameService.swift
-//  Docky
+//  MacStash
 //
 //  Backing store for the Photo Frame widget. Owns the user's chosen
 //  photos as an ordered list of file bookmarks (persisted globally in
-//  DockyPreferences), resolves them to URLs, decodes them lazily, and
+//  SideDockPreferences), resolves them to URLs, decodes them lazily, and
 //  publishes the frame the widget should currently show. When more than
 //  one photo is configured it drives a slideshow that cross-fades
 //  between frames on a timer.
 //
-//  Docky is not sandboxed (ENABLE_APP_SANDBOX = NO), so plain file
+//  MacStash is not sandboxed (ENABLE_APP_SANDBOX = NO), so plain file
 //  bookmarks resolve across launches with full read access — no
 //  security-scoped start/stop dance is required. Photos are referenced
 //  in place rather than copied, so moving or deleting a source file
@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Foundation
 import UniformTypeIdentifiers
+import MacStashCore
 
 @MainActor
 final class PhotoFrameService: ObservableObject {
@@ -43,7 +44,7 @@ final class PhotoFrameService: ObservableObject {
     /// hundreds-of-photos selection from pinning every decode in memory.
     private let maxCachedImages = 16
 
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
     private var urls: [URL] = []
     private var imageCache: [Int: NSImage] = [:]
     private var currentIndex = 0
@@ -62,14 +63,14 @@ final class PhotoFrameService: ObservableObject {
     /// reads as "these are my photos now".
     func choosePhotos() {
         let panel = NSOpenPanel()
-        panel.title = String(localized: "Choose Photos")
-        panel.prompt = String(localized: "Choose")
+        panel.title = LocalizationService.shared.localized("Choose Photos")
+        panel.prompt = LocalizationService.shared.localized("Choose")
         panel.allowsMultipleSelection = true
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
         panel.allowedContentTypes = [.image]
 
-        // Docky runs as an accessory app; bring it forward so the panel
+        // MacStash runs as an accessory app; bring it forward so the panel
         // opens in front and can take key focus.
         NSApp.activate(ignoringOtherApps: true)
 

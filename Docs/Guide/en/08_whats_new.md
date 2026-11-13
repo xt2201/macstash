@@ -2,17 +2,17 @@
 
 ## Version 2.18.0 (2026-11-12)
 
-### Complete `SideDockEngine` (Docky) Integration & 18 Unified Widgets
+### Complete `SideDockEngine` Architecture & 18 Unified Widgets
 
-- **Full `SideDockEngine` Architecture**: Upgraded Second Dock to run on the full `SideDockEngine` windowing, magnification, live glass backdrop (`LiveGlassBackdrop`), Start Menu (`MenuCatalog`), Bundled Themes, Launchpad (`Control+Option+L`), Live Window Switcher (`Option+Tab`), Space Reservation, and Interactive Dock Editor engine.
-- **9 Exclusive MacStash Widgets Integrated into Docky**: Added `Clock`, `Pomodoro`, `File Shelf`, `Clipboard History`, `Quick Note`, `Screenshot`, `Color Picker`, `Unit Converter`, and `Bookmarks` directly as native `WidgetKind` items inside Docky's Widget Gallery, Smart Stacks, hover-expansion popovers, and per-tile settings.
-- **Synchronized Now Playing & Unified Settings**: Bridged `NowPlayingManager` live metadata, artwork, and playback commands to Docky's Now Playing widget and embedded Docky's full multi-pane configuration studio directly inside **Settings > Second Dock**.
+- **Full `SideDockEngine` Architecture**: Upgraded Second Dock to run on the full `SideDockEngine` windowing, magnification, live glass backdrop (`LiveGlassBackdrop`), Menu Catalog, Bundled Themes, Launchpad (`Control+Option+L`), Live Window Switcher (`Option+Tab`), Space Reservation, and Interactive Dock Editor engine.
+- **18 Exclusive MacStash Widgets Unified**: Integrated `Clock`, `Pomodoro`, `File Shelf`, `Clipboard History`, `Quick Note`, `Screenshot`, `Color Picker`, `Unit Converter`, `Bookmarks`, `Weather`, `Batteries`, `System Stats`, `Photo Frame`, `Search`, `Calendar`, and `Now Playing` directly as native `WidgetKind` items across the Widget Gallery, Smart Stacks, hover-expansion popovers, and per-tile settings.
+- **Synchronized Now Playing & Unified Settings**: Bridged `NowPlayingManager` live metadata, artwork, and playback commands to the Second Dock's Now Playing widget and unified all configuration directly inside **Settings > Second Dock**.
 
 ---
 
 ## Version 2.17.0 (2026-11-12)
 
-### Next-Gen Second Dock: Docky-Parity Overhaul
+### Next-Gen Second Dock: Fluid ProMotion Overhaul
 
 - **Parabolic Magnification, Floating Pill Tooltips & Direct Drag-and-Drop**: Hovering across pinned apps or running apps produces a smooth 120Hz cosine magnification wave with directional edge lift, instant floating glass tooltips, launch bounce animations, Trash drop-to-recycle, Minimized Windows restore tiles, and direct on-dock drag reordering or Finder drop-to-pin.
 - **Smart Stacks, App Groups & Live App Widget Faces**: Stack multiple widgets into a single tile with two-finger scroll cycling (`SmartStackItem`), bundle apps into 2x2 `AppFolderItem` groups with combined notification badges, and flip supported app icons (Calendar, Weather, Music, Spotify, Clock, Reminders, Activity Monitor) into live widget faces.

@@ -1,6 +1,6 @@
 //
 //  ShortcutRecorderControl.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI

@@ -1,6 +1,6 @@
 //
 //  DockEditorHintWindowController.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -15,7 +15,7 @@ final class DockEditorHintWindowController: NSWindowController {
     private let animationDuration: TimeInterval = 0.16
     private let chipGap: CGFloat = 10
     private let initialDelay: TimeInterval = 1.2
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
     private let dockSettings = DockSettingsService.shared
     private let editMode = DockEditModeService.shared
     private let hostingController: NSHostingController<DockEditorHintChipView>
@@ -82,7 +82,7 @@ final class DockEditorHintWindowController: NSWindowController {
 
     private func observeSpaceBehavior() {
         observeChanges { [weak self] in
-            let behavior = DockyPreferences.shared.windowSpaceBehavior
+            let behavior = SideDockPreferences.shared.windowSpaceBehavior
             self?.window?.collectionBehavior = behavior.collectionBehavior(includesFullScreenAuxiliary: true)
         }
         .store(in: &cancellables)

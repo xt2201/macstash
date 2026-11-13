@@ -1,6 +1,6 @@
 //
 //  WidgetTextSizePreview.swift
-//  Docky
+//  MacStash
 //
 //  Live preview of the widgets inside the Settings window, so the widget
 //  text size can be judged even while the dock is hidden. Renders a real
@@ -14,7 +14,7 @@ import SwiftUI
 struct WidgetTextSizePreview: View {
     static let baseTileSize: CGFloat = 80
 
-    private var preferences = DockyPreferences.shared
+    private var preferences = SideDockPreferences.shared
     @State private var span: TileSpan = .three
 
     var body: some View {

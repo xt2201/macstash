@@ -1,6 +1,6 @@
 //
 //  StartMenuOverlayWindowController.swift
-//  Docky
+//  MacStash
 //
 //  Prototype controller. Hosts a borderless `.nonactivatingPanel`
 //  attached to the dock via `addChildWindow(_:ordered:)`. The two
@@ -10,7 +10,7 @@
 //      screen change, manual setFrame), does the child follow without
 //      us wiring our own move/resize observers?
 //   2. Focus — can a `.nonactivatingPanel` child become key for its
-//      SwiftUI TextField without pulling Docky to the foreground?
+//      SwiftUI TextField without pulling MacStash to the foreground?
 //      (Spotlight's pattern.)
 //
 
@@ -141,7 +141,7 @@ final class StartMenuOverlayWindowController: NSWindowController {
         guard let panel = window, let main = mainWindow,
               let screen = main.screen ?? NSScreen.main else { return }
         let visible = screen.visibleFrame
-        let position = DockyPreferences.shared.windowPosition
+        let position = SideDockPreferences.shared.windowPosition
             .resolved(systemOrientation: DockSettingsService.shared.orientation)
 
         // Anchor against the visible chrome rect when available; fall
@@ -203,7 +203,7 @@ final class StartMenuOverlayWindowController: NSWindowController {
     }
 
     /// Click-outside-to-dismiss. Local monitor fires when the click
-    /// lands in any Docky window (including the dock itself); global
+    /// lands in any dock window (including the dock itself); global
     /// fires for every other app. The hit test against the panel
     /// frame in screen coords keeps clicks inside the start menu
     /// from dismissing it.
@@ -305,7 +305,7 @@ private final class StartMenuPanel: NSPanel {
 
     /// `.nonactivatingPanel` + `canBecomeKey == true` is the Spotlight
     /// pattern: the panel can take keyboard focus (so the SwiftUI
-    /// TextField actually receives input) without bringing Docky to
+    /// TextField actually receives input) without bringing MacStash to
     /// the foreground.
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
@@ -316,7 +316,7 @@ private struct StartMenuView: View {
     @ObservedObject private var launchpad = LaunchpadOverlayService.shared
     @ObservedObject private var recentApps = RecentAppsService.shared
     @ObservedObject private var service = StartMenuService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @State private var query = ""
     @FocusState private var searchFocused: Bool
 
@@ -447,12 +447,12 @@ private struct StartMenuView: View {
             // tracks any tint color or opacity the user picks for the
             // dock chrome.
             Color.clear
-                .dockyGlass(in: shape)
+                .sideDockGlass(in: shape)
                 .overlay {
                     shape.fill(Color(nsColor: preferences.effectiveWindowTintColor))
                         .opacity(preferences.effectiveWindowTintOpacity)
                 }
-                .dockyGlassBorder(in: shape)
+                .sideDockGlassBorder(in: shape)
 
             VStack(spacing: 0) {
                 searchField
@@ -479,12 +479,12 @@ private struct StartMenuView: View {
         let shape = RoundedRectangle(cornerRadius: 12, style: .continuous)
         return ZStack {
             Color.clear
-                .dockyGlass(in: shape)
+                .sideDockGlass(in: shape)
                 .overlay {
                     shape.fill(Color(nsColor: preferences.effectiveWindowTintColor))
                         .opacity(preferences.effectiveWindowTintOpacity)
                 }
-                .dockyGlassBorder(in: shape)
+                .sideDockGlassBorder(in: shape)
 
             allAppsSidePanel
         }
@@ -752,7 +752,7 @@ private struct StartMenuView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .help("Docky Settings")
+            .help("Second Dock Settings")
 
             Menu {
                 Button(SystemAction.sleep.title) { SystemAction.sleep.perform() }

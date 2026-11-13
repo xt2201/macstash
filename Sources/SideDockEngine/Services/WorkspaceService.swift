@@ -1,7 +1,7 @@
 import os.log
 //
 //  WorkspaceService.swift
-//  Docky
+//  MacStash
 //
 //  Observes NSWorkspace for live workspace state. First pass: running apps
 //  (regular activation policy only, background agents and menu-bar-only
@@ -186,7 +186,7 @@ final class WorkspaceService: ObservableObject {
         runningApp: NSRunningApplication,
         visibleWindows: [AppWindow]
     ) {
-        let resolved = DockyPreferences.shared.appTileFrontmostClickBehavior
+        let resolved = SideDockPreferences.shared.appTileFrontmostClickBehavior
 
         switch resolved {
         case .none:
@@ -224,7 +224,7 @@ final class WorkspaceService: ObservableObject {
                 return
             }
 
-            sideDockEngineLogger.debug("SideDockEngine event")
+            sideDockEngineLogger.debug("SideDockEngine open error: \(error.localizedDescription)")
         }
     }
 
@@ -608,14 +608,14 @@ final class WorkspaceService: ObservableObject {
     }
 
     func refresh() {
-        // Docky is invisible to itself: filtering at this source removes
+        // MacStash is invisible to itself: filtering at this source removes
         // it from every downstream surface (dock tiles, settings pickers,
         // grouped running apps in folders, etc.) without needing per-site
         // exclusions. Matched by bundle ID so debug launches from Xcode
         // are filtered too.
-        let dockyBundleID = Bundle.main.bundleIdentifier
+        let appBundleID = Bundle.main.bundleIdentifier
         let regular = NSWorkspace.shared.runningApplications.filter {
-            $0.activationPolicy == .regular && $0.bundleIdentifier != dockyBundleID
+            $0.activationPolicy == .regular && $0.bundleIdentifier != appBundleID
         }
         var newMap: [String: RunningApp] = [:]
         for app in regular {
@@ -687,7 +687,7 @@ final class WorkspaceService: ObservableObject {
         observers.append(frontmostToken)
 
         // Seed once so the first render after launch already reflects
-        // whichever app was foreground when Docky came up.
+        // whichever app was foreground when MacStash came up.
         updateFrontmost(NSWorkspace.shared.frontmostApplication)
     }
 
@@ -1207,7 +1207,7 @@ final class WorkspaceService: ObservableObject {
                 }
 
                 guard let content else {
-                    continuation.resume(throwing: NSError(domain: "Docky.WindowPreview", code: -2, userInfo: nil))
+                    continuation.resume(throwing: NSError(domain: "MacStash.WindowPreview", code: -2, userInfo: nil))
                     return
                 }
 
@@ -1275,7 +1275,7 @@ final class WorkspaceService: ObservableObject {
                 }
 
                 guard let image else {
-                    continuation.resume(throwing: NSError(domain: "Docky.WindowPreview", code: -1, userInfo: nil))
+                    continuation.resume(throwing: NSError(domain: "MacStash.WindowPreview", code: -1, userInfo: nil))
                     return
                 }
 
@@ -1333,7 +1333,7 @@ private final class ShareableContentCache {
 
 private final class LiveWindowPreviewSession: NSObject, SCStreamOutput {
     private let stream: SCStream
-    private let outputQueue = DispatchQueue(label: "Docky.LiveWindowPreview", qos: .userInteractive)
+    private let outputQueue = DispatchQueue(label: "MacStash.LiveWindowPreview", qos: .userInteractive)
     private let ciContext = CIContext(options: nil)
     private let onFrame: @MainActor (NSImage?) -> Void
     private var isStopped = false

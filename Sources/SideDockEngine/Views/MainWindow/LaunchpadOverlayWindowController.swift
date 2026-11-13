@@ -1,6 +1,6 @@
 //
 //  LaunchpadOverlayWindowController.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -12,7 +12,7 @@ final class LaunchpadOverlayWindowController: NSWindowController {
     private var cancellables: Set<AnyCancellable> = []
     private var isInterruptingMainWindow = false
     private let animationDuration: TimeInterval = 0.18
-    private let preferences = DockyPreferences.shared
+    private let preferences = SideDockPreferences.shared
     /// The screen the launchpad is currently anchored to. Resolved at present
     /// time from the cursor location so the overlay always opens on the
     /// display the user is looking at.
@@ -35,8 +35,8 @@ final class LaunchpadOverlayWindowController: NSWindowController {
     }
 
     /// Cmd+Tab (and any other path that puts another app frontmost) takes
-    /// focus away from Docky, so the launchpad — which presented itself by
-    /// activating Docky — should dismiss to match the user's intent.
+    /// focus away from MacStash, so the launchpad — which presented itself by
+    /// activating MacStash — should dismiss to match the user's intent.
     private func observeAppActivation() {
         NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)
             .receive(on: DispatchQueue.main)
@@ -125,7 +125,7 @@ final class LaunchpadOverlayWindowController: NSWindowController {
 
     private func observeSpaceBehavior() {
         observeChanges { [weak self] in
-            let behavior = DockyPreferences.shared.windowSpaceBehavior
+            let behavior = SideDockPreferences.shared.windowSpaceBehavior
             self?.window?.collectionBehavior = behavior.collectionBehavior(includesFullScreenAuxiliary: true)
         }
         .store(in: &cancellables)
@@ -246,7 +246,7 @@ private struct LaunchpadCellFramePreference: PreferenceKey {
 
 private struct LaunchpadOverlayView: View {
     @ObservedObject private var overlay = LaunchpadOverlayService.shared
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @State private var searchText = ""
     @State private var selectedEntryID: String?
     @State private var visiblePageID: String?
@@ -904,7 +904,7 @@ private struct LaunchpadOverlayView: View {
     @ViewBuilder
     private func appContextMenu(for app: AppTile) -> some View {
         let isPinned = TileStore.shared.isPinned(bundleIdentifier: app.bundleIdentifier)
-        Button(isPinned ? "Remove from Docky" : "Add to Docky") {
+        Button(isPinned ? "Remove from Dock" : "Add to Dock") {
             _ = TileStore.shared.setPinnedApp(
                 bundleIdentifier: app.bundleIdentifier,
                 pinned: !isPinned
@@ -1436,13 +1436,13 @@ private struct LaunchpadOverlayView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .dockyGlass(in: Capsule())
+        .sideDockGlass(in: Capsule())
     }
 
     private func handleKeyDown(_ event: NSEvent, columnCount: Int, rowCount: Int) -> Bool {
         // The overlay's hosting view stays alive for the app's lifetime, so this
         // local monitor keeps firing while the overlay is hidden. Without the
-        // guard, Enter while Docky is frontmost for any other reason (NSAlert,
+        // guard, Enter while MacStash is frontmost for any other reason (NSAlert,
         // settings, permissions, Cmd-Tab back) launches the first launchpad app.
         guard overlay.isPresented, event.type == .keyDown else { return false }
 
@@ -1578,7 +1578,7 @@ private struct LaunchpadAppCard: View {
     /// can be larger than the icon (extra width becomes horizontal padding
     /// around the icon).
     let iconSide: CGFloat
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     var body: some View {
         VStack(spacing: cellSpacing) {
@@ -1680,7 +1680,7 @@ private struct LaunchpadFolderCard: View {
     /// drawn size as app tiles in the launchpad grid, regardless of how
     /// much horizontal padding the square cell adds.
     let tileSide: CGFloat
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
 
     private static let gridDimension = 3
 
@@ -1728,8 +1728,8 @@ private struct LaunchpadFolderCard: View {
 
         return ZStack {
             Color.clear
-                .dockyGlass(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                .dockyGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .sideDockGlass(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .sideDockGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 
             // LazyVGrid fills row-major from top-leading and stops at the
             // last app, so partially filled grids leave the trailing rows
@@ -2034,7 +2034,7 @@ private struct ExpandedFolderOverlay: View {
                     )
                     .contextMenu {
                         let isPinned = TileStore.shared.isPinned(bundleIdentifier: app.bundleIdentifier)
-                        Button(isPinned ? "Remove from Docky" : "Add to Docky") {
+                        Button(isPinned ? "Remove from Dock" : "Add to Dock") {
                             _ = TileStore.shared.setPinnedApp(
                                 bundleIdentifier: app.bundleIdentifier,
                                 pinned: !isPinned

@@ -31,7 +31,7 @@ public final class SideDockManager: ObservableObject {
             self?.onOpenSettings?()
         }
         SideDockEngineCoordinator.shared.start(initiallyVisible: self.config.isDockVisible)
-        Self.logger.info("SideDockManager initialized (Docky Engine, visible: \(self.config.isDockVisible))")
+        Self.logger.info("SideDockManager initialized (SideDock Engine, visible: \(self.config.isDockVisible))")
     }
 
     public var activeProfile: DockProfile {
@@ -41,7 +41,7 @@ public final class SideDockManager: ObservableObject {
         return configStore.activeProfile()
     }
 
-    // MARK: - Core Actions Bridging to Docky SideDockEngine
+    // MARK: - Core Actions Bridging to SideDockEngine
 
     public func toggleDock() {
         setDockVisible(!config.isDockVisible)
@@ -76,11 +76,17 @@ public final class SideDockManager: ObservableObject {
     }
 
     public func updateDockLayout() {
-        // Docky's MainWindowController & TileStore reactively manage layout via @Observable.
+        // MainWindowController & TileStore reactively manage layout via @Observable.
     }
 
     public func resetLayout() {
+        configStore.resetLayout()
+        self.config = configStore.config
         SideDockEngineCoordinator.shared.resetLayoutToDefaults()
+    }
+
+    public func resetLayoutToDefaults() {
+        resetLayout()
     }
 
     public func openFullSettingsWindow() {

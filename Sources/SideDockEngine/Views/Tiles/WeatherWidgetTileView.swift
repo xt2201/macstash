@@ -1,6 +1,6 @@
 //
 //  WeatherWidgetTileView.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -162,7 +162,7 @@ private struct WeatherWidgetContentView: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-                .dockyGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .sideDockGlassBorder(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 
                 if !isWithinStack {
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)

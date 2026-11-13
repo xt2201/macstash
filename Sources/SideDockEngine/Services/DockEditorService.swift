@@ -1,6 +1,6 @@
 //
 //  DockEditorService.swift
-//  Docky
+//  MacStash
 //
 
 import AppKit
@@ -56,7 +56,7 @@ final class DockEditorService {
         }
 
         restartDock()
-        TileStore.shared.refreshAfterDockyEditedSystemDock()
+        TileStore.shared.refreshAfterMacStashEditedSystemDock()
         return true
     }
 
@@ -90,7 +90,7 @@ final class DockEditorService {
         }
 
         restartDock()
-        TileStore.shared.refreshAfterDockyEditedSystemDock()
+        TileStore.shared.refreshAfterMacStashEditedSystemDock()
         return true
     }
 

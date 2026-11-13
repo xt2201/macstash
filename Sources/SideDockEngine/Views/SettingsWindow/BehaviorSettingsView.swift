@@ -1,6 +1,6 @@
 //
 //  BehaviorSettingsView.swift
-//  Docky
+//  MacStash
 //
 
 import SwiftUI
@@ -19,7 +19,7 @@ struct BehaviorSettingsView: View {
 
     let subsection: Subsection
 
-    @Bindable private var preferences = DockyPreferences.shared
+    @Bindable private var preferences = SideDockPreferences.shared
     @State private var isShowingResetConfirmation = false
 
     var body: some View {
@@ -49,7 +49,7 @@ struct BehaviorSettingsView: View {
             isPresented: $isShowingResetConfirmation
         ) {
             Button("Reset Behavior", role: .destructive) {
-                DockyPreferences.shared.resetBehaviorToDefaults()
+                SideDockPreferences.shared.resetBehaviorToDefaults()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -98,7 +98,7 @@ struct BehaviorSettingsView: View {
                     .labelsHidden()
                 }
 
-                Text("Choose where Docky sits on screen, or mirror the macOS Dock position.")
+                Text("Choose where MacStash sits on screen, or mirror the macOS Dock position.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -120,7 +120,7 @@ struct BehaviorSettingsView: View {
                     .labelsHidden()
                 }
 
-                Text("Docky uses a single main window. Choose whether it stays on the primary display or follows the display containing the pointer.")
+                Text("MacStash uses a single main window. Choose whether it stays on the primary display or follows the display containing the pointer.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -142,7 +142,7 @@ struct BehaviorSettingsView: View {
                     .labelsHidden()
                 }
 
-                Text("Choose whether Docky appears only in the active Space or joins every Space, including fullscreen auxiliary presentation.")
+                Text("Choose whether MacStash appears only in the active Space or joins every Space, including fullscreen auxiliary presentation.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -157,7 +157,7 @@ struct BehaviorSettingsView: View {
                 Toggle("Autohide Window", isOn: $preferences.autohidesWindow)
                     .font(.headline)
 
-                Text("Slides Docky's window off-screen until the pointer reaches its edge. Hide timing is controlled by Docky's own delay below, so hiding the system Dock does not stretch it.")
+                Text("Slides MacStash's window off-screen until the pointer reaches its edge. Hide timing is controlled by MacStash's own delay below, so hiding the system Dock does not stretch it.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -178,7 +178,7 @@ struct BehaviorSettingsView: View {
                         .frame(width: 56, alignment: .trailing)
                 }
 
-                Text("Controls how long Docky waits after the pointer leaves and interactions end before the window hides.")
+                Text("Controls how long MacStash waits after the pointer leaves and interactions end before the window hides.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -200,7 +200,7 @@ struct BehaviorSettingsView: View {
                         .frame(width: 56, alignment: .trailing)
                 }
 
-                Text("How long the slide takes when Docky shows or hides its window. Set to 0 to snap instantly.")
+                Text("How long the slide takes when MacStash shows or hides its window. Set to 0 to snap instantly.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -211,7 +211,7 @@ struct BehaviorSettingsView: View {
                 Toggle("Hide in Fullscreen", isOn: $preferences.hidesDuringFullscreen)
                     .font(.headline)
 
-                Text("When turned off, Docky stays pinned over fullscreen apps. When on, Docky autohides while a fullscreen app is on its display and reveals on edge dwell.")
+                Text("When turned off, MacStash stays pinned over fullscreen apps. When on, MacStash autohides while a fullscreen app is on its display and reveals on edge dwell.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -232,7 +232,7 @@ struct BehaviorSettingsView: View {
                         .frame(width: 56, alignment: .trailing)
                 }
 
-                Text("How long the pointer must dwell at the screen edge before Docky reveals while a fullscreen app is active. Mirrors the macOS Dock's intent gating.")
+                Text("How long the pointer must dwell at the screen edge before MacStash reveals while a fullscreen app is active. Mirrors the macOS Dock's intent gating.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -277,7 +277,7 @@ struct BehaviorSettingsView: View {
                     .labelsHidden()
                 }
 
-                Text("Choose whether Docky shrinks to fit the screen or keeps its size and scrolls when it runs out of room on the current dock axis.")
+                Text("Choose whether MacStash shrinks to fit the screen or keeps its size and scrolls when it runs out of room on the current dock axis.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -299,7 +299,7 @@ struct BehaviorSettingsView: View {
                     .labelsHidden()
                 }
 
-                Text("Choose whether Docky hugs its tiles or stretches across the full screen width or height of the current dock axis.")
+                Text("Choose whether MacStash hugs its tiles or stretches across the full screen width or height of the current dock axis.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -320,7 +320,7 @@ struct BehaviorSettingsView: View {
                 Toggle("Show Running Apps", isOn: $preferences.showsRunningApps)
                     .font(.headline)
 
-                Text("When turned off, unpinned running apps are hidden from Docky so it acts as a static shelf alongside the system Dock.")
+                Text("When turned off, unpinned running apps are hidden from the dock so it acts as a static shelf alongside the system Dock.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -421,7 +421,7 @@ struct BehaviorSettingsView: View {
                 Toggle("Show Minimized Windows", isOn: $preferences.showsMinimizedWindows)
                     .font(.headline)
 
-                Text("When turned off, minimized window tiles do not appear in Docky's trailing section.")
+                Text("When turned off, minimized window tiles do not appear in MacStash's trailing section.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -529,7 +529,7 @@ struct BehaviorSettingsView: View {
                 Toggle("Open at Login", isOn: $preferences.opensAtLogin)
                     .font(.headline)
 
-                Text("Registers Docky as a login item so it starts automatically after you sign in.")
+                Text("Registers MacStash as a login item so it starts automatically after you sign in.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -544,7 +544,7 @@ struct BehaviorSettingsView: View {
                 Toggle("Hide System Dock", isOn: $preferences.hidesSystemDock)
                     .font(.headline)
 
-                Text("Forces the macOS Dock to autohide with a long delay, disables bouncing and launch animations, and keeps the system Dock aligned with Docky's explicit edge selection while this stays on. Docky snapshots your current Dock settings first and restores them when you turn this off or quit Docky. This no longer affects Docky's own autohide delay.")
+                Text("Forces the macOS Dock to autohide with a long delay, disables bouncing and launch animations, and keeps the system Dock aligned with MacStash's explicit edge selection while this stays on. MacStash snapshots your current Dock settings first and restores them when you turn this off or quit MacStash. This no longer affects MacStash's own autohide delay.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 

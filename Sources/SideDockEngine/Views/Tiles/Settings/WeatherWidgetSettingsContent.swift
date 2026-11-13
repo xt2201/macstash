@@ -1,6 +1,6 @@
 //
 //  WeatherWidgetSettingsContent.swift
-//  Docky
+//  MacStash
 //
 
 import CoreLocation

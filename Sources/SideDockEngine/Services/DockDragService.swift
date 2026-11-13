@@ -1,6 +1,6 @@
 //
 //  DockDragService.swift
-//  Docky
+//  MacStash
 //
 //  Single source of truth for external drag-and-drop into the dock.
 //  The NSView-side dragging destination writes drag kind + cursor location.

@@ -1,9 +1,9 @@
 //
 //  FeatureGate.swift
-//  Docky
+//  MacStash
 //
 //  Centralizes "is this OS-gated feature available?" checks. Each
-//  `DockyFeature` declares its minimum macOS version; `FeatureGate`
+//  `MacStashFeature` declares its minimum macOS version; `FeatureGate`
 //  compares against either the running OS or, in DEBUG builds, a
 //  user-supplied "preferred" version so we can see how the app looks
 //  on an older macOS without booting one — e.g. running on macOS 26
@@ -27,17 +27,17 @@
 //
 //  Setting the simulated version from a shell:
 //
-//      defaults write gt.quintero.Docky DebugPreferredOSVersion 13.5
-//      # then relaunch Docky to re-evaluate
+//      defaults write com.macstash.app DebugPreferredOSVersion 13.5
+//      # then relaunch MacStash to re-evaluate
 //
 //  Clearing it:
 //
-//      defaults delete gt.quintero.Docky DebugPreferredOSVersion
+//      defaults delete com.macstash.app DebugPreferredOSVersion
 //
 
 import Foundation
 
-enum DockyFeature: String, CaseIterable, Codable {
+enum SideDockFeature: String, CaseIterable, Codable {
     // MARK: macOS 26+
     /// SwiftUI `.glassEffect(...)` Liquid Glass material.
     case liquidGlass
@@ -105,7 +105,7 @@ final class FeatureGate {
 
     /// True iff the simulated version (or, lacking one, the running OS)
     /// is at least the feature's `minimumMacOSVersion`.
-    func isAvailable(_ feature: DockyFeature) -> Bool {
+    func isAvailable(_ feature: SideDockFeature) -> Bool {
         let target = effectiveOSVersion()
         return Self.compare(target, feature.minimumMacOSVersion) != .orderedAscending
     }
